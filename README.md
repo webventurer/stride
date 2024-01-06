@@ -36,6 +36,11 @@ FULL_NAME="$(getent passwd $USER | cut -d : -f 5 | cut -d , -f 1)"
 sed -i'' -e "s,<COPYRIGHT HOLDER>,$FULL_NAME," LICENSE
 ```
 
+If you're on OS X use:
+```sh
+FULL_NAME="$(bin/osx/getent-passwd.sh $USER | cut -d : -f 5 | cut -d , -f 1)"
+```
+
 ## Run the tests locally
 
 You need to get everything installed, and that first test running. Start by creating a virtual environment:
