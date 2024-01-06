@@ -11,7 +11,7 @@ You'll need to rename the package from "mylib" to something sensible:
 
 ```sh
 git mv mylib newname
-sed -i'' -e 's/mylib/newname/' tests/* .projections.json
+sed -i '' -e 's/mylib/newname/' tests/* .projections.json
 ```
 
 ## Choosing the Python version
@@ -31,9 +31,9 @@ The open source MIT license is used by default (see the `LICENSE` file). [Is it 
 If it is, don't forget to set the year and the name of the copyright holder:
 
 ```sh
-sed -i'' -e "s,<YEAR>,$(date +%Y)," LICENSE
+sed -i '' -e "s,<YEAR>,$(date +%Y)," LICENSE
 FULL_NAME="$(getent passwd $USER | cut -d : -f 5 | cut -d , -f 1)"
-sed -i'' -e "s,<COPYRIGHT HOLDER>,$FULL_NAME," LICENSE
+sed -i '' -e "s,<COPYRIGHT HOLDER>,$FULL_NAME," LICENSE
 ```
 
 If you're on OS X use:
