@@ -41,7 +41,7 @@ If you're on OS X use:
 FULL_NAME="$(bin/osx/getent-passwd.sh $USER | cut -d : -f 5 | cut -d , -f 1)"
 ```
 
-## Run the tests locally
+## Install packages
 
 You need to get everything installed, and that first test running. Start by creating a virtual environment:
 
@@ -55,14 +55,13 @@ Now we can install our development tools:
 ```sh
 pip install --upgrade pip
 pip install pip-tools
-pip-sync dev-requirements.txt
+make install
 ```
 
-Once you've got non-development dependencies you can specify them in `requirements.in`, running these commands to install them alongside your development dependencies:
+As you add new development or production dependencies (or both), you can run this command to install them:
 
 ```sh
-pip-compile requirements.in
-pip-sync requirements.txt dev-requirements.txt
+make compile && make sync
 ```
 
 ## Update the README
