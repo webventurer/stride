@@ -1,5 +1,4 @@
-Python Project Template
-=======================
+# Python Project Template
 
 You can use this repository as a template when creating a new repository on GitHub, to get my preferred setup for a Python project.
 
@@ -37,6 +36,7 @@ sed -i '' -e "s,<COPYRIGHT HOLDER>,$FULL_NAME," LICENSE
 ```
 
 If you're on OS X use:
+
 ```sh
 FULL_NAME="$(bin/osx/getent-passwd.sh $USER | cut -d : -f 5 | cut -d , -f 1)"
 ```
@@ -62,6 +62,14 @@ As you add new development or production dependencies (or both), you can run thi
 
 ```sh
 make compile && make sync
+```
+
+## Run a linter & format your code on check in
+
+Ruff is a standalone package which runs a linter and a formatter over your code, replacing the need for Black, isort or flake8. Althoug you can add the Ruff extension to your VSCode (editor), you can also add it to your .pre-commit-config.yaml to check your code on a git commit.
+
+```sh
+pre-commit install
 ```
 
 ## Update the README
