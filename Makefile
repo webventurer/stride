@@ -26,3 +26,7 @@ format:
 .PHONY: types
 types:
 	mypy .
+
+.PHONY: test
+test:
+	sh -c 'pytest tests || ([ $$? = 5 ] && exit 0 || exit $$?)'
