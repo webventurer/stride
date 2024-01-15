@@ -1,0 +1,8 @@
+{
+  "reportIncompatibleMethodOverride": "error",
+  "reportMissingParameterType": "none",
+  "reportMissingTypeStubs": "none",
+  "typeCheckingMode": "basic",
+  "venv": ".venv",
+  "venvPath": "."
+}

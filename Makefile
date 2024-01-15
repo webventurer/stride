@@ -25,7 +25,7 @@ format:
 
 .PHONY: types
 types:
-	mypy .
+	pyright .
 
 .PHONY: test
 test:
