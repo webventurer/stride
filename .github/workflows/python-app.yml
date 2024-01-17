@@ -15,7 +15,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    env:
+      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/mylib
     steps:
       - uses: actions/checkout@v4
       - name: Install Python

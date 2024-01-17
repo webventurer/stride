@@ -10,7 +10,7 @@ You'll need to rename the package from "mylib" to something sensible:
 
 ```sh
 git mv mylib newname
-sed -i '' -e 's/mylib/newname/' tests/* .projections.json
+sed -i '' -e 's/mylib/newname/' tests/* .projections.json .github/workflows/python-app.yml
 ```
 
 ## Choosing the Python version
