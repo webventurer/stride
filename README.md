@@ -76,8 +76,8 @@ pre-commit install
 
 Make sure you install
 
--   ruff
--   pylance
+- ruff
+- pylance
 
 Note: Pylance incorporates the Pyright type checker so you only need to install Pylance. When Pylance is installed, the Pyright extension will disable itself.
 
