@@ -1,3 +1,5 @@
+.PHONY: install compile sync update default lint format types test
+
 install:
 	@pip install \
 	-r requirements.txt \
@@ -11,26 +13,20 @@ compile:
 sync:
 	@pip-sync requirements*.txt
 
-.PHONY: update
 update:
 	make compile && make sync
 
 
-.PHONY: default
 check: lint format types
 
-.PHONY: lint
 lint:
 	ruff check --show-source .
 
-.PHONY: format
 format:
 	ruff format --check .
 
-.PHONY: types
 types:
 	pyright .
 
-.PHONY: test
 test:
 	sh -c 'pytest tests || ([ $$? = 5 ] && exit 0 || exit $$?)'
