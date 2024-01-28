@@ -11,6 +11,10 @@ compile:
 sync:
 	@pip-sync requirements*.txt
 
+.PHONY: update
+update:
+	make compile && make sync
+
 
 .PHONY: default
 check: lint format types
