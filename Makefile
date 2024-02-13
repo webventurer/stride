@@ -20,7 +20,7 @@ update:
 check: lint format types
 
 lint:
-	ruff check --show-source .
+	ruff check --output-format=full .
 
 format:
 	ruff format --check .
