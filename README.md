@@ -4,13 +4,33 @@ You can use this repository as a template when creating a new repository on GitH
 
 After creating the new project, there are a few things you'll need to configure.
 
+## Install brew (if you haven't already)
+
+```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Or install using the .pkg installer from [here](https://github.com/Homebrew/brew/releases/).
+
+[1] https://brew.sh
+
+## Install direnv
+
+Load/unload environment variables from your .envrc. In this case we use it to set the $PYTHONPATH without resorting to sys.path.insert hacks.
+
+```sh
+brew install direnv
+```
+
+[1] https://formulae.brew.sh/formula/direnv
+
 ## Rename the main package
 
 You'll need to rename the package from "mylib" to something sensible:
 
 ```sh
 git mv mylib newname
-sed -i '' -e 's/mylib/newname/' tests/* .projections.json .github/workflows/python-app.yml
+sed -i '' -e 's/mylib/newname/' tests/* .projections.json .github/workflows/python-app.yml .envrc
 ```
 
 ## Choosing the Python version
