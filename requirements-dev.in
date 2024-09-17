@@ -1,3 +1,4 @@
+pyright
 pre-commit
 mypy
 pytest
