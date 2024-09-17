@@ -20,7 +20,7 @@ update:
 check: lint format types
 
 lint:
-	ruff check --output-format=full .
+	ruff check --output-format=grouped .
 
 format:
 	ruff format --check .
