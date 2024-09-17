@@ -1,8 +1,15 @@
 {
+  "reportGeneralTypeIssues": "none",
+  "reportArgumentType": "none",
+  "reportAttributeAccessIssue": "none",
+  "reportIndexIssue": "none",
   "reportIncompatibleMethodOverride": "error",
   "reportMissingParameterType": "none",
   "reportMissingTypeStubs": "none",
   "typeCheckingMode": "basic",
   "venv": ".venv",
-  "venvPath": "."
+  "venvPath": ".",
+  "extraPaths": [
+    "./mylib"
+  ],
 }
