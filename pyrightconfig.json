@@ -11,5 +11,5 @@
   "venvPath": ".",
   "extraPaths": [
     "./mylib"
-  ],
+  ]
 }
