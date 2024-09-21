@@ -1,15 +1,14 @@
 {
-  "reportGeneralTypeIssues": "none",
-  "reportArgumentType": "none",
-  "reportAttributeAccessIssue": "none",
-  "reportIndexIssue": "none",
-  "reportIncompatibleMethodOverride": "error",
-  "reportMissingParameterType": "none",
-  "reportMissingTypeStubs": "none",
-  "typeCheckingMode": "basic",
-  "venv": ".venv",
-  "venvPath": ".",
+  "reportMissingParameterType": "error",
+  "reportPropertyTypeMismatch": "error",
+  "reportUnnecessaryComparison": "error",
+  "typeCheckingMode": "standard",
+  "include": [
+    "."
+  ],
   "extraPaths": [
     "./mylib"
-  ]
+  ],
+  "venv": ".venv",
+  "venvPath": "."
 }
