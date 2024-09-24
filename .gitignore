@@ -1,5 +1,7 @@
 # Code
-.vscode
+.vscode/*
+!.vscode/tasks.json
+
 temp
 
 # OSX
