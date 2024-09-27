@@ -6,7 +6,7 @@
       "type": "shell",
       "command": ".venv/bin/python",
       "args": [
-        "admin/type_checks/report_callables_with_no_return_types.py",
+        "admin/type_checks/callables_with_no_return_types.py",
         "."
       ],
       "isBackground": true,

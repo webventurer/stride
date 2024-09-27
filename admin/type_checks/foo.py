@@ -2,6 +2,10 @@ def a_function(a: int, b: int):
     return a + b
 
 
+def function_returns_none():
+    pass
+
+
 class Foo:
     def __init__(self, a: int, b: int):
         self.a = a
