@@ -81,7 +81,7 @@ make install
 As you add new development or production dependencies (or both), you can run this command to install them:
 
 ```sh
-make compile && make sync
+make update
 ```
 
 ## Run a linter & format your code on check in
