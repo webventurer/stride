@@ -40,7 +40,7 @@ The version of Python that your project uses is needed by the GitHub Action that
 You can create it like this:
 
 ```sh
-echo 3.12.6 > .python-version
+echo 3.13.2 > .python-version
 ```
 
 ## Reviewing the license
