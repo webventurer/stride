@@ -1,5 +1,5 @@
-pyright
-pre-commit
-mypy
-pytest
 ruff
+mypy
+pyright
+pytest
+pre-commit
