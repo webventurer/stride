@@ -75,7 +75,7 @@ Now we can install our development tools:
 ```sh
 pip install --upgrade pip
 pip install pip-tools
-make install
+make update
 ```
 
 As you add new development or production dependencies (or both), you can run this command to install them:
