@@ -114,7 +114,7 @@ editor; you can easily jump between a Python module and its test file.
 
 Absolute imports are brittle and a little cumbersone to write it out. The sweet spot is about one (max two) layers deep in the hierarchy, so `import foo` or `import foo.bar`. Absolute imports make sense when one package talks to another, however when you're inside a package they are not very useful. After you add some typing, you'll quickly find the first way to save space is to loosen your adherence to absolute imports.
 
-Why not try out `explicit relative imports` like this:
+Why not try out explicit relative imports like this:
 
 ```
 from . import foo, bar
@@ -128,7 +128,7 @@ from .foo import baz
 from .. import foo
 ```
 
-They're easier to work. They're also clear because you're importing from within the same package.
+They're easier to work with as they make it clear you're importing from within the same package.
 
 However, if you add explicit relative imports and run these scripts from the command line you'll get an error like this:
 
