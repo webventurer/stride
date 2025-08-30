@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build:
-    if: github.repository != 'webventurer/python-template'
+    if: ${{ ! contains(github.repository, 'python-template') }}
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/mylib
