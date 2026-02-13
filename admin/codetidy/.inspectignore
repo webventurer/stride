@@ -1,7 +1,0 @@
-admin
-venv
-.venv
-.git
-.vscode
-__pycache__
-thirdparty
