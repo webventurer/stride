@@ -2,97 +2,32 @@
 
 You can use this repository as a template when creating a new repository on GitHub, to get my preferred setup for a Python project.
 
-After creating the new project, there are a few things you'll need to configure.
+## Prerequisites
 
-## Install brew (if you haven't already)
+You need [brew](https://brew.sh), [direnv](https://formulae.brew.sh/formula/direnv), and Python 3 installed before running setup.
 
-```sh
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-Or install using the .pkg installer from [here](https://github.com/Homebrew/brew/releases/).
-
-[1] https://brew.sh
-
-## Install direnv
-
-Load/unload environment variables from your .envrc. In this case we use it to set the $PYTHONPATH without resorting to sys.path.insert hacks.
+## Getting started
 
 ```sh
-brew install direnv
+./scripts/setup.sh
 ```
 
-[1] https://formulae.brew.sh/formula/direnv
+The script will:
 
-## Rename the main package
+1. Check prerequisites (brew, direnv, python3, git)
+2. Rename the `mylib/` package to match your project name
+3. Set the Python version in `.python-version`
+4. Update the LICENSE with the current year and your name
+5. Create a virtual environment and install dependencies
+6. Install pre-commit hooks
+
+After setup, run `direnv allow` to activate the environment and `./test` to verify everything works.
+
+Then replace this README with content for your new project.
+
+## Package naming convention
 
 The convention is for the package directory name to match your project name. If users write `import tempo`, the directory is `tempo/`. Avoid generic names like `app`, `lib`, `core`, or `utils` — they collide with other packages and say nothing about what your code does.
-
-Replace `newname` below with your project name:
-
-```sh
-git mv mylib newname
-sed -i '' -e 's/mylib/newname/' tests/* .projections.json .github/workflows/python-app.yml .envrc pyproject.toml pyrightconfig.json
-```
-
-## Choosing the Python version
-
-The version of Python that your project uses is needed by the GitHub Action that runs the tests, and perhaps by your local Python installation tool.
-
-You can create it like this:
-
-```sh
-echo 3.13.2 > .python-version
-```
-
-## Reviewing the license
-
-The open source MIT license is used by default (see the `LICENSE` file). [Is it appropriate](https://choosealicense.com/) for this project?
-
-If it is, don't forget to set the year and the name of the copyright holder:
-
-```sh
-sed -i '' -e "s,<YEAR>,$(date +%Y)," LICENSE
-FULL_NAME="$(getent passwd $USER | cut -d : -f 5 | cut -d , -f 1)"
-sed -i '' -e "s,<COPYRIGHT HOLDER>,$FULL_NAME," LICENSE
-```
-
-If you're on OS X use:
-
-```sh
-FULL_NAME="$(bin/osx/getent-passwd.sh $USER | cut -d : -f 5 | cut -d , -f 1)"
-```
-
-## Install packages
-
-You need to get everything installed, and that first test running. Start by creating a virtual environment:
-
-```sh
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-Now we can install our development tools:
-
-```sh
-pip install --upgrade pip
-pip install pip-tools
-make update
-```
-
-As you add new development or production dependencies (or both), you can run this command to install them:
-
-```sh
-make update
-```
-
-## Run a linter & format your code on check in
-
-Ruff is a standalone package which runs a linter and a formatter over your code, replacing the need for Black, isort or flake8. Althoug you can add the Ruff extension to your VSCode (editor), you can also add it to your .pre-commit-config.yaml to check your code on a git commit.
-
-```sh
-pre-commit install
-```
 
 ## VS Code plugins
 
@@ -152,10 +87,6 @@ Relative imports not only leave you free to rename your package later without ch
 
 [1] https://www.youtube.com/watch?v=0oTh1CXRaQ0
 
-## Update the README
-
-Now delete all the docs that you've just followed, and write something suitable for your new project!
-
 ## Add updates to this project
 
 - Create a new branch for each new feature you wish to add e.g. `fly.io` if, for example, you're adding a branch and specific code to roll out to the fly.io cloud service.
@@ -167,3 +98,97 @@ Now delete all the docs that you've just followed, and write something suitable 
 - There's no need to check in `requirements.txt` or `requirements-dev.txt` as they can be generated on the fly with `make update` from the Makefile.
 
 For future research: Is there a way to only add the parts we are interested in without a merge conflict?
+
+---
+
+## Appendix: manual setup
+
+If you prefer to run each step yourself instead of using `scripts/setup.sh`.
+
+### Install brew (if you haven't already)
+
+```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Or install using the .pkg installer from [here](https://github.com/Homebrew/brew/releases/).
+
+[1] https://brew.sh
+
+### Install direnv
+
+Load/unload environment variables from your .envrc. In this case we use it to set the $PYTHONPATH without resorting to sys.path.insert hacks.
+
+```sh
+brew install direnv
+```
+
+[1] https://formulae.brew.sh/formula/direnv
+
+### Rename the main package
+
+Replace `newname` below with your project name:
+
+```sh
+git mv mylib newname
+sed -i '' -e 's/mylib/newname/' tests/* .projections.json .github/workflows/python-app.yml .envrc pyproject.toml pyrightconfig.json
+```
+
+### Choosing the Python version
+
+The version of Python that your project uses is needed by the GitHub Action that runs the tests, and perhaps by your local Python installation tool.
+
+You can create it like this:
+
+```sh
+echo 3.13.2 > .python-version
+```
+
+### Reviewing the license
+
+The open source MIT license is used by default (see the `LICENSE` file). [Is it appropriate](https://choosealicense.com/) for this project?
+
+If it is, don't forget to set the year and the name of the copyright holder:
+
+```sh
+sed -i '' -e "s,<YEAR>,$(date +%Y)," LICENSE
+FULL_NAME="$(getent passwd $USER | cut -d : -f 5 | cut -d , -f 1)"
+sed -i '' -e "s,<COPYRIGHT HOLDER>,$FULL_NAME," LICENSE
+```
+
+If you're on OS X use:
+
+```sh
+FULL_NAME="$(bin/osx/getent-passwd.sh $USER | cut -d : -f 5 | cut -d , -f 1)"
+```
+
+### Install packages
+
+You need to get everything installed, and that first test running. Start by creating a virtual environment:
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Now we can install our development tools:
+
+```sh
+pip install --upgrade pip
+pip install pip-tools
+make update
+```
+
+As you add new development or production dependencies (or both), you can run this command to install them:
+
+```sh
+make update
+```
+
+### Run a linter & format your code on check in
+
+Ruff is a standalone package which runs a linter and a formatter over your code, replacing the need for Black, isort or flake8. Althoug you can add the Ruff extension to your VSCode (editor), you can also add it to your .pre-commit-config.yaml to check your code on a git commit.
+
+```sh
+pre-commit install
+```
