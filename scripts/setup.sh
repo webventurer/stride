@@ -29,7 +29,7 @@ check_command() {
 
 prompt_with_default() {
     local prompt="$1" default="$2" answer
-    printf "%s [%s]: " "$prompt" "$default"
+    printf "%s [%s]: " "$prompt" "$default" >&2
     read -r answer
     echo "${answer:-$default}"
 }
@@ -200,8 +200,9 @@ echo
 bold "Setup complete!"
 echo
 echo "Next steps:"
-echo "  1. Run 'direnv allow' to activate the environment"
-echo "  2. Run './test' to verify everything works"
-echo "  3. Install VS Code extensions: ruff, pylance"
-echo "  4. Replace README.md with content for your new project"
+echo "  1. Commit the setup changes: git add -A && git commit -m 'Initial project setup'"
+echo "  2. Run 'direnv allow' to activate the environment"
+echo "  3. Run './test' to verify everything works"
+echo "  4. Install VS Code extensions: ruff, pylance"
+echo "  5. Replace README.md with content for your new project"
 echo
