@@ -91,6 +91,15 @@ Make sure you install
 
 Note: Pylance incorporates the Pyright type checker so you only need to install Pylance. When Pylance is installed, the Pyright extension will disable itself.
 
+## VIM plugins
+
+The .projections.json is config for Vim projectionist plugin [1].
+
+This config makes it easy to switch between "alternate" files in the Vim
+editor; you can easily jump between a Python module and its test file.
+
+[1] https://github.com/tpope/vim-projectionist.
+
 ## Run a linter & format your code on check in
 
 Ruff is a standalone package which runs a linter and a formatter over your code, replacing the need for Black, isort or flake8. Althoug you can add the Ruff extension to your VSCode (editor), you can also add it to your .pre-commit-config.yaml to check your code on a git commit.
