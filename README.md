@@ -26,7 +26,9 @@ brew install direnv
 
 ## Rename the main package
 
-You'll need to rename the package from "mylib" to something sensible:
+The convention is for the package directory name to match your project name. If users write `import tempo`, the directory is `tempo/`. Avoid generic names like `app`, `lib`, `core`, or `utils` — they collide with other packages and say nothing about what your code does.
+
+Replace `newname` below with your project name:
 
 ```sh
 git mv mylib newname
