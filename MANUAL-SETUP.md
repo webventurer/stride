@@ -82,6 +82,15 @@ As you add new development or production dependencies (or both), you can run thi
 make update
 ```
 
+## VS Code plugins
+
+Make sure you install
+
+- ruff
+- pylance
+
+Note: Pylance incorporates the Pyright type checker so you only need to install Pylance. When Pylance is installed, the Pyright extension will disable itself.
+
 ## Run a linter & format your code on check in
 
 Ruff is a standalone package which runs a linter and a formatter over your code, replacing the need for Black, isort or flake8. Althoug you can add the Ruff extension to your VSCode (editor), you can also add it to your .pre-commit-config.yaml to check your code on a git commit.

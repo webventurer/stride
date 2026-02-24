@@ -29,24 +29,6 @@ Then replace this README with content for your new project.
 
 The convention is for the package directory name to match your project name. If users write `import tempo`, the directory is `tempo/`. Avoid generic names like `app`, `lib`, `core`, or `utils` — they collide with other packages and say nothing about what your code does.
 
-## VS Code plugins
-
-Make sure you install
-
-- ruff
-- pylance
-
-Note: Pylance incorporates the Pyright type checker so you only need to install Pylance. When Pylance is installed, the Pyright extension will disable itself.
-
-## VIM plugins
-
-The .projections.json is config for Vim projectionist plugin [1].
-
-This config makes it easy to switch between "alternate" files in the Vim
-editor; you can easily jump between a Python module and its test file.
-
-[1] https://github.com/tpope/vim-projectionist.
-
 ## Further reading
 
 - [DEVELOPMENT.md](DEVELOPMENT.md) — coding conventions (relative imports)

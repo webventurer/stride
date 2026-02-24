@@ -202,5 +202,6 @@ echo
 echo "Next steps:"
 echo "  1. Run 'direnv allow' to activate the environment"
 echo "  2. Run './test' to verify everything works"
-echo "  3. Replace README.md with content for your new project"
+echo "  3. Install VS Code extensions: ruff, pylance"
+echo "  4. Replace README.md with content for your new project"
 echo
