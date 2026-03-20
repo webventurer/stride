@@ -16,6 +16,7 @@ build/
 # Editors
 .vscode/*
 !.vscode/tasks.json
+!.vscode/settings.json
 
 # Testing
 .pytest_cache/
