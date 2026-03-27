@@ -14,9 +14,48 @@ This copies skills, commands, and hooks into your project's `.claude/` directory
 
 ## Requirements
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
-- [Linear MCP server](https://www.npmjs.com/package/@anthropic-ai/linear-mcp-server) (for /linear commands)
-- [GitHub CLI](https://cli.github.com/) (`gh`) for PR operations
+### Claude Code
+
+Install the [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI:
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+### Linear MCP server
+
+The `/linear` commands need the [Linear MCP server](https://www.npmjs.com/package/@anthropic-ai/linear-mcp-server). Add it to your Claude Code MCP config (`~/.claude/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "linear": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/linear-mcp-server"],
+      "env": {
+        "LINEAR_API_KEY": "lin_api_..."
+      }
+    }
+  }
+}
+```
+
+Get your Linear API key at [linear.app/settings/api](https://linear.app/settings/api).
+
+### GitHub CLI
+
+Install the [GitHub CLI](https://cli.github.com/) (`gh`) for PR operations:
+
+```bash
+brew install gh                # macOS
+# or: https://cli.github.com/ for other platforms
+```
+
+Then authenticate:
+
+```bash
+gh auth login
+```
 
 ## Python tools
 
