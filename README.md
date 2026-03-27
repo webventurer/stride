@@ -83,4 +83,4 @@ The install script merges hook config into your existing `.claude/settings.json`
 
 ## License
 
-MIT
+[MIT](LICENSE)
