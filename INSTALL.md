@@ -1,16 +1,10 @@
 # Install
 
 ```bash
-pnpm dlx @codefu/core
+npx github:webventurer/codefu-core
 ```
 
-Or with npx:
-
-```bash
-npx @codefu/core
-```
-
-This copies skills, commands, and hooks into your project's `.claude/` directory and merges hook config into your existing `settings.json`.
+This copies skills, commands, hooks, and tools into your project's `.claude/` directory and merges hook config into your existing `settings.json`.
 
 ## Requirements
 
