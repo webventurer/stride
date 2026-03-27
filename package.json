@@ -2,6 +2,10 @@
   "name": "@codefu/core",
   "version": "0.1.0",
   "description": "Claude Code skills for atomic commits and Linear workflow",
+  "scripts": {
+    "format": "biome format --write .",
+    "lint": "biome lint ."
+  },
   "bin": {
     "codefu-core": "./bin/install.mjs"
   },
@@ -16,6 +20,9 @@
     "linear",
     "workflow"
   ],
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.6"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
