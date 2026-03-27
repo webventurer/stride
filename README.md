@@ -1,6 +1,6 @@
 # codefu-core
 
-Claude Code skills that turn vibe coding into agentic engineering — **atomic commits** that make every change traceable and reversible, and a **Linear workflow** that ties every change to a real objective.
+Claude Code skills that turn you from a **vibe coder** into an **agentic engineer** — atomic commits that make every change traceable and reversible, and a Linear workflow that ties every change to a real objective.
 
 Ready to get started? See the **[install guide](INSTALL.md)** for setup instructions, requirements, and API keys.
 
