@@ -201,14 +201,6 @@ Again, take a deep breath and take it one step at a time.
 
 ---
 
-## Cross-references
-
-| Skill | Relationship |
-|:------|:-------------|
-| [prompt-generation](../prompt-generation/SKILL.md) | Related — OODA loop methodology for prompt creation |
-
----
-
 ## Source
 
 Based on the C.R.A.F.T. prompt framework — a meta-prompting technique for generating structured, high-quality LLM prompts.
