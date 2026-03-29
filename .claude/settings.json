@@ -1,0 +1,46 @@
+{
+  "includeCoAuthoredBy": false,
+  "hooks": {
+    "UserPromptSubmit": [],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse/block_bare_git_commit.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": []
+  },
+  "permissions": {
+    "deny": [
+      "Edit(**/.env)",
+      "Write(**/.env)",
+      "Edit(**/.env.*)",
+      "Write(**/.env.*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Edit(**/*.pem)",
+      "Edit(**/*.key)",
+      "Write(**/*.pem)",
+      "Write(**/*.key)",
+      "Read(**/secrets.*)",
+      "Edit(**/secrets.*)",
+      "Write(**/secrets.*)",
+      "Read(**/credentials.*)",
+      "Edit(**/credentials.*)",
+      "Write(**/credentials.*)",
+      "Edit(**/.git/config)",
+      "Write(**/.git/config)",
+      "Bash(git push --force :*)",
+      "Bash(git push -f :*)",
+      "Bash(git reset --hard :*)",
+      "Bash(git clean -fd :*)",
+      "Bash(rm -rf :*)",
+      "Bash(rm -fr :*)"
+    ]
+  }
+}
