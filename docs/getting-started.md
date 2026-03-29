@@ -1,6 +1,10 @@
 # Getting started
 
-codefu-core gives you two Claude Code skills that turn you from a **vibe coder** into an **agentic engineer** — atomic commits where every commit is one complete conceptual unit of work, and a [Linear](https://linear.app) workflow that lets you plan work, create issues, track progress, and ship features through a structured product management cycle — all without leaving the terminal.
+<mark>Vibe coding builds on quicksand. The first few stories go up fast, but a few changes later the house is tipping over and you can't tell which wall is load-bearing.</mark>
+
+Vibe coding is great on day one — you describe what you want, the agent builds it, and within minutes you have a running app. But by day ten you can't tell which change broke things. By day thirty you're afraid to touch anything. By day ninety you're rewriting from scratch.
+
+codefu-core gives you a **solid foundation from the start**. Three Claude Code skills that turn you from a vibe coder into an **agentic engineer** — a [Linear](https://linear.app) workflow that structures *what the agent works on*, atomic commits that structure *how it records each change*, and prompt generation that structures *how it thinks before starting*. All without leaving the terminal.
 
 ## Why atomic commits matter
 
@@ -21,11 +25,19 @@ Rather than context-switching between your editor and a browser, you can plan wo
 
 This keeps the agent *grounded in real project priorities* rather than working in isolation.
 
-## Better together
+## The loop
+
+The three skills aren't independent — they're stages in the same loop, and each one makes the next one better.
+
+1. **`/craft`** sharpens the problem — structured prompt generation that turns a vague idea into a clear description *before* the agent starts work
+2. **`/linear`** turns that description into a tracked issue, then manages the full lifecycle — branching, implementation, PR, review, merge
+3. **`/commit`** is called at every commit point within `/linear` to keep the git history atomic — one complete logical change per commit, independently revertible
+
+Remove any piece and the loop still works, but the output gets worse. Without `/craft`, the agent works from whatever you typed. Without `/commit`, the agent dumps everything into monolithic commits. Without `/linear`, the agent works in isolation with no connection to project priorities.
 
 > "When faced with two or more alternatives that deliver roughly the same value, **take the path that makes future change easier**." — David Thomas & Andrew Hunt, *The Pragmatic Programmer*
 
-Vibe coding produces code. Agentic engineering produces **a traceable, reversible, purposeful history of decisions**. Together, `/commit` and `/linear` close that gap — every change is atomic, every change is tied to an objective, and the agent operates with the discipline of a senior engineer rather than the enthusiasm of an intern with root access.
+Vibe coding produces code. [Agentic engineering](/reference/agentic-engineering) produces **a traceable, reversible, purposeful history of decisions** — every change is atomic, every change is tied to an objective, and the agent operates with the discipline of a senior engineer rather than the enthusiasm of an intern with root access.
 
 The approach is designed to compound: as AI models improve, the structured documentation gets more from them, not less.
 

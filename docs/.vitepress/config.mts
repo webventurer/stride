@@ -33,6 +33,7 @@ export default defineConfig({
       {
         text: 'Reference',
         items: [
+          { text: 'Agentic engineering', link: '/reference/agentic-engineering' },
           { text: 'Kanban process', link: '/reference/kanban' },
           { text: 'Chris Beams commit style', link: '/reference/commit-style' },
         ],
