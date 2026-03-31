@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: codefu
-  text: From vibe coder to agentic engineer
-  tagline: Claude Code skills for atomic commits and Linear workflow
+  name: flowfu
+  text: All the speed. None of the mess.
+  tagline: Kanban-driven discipline for your coding agent
   image:
-    src: /codefu-poster.jpg
-    alt: CODEFU!
+    src: /flowfu-hero.svg
+    alt: flowfu — cards flowing through a Kanban board
   actions:
     - theme: brand
       text: Getting started

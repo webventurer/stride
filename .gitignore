@@ -9,8 +9,8 @@ docs/.vitepress/dist
 # direnv
 !.envrc
 
-# codefu symlink
+# flowfu symlink
 .semgrep
 
-# codefu symlink
+# flowfu symlink
 codefu
