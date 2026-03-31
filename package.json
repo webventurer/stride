@@ -1,7 +1,7 @@
 {
-  "name": "@codefu/core",
+  "name": "flowfu",
   "version": "0.1.0",
-  "description": "Claude Code skills for atomic commits and Linear workflow",
+  "description": "All the speed. None of the mess. Claude Code skills for atomic commits and Linear workflow.",
   "scripts": {
     "dev": "vitepress dev docs",
     "build:docs": "vitepress build docs",
@@ -11,7 +11,7 @@
     "lint": "biome lint ."
   },
   "bin": {
-    "codefu-core": "./bin/install.mjs"
+    "flowfu": "./bin/install.mjs"
   },
   "files": [
     "bin",
@@ -32,6 +32,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/webventurer/codefu-core"
+    "url": "https://github.com/webventurer/flowfu"
   }
 }

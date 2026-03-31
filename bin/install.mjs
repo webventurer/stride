@@ -125,7 +125,7 @@ function mergeSettings() {
 }
 
 async function main() {
-  console.log("\n@codefu/core — atomic commits + Linear workflow\n");
+  console.log("\nflowfu — All the speed. None of the mess.\n");
 
   // Copy skill and command files
   copyFiles();
