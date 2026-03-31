@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: codefu
-  text: From vibe coder to agentic engineer
-  tagline: Claude Code skills for atomic commits and Linear workflow
+  name: flowfu
+  text: All the speed. None of the mess.
+  tagline: Atomic commits, Linear workflow, structured prompts — for AI-assisted development
   image:
     src: /codefu-poster.jpg
-    alt: CODEFU!
+    alt: flowfu
   actions:
     - theme: brand
       text: Getting started
