@@ -275,14 +275,16 @@ The board exists to make atomic commits happen *naturally* rather than by heroic
 
 **Atomic commits are the unit of trust.** The board, the workflow, the lifecycle — those exist to make atomic commits happen naturally. The board is scaffolding. The commit is the product.
 
-### Recommendation
+### Decision (implemented)
 
-Rename to **flowfu**. Pair with the tagline: ***All the speed. None of the mess.***
+Renamed to **flowfu**. Paired with the tagline: ***All the speed. None of the mess.***
 
 The name signals workflow and discipline. The tagline sells the benefit — you keep AI speed without the entropy that normally comes with it. No jargon, no mechanism, just the promise. Every developer who's vibe-coded past day ten knows what "the mess" is. The tagline names their pain. The README explains the cure.
 
 codefu stays as the research lab. flowfu is the product that ships.
 
+**Status:** Implemented in [PG-378](https://linear.app/playgroundhq/issue/PG-378/rebrand-repo-from-codefu-core-to-flowfu). The repo, README, docs, installer, and package metadata have all been updated.
+
 ---
 
-*Analysis generated using the CRAAP framework. Updated 2026-03-31*
+*Analysis generated using the CRAAP framework. Updated 2026-03-31. Decision implemented 2026-03-31.*

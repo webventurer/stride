@@ -4,7 +4,7 @@
 
 Vibe coding is great on day one — you describe what you want, the agent builds it, and within minutes you have a running app. But by day ten you can't tell which change broke things. By day thirty you're afraid to touch anything. By day ninety you're rewriting from scratch.
 
-codefu-core gives you a **solid foundation from the start**. Three Claude Code skills that turn you from a vibe coder into an **agentic engineer** — a [Linear](https://linear.app) workflow that structures *what the agent works on*, atomic commits that structure *how it records each change*, and prompt generation that structures *how it thinks before starting*. All without leaving the terminal.
+flowfu gives you a **solid foundation from the start**. Three Claude Code skills that turn you from a vibe coder into an **agentic engineer** — a [Linear](https://linear.app) workflow that structures *what the agent works on*, atomic commits that structure *how it records each change*, and prompt generation that structures *how it thinks before starting*. All without leaving the terminal.
 
 ## Why atomic commits matter
 
@@ -43,7 +43,7 @@ The approach is designed to compound: as AI models improve, the structured docum
 
 ## App starters
 
-codefu-core gives you the engineering workflow. App starters give you the project scaffold. Each starter is an opinionated template that gets you from zero to a working app in one command — with codefu-core's skills already wired in.
+flowfu gives you the engineering workflow. App starters give you the project scaffold. Each starter is an opinionated template that gets you from zero to a working app in one command — with flowfu's skills already wired in.
 
 ### [app-starter](https://github.com/webventurer/app-starter)
 
@@ -57,7 +57,7 @@ gh repo clone webventurer/app-starter
 ## Next steps
 
 - [How it works](/how-it-works) — see what gets installed and how the pieces connect
-- [Install codefu](/install) into your project
+- [Install flowfu](/install) into your project
 - Learn about [atomic commits](/skills/commit)
 - Set up the [Linear workflow](/skills/linear)
 - Generate better prompts with [/craft](/skills/craft)

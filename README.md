@@ -1,16 +1,16 @@
-# codefu-core
+# flowfu
 
-<mark>Vibe coding builds on quicksand. The first few stories go up fast, but a few changes later the house is tipping over and you can't tell which wall is load-bearing.</mark>
+**All the speed. None of the mess.**
 
-Vibe coding is great on day one — you describe what you want, the agent builds it, and within minutes you have a running app. But by day ten you can't tell which change broke things. By day thirty you're afraid to touch anything. By day ninety you're rewriting from scratch.
+AI agents write code fast. But without structure, that speed turns into entropy — monolithic commits, untraceable history, and a codebase you're afraid to touch by day thirty.
 
-![Vibe coding vs agentic engineering](docs/public/foundations.svg)
+flowfu gives you **atomic commits** — every change is one idea, independently revertible, with a reason attached. You get AI speed *and* a git history you can trust. That's the trade: you don't have to choose between fast and clean.
 
-codefu-core gives you a **solid foundation from the start** — three Claude Code skills that turn you from a vibe coder into an [agentic engineer](docs/reference/agentic-engineering.md). Everything installs as plain markdown into your `.claude/` directory. No runtime dependencies, no lock-in — read it, change it, make it yours.
+Everything installs as plain markdown into your `.claude/` directory. No runtime dependencies, no lock-in — read it, change it, make it yours.
 
 ## What you get
 
-**`/linear`** — Five commands covering the full development cycle. Plan work, create issues, implement on a branch, handle PR feedback, merge and close — all driven from Claude Code, all synced with [Linear](https://linear.app). This is an opinionated choice — Linear is keyboard-driven, git-integrated, and built for the way modern software teams actually work.
+**`/linear`** — Five commands covering the full development cycle. Plan work, create issues, implement on a branch, handle PR feedback, merge and close — all driven from Claude Code, all synced with [Linear](https://linear.app). Issues flow through your board automatically as you work.
 
 ![Kanban board](docs/public/kanban-board.svg)
 *Issues flow from Backlog through In Progress to Done — driven entirely by `/linear` commands.*
@@ -31,7 +31,7 @@ The skills aren't independent — each one feeds the next.
 ## Install
 
 ```bash
-npx github:webventurer/codefu-core
+npx github:webventurer/flowfu
 ```
 
 This copies skills, commands, hooks, and docs into your project. It merges hook config into your existing `.claude/settings.json` (or creates one). Nothing is installed globally.
@@ -58,9 +58,17 @@ This copies skills, commands, hooks, and docs into your project. It merges hook 
 /linear:finish PG-123
 ```
 
+## Why this exists
+
+Vibe coding is great on day one. By day ten you can't tell which change broke things. By day thirty you're afraid to touch anything. By day ninety you're rewriting from scratch.
+
+flowfu trades a few minutes of setup for months of maintainability. Atomic commits make reverting safe. Linear integration makes priorities visible. Structured prompts make the agent's starting point explicit. The structure compounds — as AI models improve, it gets *more* from them, not less.
+
+Read more about [agentic engineering](docs/reference/agentic-engineering.md) — the philosophy behind the approach.
+
 ## Docs
 
-Full documentation at the [docs site](https://webventurer.github.io/codefu-core) or run locally:
+Full documentation at the [docs site](https://webventurer.github.io/flowfu) or run locally:
 
 ```bash
 pnpm dev
