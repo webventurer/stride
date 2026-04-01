@@ -2,9 +2,15 @@
 
 You can use this repository as a template when creating a new repository on GitHub, to get my preferred setup for a Python project.
 
+## Choosing an OS
+
+The setup script works on **macOS**, **Ubuntu**, and **Debian**. On **Windows**, use [WSL (Windows Subsystem for Linux)](https://learn.microsoft.com/en-us/windows/wsl/install) and follow the Linux instructions below.
+
+Debian is what Ubuntu is based on, so the script works the same way. **Ubuntu** is the easier choice — more beginner-friendly with broader community support and pre-configured defaults. **Debian** favours stability and minimalism, making it a better fit for servers and experienced users.
+
 ## Prerequisites
 
-You need [brew](https://brew.sh), [direnv](https://formulae.brew.sh/formula/direnv), and Python 3 installed before running setup.
+You need brew, direnv, and Python 3 installed before running setup. See [MANUAL-SETUP.md](MANUAL-SETUP.md) for installation instructions.
 
 ## Getting started
 

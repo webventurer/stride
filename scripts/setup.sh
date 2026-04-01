@@ -23,6 +23,13 @@ dim()   { printf "\033[2m%s\033[0m\n" "$1"; }
 
 bail() { red "Error: $1"; exit 1; }
 
+# macOS sed requires '' after -i; GNU sed does not
+if [ "$(uname)" = "Darwin" ]; then
+    sedi() { sed -i '' "$@"; }
+else
+    sedi() { sed -i "$@"; }
+fi
+
 check_command() {
     command -v "$1" > /dev/null 2>&1 || bail "$1 is not installed. $2"
 }
@@ -124,7 +131,7 @@ FILES_TO_UPDATE=(
 )
 
 for file in "${FILES_TO_UPDATE[@]}"; do
-    [ -f "$file" ] && sed -i '' -e "s/mylib/$PROJECT_NAME/g" "$file"
+    [ -f "$file" ] && sedi -e "s/mylib/$PROJECT_NAME/g" "$file"
 done
 
 green "Package renamed."
@@ -156,8 +163,8 @@ if [ "$UPDATE_LICENSE" = true ]; then
     bold "Updating LICENSE..."
 
     YEAR=$(date +%Y)
-    sed -i '' -e "s/<YEAR>/$YEAR/" LICENSE
-    sed -i '' -e "s/<COPYRIGHT HOLDER>/$FULL_NAME/" LICENSE
+    sedi -e "s/<YEAR>/$YEAR/" LICENSE
+    sedi -e "s/<COPYRIGHT HOLDER>/$FULL_NAME/" LICENSE
 
     green "LICENSE updated: $YEAR, $FULL_NAME."
     echo

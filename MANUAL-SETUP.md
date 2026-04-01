@@ -4,13 +4,36 @@ If you prefer to run each step yourself instead of using `scripts/setup.sh`.
 
 ## Install brew (if you haven't already)
 
+**macOS** — use the [.pkg installer](https://github.com/Homebrew/brew/releases/) or run:
+
 ```sh
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-Or install using the .pkg installer from [here](https://github.com/Homebrew/brew/releases/).
+**Linux (Ubuntu / Debian)** — follow [Homebrew on Linux](https://docs.brew.sh/Homebrew-on-Linux).
 
-[1] https://brew.sh
+**Windows** — install [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) first, then follow the Linux instructions above.
+
+## Install Python via pyenv
+
+[pyenv](https://github.com/pyenv/pyenv) lets you install and switch between multiple Python versions.
+
+```sh
+brew install pyenv
+```
+
+Then install the version you want and set it as your default:
+
+```sh
+pyenv install 3.13.2
+pyenv global 3.13.2
+```
+
+Verify it's working:
+
+```sh
+python3 --version
+```
 
 ## Install direnv
 
