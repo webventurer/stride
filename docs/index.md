@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: flowfu
-  text: All the speed. None of the mess.
-  tagline: Kanban-driven discipline for your coding agent
+  text: Build apps that don't break in 3 days
+  tagline: Kanban-driven agents ship the code. You run the board.
   image:
     src: /flowfu-hero.svg
     alt: flowfu — cards flowing through a Kanban board
