@@ -14,6 +14,28 @@ You need brew, direnv, and Python 3 installed before running setup. See [MANUAL-
 
 ## Getting started
 
+There are two ways to use this template:
+
+### Option 1: Fresh project (no history)
+
+Click **"Use this template"** on [GitHub](https://github.com/webventurer/python-template) to create a new repository with a clean commit history.
+
+### Option 2: Merge into an existing project
+
+Add the template as a remote and merge it in. This preserves both histories and lets you pull in future template updates.
+
+```sh
+git remote add template https://github.com/webventurer/python-template.git
+git fetch template
+git merge template/main --allow-unrelated-histories
+```
+
+To pull in template updates later, run `git fetch template && git merge template/main`.
+
+> **Note:** `--allow-unrelated-histories` is needed because your project and the template have no common ancestor — they started as independent repositories. Git refuses this merge by default to prevent accidental combines. The flag tells git you're doing it intentionally.
+
+### Run setup
+
 ```sh
 ./scripts/setup.sh
 ```
