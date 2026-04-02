@@ -4,7 +4,7 @@ layout: home
 hero:
   name: flowfu
   text: Build apps that don't break in 3 days
-  tagline: Kanban-driven agents ship the code. You run the board.
+  tagline: "Agents do the work.<br>The Kanban board keeps order.<br>You control the flow."
   image:
     src: /flowfu-hero.svg
     alt: flowfu — cards flowing through a Kanban board
