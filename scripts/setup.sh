@@ -5,7 +5,7 @@ set -euo pipefail
 # Setup script for python-template
 #
 # Automates every step in README.md:
-#   1. Check prerequisites (brew, direnv, python3)
+#   1. Check prerequisites (direnv, python3)
 #   2. Gather user input (package name, Python version, license)
 #   3. Rename package directory to match project name
 #   4. Set Python version (install via pyenv if available)
@@ -45,8 +45,7 @@ prompt_with_default() {
 
 bold "Checking prerequisites..."
 
-check_command brew    "Install from https://brew.sh"
-check_command direnv  "Run: brew install direnv"
+check_command direnv  "Run: brew install direnv (macOS) or sudo apt install direnv (Ubuntu/Debian)"
 check_command python3 "Install Python 3 first"
 check_command git     "Install git first"
 

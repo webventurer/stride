@@ -10,7 +10,7 @@ Debian is what Ubuntu is based on, so the script works the same way. **Ubuntu** 
 
 ## Prerequisites
 
-You need brew, direnv, and Python 3 installed before running setup. See [MANUAL-SETUP.md](MANUAL-SETUP.md) for installation instructions.
+You need direnv and Python 3 installed before running setup. See [MANUAL-SETUP.md](MANUAL-SETUP.md) for installation instructions.
 
 ## Getting started
 
@@ -42,7 +42,7 @@ To pull in template updates later, run `git fetch template && git merge template
 
 The script will:
 
-1. Check prerequisites (brew, direnv, python3, git)
+1. Check prerequisites (direnv, python3, git)
 2. Rename the `mylib/` package to match your project name
 3. Set the Python version in `.python-version`
 4. Update the LICENSE with the current year and your name

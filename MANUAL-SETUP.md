@@ -2,24 +2,33 @@
 
 If you prefer to run each step yourself instead of using `scripts/setup.sh`.
 
-## Install brew (if you haven't already)
+## Install brew (optional)
 
-**macOS** — use the [.pkg installer](https://github.com/Homebrew/brew/releases/) or run:
+[Brew](https://brew.sh) is one way to install direnv and pyenv on macOS. On Ubuntu/Debian, use `apt` instead.
 
 ```sh
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-**Linux (Ubuntu / Debian)** — follow [Homebrew on Linux](https://docs.brew.sh/Homebrew-on-Linux).
-
-**Windows** — install [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) first, then follow the Linux instructions above.
+Or use the [.pkg installer](https://github.com/Homebrew/brew/releases/).
 
 ## Install Python via pyenv
 
 [pyenv](https://github.com/pyenv/pyenv) lets you install and switch between multiple Python versions.
 
+**macOS:**
+
 ```sh
 brew install pyenv
+```
+
+**Ubuntu / Debian:**
+
+```sh
+sudo apt update && sudo apt install -y make build-essential libssl-dev zlib1g-dev \
+  libbz2-dev libreadline-dev libsqlite3-dev curl libncurses-dev \
+  xz-utils tk-dev libffi-dev liblzma-dev
+curl https://pyenv.run | bash
 ```
 
 Then install the version you want and set it as your default:
@@ -39,11 +48,17 @@ python3 --version
 
 Load/unload environment variables from your .envrc. In this case we use it to set the $PYTHONPATH without resorting to sys.path.insert hacks.
 
+**macOS:**
+
 ```sh
 brew install direnv
 ```
 
-[1] https://formulae.brew.sh/formula/direnv
+**Ubuntu / Debian:**
+
+```sh
+sudo apt install direnv
+```
 
 ## Rename the main package
 
