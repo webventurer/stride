@@ -8,6 +8,20 @@
 
 ---
 
+## Issue sections
+
+| # | Section | Question it answers |
+|:--|:--------|:--------------------|
+| 1 | Why this matters | Should I care? |
+| 2 | What's wrong | What's the problem? |
+| 3 | What we'll do | What's the plan? |
+| 4 | What we won't do | Where's the boundary? |
+| 5 | Expected outcome | How do we know it's done? |
+| 6 | How to test it | How do we verify? |
+| 7 | Assumptions to confirm | What's still uncertain? |
+
+---
+
 Replace `[user's description]` with what the user provided:
 
 ```text
