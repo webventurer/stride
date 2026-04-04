@@ -30,18 +30,30 @@ working on without asking clarifying questions.
 ACTION:
 1. Restate the user's description as a clear problem statement
    — what is broken, missing, or suboptimal?
-2. Identify the single most important outcome (one deliverable,
+2. Explain why this matters — the user impact, business reason,
+   or technical risk that makes this worth doing now
+3. Identify the single most important outcome (one deliverable,
    not a bundle of changes)
-3. List 2–3 acceptance criteria that define "done"
-4. Flag any ambiguities or assumptions that need confirming
-5. Suggest a scope boundary — what is explicitly out of scope
+4. List 2–3 acceptance criteria that define "done"
+5. Flag any ambiguities or assumptions that need confirming
+6. Suggest a scope boundary — what is explicitly out of scope
    for this issue?
 
 FORMAT:
 Return a structured brief matching the Linear issue template:
 
+## Title
+Concise, imperative, starting with a verb (e.g., "Add dark mode
+toggle to dashboard header"). Under 70 characters.
+
+## Description
+
 ### Problem
 What problem exists (1–2 sentences)
+
+### Why
+Why this matters — user impact, business reason, or technical
+risk that makes it worth doing now (1–2 sentences)
 
 ### Goal
 Desired outcome (1 sentence)
@@ -51,6 +63,11 @@ Desired outcome (1 sentence)
 
 ### Out of scope
 (Only if genuinely useful — omit if nothing meaningful)
+
+### Acceptance criteria
+Observable outcomes that define "done" (2–3 bullets). These are
+not implementation steps — they describe what a reviewer should
+see, not how to code it.
 
 ### Success metric
 (Only if measurable — omit if not applicable)
