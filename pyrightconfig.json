@@ -4,7 +4,8 @@
   "reportUnnecessaryComparison": "error",
   "typeCheckingMode": "standard",
   "include": [
-    "."
+    "mylib",
+    "tests"
   ],
   "extraPaths": [
     "./mylib"

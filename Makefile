@@ -26,7 +26,7 @@ format:
 	ruff format --check .
 
 types:
-	pyright .
+	pyright
 
 test:
 	sh -c 'pytest tests || ([ $$? = 5 ] && exit 0 || exit $$?)'
