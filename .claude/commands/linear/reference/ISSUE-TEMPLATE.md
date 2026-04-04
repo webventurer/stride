@@ -81,3 +81,26 @@ not context they already have from the codebase. Prefer
 concrete over abstract — "the API returns 500 when X is null"
 beats "improve error handling".
 ```
+
+---
+
+## Research mode additions
+
+When running in `--research` mode, append these sections to the
+issue after the base template above:
+
+### Implementation notes
+Findings from codebase exploration
+
+### Code examples
+Actual snippets from the codebase showing how similar patterns are
+already implemented — component structure, styling, registration,
+utility usage. The goal: the implementing agent should never need
+to ask "how do we do X in this codebase?" because examples of X
+are right there in the issue.
+
+### Related code
+- Files, components, or areas discovered during research
+
+### Related issues
+- Links/identifiers of similar Linear issues found

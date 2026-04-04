@@ -87,60 +87,9 @@ Omit the section entirely when tests don't apply.
 
 ### 6. Draft the issue
 
-### Title rules
+**Quick mode** — use the full issue structure from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Title, Description with Problem, Why, Goal, Scope, Out of scope, Acceptance criteria, Success metric, Assumptions to confirm).
 
-- Imperative mood, starting with a verb (Add, Fix, Replace, Remove, Extract…)
-- Specific enough that someone can understand the scope without reading the description
-- Avoid "Investigate" unless the deliverable genuinely is a report, not a code change
-- Keep under 70 characters when possible
-
-**Quick mode** — lean template:
-
-```markdown
-## Title
-Concise, imperative (e.g., "Add dark mode toggle to dashboard header")
-
-## Description
-
-### Problem
-What problem exists
-
-### Goal
-Desired outcome
-
-### Scope
-- Bullet list of what's included
-
-### Out of scope
-(Include only when genuinely useful — omit if nothing meaningful to exclude)
-
-### Success metric
-(Include only when genuinely useful — omit if not applicable)
-```
-
-**Research mode** — adds to the lean template:
-
-```markdown
-### Implementation notes
-Findings from codebase exploration
-
-### Code examples
-Actual snippets from the codebase showing how similar patterns are
-already implemented — component structure, styling, registration,
-utility usage. The goal: the implementing agent should never need
-to ask "how do we do X in this codebase?" because examples of X
-are right there in the issue.
-
-### Acceptance criteria
-Observable outcomes that define "done". These are not implementation
-steps — they describe what a reviewer should see, not how to code it.
-
-### Related code
-- Files, components, or areas discovered during research
-
-### Related issues
-- Links/identifiers of similar Linear issues found
-```
+**Research mode** — also include the research mode additions from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Implementation notes, Code examples, Related code, Related issues).
 
 Suggest **priority** (default Medium unless clearly urgent). Suggest no more than 3 **labels**, only if clearly relevant — prefer no labels over speculative ones.
 
