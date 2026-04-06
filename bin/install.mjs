@@ -86,29 +86,31 @@ const HOOKS = [
   ".claude/hooks/pretooluse/block_bare_git_commit.sh",
 ];
 
-function copyFiles() {
-  for (const dir of DIRS) {
-    const src = join(srcRoot, dir);
-    const dest = join(destRoot, dir);
-    if (existsSync(src)) {
-      // Remove destination if type mismatches (file vs directory) to avoid
-      // ERR_FS_CP_DIR_TO_NON_DIR when upgrading from an older layout.
-      if (existsSync(dest)) {
-        const srcIsDir = lstatSync(src).isDirectory();
-        const destIsDir = lstatSync(dest).isDirectory();
-        if (srcIsDir !== destIsDir) {
-          rmSync(dest, { recursive: true, force: true });
-        }
-      }
-      mkdirSync(dest, { recursive: true });
-      cpSync(src, dest, { recursive: true });
-    }
-  }
+function resolveTypeMismatch(dest) {
+  const src = join(srcRoot, dest);
+  const full = join(destRoot, dest);
+  if (!existsSync(full)) return;
+  const srcIsDir = lstatSync(src).isDirectory();
+  const destIsDir = lstatSync(full).isDirectory();
+  if (srcIsDir !== destIsDir) rmSync(full, { recursive: true, force: true });
+}
 
-  for (const hook of HOOKS) {
-    const path = join(destRoot, hook);
-    if (existsSync(path)) chmodSync(path, 0o755);
-  }
+function copyDir(dir) {
+  const src = join(srcRoot, dir);
+  if (!existsSync(src)) return;
+  resolveTypeMismatch(dir);
+  mkdirSync(join(destRoot, dir), { recursive: true });
+  cpSync(src, join(destRoot, dir), { recursive: true });
+}
+
+function makeExecutable(hook) {
+  const path = join(destRoot, hook);
+  if (existsSync(path)) chmodSync(path, 0o755);
+}
+
+function copyFiles() {
+  DIRS.forEach(copyDir);
+  HOOKS.forEach(makeExecutable);
 }
 
 const EXAMPLE_FILES = [".mcp.json.example"];
