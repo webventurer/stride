@@ -199,7 +199,7 @@ function mergeSettings() {
 }
 
 async function main() {
-  console.log("\nflowfu — All the speed. None of the mess.\n");
+  console.log("\nstride — All the speed. None of the mess.\n");
 
   // Copy skill and command files
   copyFiles();

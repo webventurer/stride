@@ -206,15 +206,15 @@ Valid long-term argument. The question is whether the project is at the stage wh
 
 codefu-core is at **early adoption**. The recommendation:
 
-### Recommended: Rename to flowfu
+### Recommended: Rename to stride
 
-**flowfu** — *All the speed. None of the mess.*
+**stride** — *All the speed. None of the mess.*
 
 | Dimension | Assessment |
 |:----------|:-----------|
 | **What "flow" signals** | Workflow, continuous movement, Kanban flow — all things the tool actually does |
 | **What "fu" signals** | Mastery, discipline — aligned with the anti-vibe-coding message |
-| **Brand family** | Keeps the "fu" lineage from codefu. The parent repo is the research lab; flowfu is the distributable product |
+| **Brand family** | Keeps the "fu" lineage from codefu. The parent repo is the research lab; stride is the distributable product |
 | **No "core" suffix** | No false expectation of a library/SDK with import/extend semantics |
 | **Discoverability** | "flow" gives a partial signal for developers searching for workflow tools |
 | **Length** | Two syllables, six characters, easy to type and say |
@@ -239,7 +239,7 @@ The tagline needs to land at the benefit level — what the developer *feels*, n
 
 **The recommended pairing:**
 
-> **flowfu** — *All the speed. None of the mess.*
+> **stride** — *All the speed. None of the mess.*
 
 Eight words. No jargon. It tells you:
 - **What you keep**: the speed that AI-assisted development gives you
@@ -255,9 +255,9 @@ The naming clarifies the relationship between the two repos:
 | Repo | Role | Audience |
 |:-----|:-----|:---------|
 | **codefu** | Research lab — AI patterns, CRAAP framework, harvest skill, experiments | You (and other methodology researchers) |
-| **flowfu** | Distributable product — the three skills that ship to developers | Anyone using Claude Code |
+| **stride** | Distributable product — the three skills that ship to developers | Anyone using Claude Code |
 
-"codefu" stays as the parent brand and research home. "flowfu" is what developers install. This is cleaner than "codefu-core" because it doesn't require understanding that a "core" was extracted from a larger thing — flowfu stands on its own.
+"codefu" stays as the parent brand and research home. "stride" is what developers install. This is cleaner than "codefu-core" because it doesn't require understanding that a "core" was extracted from a larger thing — stride stands on its own.
 
 ---
 
@@ -277,13 +277,13 @@ The board exists to make atomic commits happen *naturally* rather than by heroic
 
 ### Decision (implemented)
 
-Renamed to **flowfu**. Paired with the tagline: ***All the speed. None of the mess.***
+Renamed to **stride**. Paired with the tagline: ***All the speed. None of the mess.***
 
 The name signals workflow and discipline. The tagline sells the benefit — you keep AI speed without the entropy that normally comes with it. No jargon, no mechanism, just the promise. Every developer who's vibe-coded past day ten knows what "the mess" is. The tagline names their pain. The README explains the cure.
 
-codefu stays as the research lab. flowfu is the product that ships.
+codefu stays as the research lab. stride is the product that ships.
 
-**Status:** Implemented in [PG-378](https://linear.app/playgroundhq/issue/PG-378/rebrand-repo-from-codefu-core-to-flowfu). The repo, README, docs, installer, and package metadata have all been updated.
+**Status:** Implemented in [PG-378](https://linear.app/playgroundhq/issue/PG-378/rebrand-repo-from-codefu-core-to-stride). The repo, README, docs, installer, and package metadata have all been updated.
 
 ---
 

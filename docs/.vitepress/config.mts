@@ -1,9 +1,9 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: 'flowfu',
+  title: 'stride',
   description: 'All the speed. None of the mess. Claude Code skills for atomic commits and Linear workflow.',
-  base: '/flowfu/',
+  base: '/stride/',
   themeConfig: {
     nav: [
       { text: 'Guide', link: '/getting-started' },
@@ -12,7 +12,7 @@ export default defineConfig({
         { text: '/linear', link: '/skills/linear' },
         { text: '/craft', link: '/skills/craft' },
       ]},
-      { text: 'GitHub', link: 'https://github.com/webventurer/flowfu' },
+      { text: 'GitHub', link: 'https://github.com/webventurer/stride' },
     ],
     sidebar: [
       {
@@ -42,7 +42,7 @@ export default defineConfig({
       },
     ],
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/webventurer/flowfu' },
+      { icon: 'github', link: 'https://github.com/webventurer/stride' },
     ],
   },
 })

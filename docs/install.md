@@ -1,7 +1,7 @@
 # Install
 
 ```bash
-npx github:webventurer/flowfu
+npx github:webventurer/stride
 ```
 
 This copies skills, commands, hooks, and tools into your project's `.claude/` directory and merges hook config into your existing `settings.json`.
@@ -9,10 +9,10 @@ This copies skills, commands, hooks, and tools into your project's `.claude/` di
 ## Uninstall
 
 ```bash
-npx -p github:webventurer/flowfu flowfu-uninstall
+npx -p github:webventurer/stride stride-uninstall
 ```
 
-This removes all copied directories, the example file, and strips the flowfu hook from `.claude/settings.json`. Your `.mcp.json` is left untouched — remove Linear servers manually if needed.
+This removes all copied directories, the example file, and strips the stride hook from `.claude/settings.json`. Your `.mcp.json` is left untouched — remove Linear servers manually if needed.
 
 ## Requirements
 
@@ -156,7 +156,7 @@ There's no version number, changelog, or upgrade path. When you install, you get
 **Workaround:** pin to a specific commit if stability matters:
 
 ```bash
-npx github:webventurer/flowfu#<commit-sha>
+npx github:webventurer/stride#<commit-sha>
 ```
 
 ### Hook scripts require bash
@@ -169,8 +169,8 @@ The commit safety hook (`block_bare_git_commit.sh`) is a shell script. If it fai
 
 When you already have a `.claude/settings.json`, the install script asks before merging. If you say yes, it uses a deep merge:
 
-- **Objects** are merged recursively — your keys are preserved, flowfu's keys are added alongside
+- **Objects** are merged recursively — your keys are preserved, stride's keys are added alongside
 - **Arrays** (like hook lists) are appended with deduplication — if a hook already exists, it's skipped
-- **Scalar values** — flowfu's value wins if both sides set the same key
+- **Scalar values** — stride's value wins if both sides set the same key
 
 The merge is additive — it never removes your existing settings. But if you have a hook on the same event with different behaviour, both will run. Review `.claude/settings.json` after install if you have existing hooks.
