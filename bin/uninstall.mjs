@@ -6,7 +6,7 @@ import { join } from "node:path";
 const destRoot = process.cwd();
 
 if (existsSync(join(destRoot, "bin/install.mjs"))) {
-  console.error("Cannot uninstall from the flowfu repo itself.");
+  console.error("Cannot uninstall from the stride repo itself.");
   process.exit(1);
 }
 
@@ -51,7 +51,7 @@ function removeHookConfig() {
 }
 
 function main() {
-  console.log("\nflowfu — uninstalling\n");
+  console.log("\nstride — uninstalling\n");
 
   DIRS.forEach(removeDir);
   EXAMPLE_FILES.forEach(removeFile);
@@ -66,7 +66,9 @@ function main() {
   console.log("  tools/                     (cross-model feedback script)");
   console.log("  .mcp.json.example          (Linear MCP server reference)");
   console.log("  PreToolUse hook            (from .claude/settings.json)");
-  console.log("\nNote: .mcp.json was not modified — remove Linear servers manually if needed.");
+  console.log(
+    "\nNote: .mcp.json was not modified — remove Linear servers manually if needed.",
+  );
   console.log("Done.\n");
 }
 

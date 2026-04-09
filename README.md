@@ -1,10 +1,10 @@
-# flowfu
+# stride
 
 **All the speed. None of the mess.**
 
 AI agents write code fast. But without structure, that speed turns into entropy — monolithic commits, untraceable history, and a codebase you're afraid to touch by day thirty.
 
-flowfu gives you **atomic commits** — every change is one idea, independently revertible, with a reason attached. You get AI speed *and* a git history you can trust. That's the trade: you don't have to choose between fast and clean.
+stride gives you **atomic commits** — every change is one idea, independently revertible, with a reason attached. You get AI speed *and* a git history you can trust. That's the trade: you don't have to choose between fast and clean.
 
 Everything installs as plain markdown into your `.claude/` directory. No runtime dependencies, no lock-in — read it, change it, make it yours.
 
@@ -31,7 +31,7 @@ The skills aren't independent — each one feeds the next.
 ## Install
 
 ```bash
-npx github:webventurer/flowfu
+npx github:webventurer/stride
 ```
 
 This copies skills, commands, hooks, and docs into your project. It merges hook config into your existing `.claude/settings.json` (or creates one). Nothing is installed globally.
@@ -65,13 +65,13 @@ This copies skills, commands, hooks, and docs into your project. It merges hook 
 
 Vibe coding is great on day one. By day ten you can't tell which change broke things. By day thirty you're afraid to touch anything. By day ninety you're rewriting from scratch.
 
-flowfu trades a few minutes of setup for months of maintainability. Atomic commits make reverting safe. Linear integration makes priorities visible. Structured prompts make the agent's starting point explicit. The structure compounds — as AI models improve, it gets *more* from them, not less.
+stride trades a few minutes of setup for months of maintainability. Atomic commits make reverting safe. Linear integration makes priorities visible. Structured prompts make the agent's starting point explicit. The structure compounds — as AI models improve, it gets *more* from them, not less.
 
 Read more about [agentic engineering](docs/reference/agentic-engineering.md) — the philosophy behind the approach.
 
 ## Docs
 
-Full documentation at the [docs site](https://webventurer.github.io/flowfu) or run locally:
+Full documentation at the [docs site](https://webventurer.github.io/stride) or run locally:
 
 ```bash
 pnpm dev
@@ -79,7 +79,7 @@ pnpm dev
 
 ## Built by
 
-![flowfu](docs/public/flowfu-hero.svg)
+![stride](docs/public/stride-hero.svg)
 
 [@mikemindel](https://github.com/mikemindel)
 

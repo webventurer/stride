@@ -77,7 +77,7 @@ This is the core decision:
 
 <mark>Vibe coding optimises for the first hour. Agentic engineering optimises for the next six months.</mark>
 
-## How flowfu structures the agent
+## How stride structures the agent
 
 Agentic engineering imposes structure at three levels:
 
@@ -101,4 +101,4 @@ The investment in structure pays increasing returns as the tools get better. Vib
 
 > "When faced with two or more alternatives that deliver roughly the same value, **take the path that makes future change easier**." — David Thomas & Andrew Hunt, *The Pragmatic Programmer*
 
-Every decision in flowfu optimises for future change: atomic commits make reverting safe, Linear integration makes priorities visible, structured prompts make the agent's starting point explicit. The path that makes future change easier *is* the structured path.
+Every decision in stride optimises for future change: atomic commits make reverting safe, Linear integration makes priorities visible, structured prompts make the agent's starting point explicit. The path that makes future change easier *is* the structured path.

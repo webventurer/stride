@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: flowfu
+  name: stride
   text: Build apps that don't break in 3 days
   tagline: "Agents do the work.<br>The Kanban board keeps order.<br>You control the flow."
   image:
-    src: /flowfu-hero.svg
-    alt: flowfu — cards flowing through a Kanban board
+    src: /stride-hero.svg
+    alt: stride — cards flowing through a Kanban board
   actions:
     - theme: brand
       text: Getting started

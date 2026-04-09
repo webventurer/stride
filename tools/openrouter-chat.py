@@ -2,7 +2,7 @@
 # /// script
 # dependencies = ["click", "python-dotenv", "httpx"]
 # ///
-"""Chat completion via OpenRouter. Zero-dependency on flowfu.
+"""Chat completion via OpenRouter. Zero-dependency on stride.
 
 Usage:
     uv run tools/openrouter-chat.py "prompt"

@@ -1,6 +1,6 @@
 # How it works
 
-flowfu installs as plain markdown files in your project's `.claude/` directory. No runtime dependencies, no build step — Claude Code reads the files and follows the instructions.
+stride installs as plain markdown files in your project's `.claude/` directory. No runtime dependencies, no build step — Claude Code reads the files and follows the instructions.
 
 ## What gets installed
 
@@ -93,14 +93,14 @@ This requires an OpenRouter API key. See the [install guide](/install) for setup
 
 ## What the install script does
 
-When you run `npx github:webventurer/flowfu`, the script (`bin/install.mjs`) does four things:
+When you run `npx github:webventurer/stride`, the script (`bin/install.mjs`) does four things:
 
 1. **Copies files** into your project's `.claude/` directory — skills, commands, hooks, docs, and the `tools/` folder
 2. **Sets permissions** — makes hook scripts (`do_commit.sh`, `block_bare_git_commit.sh`) executable
 3. **Merges settings** — if you already have a `.claude/settings.json`, it asks before merging. If you say no, nothing is touched. If you don't have one, it creates a minimal config with the commit hook wired up
 4. **Prints a summary** — shows what was installed and which commands are available
 
-The merge is additive — it adds flowfu's hooks alongside your existing config using a deep merge with deduplication. It never removes or overwrites your existing settings.
+The merge is additive — it adds stride's hooks alongside your existing config using a deep merge with deduplication. It never removes or overwrites your existing settings.
 
 **If something goes wrong:** the script only writes to `.claude/` and `tools/` inside your project. Delete those directories to fully uninstall. There are no global side effects.
 
@@ -118,7 +118,7 @@ The "no lock-in" promise means you can change anything. Here's what's safe to ed
 | Settings deny list | Yes | Add your own deny rules to `.claude/settings.json` |
 | Adding new skills | Yes | Create a new directory under `.claude/skills/` with a `SKILL.md` — Claude Code auto-discovers it |
 
-**Pulling upstream updates:** there's no automatic upgrade path. If you want to pick up changes from flowfu, re-run the install script — it will overwrite files but won't remove your additions. For heavy customisation, fork the repo and maintain your own version.
+**Pulling upstream updates:** there's no automatic upgrade path. If you want to pick up changes from stride, re-run the install script — it will overwrite files but won't remove your additions. For heavy customisation, fork the repo and maintain your own version.
 
 ## Why markdown
 

@@ -1,5 +1,5 @@
 {
-  "name": "flowfu",
+  "name": "stride",
   "version": "0.1.0",
   "description": "All the speed. None of the mess. Claude Code skills for atomic commits and Linear workflow.",
   "scripts": {
@@ -11,8 +11,8 @@
     "lint": "biome lint ."
   },
   "bin": {
-    "flowfu": "./bin/install.mjs",
-    "flowfu-uninstall": "./bin/uninstall.mjs"
+    "stride": "./bin/install.mjs",
+    "stride-uninstall": "./bin/uninstall.mjs"
   },
   "files": [
     "bin",
@@ -33,6 +33,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/webventurer/flowfu"
+    "url": "https://github.com/webventurer/stride"
   }
 }
