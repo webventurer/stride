@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <!-- Phase 1: Crouched start -->
+  <g transform="translate(95, 18)" opacity="0.06">
+    <circle cx="90" cy="55" r="20" fill="#6366f1"/>
+    <line x1="90" y1="75" x2="85" y2="138" stroke="#6366f1" stroke-width="12" stroke-linecap="round"/>
+    <line x1="87" y1="95" x2="110" y2="85" stroke="#6366f1" stroke-width="8" stroke-linecap="round"/>
+    <line x1="87" y1="95" x2="65" y2="100" stroke="#6366f1" stroke-width="8" stroke-linecap="round"/>
+    <line x1="85" y1="138" x2="100" y2="195" stroke="#6366f1" stroke-width="10" stroke-linecap="round"/>
+    <line x1="100" y1="195" x2="105" y2="245" stroke="#6366f1" stroke-width="9" stroke-linecap="round"/>
+    <line x1="85" y1="138" x2="70" y2="195" stroke="#6366f1" stroke-width="10" stroke-linecap="round"/>
+    <line x1="70" y1="195" x2="65" y2="245" stroke="#6366f1" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <!-- Phase 2: Rising, legs opening -->
+  <g transform="translate(130, 18)" opacity="0.14">
+    <circle cx="95" cy="48" r="20" fill="#6366f1"/>
+    <line x1="95" y1="68" x2="86" y2="138" stroke="#6366f1" stroke-width="12" stroke-linecap="round"/>
+    <line x1="90" y1="88" x2="125" y2="72" stroke="#6366f1" stroke-width="8" stroke-linecap="round"/>
+    <line x1="90" y1="88" x2="58" y2="82" stroke="#6366f1" stroke-width="8" stroke-linecap="round"/>
+    <line x1="86" y1="138" x2="115" y2="195" stroke="#6366f1" stroke-width="10" stroke-linecap="round"/>
+    <line x1="115" y1="195" x2="125" y2="245" stroke="#6366f1" stroke-width="9" stroke-linecap="round"/>
+    <line x1="86" y1="138" x2="55" y2="200" stroke="#6366f1" stroke-width="10" stroke-linecap="round"/>
+    <line x1="55" y1="200" x2="42" y2="238" stroke="#6366f1" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <!-- Phase 3: Accelerating -->
+  <g transform="translate(165, 18)" opacity="0.30">
+    <circle cx="98" cy="42" r="20" fill="#6366f1"/>
+    <line x1="98" y1="62" x2="84" y2="138" stroke="#6366f1" stroke-width="12" stroke-linecap="round"/>
+    <line x1="90" y1="82" x2="140" y2="60" stroke="#6366f1" stroke-width="8" stroke-linecap="round"/>
+    <line x1="90" y1="82" x2="48" y2="68" stroke="#6366f1" stroke-width="8" stroke-linecap="round"/>
+    <line x1="84" y1="138" x2="125" y2="192" stroke="#6366f1" stroke-width="10" stroke-linecap="round"/>
+    <line x1="125" y1="192" x2="142" y2="245" stroke="#6366f1" stroke-width="9" stroke-linecap="round"/>
+    <line x1="84" y1="138" x2="40" y2="210" stroke="#6366f1" stroke-width="10" stroke-linecap="round"/>
+    <line x1="40" y1="210" x2="22" y2="245" stroke="#6366f1" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <!-- Phase 4: Full speed -->
+  <g transform="translate(200, 18)" opacity="1">
+    <circle cx="100" cy="38" r="20" fill="#6366f1"/>
+    <line x1="100" y1="58" x2="78" y2="138" stroke="#6366f1" stroke-width="12" stroke-linecap="round"/>
+    <line x1="88" y1="80" x2="155" y2="48" stroke="#6366f1" stroke-width="8" stroke-linecap="round"/>
+    <line x1="88" y1="80" x2="30" y2="58" stroke="#6366f1" stroke-width="8" stroke-linecap="round"/>
+    <line x1="78" y1="138" x2="130" y2="190" stroke="#6366f1" stroke-width="10" stroke-linecap="round"/>
+    <line x1="130" y1="190" x2="160" y2="245" stroke="#6366f1" stroke-width="9" stroke-linecap="round"/>
+    <line x1="78" y1="138" x2="20" y2="218" stroke="#6366f1" stroke-width="10" stroke-linecap="round"/>
+    <line x1="20" y1="218" x2="-2" y2="245" stroke="#6366f1" stroke-width="8" stroke-linecap="round"/>
+
+    <ellipse cx="78" cy="258" rx="90" ry="6" fill="#6366f1" opacity="0.07"/>
+  </g>
+</svg>
