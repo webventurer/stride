@@ -1,23 +1,6 @@
 # macOS
 .DS_Store
 
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-dist/
-build/
-
-# Environments
-.env
-.venv
-!.envrc
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-
 # Editors
 .vscode/*
 !.vscode/tasks.json
