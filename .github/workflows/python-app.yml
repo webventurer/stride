@@ -1,0 +1,40 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: ${{ ! contains(github.repository, 'python-template') }}
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/mylib
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version-file: .python-version
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-tools
+          [ -f requirements.txt ] && pip-sync requirements.txt requirements-dev.txt || pip-sync requirements-dev.txt
+      - name: Run linter
+        run: make lint
+      - name: Check formatting
+        run: make format
+      - name: Check types
+        run: make types
+      - name: Run tests
+        run: pytest -o console_output_style=classic -v || ([ $? = 5 ] && exit 0 || exit $?)

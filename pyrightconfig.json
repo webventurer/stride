@@ -1,0 +1,15 @@
+{
+  "reportMissingParameterType": "error",
+  "reportPropertyTypeMismatch": "error",
+  "reportUnnecessaryComparison": "error",
+  "typeCheckingMode": "standard",
+  "include": [
+    "mylib",
+    "tests"
+  ],
+  "extraPaths": [
+    "./mylib"
+  ],
+  "venv": ".venv",
+  "venvPath": "."
+}
