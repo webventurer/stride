@@ -10,14 +10,16 @@ from linear_api import graphql, require_env
 @click.command()
 @click.option("--target-api-key-env", required=True)
 @click.option("--export-dir", required=True, type=click.Path(exists=True))
-@click.option("--create", is_flag=True, default=False, help="Create missing labels")
+@click.option(
+    "--create", is_flag=True, default=False, help="Create missing labels"
+)
 def main(target_api_key_env: str, export_dir: str, create: bool):
     api_key = require_env(target_api_key_env)
     source_labels = load_source_labels(Path(export_dir))
     target_labels = fetch_target_labels(api_key)
 
-    source_names = {l["name"] for l in source_labels}
-    target_names = {l["name"] for l in target_labels}
+    source_names = {label["name"] for label in source_labels}
+    target_names = {label["name"] for label in target_labels}
     missing = source_names - target_names
 
     report(source_labels, missing)
@@ -50,9 +52,9 @@ def fetch_target_labels(api_key: str) -> list:
 
 def report(source_labels: list, missing: set):
     click.echo("Source labels:")
-    for l in sorted(source_labels, key=lambda x: x["name"]):
-        marker = "✗" if l["name"] in missing else "✓"
-        click.echo(f"  {marker} {l['name']}")
+    for label in sorted(source_labels, key=lambda x: x["name"]):
+        marker = "✗" if label["name"] in missing else "✓"
+        click.echo(f"  {marker} {label['name']}")
 
     if not missing:
         click.echo("\nPASS: all source labels exist in target")
@@ -60,7 +62,7 @@ def report(source_labels: list, missing: set):
 
 def create_missing(api_key: str, source_labels: list, missing: set):
     click.echo(f"\nCreating {len(missing)} missing labels...")
-    source_by_name = {l["name"]: l for l in source_labels}
+    source_by_name = {label["name"]: label for label in source_labels}
     for name in sorted(missing):
         color = source_by_name[name].get("color", "")
         create_label(api_key, name, color)
@@ -75,8 +77,12 @@ def create_label(api_key: str, name: str, color: str):
     label_input = {"name": name}
     if color:
         label_input["color"] = color
-    result = graphql(api_key, CREATE_LABEL_QUERY, variables={"input": label_input})
-    success = result.get("data", {}).get("issueLabelCreate", {}).get("success", False)
+    result = graphql(
+        api_key, CREATE_LABEL_QUERY, variables={"input": label_input}
+    )
+    success = (
+        result.get("data", {}).get("issueLabelCreate", {}).get("success", False)
+    )
     click.echo(f"  {'✓' if success else '✗'} {name}")
 
 

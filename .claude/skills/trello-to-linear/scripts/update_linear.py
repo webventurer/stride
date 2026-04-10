@@ -86,7 +86,11 @@ def load_state_map(path: str | None) -> dict:
 
 def validate_states(creates: list, list_to_state: dict):
     trello_lists = {e.get("trello_list", "") for e in creates}
-    unmapped = {l for l in trello_lists if l not in list_to_state and not l.startswith("Doing")}
+    unmapped = {
+        name
+        for name in trello_lists
+        if name not in list_to_state and not name.startswith("Doing")
+    }
     if not unmapped:
         return
     click.echo("FAIL: Trello lists with no state mapping:\n")
@@ -99,7 +103,9 @@ def validate_states(creates: list, list_to_state: dict):
     raise SystemExit(1)
 
 
-def build_payload(entry: dict, team: str, project: str | None, list_to_state: dict) -> dict:
+def build_payload(
+    entry: dict, team: str, project: str | None, list_to_state: dict
+) -> dict:
     if entry["action"] == "update":
         return {
             "action": "update",

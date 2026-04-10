@@ -31,7 +31,9 @@ def main(api_key_env: str, project: str, team: str, output: str):
     write_grouped(grouped, out)
     write_summary(grouped, issues, out)
 
-    click.echo(f"Exported {len(issues)} issues across {len(grouped)} states to {out}")
+    click.echo(
+        f"Exported {len(issues)} issues across {len(grouped)} states to {out}"
+    )
 
 
 ISSUES_QUERY = """{{
@@ -67,7 +69,8 @@ def paginate_issues(api_key: str, team: str, project: str):
     while True:
         after = f', after: "{cursor}"' if cursor else ""
         data = graphql(
-            api_key, ISSUES_QUERY.format(team=team, project=project, after=after)
+            api_key,
+            ISSUES_QUERY.format(team=team, project=project, after=after),
         )
         yield data["data"]["issues"]["nodes"]
         page = data["data"]["issues"]["pageInfo"]
@@ -77,8 +80,8 @@ def paginate_issues(api_key: str, team: str, project: str):
 
 
 def collect_labels(node: dict, labels: dict):
-    for l in node.get("labels", {}).get("nodes", []):
-        labels[l["name"]] = l.get("color", "")
+    for label in node.get("labels", {}).get("nodes", []):
+        labels[label["name"]] = label.get("color", "")
 
 
 def issue_record(n: dict) -> dict:
@@ -96,11 +99,13 @@ def issue_record(n: dict) -> dict:
 
 
 def label_names(n: dict) -> list:
-    return [l["name"] for l in n.get("labels", {}).get("nodes", [])]
+    return [label["name"] for label in n.get("labels", {}).get("nodes", [])]
 
 
 def attachment_records(n: dict) -> list:
-    return [attachment_record(a) for a in n.get("attachments", {}).get("nodes", [])]
+    return [
+        attachment_record(a) for a in n.get("attachments", {}).get("nodes", [])
+    ]
 
 
 def attachment_record(a: dict) -> dict:
@@ -126,7 +131,8 @@ def fetch_comments(api_key: str, issues: list):
     for i, issue in enumerate(issues):
         data = graphql(api_key, COMMENTS_QUERY.format(issue_id=issue["id"]))
         issue["comments"] = [
-            comment_record(c) for c in data["data"]["issue"]["comments"]["nodes"]
+            comment_record(c)
+            for c in data["data"]["issue"]["comments"]["nodes"]
         ]
         if i % 10 == 9:
             time.sleep(0.5)
@@ -152,7 +158,8 @@ def fetch_states(api_key: str, team: str) -> list:
 
 def write_labels(out: Path, labels: dict):
     write_json(
-        out / "labels.json", [{"name": n, "color": c} for n, c in labels.items()]
+        out / "labels.json",
+        [{"name": n, "color": c} for n, c in labels.items()],
     )
 
 
