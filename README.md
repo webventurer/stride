@@ -36,6 +36,13 @@ npx github:webventurer/stride
 
 This copies skills, commands, hooks, and docs into your project. It merges hook config into your existing `.claude/settings.json` (or creates one). Nothing is installed globally.
 
+## Setup
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+make install
+```
+
 ## Quick start
 
 ```bash
