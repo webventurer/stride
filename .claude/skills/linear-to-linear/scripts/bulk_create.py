@@ -29,7 +29,9 @@ def main(
     if dry_run:
         preview_payloads(payloads)
     else:
-        process_payloads(api_key, team_id, project_id, state_ids, label_ids, payloads)
+        process_payloads(
+            api_key, team_id, project_id, state_ids, label_ids, payloads
+        )
 
 
 def resolve_state_ids(api_key: str, team_id: str) -> dict:
@@ -42,7 +44,10 @@ LABELS_QUERY = """{ issueLabels { nodes { id name } } }"""
 
 def resolve_label_ids(api_key: str) -> dict:
     data = graphql(api_key, LABELS_QUERY)
-    return {l["name"]: l["id"] for l in data["data"]["issueLabels"]["nodes"]}
+    return {
+        label["name"]: label["id"]
+        for label in data["data"]["issueLabels"]["nodes"]
+    }
 
 
 def validate_states(payloads: list, state_ids: dict):
@@ -65,7 +70,9 @@ def report_missing_states(missing: set, state_ids: dict):
 
 def preview_payloads(payloads: list):
     for p in payloads:
-        click.echo(f"[DRY RUN] {p['title'][:60]} → {p.get('state', 'Backlog')}{preview_suffix(p)}")
+        click.echo(
+            f"[DRY RUN] {p['title'][:60]} → {p.get('state', 'Backlog')}{preview_suffix(p)}"
+        )
 
 
 def preview_suffix(p: dict) -> str:
@@ -78,11 +85,18 @@ def preview_suffix(p: dict) -> str:
 
 
 def process_payloads(
-    api_key: str, team_id: str, project_id: str, state_ids: dict, label_ids: dict, payloads: list
+    api_key: str,
+    team_id: str,
+    project_id: str,
+    state_ids: dict,
+    label_ids: dict,
+    payloads: list,
 ):
     created, failed = 0, 0
     for payload in payloads:
-        ok = create_issue(api_key, team_id, project_id, state_ids, label_ids, payload)
+        ok = create_issue(
+            api_key, team_id, project_id, state_ids, label_ids, payload
+        )
         created += ok
         failed += not ok
         throttle(created)
@@ -103,11 +117,18 @@ def load_create_payloads(cards_dir: Path) -> list:
 
 
 def create_issue(
-    api_key: str, team_id: str, project_id: str, state_ids: dict, label_ids: dict, payload: dict
+    api_key: str,
+    team_id: str,
+    project_id: str,
+    state_ids: dict,
+    label_ids: dict,
+    payload: dict,
 ) -> bool:
     state = payload.get("state", "Backlog")
     state_id = state_ids[state]
-    issue_input = build_issue_input(team_id, project_id, state_id, label_ids, payload)
+    issue_input = build_issue_input(
+        team_id, project_id, state_id, label_ids, payload
+    )
     issue_id = submit_issue(api_key, issue_input, payload["title"])
     if issue_id:
         create_attachments(api_key, issue_id, payload.get("attachments", []))
@@ -172,8 +193,14 @@ def create_attachments(api_key: str, issue_id: str, attachments: list):
             att_input["subtitle"] = a["subtitle"]
         if a.get("metadata"):
             att_input["metadata"] = a["metadata"]
-        result = graphql(api_key, CREATE_ATTACHMENT_QUERY, variables={"input": att_input})
-        success = result.get("data", {}).get("attachmentCreate", {}).get("success", False)
+        result = graphql(
+            api_key, CREATE_ATTACHMENT_QUERY, variables={"input": att_input}
+        )
+        success = (
+            result.get("data", {})
+            .get("attachmentCreate", {})
+            .get("success", False)
+        )
         icon = "✓" if success else "✗"
         click.echo(f"    {icon} attachment: {a['title'][:50]}")
 

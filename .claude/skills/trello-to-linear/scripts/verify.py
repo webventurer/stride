@@ -75,7 +75,6 @@ def check_titles(trello: list, linear: list):
 
 
 def check_order(trello: list, linear: list):
-    linear_by_title = {i["title"]: i for i in linear}
     linear_sorted = sorted(linear, key=sort_key)
 
     matches = 0
