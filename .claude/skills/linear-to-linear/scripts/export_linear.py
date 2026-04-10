@@ -48,7 +48,7 @@ ISSUES_QUERY = """{{
             id identifier title description url
             state {{ name }}
             labels {{ nodes {{ name color }} }}
-            attachments {{ nodes {{ title subtitle url sourceType }} }}
+            attachments {{ nodes {{ title subtitle url sourceType metadata }} }}
         }}
         pageInfo {{ hasNextPage endCursor }}
     }}
@@ -90,12 +90,15 @@ def issue_record(n: dict) -> dict:
 
 
 def attachment_record(a: dict) -> dict:
-    return {
+    rec = {
         "title": a["title"],
         "subtitle": a.get("subtitle", ""),
         "url": a["url"],
         "sourceType": a.get("sourceType", ""),
     }
+    if a.get("metadata"):
+        rec["metadata"] = a["metadata"]
+    return rec
 
 
 COMMENTS_QUERY = """{{

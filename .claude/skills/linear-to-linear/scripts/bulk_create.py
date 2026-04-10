@@ -167,6 +167,8 @@ def create_attachments(api_key: str, issue_id: str, attachments: list):
         att_input = {"issueId": issue_id, "title": a["title"], "url": a["url"]}
         if a.get("subtitle"):
             att_input["subtitle"] = a["subtitle"]
+        if a.get("metadata"):
+            att_input["metadata"] = a["metadata"]
         result = graphql(api_key, CREATE_ATTACHMENT_QUERY, variables={"input": att_input})
         success = result.get("data", {}).get("attachmentCreate", {}).get("success", False)
         icon = "✓" if success else "✗"
