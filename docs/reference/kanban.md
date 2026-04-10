@@ -11,10 +11,10 @@ See [Issue statuses](/reference/issue-statuses) for how to configure these colum
 | Category | Column | Purpose | Entry rule | Exit rule |
 |:---------|:-------|:--------|:-----------|:----------|
 | Backlog | **Backburner** | Parked work — valid but not now | Team agrees to defer | Re-prioritised back to Backlog or To do |
-| Backlog | **Backlog** | Ideas and requests not yet prioritised | Anyone can add work here | Prioritised and refined enough to start |
+| Backlog | **Backlog** | New work not yet prioritised | Anyone can add work here | Prioritised and refined enough to start |
 | Unstarted | **To do** | Committed work, ready to pick up | Prioritised by the team | Someone pulls it into Doing |
 | Started | **Doing** | Actively being worked on | Developer pulls from To do | Implementation complete, ready for review |
-| Started | **In Review** | Waiting for code review or QA | PR opened or review requested | Reviewer approves or requests changes |
+| Started | **In Review** | Code complete, under review | PR opened or review requested | Reviewer approves or requests changes |
 | Started | **Waiting** | Blocked on something external | Work cannot progress without input | Blocker resolved, moves back to Doing or forward |
 | Completed | **Done** | Merged and deployed | Review approved, PR merged | — |
 | Canceled | **Canceled** | Work we decided not to do | Team agrees to cancel | — |
@@ -25,7 +25,7 @@ See [Issue statuses](/reference/issue-statuses) for how to configure these colum
 | | | | | | | | | |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | **Backburner** | **Backlog** | **To do** | **Doing** | **In Review** | **Waiting** | **Done** | **Canceled** | **Duplicate** |
-| Valid, but not now | Work we want to achieve | Prioritised, ready to pick up | Actively being worked on | Waiting for review | Blocked externally | Merged and deployed | Decided not to do | Covered elsewhere |
+| Valid, but not now | New work, not yet prioritised | Prioritised, ready to pick up | Actively being worked on | Code complete, under review | Blocked externally | Merged and deployed | Decided not to do | Covered elsewhere |
 
 ### The rules
 
