@@ -71,7 +71,9 @@ def migrate_card_images(
     dry_run: bool,
 ):
     signed = fetch_signed_urls(source_key, card["id"])
-    url_map = migrate_all_images(target_key, card["images"], signed, dry_run)
+    url_map = migrate_all_images(
+        source_key, target_key, card["images"], signed, dry_run
+    )
     if url_map and not dry_run:
         append_images_to_issue(
             target_key, target_issues, card["title"], url_map
@@ -108,15 +110,18 @@ def url_path(url: str) -> str:
 
 
 def migrate_all_images(
-    target_key: str, images: list, signed: dict, dry_run: bool
+    source_key: str, target_key: str, images: list, signed: dict, dry_run: bool
 ) -> dict:
     url_map = {}
     for alt, old_url in images:
-        migrate_one_image(target_key, alt, old_url, signed, dry_run, url_map)
+        migrate_one_image(
+            source_key, target_key, alt, old_url, signed, dry_run, url_map
+        )
     return url_map
 
 
 def migrate_one_image(
+    source_key: str,
     target_key: str,
     alt: str,
     old_url: str,
@@ -131,15 +136,15 @@ def migrate_one_image(
     if dry_run:
         click.echo(f"  [DRY RUN] {alt}")
         return
-    result = download_and_upload(target_key, alt, signed_url)
+    result = download_and_upload(source_key, target_key, alt, signed_url)
     if result:
         url_map[old_url] = result
 
 
 def download_and_upload(
-    target_key: str, alt: str, signed_url: str
+    source_key: str, target_key: str, alt: str, signed_url: str
 ) -> tuple | None:
-    resp = requests.get(signed_url)
+    resp = requests.get(signed_url, headers={"Authorization": source_key})
     if resp.status_code != 200:
         click.echo(f"  ✗ Download failed: {resp.status_code}")
         return None
