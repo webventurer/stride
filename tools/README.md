@@ -20,6 +20,11 @@ This is a deliberate choice. The alternative — a published SDK with a
 support contract — costs more in ceremony than it would save in
 convenience for the small number of scripts that will ever use this.
 
+### Requirements
+
+- **Python 3.10+** — the module uses PEP 604 union syntax (`dict | None`). On 3.9 you will get a `TypeError` at import time.
+- **`requests`** — the only external dependency. `pip install requests` and you're done.
+
 ### What it provides
 
 - `graphql(api_key, query, variables)` — raw client with retries and
@@ -63,6 +68,18 @@ convenience for the small number of scripts that will ever use this.
   messages. Never logs API keys.
 - **Retries only connection errors and timeouts.** GraphQL errors are
   raised, not retried.
+
+### What's deliberately missing
+
+The current surface stops at the CRUD that our own in-repo skills needed. If you're integrating this into a new project, you may reach for helpers that aren't here:
+
+- `get_issue(issue_id)` — single-issue read. Use `list_issues(project_id=...)` and filter client-side, or call `graphql()` directly.
+- `list_comments(issue_id)` / `create_comment(issue_id, body)` — comment CRUD.
+- `list_milestones(project_id)` / `create_milestone(...)` — project milestones.
+- User, team, and cycle queries beyond `resolve_by_name()`.
+- Pagination cursors exposed to the caller (list helpers paginate internally and return the full list).
+
+These aren't broken or hidden — they're just outside the line WB-62 drew around "things our skills call". The vendor contract is explicit: copy the file and add what you need in your own vendored copy. The `graphql()` helper gives you the full Linear GraphQL API directly; the typed helpers are just a convenience layer over the dozen or so operations we happened to need first.
 
 ### Usage
 
