@@ -4,7 +4,8 @@ import json
 from pathlib import Path
 
 import click
-from linear_api import graphql, require_env
+
+from linear_client import LinearError, create_label, graphql, require_env
 
 
 @click.command()
@@ -64,26 +65,16 @@ def create_missing(api_key: str, source_labels: list, missing: set):
     click.echo(f"\nCreating {len(missing)} missing labels...")
     source_by_name = {label["name"]: label for label in source_labels}
     for name in sorted(missing):
-        color = source_by_name[name].get("color", "")
-        create_label(api_key, name, color)
+        color = source_by_name[name].get("color") or None
+        create_one_label(api_key, name, color)
 
 
-CREATE_LABEL_QUERY = """mutation($input: IssueLabelCreateInput!) {
-    issueLabelCreate(input: $input) { success issueLabel { id name } }
-}"""
-
-
-def create_label(api_key: str, name: str, color: str):
-    label_input = {"name": name}
-    if color:
-        label_input["color"] = color
-    result = graphql(
-        api_key, CREATE_LABEL_QUERY, variables={"input": label_input}
-    )
-    success = (
-        result.get("data", {}).get("issueLabelCreate", {}).get("success", False)
-    )
-    click.echo(f"  {'✓' if success else '✗'} {name}")
+def create_one_label(api_key: str, name: str, color: str | None):
+    try:
+        create_label(api_key, name=name, color=color)
+        click.echo(f"  ✓ {name}")
+    except LinearError as e:
+        click.echo(f"  ✗ {name} — {e}")
 
 
 if __name__ == "__main__":
