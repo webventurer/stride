@@ -1,7 +1,10 @@
 """Reusable Linear GraphQL client helpers.
 
 Vendored module — no support, no versioning, no PyPI. Copy and adapt
-to your needs. See scripts/README.md for the usage contract.
+to your needs. See tools/README.md for the usage contract.
+
+Requires Python 3.10+ (uses PEP 604 union syntax, e.g. `dict | None`).
+Only external dependency is `requests`.
 
 All mutation helpers accept IDs only (no name resolution), return the
 created or updated node's id as a string, and raise LinearError on
