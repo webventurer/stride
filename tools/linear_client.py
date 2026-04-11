@@ -9,6 +9,15 @@ Only external dependency is `requests`.
 All mutation helpers accept IDs only (no name resolution), return the
 created or updated node's id as a string, and raise LinearError on
 failure. Use resolve_by_name() to turn names into IDs.
+
+CRUD API calls (quick reference):
+
+    Issues      create_issue, update_issue, delete_issue, list_issues
+    Projects    create_project, update_project, delete_project, list_projects
+                create_project_update, create_project_link
+    Labels      create_label, delete_label, list_labels
+    Attachments create_attachment
+    Lookups     resolve_by_name, resolve_states
 """
 
 import os
