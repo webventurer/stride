@@ -75,9 +75,7 @@ def migrate_card_images(
         source_key, target_key, card["images"], signed, dry_run
     )
     if url_map and not dry_run:
-        append_images_to_issue(
-            target_key, target_issues, card["title"], url_map
-        )
+        replace_image_urls(target_key, target_issues, card["title"], url_map)
 
 
 def load_cards_with_images(export_dir: Path) -> list:
@@ -194,7 +192,7 @@ def build_upload_headers(upload_info: dict, content_type: str) -> dict:
     return headers
 
 
-def append_images_to_issue(
+def replace_image_urls(
     api_key: str, target_issues: list, title: str, url_map: dict
 ):
     issue = find_issue_by_title(target_issues, title)
@@ -202,10 +200,11 @@ def append_images_to_issue(
         click.echo(f"  ✗ Target not found: {title[:60]}")
         return
 
-    img_md = build_image_markdown(url_map)
-    new_desc = (issue.get("description", "") + "\n\n" + img_md).strip()
+    desc = issue.get("description", "")
+    for old_url, (_alt, new_url) in url_map.items():
+        desc = desc.replace(old_url, new_url)
     try:
-        update_issue(api_key, issue["id"], description=new_desc)
+        update_issue(api_key, issue["id"], description=desc)
         click.echo(f"  ✓ {title[:60]}: updated")
     except LinearError as e:
         click.echo(f"  ✗ {title[:60]}: {e}")
@@ -213,10 +212,6 @@ def append_images_to_issue(
 
 def find_issue_by_title(issues: list, title: str) -> dict | None:
     return next((i for i in issues if i["title"] == title), None)
-
-
-def build_image_markdown(url_map: dict) -> str:
-    return "\n\n".join(f"![{alt}]({url})" for alt, url in url_map.values())
 
 
 def fetch_target_issues(api_key: str, team: str, project: str) -> list:
