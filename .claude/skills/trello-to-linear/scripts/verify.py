@@ -158,17 +158,40 @@ def assemble_sections(
 
 
 def find_issue(title: str, issues_by_title: dict) -> dict | None:
-    return issues_by_title.get(title) or find_issue_case_insensitive(
-        title, issues_by_title
+    return (
+        issues_by_title.get(title)
+        or find_case_insensitive(title, issues_by_title)
+        or find_normalized(title, issues_by_title)
     )
 
 
-def find_issue_case_insensitive(
-    title: str, issues_by_title: dict
-) -> dict | None:
+def find_case_insensitive(title: str, issues_by_title: dict) -> dict | None:
     lower = title.lower().strip()
     matches = (
         v for k, v in issues_by_title.items() if k.lower().strip() == lower
+    )
+    return next(matches, None)
+
+
+SMART_QUOTES = str.maketrans(
+    {
+        "\u2018": "'",
+        "\u2019": "'",
+        "\u201c": '"',
+        "\u201d": '"',
+    }
+)
+
+
+def normalize_title(text: str) -> str:
+    collapsed = re.sub(r"\s+", " ", text.translate(SMART_QUOTES))
+    return collapsed.lower().strip().rstrip(".")
+
+
+def find_normalized(title: str, issues_by_title: dict) -> dict | None:
+    target = normalize_title(title)
+    matches = (
+        v for k, v in issues_by_title.items() if normalize_title(k) == target
     )
     return next(matches, None)
 
