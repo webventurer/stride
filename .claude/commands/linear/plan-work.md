@@ -131,15 +131,15 @@ Show the full draft to the user. Ask for explicit approval before creating.
 
 Only after explicit approval:
 
+First, resolve the Backlog status ID — call `list_issue_statuses` for the team and find the status with `name: "Backlog"` (not "Backburner" or other backlog-type statuses). Use the ID, not the name, when creating the issue.
+
 ```
 save_issue with:
   - team: resolved team
   - project: resolved project
-  - state: "Backlog"
+  - state: <Backlog status ID from list_issue_statuses>
   - title, description, priority, and labels from the draft
 ```
-
-**Important**: use the exact status name `"Backlog"`, not the type. Some teams have multiple statuses of type `backlog` (e.g. "Backburner" and "Backlog") — fuzzy matching may pick the wrong one. If the issue lands in the wrong status, update it immediately.
 
 Do not assign the issue unless the user explicitly requested it.
 
