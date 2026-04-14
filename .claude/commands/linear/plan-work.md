@@ -135,9 +135,11 @@ Only after explicit approval:
 save_issue with:
   - team: resolved team
   - project: resolved project
-  - status: "Backlog"
+  - state: "Backlog"
   - title, description, priority, and labels from the draft
 ```
+
+**Important**: use the exact status name `"Backlog"`, not the type. Some teams have multiple statuses of type `backlog` (e.g. "Backburner" and "Backlog") — fuzzy matching may pick the wrong one. If the issue lands in the wrong status, update it immediately.
 
 Do not assign the issue unless the user explicitly requested it.
 
