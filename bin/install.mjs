@@ -184,12 +184,27 @@ function writeMcpConfig(path, config) {
   writeFileSync(path, `${JSON.stringify(config, null, 2)}\n`);
 }
 
+function hasLinearMcp(mcpPath) {
+  if (!existsSync(mcpPath)) return false;
+  const config = JSON.parse(readFileSync(mcpPath, "utf8"));
+  const servers = Object.keys(config.mcpServers || {});
+  return servers.some((s) => s.toLowerCase().includes("linear"));
+}
+
 async function configureMcp() {
-  const method = await ask(
-    "Linear: OAuth (single org) or API key (multiple orgs)? (oauth/api) ",
-  );
-  const servers = isApiKey(method) ? LINEAR_API_KEY : LINEAR_OAUTH;
   const mcpPath = join(destRoot, ".mcp.json");
+  if (hasLinearMcp(mcpPath)) {
+    console.log("Linear MCP already configured in .mcp.json — skipping");
+    return;
+  }
+  const method = await ask(
+    "Linear MCP: oauth (single org), api (multiple orgs), or none? [none] ",
+  );
+  if (!method || method === "none" || method === "n" || method === "skip") {
+    console.log("Skipped Linear MCP setup");
+    return;
+  }
+  const servers = isApiKey(method) ? LINEAR_API_KEY : LINEAR_OAUTH;
   const config = readMcpConfig(mcpPath);
   deepMerge(config.mcpServers, servers);
   writeMcpConfig(mcpPath, config);
