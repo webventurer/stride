@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/userpromptsubmit/inject_design_principles.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/stride/hooks/userpromptsubmit/inject_design_principles.sh"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse/block_bare_git_commit.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/stride/hooks/pretooluse/block_bare_git_commit.sh"
           }
         ]
       }

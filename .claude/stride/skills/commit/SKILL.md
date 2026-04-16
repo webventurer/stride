@@ -41,7 +41,7 @@ description: Create atomic git commits using a four-pass methodology — content
 
 Read before executing:
 
-1. `.claude/docs/patterns/git/atomic-git-commits.md` — the full atomic commit methodology and Conventional Commits standard
+1. `.claude/stride/docs/patterns/git/atomic-git-commits.md` — the full atomic commit methodology and Conventional Commits standard
 
 ---
 
@@ -123,10 +123,10 @@ git add TODO.md docs/research/ai-coding/what-is-a-frame.md
 
 # GOOD: Separate atomic commits
 git add TODO.md
-.claude/hooks/do_commit.sh -m "build: Add TODO.md with AI frame loading system entry"
+.claude/stride/hooks/do_commit.sh -m "build: Add TODO.md with AI frame loading system entry"
 
 git add docs/research/ai-coding/what-is-a-frame.md
-.claude/hooks/do_commit.sh -m "docs: Create comprehensive frame concept documentation"
+.claude/stride/hooks/do_commit.sh -m "docs: Create comprehensive frame concept documentation"
 ```
 
 ---

@@ -57,7 +57,7 @@ const STRIDE_HOOKS = {
           {
             type: "command",
             command:
-              "$CLAUDE_PROJECT_DIR/.claude/hooks/userpromptsubmit/inject_design_principles.sh",
+              "$CLAUDE_PROJECT_DIR/.claude/stride/hooks/userpromptsubmit/inject_design_principles.sh",
           },
         ],
       },
@@ -69,7 +69,7 @@ const STRIDE_HOOKS = {
           {
             type: "command",
             command:
-              "$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse/block_bare_git_commit.sh",
+              "$CLAUDE_PROJECT_DIR/.claude/stride/hooks/pretooluse/block_bare_git_commit.sh",
           },
         ],
       },

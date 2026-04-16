@@ -30,24 +30,24 @@ your-project/
 
 ## The three layers
 
-### 1. Knowledge (`.claude/docs/`)
+### 1. Knowledge (`.claude/stride/docs/`)
 
 Foundational concepts the agent needs to understand *why* things work a certain way. The commit skill references `atomic-git-commits.md` as required reading — without it, the agent would follow rules without understanding the reasoning behind them.
 
-### 2. Skills and commands (`.claude/skills/`, `.claude/commands/`)
+### 2. Skills and commands (`.claude/stride/skills/`, `.claude/stride/commands/`)
 
 Executable instructions the agent follows step by step. Each skill has:
 
 - **SKILL.md** — the principles, decision rules, and reference material
 - **WORKFLOW.md** — the exact execution sequence
 
-**Skills** live in `.claude/skills/` and are invoked directly (`/commit`, `/craft`). A skill has its own `SKILL.md` (principles and rules) and `WORKFLOW.md` (execution steps) — it's a self-contained methodology the agent internalises.
+**Skills** live in `.claude/stride/skills/` and are invoked directly (`/commit`, `/craft`). A skill has its own `SKILL.md` (principles and rules) and `WORKFLOW.md` (execution steps) — it's a self-contained methodology the agent internalises.
 
-**Commands** live in `.claude/commands/` and are namespaced (`/linear:start`, `/linear:finish`). Each command is a single markdown file describing one discrete action. Commands are grouped by integration — all five Linear commands share context but execute independently.
+**Commands** live in `.claude/stride/commands/` and are namespaced (`/linear:start`, `/linear:finish`). Each command is a single markdown file describing one discrete action. Commands are grouped by integration — all five Linear commands share context but execute independently.
 
 The distinction: a skill teaches the agent *how to think* about a problem (atomic commits, prompt crafting). A command tells the agent *what to do* in a specific situation (start an issue, merge a PR).
 
-### 3. Safety (`.claude/hooks/`)
+### 3. Safety (`.claude/stride/hooks/`)
 
 Hooks that enforce discipline at the tool level:
 
@@ -95,14 +95,14 @@ This requires an OpenRouter API key. See the [install guide](/install) for setup
 
 When you run `npx github:webventurer/stride`, the script (`bin/install.mjs`) does four things:
 
-1. **Copies files** into your project's `.claude/` directory — skills, commands, hooks, docs, and the `tools/` folder
+1. **Copies files** into `.claude/stride/` — skills, commands, hooks, docs, and tools in one namespaced folder
 2. **Sets permissions** — makes hook scripts (`do_commit.sh`, `block_bare_git_commit.sh`) executable
 3. **Merges settings** — if you already have a `.claude/settings.json`, it asks before merging. If you say no, nothing is touched. If you don't have one, it creates a minimal config with the commit hook wired up
 4. **Prints a summary** — shows what was installed and which commands are available
 
 The merge is additive — it adds stride's hooks alongside your existing config using a deep merge with deduplication. It never removes or overwrites your existing settings.
 
-**If something goes wrong:** the script only writes to `.claude/` and `tools/` inside your project. Delete those directories to fully uninstall. There are no global side effects.
+**If something goes wrong:** `rm -rf .claude/stride/` removes everything stride installed. There are no global side effects.
 
 ## Customising
 
@@ -110,13 +110,13 @@ The "no lock-in" promise means you can change anything. Here's what's safe to ed
 
 | What | Safe to edit? | Notes |
 |:-----|:--------------|:------|
-| Commit prefixes | Yes | Edit `.claude/skills/commit/SKILL.md` — change the prefix table |
+| Commit prefixes | Yes | Edit `.claude/stride/skills/commit/SKILL.md` — change the prefix table |
 | Commit message rules | Yes | Edit `SKILL.md` and `WORKFLOW.md` — your rules, your standards |
-| Linear command behaviour | Yes | Edit files in `.claude/commands/linear/` — each command is a standalone markdown file |
-| Hook scripts | Yes | Edit or remove scripts in `.claude/hooks/` — update `settings.json` to match |
-| Foundational docs | Yes | Edit `.claude/docs/` — these shape the agent's understanding |
+| Linear command behaviour | Yes | Edit files in `.claude/stride/commands/linear/` — each command is a standalone markdown file |
+| Hook scripts | Yes | Edit or remove scripts in `.claude/stride/hooks/` — update `settings.local.json` to match |
+| Foundational docs | Yes | Edit `.claude/stride/docs/` — these shape the agent's understanding |
 | Settings deny list | Yes | Add your own deny rules to `.claude/settings.json` |
-| Adding new skills | Yes | Create a new directory under `.claude/skills/` with a `SKILL.md` — Claude Code auto-discovers it |
+| Adding new skills | Yes | Create a new directory under `.claude/stride/skills/` with a `SKILL.md` — Claude Code auto-discovers it |
 
 **Pulling upstream updates:** there's no automatic upgrade path. If you want to pick up changes from stride, re-run the install script — it will overwrite files but won't remove your additions. For heavy customisation, fork the repo and maintain your own version.
 

@@ -10,16 +10,7 @@ if (existsSync(join(destRoot, "bin/install.mjs"))) {
   process.exit(1);
 }
 
-const DIRS = [
-  ".claude/skills/commit",
-  ".claude/skills/craft",
-  ".claude/commands/linear",
-  ".claude/hooks",
-  ".claude/stride/docs/patterns/git",
-  ".claude/stride/docs/concepts",
-  ".claude/stride/docs/principles",
-  "tools",
-];
+const DIRS = [".claude/stride"];
 
 const EXAMPLE_FILES = [".mcp.json.example"];
 
@@ -67,12 +58,7 @@ function main() {
   removeHookConfig();
 
   console.log("Removed:");
-  console.log("  .claude/skills/commit/     (4-pass atomic commit skill)");
-  console.log("  .claude/skills/craft/      (CRAFT prompt skill)");
-  console.log("  .claude/commands/linear/   (Linear workflow commands)");
-  console.log("  .claude/hooks/             (commit hook scripts)");
-  console.log("  .claude/stride/docs/       (principles, patterns, concepts)");
-  console.log("  tools/                     (cross-model feedback script)");
+  console.log("  .claude/stride/            (all stride content)");
   console.log("  .mcp.json.example          (Linear MCP server reference)");
   console.log(
     "  hooks config               (from .claude/settings.local.json)",

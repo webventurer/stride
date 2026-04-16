@@ -136,14 +136,16 @@ Get your key at [openrouter.ai/keys](https://openrouter.ai/keys).
 ## What gets installed
 
 ```bash
-.claude/
+.claude/stride/
 ├── skills/commit/           # skill + workflow + reference docs
+├── skills/craft/            # CRAFT prompt skill
 ├── commands/linear/         # 5 commands + reference docs
 ├── hooks/                   # commit wrapper + bare-commit blocker
-└── docs/                    # supporting patterns and concepts
+├── docs/                    # supporting patterns and concepts
+└── tools/                   # cross-model feedback script
 ```
 
-The install script merges hook config into `.claude/settings.local.json` (gitignored) — your committed `settings.json` is never modified. Claude Code concatenates hooks from both files, so repo hooks and stride hooks run together.
+Everything lives under `.claude/stride/` — add one line to your `.gitignore` and never touch it again. Hook config goes into `.claude/settings.local.json` (gitignored) — your committed `settings.json` is never modified. Claude Code concatenates hooks from both files, so repo hooks and stride hooks run together.
 
 ## Migration skills
 
@@ -177,7 +179,7 @@ npx github:webventurer/stride#<commit-sha>
 
 The commit safety hook (`block_bare_git_commit.sh`) is a shell script. If it fails — wrong shell, missing permissions, Windows without WSL — the enforcement disappears silently. The agent will happily use bare `git commit` without the four-pass methodology.
 
-**Check it's working:** if you can run `.claude/hooks/do_commit.sh --help` without errors, you're fine. If not, check that the scripts are executable (`chmod +x .claude/hooks/*.sh`).
+**Check it's working:** if you can run `.claude/stride/hooks/do_commit.sh --help` without errors, you're fine. If not, check that the scripts are executable (`chmod +x .claude/stride/hooks/*.sh`).
 
 ### Settings merge strategy
 

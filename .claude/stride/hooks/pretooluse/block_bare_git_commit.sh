@@ -2,7 +2,7 @@
 # PreToolUse hook: block ALL bare git commit commands.
 #
 # All commits must go through the /commit skill, which uses
-# .claude/hooks/do_commit.sh instead of git commit directly.
+# .claude/stride/hooks/do_commit.sh instead of git commit directly.
 # The hook only sees the top-level Bash command, so the wrapper
 # script's internal git commit is invisible to it.
 #

@@ -6,7 +6,7 @@
 # hook inspects the top-level Bash command (not subprocesses),
 # calling this script bypasses the block cleanly.
 #
-# Usage: .claude/hooks/do_commit.sh -m "feat: Subject" -m "Body..."
+# Usage: .claude/stride/hooks/do_commit.sh -m "feat: Subject" -m "Body..."
 # All arguments are forwarded to git commit.
 
 git commit "$@"

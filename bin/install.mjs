@@ -26,7 +26,7 @@ const HOOK_CONFIG = {
           {
             type: "command",
             command:
-              "$CLAUDE_PROJECT_DIR/.claude/hooks/userpromptsubmit/inject_design_principles.sh",
+              "$CLAUDE_PROJECT_DIR/.claude/stride/hooks/userpromptsubmit/inject_design_principles.sh",
           },
         ],
       },
@@ -38,7 +38,7 @@ const HOOK_CONFIG = {
           {
             type: "command",
             command:
-              "$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse/block_bare_git_commit.sh",
+              "$CLAUDE_PROJECT_DIR/.claude/stride/hooks/pretooluse/block_bare_git_commit.sh",
           },
         ],
       },
@@ -85,20 +85,20 @@ function dedupeHooks(existing, incoming) {
 }
 
 const DIRS = [
-  ".claude/skills/commit",
-  ".claude/skills/craft",
-  ".claude/commands/linear",
-  ".claude/hooks",
+  ".claude/stride/skills/commit",
+  ".claude/stride/skills/craft",
+  ".claude/stride/commands/linear",
+  ".claude/stride/hooks",
   ".claude/stride/docs/patterns/git",
   ".claude/stride/docs/concepts",
   ".claude/stride/docs/principles",
-  "tools",
+  ".claude/stride/tools",
 ];
 
 const HOOKS = [
-  ".claude/hooks/do_commit.sh",
-  ".claude/hooks/pretooluse/block_bare_git_commit.sh",
-  ".claude/hooks/userpromptsubmit/inject_design_principles.sh",
+  ".claude/stride/hooks/do_commit.sh",
+  ".claude/stride/hooks/pretooluse/block_bare_git_commit.sh",
+  ".claude/stride/hooks/userpromptsubmit/inject_design_principles.sh",
 ];
 
 function resolveTypeMismatch(dest) {
@@ -235,13 +235,15 @@ function installFiles() {
 }
 
 function logCopiedFiles() {
-  console.log("Copied:");
-  console.log("  .claude/skills/commit/     (4-pass atomic commit skill)");
-  console.log("  .claude/commands/linear/   (Linear workflow commands)");
-  console.log("  .claude/hooks/             (commit hook scripts)");
-  console.log("  .claude/stride/docs/       (principles, patterns, concepts)");
-  console.log("  tools/                     (cross-model feedback script)");
-  console.log("  .mcp.json.example          (Linear MCP server reference)");
+  console.log("Copied to .claude/stride/:");
+  console.log("  skills/commit/     (4-pass atomic commit skill)");
+  console.log("  skills/craft/      (CRAFT prompt skill)");
+  console.log("  commands/linear/   (Linear workflow commands)");
+  console.log("  hooks/             (commit hook scripts)");
+  console.log("  docs/              (principles, patterns, concepts)");
+  console.log("  tools/             (cross-model feedback script)");
+  console.log("Also:");
+  console.log("  .mcp.json.example  (Linear MCP server reference)");
 }
 
 async function confirmSettingsMerge() {

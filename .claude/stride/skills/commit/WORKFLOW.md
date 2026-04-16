@@ -189,7 +189,7 @@ The diff tells you *what changed*. The user's intent tells you *why*. The commit
 Use multiple `-m` flags to avoid heredoc issues with special characters:
 
 ```bash
-.claude/hooks/do_commit.sh -m "type: Subject line here" -m "Explanatory paragraph about
+.claude/stride/hooks/do_commit.sh -m "type: Subject line here" -m "Explanatory paragraph about
 why this change was needed. Keep lines under
 72 characters.
 
@@ -251,10 +251,10 @@ git reset HEAD .
 
 # Now re-stage and commit each logical change separately
 git add <files-for-change-1>
-.claude/hooks/do_commit.sh -m "prefix: First logical change"
+.claude/stride/hooks/do_commit.sh -m "prefix: First logical change"
 
 git add <files-for-change-2>
-.claude/hooks/do_commit.sh -m "prefix: Second logical change"
+.claude/stride/hooks/do_commit.sh -m "prefix: Second logical change"
 ```
 
 ### Folding mistakes
@@ -263,7 +263,7 @@ If a commit has a small error (typo, missed file) that belongs to the same logic
 
 ```bash
 git add .
-.claude/hooks/do_commit.sh --amend --no-edit
+.claude/stride/hooks/do_commit.sh --amend --no-edit
 ```
 
 Only use `--amend` for unpushed commits.
