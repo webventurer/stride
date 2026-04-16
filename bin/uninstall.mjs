@@ -58,6 +58,7 @@ function removeStrideFiles(dir) {
     if (existsSync(target)) unlinkSync(target);
   }
   pruneEmptyDirs(destDir);
+  pruneEmptyAncestors(destDir);
 }
 
 function pruneEmptyDirs(dir) {
@@ -67,6 +68,16 @@ function pruneEmptyDirs(dir) {
     if (lstatSync(full).isDirectory()) pruneEmptyDirs(full);
   }
   if (readdirSync(dir).length === 0) rmdirSync(dir);
+}
+
+function pruneEmptyAncestors(dir) {
+  const claudeRoot = join(destRoot, ".claude");
+  let current = dirname(dir);
+  while (current.length > claudeRoot.length && current.startsWith(claudeRoot)) {
+    if (!existsSync(current) || readdirSync(current).length > 0) return;
+    rmdirSync(current);
+    current = dirname(current);
+  }
 }
 
 function isStrideHook(entry) {
