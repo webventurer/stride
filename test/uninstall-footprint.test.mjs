@@ -122,4 +122,41 @@ describe("uninstall footprint", () => {
 
     strictEqual(existsSync(join(fixtureRoot, ".claude/skills/commit")), false);
   });
+
+  it("prunes empty parent directories above stride's dirs", () => {
+    seedInstalled();
+
+    runUninstall();
+
+    // .claude/skills/ held only stride subdirs, should be gone
+    strictEqual(existsSync(join(fixtureRoot, ".claude/skills")), false);
+    strictEqual(existsSync(join(fixtureRoot, ".claude/commands")), false);
+    strictEqual(existsSync(join(fixtureRoot, ".claude/stride")), false);
+  });
+
+  it("stops pruning at .claude/ — does not remove the consumer-owned root", () => {
+    seedInstalled();
+
+    runUninstall();
+
+    // .claude/ still exists (has settings.local.json) — it's the consumer's
+    strictEqual(existsSync(join(fixtureRoot, ".claude")), true);
+  });
+
+  it("keeps parent directories that still hold non-stride content", () => {
+    seedInstalled();
+    writeSentinel(
+      ".claude/skills/my-custom-skill/SKILL.md",
+      "consumer's own skill",
+    );
+
+    runUninstall();
+
+    // .claude/skills/ has my-custom-skill, should survive
+    strictEqual(existsSync(join(fixtureRoot, ".claude/skills")), true);
+    strictEqual(
+      existsSync(join(fixtureRoot, ".claude/skills/my-custom-skill/SKILL.md")),
+      true,
+    );
+  });
 });
