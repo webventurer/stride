@@ -213,12 +213,13 @@ function mergeSettings() {
   writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 }
 
-async function main() {
-  console.log("\nstride — All the speed. None of the mess.\n");
-
-  // Copy skill and command files
+function installFiles() {
   copyFiles();
   copyExampleFiles();
+  logCopiedFiles();
+}
+
+function logCopiedFiles() {
   console.log("Copied:");
   console.log("  .claude/skills/commit/     (4-pass atomic commit skill)");
   console.log("  .claude/commands/linear/   (Linear workflow commands)");
@@ -226,33 +227,33 @@ async function main() {
   console.log("  .claude/docs/              (principles, patterns, concepts)");
   console.log("  tools/                     (cross-model feedback script)");
   console.log("  .mcp.json.example          (Linear MCP server reference)");
+}
 
-  // Configure Linear MCP
-  await configureMcp();
+async function confirmSettingsMerge() {
+  const answer = await ask(
+    "\nMerge hook config into existing .claude/settings.local.json? (y/n) ",
+  );
+  return answer === "y" || answer === "yes";
+}
 
-  // Merge settings into local (gitignored) settings
-  const settingsPath = join(destRoot, ".claude/settings.local.json");
-  const settingsExist = existsSync(settingsPath);
-
-  if (settingsExist) {
-    const answer = await ask(
-      "\nMerge hook config into existing .claude/settings.local.json? (y/n) ",
+async function installHookConfig() {
+  const existed = existsSync(join(destRoot, ".claude/settings.local.json"));
+  if (existed && !(await confirmSettingsMerge())) {
+    console.log(
+      "Skipped settings merge. You can add the hooks manually — see README.",
     );
-    if (answer !== "y" && answer !== "yes") {
-      console.log(
-        "Skipped settings merge. You can add the hooks manually — see README.",
-      );
-      return;
-    }
+    return false;
   }
-
   mergeSettings();
   console.log(
-    settingsExist
+    existed
       ? "Merged hooks into .claude/settings.local.json"
       : "Created .claude/settings.local.json with hook config",
   );
+  return true;
+}
 
+function logAvailableSkills() {
   console.log("\nDone. Available skills:");
   console.log("  /commit              — 4-pass atomic git commits");
   console.log("  /linear:check        — verify MCP connections");
@@ -261,6 +262,14 @@ async function main() {
   console.log("  /linear:fix          — address PR review feedback");
   console.log("  /linear:finish       — merge and close");
   console.log("  /linear:next-steps   — review priorities\n");
+}
+
+async function main() {
+  console.log("\nstride — All the speed. None of the mess.\n");
+  installFiles();
+  await configureMcp();
+  if (!(await installHookConfig())) return;
+  logAvailableSkills();
 }
 
 main();
