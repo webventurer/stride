@@ -54,6 +54,17 @@ gh repo clone webventurer/app-starter
 ./app-starter/scripts/create.sh my-app
 ```
 
+### [python-template](https://github.com/webventurer/python-template)
+
+A Python project starter with development tooling already wired up — direnv for environment management, pip-tools for dependencies, Pyright for type checking, pre-commit hooks, and pytest for tests. A Makefile, setup script, and GitHub Actions come in the box so you start from a working project on day one.
+
+```bash
+gh repo clone webventurer/python-template
+cd python-template
+direnv allow
+./scripts/setup.sh
+```
+
 ## Next steps
 
 - [How it works](/how-it-works) — see what gets installed and how the pieces connect
