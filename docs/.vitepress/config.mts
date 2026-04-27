@@ -43,6 +43,15 @@ export default defineConfig({
           { text: 'Migration skills', link: '/reference/migration-skills' },
         ],
       },
+      {
+        text: 'Research',
+        items: [
+          { text: 'Epics, stories, and tasks', link: '/research/epics-and-user-stories' },
+          { text: 'Orchestrator and loop', link: '/research/orchestrator-and-loop' },
+          { text: 'Sprint vs kanban', link: '/research/agile/sprint-vs-kanban' },
+          { text: 'What agile really means', link: '/research/agile/what-agile-really-means' },
+        ],
+      },
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/webventurer/stride' },
