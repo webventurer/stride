@@ -77,6 +77,16 @@ Ends by asking: "Does this look right, or do you want changes?"
 
 Reviewer feedback takes priority over the original issue — plans evolve through review.
 
+**When to use it:**
+
+| Situation | Use |
+|:----------|:----|
+| You're driving the iteration yourself, mid-session | Keep talking to Claude in the same session — faster, no PR-comment overhead |
+| Someone else (or future-you) reviewed on GitHub | `/linear:fix` — built to read PR reviews and apply them in one pass |
+| You want the reasoning visible on the PR record | PR comments + `/linear:fix` — leaves a durable trail |
+
+`/linear:fix` is the tool for *external review feedback*. In-session chat is the tool for *you steering*. Don't add PR comments to yourself just to feed `/linear:fix` — that's ceremony for no gain.
+
 **Usage**:
 
 - `/linear:fix PG-205` — explicit issue
