@@ -122,7 +122,7 @@ Linear gives us four primitives worth knowing about here — **Project**, **Mile
 |:----------------|:-----------------|:-------------|
 | **Product / vision** | Project | `Stride >>>` — the whole-product container |
 | **Epic** (big initiative) | **Milestone** inside the project (preferred); a dedicated Project only at a scale stride isn't at | *None explicit yet.* The `Stride >>>` project acts as one implicit epic |
-| **Story** (slice of value) | Issue | WB-240 — *Stride installer should hash-compare before refusing on conflict* |
+| **Story** (slice of value) | Issue | WB-240 — *Stride installs cleanly when consumer files already match* |
 | **Iteration** (one agent loop pass) | *Not surfaced in Linear* — lives in the agent's working state | The plan / implement / review passes the agent runs while driving WB-240 to done |
 | **Task** (unit of work) | Atomic commit, or Sub-issue for bigger breakdowns | The individual commits on the WB-240 branch — one idea each |
 
@@ -193,7 +193,7 @@ The `Stride >>>` Linear project is the **whole-product container** — not an ep
 
 Recent issues inside the project behave like stories:
 
-- **WB-240** — *Installer should hash-compare before refusing on conflict.* Slice of user value: consumers who already have codefu installed can now install stride without a type-mismatch refusal.
+- **WB-240** — *Stride installs cleanly when consumer files already match.* Slice of user value: consumers who already have codefu installed can now install stride without a type-mismatch refusal.
 - **WB-238** — *Write stride paths to the consumer's `.gitignore` on install.* Slice of user value: consumers don't need to edit `.gitignore` by hand.
 - **WB-234** — *Installer deletes files outside its footprint.* Slice of user value: the consumer's existing files survive a stride install.
 
