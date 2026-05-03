@@ -2,8 +2,6 @@
 
 Stride breaks work into three layers — **epic, story, task** — and maps them onto Linear's primitives. This page is the reference for what each layer is, where it lives, and how the `/linear` commands use them.
 
-For the *why* behind the choices (vocabulary origins, the trade-off between three possible epic mappings, the live question on non-user-facing work), see the [research doc](/research/epics-and-user-stories).
-
 ## The mapping
 
 | Layer | Linear primitive | Where it lives |

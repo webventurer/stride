@@ -47,9 +47,6 @@ export default defineConfig({
       {
         text: 'Research',
         items: [
-          { text: 'Epics, stories, and tasks', link: '/research/epics-and-user-stories' },
-          { text: 'Should stride add iterations?', link: '/research/add-iterations' },
-          { text: 'Orchestrator and loop', link: '/research/orchestrator-and-loop' },
           { text: 'Sprint vs kanban', link: '/research/agile/sprint-vs-kanban' },
           { text: 'What agile really means', link: '/research/agile/what-agile-really-means' },
         ],

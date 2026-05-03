@@ -113,7 +113,7 @@ For stride today — small codebase, a lot of work touching `bin/install.mjs`, t
 | Factor | Effect |
 |:-------|:-------|
 | **Strong test coverage** | Raises the cap — AI-merged code with comprehensive tests passing is high-confidence. Without tests, AI merge is a gamble. |
-| **Well-decomposed stories** (see [epic / story / task](../epics-and-user-stories)) | Reduces conflict frequency entirely — disjoint stories don't fight at merge. Better still: **AI can read a well-carved epic plan and route itself through the work accordingly** — picking up non-overlapping slices, sequencing dependencies, not stepping on other agents. Good decomposition multiplied by AI execution is a qualitatively different thing than either alone. |
+| **Well-decomposed stories** (see [epic / story / task](/reference/epics-and-user-stories)) | Reduces conflict frequency entirely — disjoint stories don't fight at merge. Better still: **AI can read a well-carved epic plan and route itself through the work accordingly** — picking up non-overlapping slices, sequencing dependencies, not stepping on other agents. Good decomposition multiplied by AI execution is a qualitatively different thing than either alone. |
 
 Both caps are about the *same* bottleneck showing up in different places: the human. As **reviewer**, you can't read more than *N* diffs; as **integrator / conflict-resolver**, you can't hold the shape of *N* overlapping streams. So the WIP discipline in human+agents kanban isn't one cap:
 
@@ -123,14 +123,14 @@ Sprint doesn't help on either side — arguably makes merging worse by bunching 
 
 ### The other wrinkle — story decomposition matters more, not less
 
-Multiple agents working in parallel on oversized stories produces merge conflicts, context thrash, and half-implemented features. So the [epic / story / task decomposition](../epics-and-user-stories) isn't optional in this world — it's **load-bearing**. Well-carved atomic stories are how you keep agents from colliding.
+Multiple agents working in parallel on oversized stories produces merge conflicts, context thrash, and half-implemented features. So the [epic / story / task decomposition](/reference/epics-and-user-stories) isn't optional in this world — it's **load-bearing**. Well-carved atomic stories are how you keep agents from colliding.
 
 So kanban fits — *but* the story-decomposition discipline and the review-lane WIP cap are what make it actually work under agents.
 
 ### The torch — what I'm not saying
 
 - **"Kanban pull" is subtly different with agents.** Classic kanban-pull assumes workers choose when to start. Agents usually need to be *dispatched* by the human. Technically it's push-from-human, pull-from-agent-capacity. Doesn't break kanban, but be honest about the mechanics.
-- **We may need new vocabulary eventually.** Sprint-vs-kanban was designed for teams of humans. Solo-human + N-agents sits outside that dichotomy. Kanban is the closest fit *today*, but a third model may emerge as the pattern matures. The signal to watch for: if you find yourself inventing terms that don't map cleanly onto either sprint or kanban, that's *friction is information* — something needs a new name. The first such name has already emerged: the **orchestrator + loop** split (see [Orchestrator and loop](../orchestrator-and-loop)) — neither a sprint mechanism nor a pure kanban one, but the shape that fits when one human orchestrates many agent loops.
+- **We may need new vocabulary eventually.** Sprint-vs-kanban was designed for teams of humans. Solo-human + N-agents sits outside that dichotomy. Kanban is the closest fit *today*, but a third model may emerge as the pattern matures. The signal to watch for: if you find yourself inventing terms that don't map cleanly onto either sprint or kanban, that's *friction is information* — something needs a new name.
 
 ## Why our agile-sourced docs keep saying "sprint"
 
