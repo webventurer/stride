@@ -10,10 +10,11 @@ Accepts a description and optional flags: `/plan-work --research --craft "add er
 ## Flags
 
 - `--research` — explore codebase and Linear before drafting (adds implementation notes, code examples, related code and issues)
-- `--craft` — auto-run CRAFT prompt refinement without asking (skips the interactive prompt in step 3)
+- `--craft` — auto-run CRAFT prompt refinement without asking (skips the interactive prompt in step 4)
 
 ## Decision rules
 
+- **Vision is the anchor**: every issue must trace back to a Vision outcome. The draft's "Why this matters" section must reference which Vision outcome the issue serves. If it can't, flag and ask the user — the issue may be out of scope. Without `VISION.md` at the repo root, the command stops and suggests `/vision` (see step 1).
 - **Sizing first**: before drafting, determine whether the description is story-sized (one deliverable, ships as one PR) or epic-sized (a named initiative with multiple stories). Epic-sized work becomes a Milestone; story-sized work becomes an Issue linked to a Milestone if one exists.
 - One issue = one deliverable. If the description contains "and" connecting unrelated outcomes, split.
 - Default to the smallest issue that moves something forward. If the user's description is broad, propose a focused first issue plus follow-ups.
@@ -37,15 +38,39 @@ Check for a `.linear_project` file in the repository root.
 
 Use the resolved project name for all Linear API calls in this command.
 
-### 1. Parse arguments
+### 1. Vision check
+
+Vision is the upstream anchor — every issue drafted by stride must trace back to a Vision outcome. Before sizing or drafting, check that one exists.
+
+Read `VISION.md` from the repo root.
+
+- **If missing**: stop and tell the user:
+
+  ```
+  No VISION.md found at the repo root.
+
+  /linear:plan-work needs a Vision to anchor issues to — without
+  one, every issue is drafted in a vacuum and nothing measures
+  whether the work belongs in this project.
+
+  Run /vision first, then re-run /linear:plan-work.
+  ```
+
+  Do not draft an issue against a project with no anchor.
+
+- **If present**: read the full file and load it as context for the rest of the flow. The Success Criteria section in particular tells you what outcomes the project is committed to — the draft's "Why this matters" should connect the proposed work to one of them.
+
+<mark>**This is a hard gate, not a warning.**</mark> Stop-and-suggest, don't draft-with-warning. Vision-less drafting produces issues that look fine in isolation but accumulate as drift.
+
+### 2. Parse arguments
 
 Extract the description and flags from `$ARGUMENTS`. Determine if `--research` and/or `--craft` are present.
 
-### 1b. Sizing gate
+### 2b. Sizing gate
 
 Ask the user: **"Is this story-sized (one deliverable, ships as one PR) or epic-sized (a named initiative with multiple stories)?"**
 
-**If story-sized** — continue to step 2 as normal. At step 9 (create issue), also call `list_milestones` for the project: if any milestones exist, ask "Link this story to an existing epic?" and if yes, set the `milestone` field on `save_issue`.
+**If story-sized** — continue to step 3 as normal. At step 10 (create issue), also call `list_milestones` for the project: if any milestones exist, ask "Link this story to an existing epic?" and if yes, set the `milestone` field on `save_issue`.
 
 **If epic-sized** — follow the epic path:
 
@@ -54,12 +79,12 @@ Ask the user: **"Is this story-sized (one deliverable, ships as one PR) or epic-
 3. If creating: ask for a name and one-line description, then call `save_milestone` with `name`, `description`, and `project`
 4. Confirm the milestone with the user before proceeding
 5. Ask: "What are the first 1–3 stories for this epic?" — each answer becomes a separate issue draft
-6. For each story: run the full flow from step 2 onwards (duplicate check, CRAFT if requested, draft, approval, create) with `milestone` set to the new or chosen milestone
+6. For each story: run the full flow from step 3 onwards (duplicate check, CRAFT if requested, draft, approval, create) with `milestone` set to the new or chosen milestone
 7. After all stories are created, summarise: list the milestone and all created issues
 
 <mark>**Do not bundle all stories into one issue.** Each story is its own issue linked to the milestone.</mark>
 
-### 2. Duplicate check (all modes)
+### 3. Duplicate check (all modes)
 
 Search Linear for potentially related issues:
 
@@ -72,7 +97,7 @@ Handle results in two tiers:
 - **Exact or near-exact duplicates** (same problem, same scope): warn strongly, show them, and ask whether to proceed or stop.
 - **Similar or related issues** (overlapping area but different scope/angle): show briefly, continue drafting, and reference them in the draft's "Related issues" section.
 
-### 3. CRAFT prompt refinement (all modes)
+### 4. CRAFT prompt refinement (all modes)
 
 <mark>**When `--craft` is present, always run CRAFT before research. Never skip this step.**</mark> The user passes `--craft` to sharpen their description into a clearer prompt — skipping it means research works from a vaguer input than intended.
 
@@ -81,15 +106,15 @@ If `--craft` flag is present, run CRAFT automatically. Otherwise, ask the user: 
 - If **yes** (or `--craft`): read [reference/ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md), run `/craft` using that template with the user's description, then use the refined output as the description for all subsequent steps
 - If **no**: continue with the original description
 
-### 4. Research (only with `--research`)
+### 5. Research (only with `--research`)
 
 - Search the codebase for 2–5 relevant files using Grep/Glob — summarise patterns or constraints, avoid exhaustive repository analysis
-- Check Linear for similar issues via `list_issues` (broader search than step 2)
+- Check Linear for similar issues via `list_issues` (broader search than step 3)
 - Read relevant project documentation if necessary (see [reference/project-docs.md](reference/project-docs.md) for standard paths)
 - Fetch available labels via `list_issue_labels` for the resolved team
 - Summarise findings for use in the draft
 
-### 5. Test consideration
+### 6. Test consideration
 
 Assess whether tests make sense for this change. Not every issue needs them — pure documentation, config changes, or exploratory spikes typically don't.
 
@@ -105,15 +130,21 @@ behaviour, edge cases, error conditions.]
 
 Omit the section entirely when tests don't apply.
 
-### 6. Draft the issue
+### 7. Draft the issue
 
 **Quick mode** — use the full issue structure from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Title, Description with Why this matters, Where things stand, What we'll do, What we won't do, Expected outcome, How to test it, Assumptions to confirm).
 
 **Research mode** — also include the research mode additions from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Implementation notes, Code examples, Related code, Related issues).
 
+**Ground the draft in the Vision** loaded at step 1. The "Why this matters" section must explicitly reference which Vision outcome the issue serves — quote the relevant Success Criteria line or constraint, and explain how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
+
+> "I can't see how this work traces back to a Vision outcome. The Vision says: [list relevant outcomes]. Which one does this serve, or should we add this as an outcome to the Vision first?"
+
+Don't draft past the user's answer. The Vision is the project's stated purpose; an issue that doesn't serve it is either out of scope or a sign the Vision needs updating.
+
 Apply the priority, labels, and scope guidance from the decision rules above.
 
-### 7. Cross-model feedback loop (optional)
+### 8. Cross-model feedback loop (optional)
 
 After drafting the issue:
 
@@ -136,18 +167,18 @@ uv run .claude/tools/openrouter-chat.py "<full draft text + Claude assessment>" 
 
 4. **User decides** — ask: **"Send to ChatGPT again or save the issue on Linear?"**
    - If **again** — repeat from step 1 with the revised draft
-   - If **save** — continue to step 8
+   - If **save** — continue to step 9
 
 Each round has three voices: Claude proposes and synthesises, ChatGPT challenges, the user steers. The loop sharpens the issue through cross-model perspectives — like a design review but for issue planning.
 
-### 8. Present for approval
+### 9. Present for approval
 
 Show the full draft to the user. Ask for explicit approval before creating.
 
 - If the user requests changes, revise and re-present
 - If the user declines, stop — do not create the issue
 
-### 9. Create the issue
+### 10. Create the issue
 
 Only after explicit approval:
 
@@ -163,7 +194,7 @@ save_issue with:
 
 Do not assign the issue unless the user explicitly requested it.
 
-### 10. Confirm creation
+### 11. Confirm creation
 
 Display:
 - Linear issue identifier (e.g., PG-184)
