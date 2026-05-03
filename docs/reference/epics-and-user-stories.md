@@ -2,6 +2,8 @@
 
 Stride breaks work into three layers — **epic, story, task** — and maps them onto Linear's primitives. This page is the reference for what each layer is, where it lives, and how the `/linear` commands use them.
 
+Above all three sits **Vision** — `VISION.md` at the repo root, written via [/vision](/skills/vision). Epics and stories carve up the work; the Vision is what they're carving up *toward*. When `/linear:plan-work` asks whether a description is epic-sized or story-sized, the answer should trace back to a Vision outcome.
+
 ## The mapping
 
 | Layer | Linear primitive | Where it lives |

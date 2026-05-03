@@ -6,6 +6,16 @@ Vibe coding is great on day one — you describe what you want, the agent builds
 
 stride gives you a **solid foundation from the start**. Three Claude Code skills that turn you from a vibe coder into an **agentic engineer** — a [Linear](https://linear.app) workflow that structures *what the agent works on*, atomic commits that structure *how it records each change*, and prompt generation that structures *how it thinks before starting*. All without leaving the terminal.
 
+A fourth skill, [`/vision`](/skills/vision), sits *above* the loop — it captures what the project is for, so every issue, every feature, and every commit traces back to a single anchor.
+
+## Vision — the upstream anchor
+
+Before the loop, there's a question the loop can't answer: **what is this project for?**
+
+[`/vision`](/skills/vision) walks you through writing a `VISION.md` — seven questions, one at a time, drafted and approved before it lands at the repo root. Without it, every planner — human or AI — has to reinvent "what's this project for" from thin context. With it, the rest of stride has something concrete to measure against.
+
+You only run `/vision` once per project, then evolve it sparingly. The three loop skills below are how stride executes against the Vision.
+
 ## Why atomic commits matter
 
 When AI agents write code, the quality of git history becomes a make-or-break concern.
@@ -69,6 +79,7 @@ direnv allow
 
 - [How it works](/how-it-works) — see what gets installed and how the pieces connect
 - [Install stride](/install) into your project
+- Anchor the project with [/vision](/skills/vision)
 - Learn about [atomic commits](/skills/commit)
 - Set up the [Linear workflow](/skills/linear)
 - Generate better prompts with [/craft](/skills/craft)

@@ -8,6 +8,7 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/getting-started' },
       { text: 'Skills', items: [
+        { text: '/vision', link: '/skills/vision' },
         { text: '/commit', link: '/skills/commit' },
         { text: '/linear', link: '/skills/linear' },
         { text: '/craft', link: '/skills/craft' },
@@ -26,6 +27,7 @@ export default defineConfig({
       {
         text: 'Skills',
         items: [
+          { text: '/vision — Author a project Vision', link: '/skills/vision' },
           { text: '/commit — Atomic commits', link: '/skills/commit' },
           { text: '/linear — Linear workflow', link: '/skills/linear' },
           { text: '/craft — Prompt generation', link: '/skills/craft' },
