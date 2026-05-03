@@ -47,7 +47,9 @@ For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved c
 
 ### /linear:plan-work
 
-**Plan work and create a Linear issue.** Checks for duplicates, optionally refines the description with CRAFT, drafts title and description, and waits for your approval before creating.
+**Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, optionally refines the description with CRAFT, drafts title and description, and waits for your approval before creating.
+
+<mark>**Vision is a hard prerequisite.**</mark> If `VISION.md` is missing at the repo root, the command stops and suggests running [/vision](/skills/vision) first — issues drafted in a vacuum drift from the project's purpose. With a Vision present, every draft's "Why this matters" section explicitly traces back to a Vision outcome, and the agent pushes back if the user's request can't be tied to one.
 
 In `--research` mode, explores the codebase and Linear first, then adds code examples (showing how similar patterns are already implemented) and acceptance criteria (observable outcomes, not implementation steps).
 
