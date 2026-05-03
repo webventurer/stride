@@ -27,7 +27,7 @@ export default defineConfig({
       {
         text: 'Skills',
         items: [
-          { text: '/vision — Author a project Vision', link: '/skills/vision' },
+          { text: '/vision — Project vision', link: '/skills/vision' },
           { text: '/commit — Atomic commits', link: '/skills/commit' },
           { text: '/linear — Linear workflow', link: '/skills/linear' },
           { text: '/craft — Prompt generation', link: '/skills/craft' },

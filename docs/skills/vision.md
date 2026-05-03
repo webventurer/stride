@@ -1,4 +1,4 @@
-# /vision — author a project Vision
+# /vision — Project vision
 
 A Vision is the canonical "what is this project for" document. Written once, evolved sparingly. It's the anchor every issue, every feature, and every architectural decision should trace back to.
 
