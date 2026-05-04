@@ -81,3 +81,23 @@
 .inline-image {
   margin: 2.5rem 0;
 }
+
+.image-row {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+  margin: 1.5rem 0;
+}
+
+.image-row > :first-child {
+  flex: 1;
+}
+
+.image-row > :last-child {
+  flex: 0 0 200px;
+}
+
+.image-row > :last-child img {
+  max-width: 100%;
+  height: auto;
+}

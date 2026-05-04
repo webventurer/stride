@@ -1,11 +1,25 @@
 # /vision — Project vision
 
+<div class="image-row">
+
+<div>
+
 A Vision is the canonical "what is this project for" document. Written once, evolved sparingly. It's the anchor every issue, every feature, and every architectural decision should trace back to.
 
-![Vision lightbulb](/lightbulb.svg)
+`/vision` walks you through writing one. It interviews you on seven questions one at a time, drafts the file, shows it for approval, then writes `VISION.md` at the repo root.
+
 *Vision sits above the loop — issues, features, and architectural decisions trace back to it.*
 
-`/vision` walks you through writing one. It interviews you on seven questions one at a time, drafts the file, shows it for approval, then writes `VISION.md` at the repo root.
+</div>
+
+<div>
+
+![Vision lightbulb](/lightbulb.svg)
+
+</div>
+
+</div>
+
 
 ## When to use
 
