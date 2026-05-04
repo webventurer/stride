@@ -79,9 +79,6 @@ Priority ordering: build failure > PRs needing fix > in-progress work > PRs need
 
 For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved comments. PRs needing fix are surfaced above new backlog work.
 
-![Linear issue detail](/linear-card.jpg)
-*A well-structured issue created by `/linear:plan-work` — see the [issue template](/reference/issue-template) for the full section structure.*
-
 ### /linear:plan-work
 
 **Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, optionally refines the description with CRAFT, drafts title and description, and waits for your approval before creating.
