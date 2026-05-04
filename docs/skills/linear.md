@@ -22,6 +22,35 @@ Seven commands covering the full development cycle, from setup through to merge 
 ![Kanban board](/kanban-board.svg)
 *Issues flow from Backlog through Doing to Done, driven entirely by `/linear` commands. See the [Kanban process](/reference/kanban) for how the columns work.*
 
+## When do you need a card?
+
+Stride's gates aren't blanket *every change → card*. Cards are the planning artefact for work that earns planning. Tiny changes (typo fixes, single-sentence rewrites, a tagline tweak) can go straight to main with `/commit` — no card, no PR, no ceremony.
+
+Three signals that mean a card *is* needed:
+
+| Signal | Why |
+|:--|:--|
+| You'll go through `/linear:start` | The command needs an issue ID to read — there's nothing for it to load without a card |
+| The work is large enough that planning helps | A card forces you to write down *"Why this matters / What we'll do / What we won't do"* — useful when you'd otherwise drift |
+| The work needs to be visible on the board | Stakeholders or future-you reading the Kanban want to see it |
+
+**The common-sense test:** could this be a single commit message, with no body needed beyond a sentence of *"why"*? If yes, no card. If you'd find yourself wanting *"Why this matters / What we'll do / What we won't do"* sections, that's the signal you need a card.
+
+**The line not to cross:** wording tweaks preserve meaning (fine direct-to-main); refactors change structure (earn cards); new sections add new content (earn cards).
+
+### Examples
+
+| Change | Route | Why |
+|:--|:--|:--|
+| Fix a typo in README | No card, direct commit | Obvious, no planning needed |
+| Rewrite a sentence for clarity (preserving meaning) | No card, direct commit | Wording fix, single commit message |
+| Add a new section to a doc | Card | New content earns planning |
+| Reorder sections in a doc | Card | Structural change |
+| Add a new skill or command | Card | Behaviour change, board-visible |
+| Fix a bug in `install.mjs` | Card | Code change, deserves a PR record |
+
+For the related decision of *direct commit vs branch + PR* once you've decided you don't need a card, see the agent-facing [pr-vs-direct-commit reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/pr-vs-direct-commit.md) inside the installed skill — adjacent decision, different scope.
+
 ## Commands
 
 ### /linear:check
