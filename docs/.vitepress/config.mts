@@ -19,6 +19,7 @@ export default defineConfig({
       {
         text: 'Guide',
         items: [
+          { text: 'Why Stride?', link: '/why-stride' },
           { text: 'Getting started', link: '/getting-started' },
           { text: 'How it works', link: '/how-it-works' },
           { text: 'Install', link: '/install' },
