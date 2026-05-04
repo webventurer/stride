@@ -41,7 +41,7 @@ If the issue is assigned to someone other than the current user, warn and ask wh
 
 ### 2. Vision check
 
-Vision is the upstream anchor — implementation decisions made without it drift toward whatever feels reasonable. Before implementation begins, check that one exists.
+Vision is the guiding light — implementation decisions made without it drift toward whatever feels reasonable. Before implementation begins, check that one exists.
 
 Read `VISION.md` from the repo root.
 

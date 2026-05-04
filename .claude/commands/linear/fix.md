@@ -34,7 +34,7 @@ Stop if the issue cannot be found.
 
 ### 2. Vision check
 
-Vision is the upstream anchor — review feedback applied without it can pull implementation away from the project's stated purpose, even when each individual change looks reasonable. Before applying any feedback, check that one exists.
+Vision is the guiding light — review feedback applied without it can pull implementation away from the project's stated purpose, even when each individual change looks reasonable. Before applying any feedback, check that one exists.
 
 Read `VISION.md` from the repo root.
 

@@ -14,7 +14,7 @@ Once stride is installed, run `/vision` before anything else:
 /vision
 ```
 
-It walks you through seven questions and writes `VISION.md` at the repo root — what the project delivers, why it exists, what success looks like. Every `/linear:*` command reads it as the upstream anchor: `/linear:plan-work` won't draft an issue without it, and `/linear:start` / `/linear:fix` use it to ground implementation decisions.
+It walks you through seven questions and writes `VISION.md` at the repo root — what the project delivers, why it exists, what success looks like. Vision is the project's guiding light — every `/linear:*` command reads it before deciding anything (its functional role as the upstream anchor): `/linear:plan-work` won't draft an issue without it, and `/linear:start` / `/linear:fix` use it to ground implementation decisions.
 
 Skipping this step means your first `/linear:plan-work` call stops with a hard-gate error. See [the `/vision` skill](/skills/vision) for the full walkthrough.
 

@@ -8,13 +8,13 @@ stride gives you a **solid foundation from the start**. Three Claude Code skills
 
 A fourth skill, [`/vision`](/skills/vision), sits *above* the loop — it captures what the project is for, so every issue, every feature, and every commit traces back to a single anchor.
 
-## Vision — the upstream anchor
+## Vision — the guiding light
 
 Before the loop, there's a question the loop can't answer: **what is this project for?**
 
 [`/vision`](/skills/vision) walks you through writing a `VISION.md` — seven questions, one at a time, drafted and approved before it lands at the repo root. Without it, every planner — human or AI — has to reinvent "what's this project for" from thin context. With it, the rest of stride has something concrete to measure against.
 
-You only run `/vision` once per project, then evolve it sparingly. The three loop skills below are how stride executes against the Vision.
+Functionally, Vision is stride's *upstream anchor* — planning, ranking, and implementation all read it before deciding anything. You only run `/vision` once per project, then evolve it sparingly. The three loop skills below are how stride executes against the Vision.
 
 ## Why atomic commits matter
 

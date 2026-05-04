@@ -41,7 +41,7 @@ Use the resolved project name for all Linear API calls in this command.
 
 ### 1. Vision check
 
-Vision is the upstream anchor — every issue drafted by stride must trace back to a Vision outcome. Before sizing or drafting, check that one exists.
+Vision is the guiding light — every issue drafted by stride must trace back to a Vision outcome. Before sizing or drafting, check that one exists.
 
 Read `VISION.md` from the repo root.
 

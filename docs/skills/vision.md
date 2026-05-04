@@ -76,7 +76,7 @@ If you can't tell whether a criterion has been met, it can't trigger "done". Re-
 
 ## Where Vision sits in stride
 
-Vision is the **upstream anchor**. The three skills that follow execute against it:
+Vision is the **guiding light**. Functionally, that makes it stride's upstream anchor — every skill below reads `VISION.md` before deciding anything, so the work flows from a single source of intent:
 
 | Layer | What it does | What anchors it |
 |:------|:-------------|:----------------|

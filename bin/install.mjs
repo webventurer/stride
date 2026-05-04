@@ -351,7 +351,7 @@ function logAvailableSkills() {
   console.log("  /linear:finish       — merge and close");
   console.log("  /linear:next-steps   — review priorities");
   console.log(
-    "\nNext: run /vision to anchor your project. Every /linear:* command reads VISION.md as the upstream anchor — without one, /linear:plan-work refuses to draft.\n",
+    "\nNext: run /vision to author your project's guiding light. Every /linear:* command reads VISION.md before deciding anything — without one, /linear:plan-work refuses to draft.\n",
   );
 }
 

@@ -27,7 +27,7 @@ Use the resolved project name for all Linear API calls in this command.
 
 ### 1. Vision check
 
-Vision is the upstream anchor for ranking — without it, recommendations drift from the project's stated purpose. Before fetching candidates, check that one exists.
+Vision is the guiding light for ranking — without it, recommendations drift from the project's stated purpose. Before fetching candidates, check that one exists.
 
 Read `VISION.md` from the repo root.
 
