@@ -90,6 +90,7 @@ function dedupeHooks(existing, incoming) {
 const DIRS = [
   ".claude/skills/commit",
   ".claude/skills/craft",
+  ".claude/skills/vision",
   ".claude/commands/linear",
   ".claude/hooks",
   ".claude/stride/docs/patterns/git",
@@ -305,7 +306,9 @@ function installHeader({ copied, skipped }) {
 
 function logCopiedFiles(totals) {
   console.log(installHeader(totals));
+  console.log("  skills/vision/   (project Vision authoring skill)");
   console.log("  skills/commit/   (4-pass atomic commit skill)");
+  console.log("  skills/craft/    (CRAFT prompt skill)");
   console.log("  commands/linear/ (Linear workflow commands)");
   console.log("  hooks/           (commit hook scripts)");
   console.log("  stride/docs/     (principles, patterns, concepts)");
@@ -338,13 +341,18 @@ async function installHookConfig() {
 
 function logAvailableSkills() {
   console.log("\nDone. Available skills:");
+  console.log("  /vision              — author the project Vision (run this first)");
   console.log("  /commit              — 4-pass atomic git commits");
+  console.log("  /craft               — CRAFT prompt framework");
   console.log("  /linear:check        — verify MCP connections");
   console.log("  /linear:start        — implement a Linear issue");
   console.log("  /linear:plan-work    — create a Linear issue");
   console.log("  /linear:fix          — address PR review feedback");
   console.log("  /linear:finish       — merge and close");
-  console.log("  /linear:next-steps   — review priorities\n");
+  console.log("  /linear:next-steps   — review priorities");
+  console.log(
+    "\nNext: run /vision to anchor your project. Every /linear:* command reads VISION.md as the upstream anchor — without one, /linear:plan-work refuses to draft.\n",
+  );
 }
 
 function gitignoreEntries() {

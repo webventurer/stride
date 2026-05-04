@@ -25,6 +25,7 @@ if (existsSync(join(destRoot, "bin/install.mjs"))) {
 const DIRS = [
   ".claude/skills/commit",
   ".claude/skills/craft",
+  ".claude/skills/vision",
   ".claude/commands/linear",
   ".claude/hooks",
   ".claude/stride/docs/patterns/git",
@@ -121,6 +122,7 @@ function main() {
   removeGitignoreSection();
 
   console.log("Removed stride files from .claude/:");
+  console.log("  skills/vision/   (project Vision authoring skill)");
   console.log("  skills/commit/   (4-pass atomic commit skill)");
   console.log("  skills/craft/    (CRAFT prompt skill)");
   console.log("  commands/linear/ (Linear workflow commands)");
