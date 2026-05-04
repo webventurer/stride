@@ -64,9 +64,11 @@ In `--research` mode, explores the codebase and Linear first, then adds code exa
 
 **Start work on a Linear issue.** One headless flow: create or switch to the feature branch, move the issue to Doing, implement the changes, validate (build + tests), **auto-squash similar commits**, push, open a PR, move to In Review, then show the full diff for terminal review.
 
+<mark>**Vision is a hard prerequisite.**</mark> If `VISION.md` is missing at the repo root, `/linear:start` stops and suggests running [/vision](/skills/vision) first — implementation decisions made without a Vision drift toward whatever feels reasonable, exactly the failure mode stride exists to prevent. With a Vision present, the command surfaces the outcome the issue serves (extracted from its "Why this matters" section) and carries it as context throughout implementation.
+
 <mark>**While iterating, you naturally produce journey-shaped commits — "first attempt", "wait that broke X", "ok now it's fixed", "format pass". Before merge, those should be rewritten to describe where you ended up, not how you got there.**</mark>
 
-That's what step 9 does. The agent groups commits by purpose and squashes similar ones into single commits with rewritten messages. Conservative by default — when uncertain whether two commits belong together, they stay separate. The user gates via terminal review and can recover the original commits via reflog if a squash was wrong.
+That's what step 10 does. The agent groups commits by purpose and squashes similar ones into single commits with rewritten messages. Conservative by default — when uncertain whether two commits belong together, they stay separate. The user gates via terminal review and can recover the original commits via reflog if a squash was wrong.
 
 Trusts the issue — the plan was agreed during `/plan-work`. No approval gate mid-flow.
 
@@ -80,6 +82,8 @@ Ends by asking: "Does this look right, or do you want changes?"
 ### /linear:fix
 
 **Address GitHub PR review feedback.** Reads review comments from GitHub (review body, line comments, past reviews), implements all requested changes in one pass, validates, pushes, and posts a summary comment on the PR.
+
+<mark>**Vision is a hard prerequisite.**</mark> If `VISION.md` is missing at the repo root, `/linear:fix` stops and suggests running [/vision](/skills/vision) first — review feedback applied without a Vision can pull implementation away from the project's stated purpose even when each individual change looks reasonable. With a Vision present, the command surfaces the outcome the parent issue serves and carries it as context while applying review feedback.
 
 Reviewer feedback takes priority over the original issue — plans evolve through review.
 
