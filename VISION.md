@@ -28,6 +28,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] Every commit on a stride-managed branch passes four-pass atomicity — no monolithic commits, every message explains *why*
 - [ ] When you list the commits this branch is adding, the story reads naturally to a non-engineer scanning top-to-bottom (`git log main..HEAD --oneline` to check)
 - [ ] Linear board state matches branch state automatically as `/linear:*` runs (Backlog → Doing → In Review → Done)
+- [ ] After `/linear:vision` runs, the Linear project description matches `VISION.md`
 - [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
 - [ ] Issue titles read as stakeholder outcomes, not implementation steps
 
