@@ -38,7 +38,9 @@ Seven commands covering the full development cycle, from setup through to merge 
 
 **Review priorities and recommend next work.** Shows current work, open PRs, recently completed issues, and backlog — then recommends 1–3 concrete next actions.
 
-Priority ordering: build failure > PRs needing fix > in-progress work > PRs needing review > approved PRs to merge > backlog.
+<mark>**Vision is a hard prerequisite.**</mark> If `VISION.md` is missing at the repo root, `/linear:next-steps` stops and suggests running [/vision](/skills/vision) first — ranking candidates without an anchor produces recommendations that drift from the project's purpose.
+
+Priority ordering: build failure > PRs needing fix > in-progress work > PRs needing review > approved PRs to merge > backlog. **Within each tier, ordering is refined by Vision alignment** — items advancing the least-progressed Success Criteria sit higher. Recommendations name the Vision outcome each item serves so you can see why the agent picked it.
 
 For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved comments. PRs needing fix are surfaced above new backlog work.
 
@@ -49,7 +51,7 @@ For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved c
 
 **Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, optionally refines the description with CRAFT, drafts title and description, and waits for your approval before creating.
 
-<mark>**Vision is a hard prerequisite.**</mark> If `VISION.md` is missing at the repo root, the command stops and suggests running [/vision](/skills/vision) first — issues drafted in a vacuum drift from the project's purpose. With a Vision present, every draft's "Why this matters" section explicitly traces back to a Vision outcome, and the agent pushes back if the user's request can't be tied to one.
+<mark>**Vision is a hard prerequisite.**</mark> If `VISION.md` is missing at the repo root, the command stops and suggests running [/vision](/skills/vision) first — issues drafted in a vacuum drift from the project's purpose. With a Vision present, every draft's "Why this matters" section explicitly traces back to a Vision outcome, and the agent pushes back if the user's request can't be tied to one. When a broad description splits into multiple follow-ups, the follow-ups are ordered by Vision alignment — the one advancing the least-progressed Success Criterion sits first.
 
 In `--research` mode, explores the codebase and Linear first, then adds code examples (showing how similar patterns are already implemented) and acceptance criteria (observable outcomes, not implementation steps).
 
