@@ -39,13 +39,50 @@ Stop if the issue cannot be found.
 
 If the issue is assigned to someone other than the current user, warn and ask whether to proceed.
 
-### 2. Load project context
+### 2. Vision check
+
+Vision is the upstream anchor — implementation decisions made without it drift toward whatever feels reasonable. Before implementation begins, check that one exists.
+
+Read `VISION.md` from the repo root.
+
+- **If missing**: stop and tell the user:
+
+  ```
+  No VISION.md found at the repo root.
+
+  /linear:start needs a Vision to anchor implementation to —
+  without one, design decisions made during implementation
+  drift away from the project's stated purpose.
+
+  Run /vision first, then re-run /linear:start.
+  ```
+
+  Do not start implementation against a project with no anchor.
+
+- **If present**: read the full file and load it as context for the rest of the flow.
+
+Then, from the issue body's "Why this matters" section (loaded in step 1), surface the Vision outcome the issue serves:
+
+```
+This work serves: <outcome line from VISION.md>
+```
+
+If the issue has no "Why this matters" section or doesn't name a Vision outcome (legacy issue from before issues were Vision-anchored), surface a soft warning and proceed:
+
+```
+This issue predates Vision-anchored issue drafting — proceeding
+without a named outcome.
+```
+
+<mark>**The hard gate is on `VISION.md`, not on the issue's outcome reference.**</mark> No Vision = stop. Vision present but the issue doesn't name an outcome = soft warning, continue. Carry the loaded Vision and (when present) the named outcome as context throughout step 7 (Implement) — when making design decisions, reference what the work is in service of.
+
+### 3. Load project context
 
 Read project documentation using the paths in [reference/project-docs.md](reference/project-docs.md). Check what exists — only read what is found.
 
 Also check for feature docs matching the issue title, labels, or keywords.
 
-### 3. Inspect the repository state
+### 4. Inspect the repository state
 
 Run:
 
@@ -58,9 +95,9 @@ git branch -a
 
 If there are uncommitted changes, warn and stop — suggest `/commit`.
 
-Never work directly on `main`. If the current branch is `main`, proceed to step 4 to create or switch to a feature branch.
+Never work directly on `main`. If the current branch is `main`, proceed to step 5 to create or switch to a feature branch.
 
-### 4. Resolve the correct branch
+### 5. Resolve the correct branch
 
 Branch priority:
 
@@ -69,7 +106,7 @@ Branch priority:
 3. Linear `gitBranchName`
 4. Fallback pattern: `feature/<issue-id>-<slug>`
 
-If already on the correct branch (resuming from a worktree), skip to step 5.
+If already on the correct branch (resuming from a worktree), skip to step 6.
 
 #### Ask: worktree or inline?
 
@@ -77,7 +114,7 @@ If creating a new branch, ask the user:
 
 **"Run this here or in a separate worktree?"**
 
-- **Here** — create the branch in the current repo and continue to step 5
+- **Here** — create the branch in the current repo and continue to step 6
 - **Worktree** — create an isolated worktree and hand off to a new session
 
 #### Option A: inline (here)
@@ -86,7 +123,7 @@ If creating a new branch, ask the user:
 git checkout -b <branch>
 ```
 
-Continue to step 5.
+Continue to step 6.
 
 #### Option B: Worktree
 
@@ -141,12 +178,12 @@ Open a Claude Code session there with:
 cd <absolute-worktree-path>
 claude
 
-Then run /linear:start <issue-id> — it will pick up the branch and skip straight to implementation.
+Then run /linear:start <issue-id> — it will pick up the branch and continue from the Vision check onwards.
 ```
 
-**Do not continue to step 5.** The user will run `/linear:start` again from inside the worktree, where it will detect the existing branch and resume from step 5 onwards.
+**Do not continue to step 6.** The user will run `/linear:start` again from inside the worktree, where it will detect the existing branch and resume from step 6 onwards (still running the Vision check at step 2 first).
 
-### 5. Update Linear status → Doing
+### 6. Update Linear status → Doing
 
 Only update if the current status is Todo, Backlog, or Backburner.
 
@@ -154,7 +191,7 @@ Set status to **Doing** via `save_issue`.
 
 If already Doing, leave unchanged. Never set any other status in this step.
 
-### 6. Implement
+### 7. Implement
 
 Read the codebase as needed to understand existing patterns before making changes.
 
@@ -164,7 +201,9 @@ Read the codebase as needed to understand existing patterns before making change
 - Avoid unrelated refactors
 - Add or update tests where appropriate
 
-### 7. Validate
+Keep the Vision outcome from step 2 in mind throughout. When choosing between approaches of roughly equal value, prefer the one that more directly serves the named outcome.
+
+### 8. Validate
 
 Run the project's build command (e.g. `pnpm build`). Stop if it fails — show the first error and fix it before continuing.
 
@@ -172,7 +211,7 @@ If the project has tests, run them too. Fix any failures.
 
 Re-validate after fixes until the build passes cleanly.
 
-### 8. Review scope
+### 9. Review scope
 
 Run these commands to understand what the PR will contain:
 
@@ -184,13 +223,13 @@ git log main..HEAD --oneline
 
 Warn if no commits ahead of main (stop — nothing to ship). Warn if changed files look unrelated to the issue.
 
-### 9. Auto-squash similar commits
+### 10. Auto-squash similar commits
 
-Iterative refinement during step 6 leaves journey-shaped commits — "first attempt", "wait that broke X", "format pass". Before push, group them by purpose and rewrite the messages to describe **where you ended up**, not how you got there. The agent makes the call automatically — the user gates via terminal review (step 14).
+Iterative refinement during step 7 leaves journey-shaped commits — "first attempt", "wait that broke X", "format pass". Before push, group them by purpose and rewrite the messages to describe **where you ended up**, not how you got there. The agent makes the call automatically — the user gates via terminal review (step 15).
 
 **Fast path.** If `git log main..HEAD --oneline` shows a single commit, skip this step entirely.
 
-**Algorithm.** Otherwise, with the diffs from step 8 in context:
+**Algorithm.** Otherwise, with the diffs from step 9 in context:
 
 1. **Group by purpose.** Walk `git log main..HEAD --oneline` and decide which commits serve the same purpose. Signals that two commits belong together:
    - They touch the same file(s) for the same reason (e.g. consecutive edits to one skill prompt while iterating on it)
@@ -231,21 +270,21 @@ Iterative refinement during step 6 leaves journey-shaped commits — "first atte
 
    Confirm the diff stat matches what was there before the squash (file changes preserved) and that the new commit count is ≤ the old count.
 
-**Reflog as recovery.** If anything goes wrong — or the user objects in step 14 — `git reflog` plus `git reset --hard <pre-squash-sha>` returns to the original commits.
+**Reflog as recovery.** If anything goes wrong — or the user objects in step 15 — `git reflog` plus `git reset --hard <pre-squash-sha>` returns to the original commits.
 
-### 10. Push
+### 11. Push
 
 Run `git push -u origin <current-branch>` if the branch has not been pushed yet.
 
 If this is a resume run and the branch was already pushed before the squash, use `git push --force-with-lease` instead. The squash rewrote SHAs; force-with-lease succeeds only if the remote tip matches what was last fetched, so it can't silently overwrite someone else's work.
 
-### 11. Check for existing PR
+### 12. Check for existing PR
 
 Run `gh pr list --head <branch> --json url,number`.
 
-If a PR already exists, show the URL and skip to step 13.
+If a PR already exists, show the URL and skip to step 14.
 
-### 12. Create PR
+### 13. Create PR
 
 Run `gh pr create`:
 
@@ -268,13 +307,13 @@ EOF
 )"
 ```
 
-### 13. Update Linear status → In Review
+### 14. Update Linear status → In Review
 
 Move the issue to **In Review** via `save_issue`.
 
 Only after the PR is confirmed created or already exists. Skip if the issue is already In Review. Warn (but proceed) if the issue is Done.
 
-### 14. Review in terminal
+### 15. Review in terminal
 
 Show the full diff against main for the user to review:
 
@@ -290,13 +329,13 @@ Then display:
 - Build: passed
 - PR URL
 - Linear status: In Review
-- Squash summary (if step 9 grouped any commits): "Squashed N commits into M"
+- Squash summary (if step 10 grouped any commits): "Squashed N commits into M"
 
 Ask: **"Does this look right, or do you want changes?"**
 
-If the user requests changes, make them, re-validate (step 7), commit, push, and show the updated diff. Repeat until the user is satisfied.
+If the user requests changes, make them, re-validate (step 8), commit, push, and show the updated diff. Repeat until the user is satisfied.
 
-If the user objects to a squash from step 9 ("don't squash these"), recover via `git reflog` to find the pre-squash SHA, then `git reset --hard <sha>`, then re-push with `--force-with-lease`.
+If the user objects to a squash from step 10 ("don't squash these"), recover via `git reflog` to find the pre-squash SHA, then `git reset --hard <sha>`, then re-push with `--force-with-lease`.
 
 <mark>**When the user approves, stop. Do not merge.** Say "Ready for `/finish` when you are" and end. Merging is `/finish`'s job — it uses `--merge` to preserve atomic commits. Never use `--squash`.</mark>
 
@@ -308,8 +347,9 @@ The PR is the record. The terminal is where the real review happens first.
 
 - Issue ID unresolvable → stop, ask the user
 - Issue not found in Linear → stop
+- `VISION.md` missing → stop, suggest `/vision`
 - Uncommitted changes → stop, suggest `/commit`
-- On `main` with no issue branch → create branch in step 4
+- On `main` with no issue branch → create branch in step 5
 - No commits ahead of `main` → stop
 - Build fails → fix, re-validate, continue
 - PR already exists → not an error, show URL and continue
