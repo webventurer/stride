@@ -161,6 +161,30 @@ The installer only writes under `.claude/` — it never touches other directorie
 
 The installer also offers to add stride's paths to your root `.gitignore` in a marker-delimited section (`# >>> stride ... # <<< stride`). Accept the prompt to keep `git status` clean; decline to commit stride's content into your repo instead. Uninstall removes the section cleanly.
 
+## App starters
+
+stride gives you the engineering workflow. App starters give you the project scaffold. Each starter is an opinionated template that gets you from zero to a working app in one command — with stride's skills already wired in.
+
+### [app-starter](https://github.com/webventurer/app-starter)
+
+A modern full-stack web app starter — React + TypeScript + Vite on the frontend, Hono + Neon + Clerk + Drizzle on the backend. Every layer is independently replaceable — swap one piece without rewiring the rest. Includes shadcn/ui for components, Biome for formatting, and reference docs that explain every technology choice.
+
+```bash
+gh repo clone webventurer/app-starter
+./app-starter/scripts/create.sh my-app
+```
+
+### [python-template](https://github.com/webventurer/python-template)
+
+A Python project starter with development tooling already wired up — direnv for environment management, pip-tools for dependencies, Pyright for type checking, pre-commit hooks, and pytest for tests. A Makefile, setup script, and GitHub Actions come in the box so you start from a working project on day one.
+
+```bash
+gh repo clone webventurer/python-template
+cd python-template
+direnv allow
+./scripts/setup.sh
+```
+
 ## Migration skills
 
 Two skills for migrating issues between workspaces live on the [`migrate` branch](/reference/migration-skills). They require Python and are kept separate to keep the main install lightweight.

@@ -47,30 +47,6 @@ Vibe coding produces code. [Agentic engineering](/reference/agentic-engineering)
 
 The approach is designed to compound: as AI models improve, the structured documentation gets more from them, not less.
 
-## App starters
-
-stride gives you the engineering workflow. App starters give you the project scaffold. Each starter is an opinionated template that gets you from zero to a working app in one command — with stride's skills already wired in.
-
-### [app-starter](https://github.com/webventurer/app-starter)
-
-A modern full-stack web app starter — React + TypeScript + Vite on the frontend, Hono + Neon + Clerk + Drizzle on the backend. Every layer is independently replaceable — swap one piece without rewiring the rest. Includes shadcn/ui for components, Biome for formatting, and reference docs that explain every technology choice.
-
-```bash
-gh repo clone webventurer/app-starter
-./app-starter/scripts/create.sh my-app
-```
-
-### [python-template](https://github.com/webventurer/python-template)
-
-A Python project starter with development tooling already wired up — direnv for environment management, pip-tools for dependencies, Pyright for type checking, pre-commit hooks, and pytest for tests. A Makefile, setup script, and GitHub Actions come in the box so you start from a working project on day one.
-
-```bash
-gh repo clone webventurer/python-template
-cd python-template
-direnv allow
-./scripts/setup.sh
-```
-
 ## Next steps
 
 - [How it works](/how-it-works) — see what gets installed and how the pieces connect
