@@ -184,17 +184,68 @@ git log main..HEAD --oneline
 
 Warn if no commits ahead of main (stop — nothing to ship). Warn if changed files look unrelated to the issue.
 
-### 9. Push
+### 9. Auto-squash similar commits
+
+Iterative refinement during step 6 leaves journey-shaped commits — "first attempt", "wait that broke X", "format pass". Before push, group them by purpose and rewrite the messages to describe **where you ended up**, not how you got there. The agent makes the call automatically — the user gates via terminal review (step 14).
+
+**Fast path.** If `git log main..HEAD --oneline` shows a single commit, skip this step entirely.
+
+**Algorithm.** Otherwise, with the diffs from step 8 in context:
+
+1. **Group by purpose.** Walk `git log main..HEAD --oneline` and decide which commits serve the same purpose. Signals that two commits belong together:
+   - They touch the same file(s) for the same reason (e.g. consecutive edits to one skill prompt while iterating on it)
+   - One refines what an earlier commit started (e.g. "first attempt" + "address feedback" + "format pass")
+   - One is a fixup — typo, formatting, lint repair — for the change just before it
+   - The Conventional-Commits prefixes match (`feat:` + `feat:` on the same area; `docs:` + `docs:` touching the same paths)
+
+   Signals that commits should stay separate:
+   - Different files, different reasons (a feature change and an unrelated bug fix in the same session)
+   - Different prefixes describing different concerns (`feat:` then `refactor:` on a different area)
+   - Distinct logical units that each merit independent revertibility
+
+   <mark>**When uncertain, leave them separate.** False positives — collapsing real changes into one commit — are worse than false negatives. Conservative grouping is the safer default.</mark>
+
+2. **For each group of 2+ commits, squash and rewrite.** For a group spanning commits `<oldest>..<newest>`:
+
+   ```bash
+   git reset --soft <commit-before-oldest>
+   git add <files-in-this-group>
+   .claude/hooks/do_commit.sh -F /tmp/squash-msg-<n>.txt
+   ```
+
+   Where `/tmp/squash-msg-<n>.txt` contains a fresh message written from the post-implementation understanding. The message describes **what the work is**, not how it got there.
+
+   - Use a Conventional Commits prefix (`feat:`, `fix:`, `docs:`, `refactor:`, etc.) and a single sentence subject under 50 characters
+   - The body explains *why* the change exists, in present tense, as if the work was right the first time
+   - Drop "first attempt", "addressed feedback", "refactor of X", "WIP" — those describe the journey, not where you ended up
+   - If the body needs bullets, list the substantive changes — not the iterations
+
+3. **Single-commit groups stay untouched.** A single commit already earns its place; rewriting it is friction with no gain.
+
+4. **After processing all groups, verify**:
+
+   ```bash
+   git log main..HEAD --oneline
+   git diff main...HEAD --stat
+   ```
+
+   Confirm the diff stat matches what was there before the squash (file changes preserved) and that the new commit count is ≤ the old count.
+
+**Reflog as recovery.** If anything goes wrong — or the user objects in step 14 — `git reflog` plus `git reset --hard <pre-squash-sha>` returns to the original commits.
+
+### 10. Push
 
 Run `git push -u origin <current-branch>` if the branch has not been pushed yet.
 
-### 10. Check for existing PR
+If this is a resume run and the branch was already pushed before the squash, use `git push --force-with-lease` instead. The squash rewrote SHAs; force-with-lease succeeds only if the remote tip matches what was last fetched, so it can't silently overwrite someone else's work.
+
+### 11. Check for existing PR
 
 Run `gh pr list --head <branch> --json url,number`.
 
-If a PR already exists, show the URL and skip to step 12.
+If a PR already exists, show the URL and skip to step 13.
 
-### 11. Create PR
+### 12. Create PR
 
 Run `gh pr create`:
 
@@ -217,18 +268,19 @@ EOF
 )"
 ```
 
-### 12. Update Linear status → In Review
+### 13. Update Linear status → In Review
 
 Move the issue to **In Review** via `save_issue`.
 
 Only after the PR is confirmed created or already exists. Skip if the issue is already In Review. Warn (but proceed) if the issue is Done.
 
-### 13. Review in terminal
+### 14. Review in terminal
 
 Show the full diff against main for the user to review:
 
 ```bash
 git diff main...HEAD
+git log main..HEAD --oneline
 ```
 
 Then display:
@@ -238,10 +290,13 @@ Then display:
 - Build: passed
 - PR URL
 - Linear status: In Review
+- Squash summary (if step 9 grouped any commits): "Squashed N commits into M"
 
 Ask: **"Does this look right, or do you want changes?"**
 
 If the user requests changes, make them, re-validate (step 7), commit, push, and show the updated diff. Repeat until the user is satisfied.
+
+If the user objects to a squash from step 9 ("don't squash these"), recover via `git reflog` to find the pre-squash SHA, then `git reset --hard <sha>`, then re-push with `--force-with-lease`.
 
 <mark>**When the user approves, stop. Do not merge.** Say "Ready for `/finish` when you are" and end. Merging is `/finish`'s job — it uses `--merge` to preserve atomic commits. Never use `--squash`.</mark>
 
@@ -258,3 +313,4 @@ The PR is the record. The terminal is where the real review happens first.
 - No commits ahead of `main` → stop
 - Build fails → fix, re-validate, continue
 - PR already exists → not an error, show URL and continue
+- Squash leaves the diff stat changed (file content drift) → abort the squash, restore via reflog, leave commits as-is
