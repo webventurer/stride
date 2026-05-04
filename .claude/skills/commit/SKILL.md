@@ -137,6 +137,22 @@ git add docs/research/ai-coding/what-is-a-frame.md
 
 The diff tells you *what changed*. The user's intent tells you *why*. AI consistently writes commit messages that describe the mechanics of the diff ("fix image paths", "rename directory") rather than the purpose ("add PDF export with embedded images"). The commit log should read like a story of what was accomplished, not a changelog of file operations.
 
+## Describe what is, not what was
+
+<mark>**Commit messages describe the destination, not the journey.** Don't narrate the previous state — describe what the current state does.</mark>
+
+The diff already shows what changed. Narrating the previous version inside the message ("the previous intro claimed X — that's wrong, now it says Y") doubles the reader's work without adding information. Worse, the retrospective framing rots — six months later the "previous" state is gone from anyone's mind, and the message reads as confusing context-free criticism.
+
+| Avoid | Prefer |
+|:------|:-------|
+| "The previous intro claimed X. That's wrong: ..." | Describe what the intro now says |
+| "Removed the old behaviour and replaced it with..." | Describe the new behaviour |
+| "Before, the function did Y. Now it does Z." | "The function does Z" |
+| "Fixed the typo where..." | Describe the corrected text |
+| "No longer does X" | Describe what it does instead |
+
+This is the same principle as the auto-squash rule in `/linear:start` — *describe where you ended up, not how you got there.* The git log should read as if the work was right the first time. If the only context the reader has is the commit message and the diff, the message should make sense from that alone.
+
 ## Content focus blindness
 
 Both people and AI consistently miss formatting standards while focused on content logic. The four-pass approach solves this by making standards verification a dedicated step (Pass 2) separate from content decisions (Pass 1).
