@@ -62,7 +62,11 @@ In `--research` mode, explores the codebase and Linear first, then adds code exa
 
 ### /linear:start
 
-**Start work on a Linear issue.** One headless flow: create or switch to the feature branch, move the issue to Doing, implement the changes, validate (build + tests), commit, push, open a PR, move to In Review, then show the full diff for terminal review.
+**Start work on a Linear issue.** One headless flow: create or switch to the feature branch, move the issue to Doing, implement the changes, validate (build + tests), **auto-squash similar commits**, push, open a PR, move to In Review, then show the full diff for terminal review.
+
+<mark>**While iterating, you naturally produce journey-shaped commits — "first attempt", "wait that broke X", "ok now it's fixed", "format pass". Before merge, those should be rewritten to describe where you ended up, not how you got there.**</mark>
+
+That's what step 9 does. The agent groups commits by purpose and squashes similar ones into single commits with rewritten messages. Conservative by default — when uncertain whether two commits belong together, they stay separate. The user gates via terminal review and can recover the original commits via reflog if a squash was wrong.
 
 Trusts the issue — the plan was agreed during `/plan-work`. No approval gate mid-flow.
 
