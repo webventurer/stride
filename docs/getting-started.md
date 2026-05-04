@@ -1,10 +1,8 @@
 # Getting started
 
-> **Vision sets the destination, Linear runs the trip, `/commit` records each step.**
+<mark>**Vision sets the destination, Linear runs the trip, `/commit` records each step.**</mark>
 
-stride installs as four Claude Code skills — `/vision`, `/craft`, `/linear`, and `/commit` — wired together by hooks and scripts. This page walks through how the pieces fit together.
-
-> New here? Start with [Why Stride?](/why-stride) first — that's the case for using stride at all. This page assumes you've decided.
+> New here? Start with [Why Stride?](/why-stride) first — this page assumes you've decided.
 
 ## Vision — the guiding light
 
