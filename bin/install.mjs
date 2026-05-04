@@ -341,7 +341,9 @@ async function installHookConfig() {
 
 function logAvailableSkills() {
   console.log("\nDone. Available skills:");
-  console.log("  /vision              — author the project Vision (run this first)");
+  console.log(
+    "  /vision              — author the project Vision (run this first)",
+  );
   console.log("  /commit              — 4-pass atomic git commits");
   console.log("  /craft               — CRAFT prompt framework");
   console.log("  /linear:check        — verify MCP connections");
