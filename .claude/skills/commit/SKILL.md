@@ -229,6 +229,44 @@ Pre-commit hooks can accidentally cause you to commit multiple unrelated files t
 
 ---
 
+## How to fold
+
+To fold a change into an existing commit — a typo fix, a missed edge case, a wording correction that belongs to work already in flight — use **fixup + autosquash**. Don't cherry-pick replay or soft-reset replay; both create new SHAs across commits that didn't logically change.
+
+### The pattern
+
+```bash
+git add <files>
+.claude/hooks/do_commit.sh --fixup=<sha>                  # writes "fixup! <original subject>"
+GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash <base>   # collapses fixups
+```
+
+The wrapper forwards `--fixup` to git unchanged. `--autosquash` rearranges the rebase plan so each fixup commit lands immediately after its target; `GIT_SEQUENCE_EDITOR=:` accepts the plan without opening an editor.
+
+### Agent / user split
+
+Agents write the fixup commit; users run the autosquash. The harness blocks `git rebase -i` for agents (interactive input not supported), but the fixup commit itself is fine.
+
+1. **Agent**: stage the change, run `do_commit.sh --fixup=<sha>`, stop.
+2. **User**: run the autosquash rebase locally to collapse the fixup.
+
+This split keeps each side doing what it can — agents record fold intent as a normal commit (debuggable, reversible, visible in the log); users keep ownership of the history rewrite.
+
+### When to fold vs. new commit
+
+| Situation | Use |
+|:--|:--|
+| Original commit on a local branch, work-in-progress | Fold |
+| Original commit is HEAD | `git commit --amend` directly (fixup unnecessary) |
+| Original commit on `main` and pushed widely | New commit — don't rewrite shipped history without strong reason |
+
+### What not to do
+
+- ❌ `git reset --hard HEAD~N` + cherry-pick replay — clean but creates new SHAs across commits that didn't change
+- ❌ `git reset --soft <base>` + recommit chain — same problem, plus error-prone manual content reconstruction
+
+---
+
 ## Execution
 
 <mark>**Read and follow every step in [WORKFLOW.md](WORKFLOW.md).**</mark>
