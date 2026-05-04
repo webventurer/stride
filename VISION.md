@@ -47,3 +47,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - **Not installed globally.** Everything lives in the consumer's `.claude/` — no machine-wide state
 - **Not lock-in.** Read the markdown, change it, fork it, remove it
 - **Not replacing PR review.** stride structures the steps *before* review, not the review itself
+
+---
+
+*Generated via [`/vision`](docs/skills/vision.md). Re-run to evolve.*

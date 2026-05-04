@@ -42,6 +42,12 @@ If even the system behaviour is invisible (a pure rename, for instance), say wha
 
 Sections 4, 6, and 7 are optional — omit them when they don't add value.
 
+### Why this matters: trace back to Vision
+
+This section names the **Vision outcome** the issue serves — quote the relevant Success Criterion line from [`VISION.md`](/) and explain how the work moves toward it. [`/linear:plan-work`](/skills/linear#linear-plan-work) enforces this: every draft must reference a Success Criterion, and the agent pushes back if the user's request can't be tied to one. Either the work is out of scope, or the Vision needs a new outcome.
+
+No Vision-tracing = no issue. Issues drafted in a vacuum drift from the project's purpose; the rule lives here so the doc matches the behaviour the command already enforces.
+
 ## Example
 
 **Verify new issue template format renders correctly**

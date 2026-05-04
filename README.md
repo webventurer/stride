@@ -10,6 +10,8 @@ Everything installs as plain markdown into your `.claude/` directory. No runtime
 
 ## What you get
 
+**`/vision`** — The upstream anchor. One canonical `VISION.md` at the repo root: what the project delivers, why it exists, what success looks like. Every issue, every feature, every architectural decision traces back to it. `/linear:plan-work` enforces this — issues drafted in a vacuum get refused, not just warned. Vision evolves rarely and reads as stakeholder language; the rest of stride's loop runs against it. See [the `/vision` skill](docs/skills/vision.md) for the seven-question walkthrough.
+
 **`/linear`** — Five commands covering the full development cycle. Plan work, create issues, implement on a branch, handle PR feedback, merge and close — all driven from Claude Code, all synced with [Linear](https://linear.app). Issues flow through your board automatically as you work.
 
 ![Kanban board](docs/public/kanban-board.svg)
@@ -26,7 +28,7 @@ Everything installs as plain markdown into your `.claude/` directory. No runtime
 
 The skills aren't independent — each one feeds the next.
 
-`/craft` sharpens the problem. `/linear` turns it into a tracked issue and manages the full lifecycle. `/commit` records each change as one atomic, revertible unit. Remove any piece and the loop still works, but the output gets worse.
+`/vision` sets the destination. `/craft` sharpens the problem. `/linear` turns it into a tracked issue (anchored to a Vision outcome) and manages the full lifecycle. `/commit` records each change as one atomic, revertible unit. Remove any piece and the loop still works, but the output gets worse.
 
 ## Install
 

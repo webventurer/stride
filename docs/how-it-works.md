@@ -6,8 +6,12 @@ stride installs as plain markdown files in your project's `.claude/` directory. 
 
 ```
 your-project/
+├── VISION.md                # Project anchor — what it delivers, why,
+│                            # success criteria. Every issue traces back
 └── .claude/
     ├── skills/
+    │   ├── vision/          # /vision skill
+    │   │   └── SKILL.md     # Seven-question walkthrough → VISION.md
     │   ├── commit/          # /commit skill
     │   │   ├── SKILL.md     # Principles, coherence test, atomicity rules
     │   │   └── WORKFLOW.md  # Four-pass execution sequence
@@ -27,6 +31,8 @@ your-project/
     └── hooks/               # Safety enforcement
         └── do_commit.sh     # Commit wrapper
 ```
+
+`VISION.md` lives at the repo root, not under `.claude/` — it's a stakeholder-readable artefact, not a Claude Code internal. The `/vision` skill writes it; the `/linear:*` commands read it as the anchor for every issue, ranking, and implementation decision.
 
 ## The three layers
 

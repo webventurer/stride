@@ -6,6 +6,18 @@ npx github:webventurer/stride
 
 This copies skills, commands, hooks, and tools into your project's `.claude/` directory and merges hook config into your `.claude/settings.local.json` (gitignored, machine-local).
 
+## Next: anchor your project with `/vision`
+
+Once stride is installed, run `/vision` before anything else:
+
+```
+/vision
+```
+
+It walks you through seven questions and writes `VISION.md` at the repo root — what the project delivers, why it exists, what success looks like. Every `/linear:*` command reads it as the upstream anchor: `/linear:plan-work` won't draft an issue without it, and `/linear:start` / `/linear:fix` use it to ground implementation decisions.
+
+Skipping this step means your first `/linear:plan-work` call stops with a hard-gate error. See [the `/vision` skill](/skills/vision) for the full walkthrough.
+
 ## Uninstall
 
 ```bash
