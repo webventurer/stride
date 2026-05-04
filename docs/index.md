@@ -12,9 +12,6 @@ hero:
     - theme: brand
       text: Getting started
       link: /getting-started
-    - theme: alt
-      text: Install
-      link: /install
     - theme: green
       text: Need some help?
       link: https://webventurer.github.io/stride-consult
