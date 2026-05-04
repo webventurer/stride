@@ -5,6 +5,24 @@
   --vp-code-color: #1a1a1a;
 }
 
+.VPButton.green {
+  border-color: #22c55e;
+  color: #ffffff;
+  background-color: #22c55e;
+}
+
+.VPButton.green:hover {
+  border-color: #16a34a;
+  color: #ffffff;
+  background-color: #16a34a;
+}
+
+.VPButton.green:active {
+  border-color: #15803d;
+  color: #ffffff;
+  background-color: #15803d;
+}
+
 .dark {
   --vp-c-text-1: #ffffffde;
   --vp-c-text-2: #ffffffab;
@@ -62,9 +80,42 @@
   vertical-align: -0.1em;
 }
 
+/* Breathing room between the brand name, headline, and tagline */
+.VPHero .name {
+  margin-bottom: 16px !important;
+}
+
+.VPHero .tagline {
+  margin-top: 20px !important;
+}
+
 @media (min-width: 960px) and (max-width: 1199px) {
   .VPHero .VPImage {
     max-width: 400px !important;
     max-height: 400px !important;
   }
+}
+
+.inline-image {
+  margin: 2.5rem 0;
+}
+
+.image-row {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+  margin: 1.5rem 0;
+}
+
+.image-row > :first-child {
+  flex: 1;
+}
+
+.image-row > :last-child {
+  flex: 0 0 200px;
+}
+
+.image-row > :last-child img {
+  max-width: 100%;
+  height: auto;
 }

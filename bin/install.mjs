@@ -1,36 +1,52 @@
 #!/usr/bin/env node
 
+import { createHash } from "node:crypto";
 import {
   chmodSync,
-  cpSync,
+  copyFileSync,
   existsSync,
   lstatSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
-  rmSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
+import { buildSection, removeSection } from "./gitignore.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, "..");
 const destRoot = process.cwd();
 
 const HOOK_CONFIG = {
-  PreToolUse: [
-    {
-      matcher: "Bash",
-      hooks: [
-        {
-          type: "command",
-          command:
-            "$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse/block_bare_git_commit.sh",
-        },
-      ],
-    },
-  ],
+  hooks: {
+    UserPromptSubmit: [
+      {
+        hooks: [
+          {
+            type: "command",
+            command:
+              "$CLAUDE_PROJECT_DIR/.claude/hooks/userpromptsubmit/inject_design_principles.sh",
+          },
+        ],
+      },
+    ],
+    PreToolUse: [
+      {
+        matcher: "Bash",
+        hooks: [
+          {
+            type: "command",
+            command:
+              "$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse/block_bare_git_commit.sh",
+          },
+        ],
+      },
+    ],
+  },
 };
 
 function ask(question) {
@@ -74,33 +90,105 @@ function dedupeHooks(existing, incoming) {
 const DIRS = [
   ".claude/skills/commit",
   ".claude/skills/craft",
+  ".claude/skills/vision",
   ".claude/commands/linear",
   ".claude/hooks",
-  ".claude/docs/patterns/git",
-  ".claude/docs/concepts",
-  "tools",
+  ".claude/stride/docs/patterns/git",
+  ".claude/stride/docs/concepts",
+  ".claude/stride/docs/principles",
+  ".claude/tools",
 ];
 
 const HOOKS = [
   ".claude/hooks/do_commit.sh",
   ".claude/hooks/pretooluse/block_bare_git_commit.sh",
+  ".claude/hooks/userpromptsubmit/inject_design_principles.sh",
 ];
 
-function resolveTypeMismatch(dest) {
-  const src = join(srcRoot, dest);
-  const full = join(destRoot, dest);
-  if (!existsSync(full)) return;
-  const srcIsDir = lstatSync(src).isDirectory();
-  const destIsDir = lstatSync(full).isDirectory();
-  if (srcIsDir !== destIsDir) rmSync(full, { recursive: true, force: true });
+function assertUnderClaudeDir(dir) {
+  if (dir.startsWith(".claude/") || dir === ".claude") return;
+  console.error(
+    `\nERROR: refusing to write outside .claude/: ${dir}\n` +
+      `Stride's install footprint is .claude/ only. This is a bug in DIRS.`,
+  );
+  process.exit(1);
 }
 
-function copyDir(dir) {
-  const src = join(srcRoot, dir);
-  if (!existsSync(src)) return;
-  resolveTypeMismatch(dir);
-  mkdirSync(join(destRoot, dir), { recursive: true });
-  cpSync(src, join(destRoot, dir), { recursive: true });
+function hashFile(path) {
+  return createHash("sha256").update(readFileSync(path)).digest("hex");
+}
+
+function contentsMatch(srcFile, destFile) {
+  return hashFile(srcFile) === hashFile(destFile);
+}
+
+function walkFiles(root, base = root) {
+  const paths = [];
+  for (const entry of readdirSync(root)) {
+    const full = join(root, entry);
+    const stat = lstatSync(full);
+    if (stat.isSymbolicLink()) continue;
+    if (stat.isDirectory()) paths.push(...walkFiles(full, base));
+    else paths.push(relative(base, full));
+  }
+  return paths;
+}
+
+function planAction(srcFile, destFile) {
+  if (!existsSync(destFile)) return "copy";
+  if (statSync(destFile).isDirectory()) return "conflict";
+  return contentsMatch(srcFile, destFile) ? "skip" : "conflict";
+}
+
+function copyFile(srcFile, destFile) {
+  mkdirSync(dirname(destFile), { recursive: true });
+  copyFileSync(srcFile, destFile);
+}
+
+const ACTIONS = {
+  copy: (src, dst, rel, s) => {
+    copyFile(src, dst);
+    s.copied.push(rel);
+  },
+  skip: (_src, _dst, rel, s) => s.skipped.push(rel),
+  conflict: (_src, _dst, rel, s) => s.conflicts.push(rel),
+};
+
+function installFile(srcFile, destFile, rel, summary) {
+  ACTIONS[planAction(srcFile, destFile)](srcFile, destFile, rel, summary);
+}
+
+function emptySummary() {
+  return { copied: [], skipped: [], conflicts: [] };
+}
+
+function installDir(dir) {
+  const srcDir = join(srcRoot, dir);
+  const summary = emptySummary();
+  if (!existsSync(srcDir)) return summary;
+  assertUnderClaudeDir(dir);
+  for (const rel of walkFiles(srcDir)) {
+    installFile(
+      join(srcDir, rel),
+      join(destRoot, dir, rel),
+      join(dir, rel),
+      summary,
+    );
+  }
+  return summary;
+}
+
+function mergeSummary(totals, part) {
+  totals.copied.push(...part.copied);
+  totals.skipped.push(...part.skipped);
+  totals.conflicts.push(...part.conflicts);
+}
+
+function reportConflictsAndExit(paths) {
+  console.error("\nERROR: target files differ from stride's source:");
+  for (const p of paths) console.error(`  ${p}`);
+  console.error("\nResolve manually (diff or replace) and re-run.");
+  process.exit(1);
 }
 
 function makeExecutable(hook) {
@@ -109,17 +197,11 @@ function makeExecutable(hook) {
 }
 
 function copyFiles() {
-  DIRS.forEach(copyDir);
+  const totals = emptySummary();
+  for (const dir of DIRS) mergeSummary(totals, installDir(dir));
   HOOKS.forEach(makeExecutable);
-}
-
-const EXAMPLE_FILES = [".mcp.json.example"];
-
-function copyExampleFiles() {
-  for (const file of EXAMPLE_FILES) {
-    const src = join(srcRoot, file);
-    if (existsSync(src)) cpSync(src, join(destRoot, file));
-  }
+  if (totals.conflicts.length > 0) reportConflictsAndExit(totals.conflicts);
+  return totals;
 }
 
 const LINEAR_OAUTH = {
@@ -169,12 +251,27 @@ function writeMcpConfig(path, config) {
   writeFileSync(path, `${JSON.stringify(config, null, 2)}\n`);
 }
 
+function hasLinearMcp(mcpPath) {
+  if (!existsSync(mcpPath)) return false;
+  const config = JSON.parse(readFileSync(mcpPath, "utf8"));
+  const servers = Object.keys(config.mcpServers || {});
+  return servers.some((s) => s.toLowerCase().includes("linear"));
+}
+
 async function configureMcp() {
-  const method = await ask(
-    "Linear: OAuth (single org) or API key (multiple orgs)? (oauth/api) ",
-  );
-  const servers = isApiKey(method) ? LINEAR_API_KEY : LINEAR_OAUTH;
   const mcpPath = join(destRoot, ".mcp.json");
+  if (hasLinearMcp(mcpPath)) {
+    console.log("Linear MCP already configured in .mcp.json — skipping");
+    return;
+  }
+  const method = await ask(
+    "Linear MCP: oauth (single org), api (multiple orgs), or none? [none] ",
+  );
+  if (!method || method === "none" || method === "n" || method === "skip") {
+    console.log("Skipped Linear MCP setup");
+    return;
+  }
+  const servers = isApiKey(method) ? LINEAR_API_KEY : LINEAR_OAUTH;
   const config = readMcpConfig(mcpPath);
   deepMerge(config.mcpServers, servers);
   writeMcpConfig(mcpPath, config);
@@ -186,7 +283,7 @@ async function configureMcp() {
 }
 
 function mergeSettings() {
-  const settingsPath = join(destRoot, ".claude/settings.json");
+  const settingsPath = join(destRoot, ".claude/settings.local.json");
   mkdirSync(dirname(settingsPath), { recursive: true });
 
   let settings = {};
@@ -198,54 +295,102 @@ function mergeSettings() {
   writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 }
 
-async function main() {
-  console.log("\nstride — All the speed. None of the mess.\n");
+function installFiles() {
+  logCopiedFiles(copyFiles());
+}
 
-  // Copy skill and command files
-  copyFiles();
-  copyExampleFiles();
-  console.log("Copied:");
-  console.log("  .claude/skills/commit/     (4-pass atomic commit skill)");
-  console.log("  .claude/commands/linear/   (Linear workflow commands)");
-  console.log("  .claude/hooks/             (commit hook scripts)");
-  console.log("  .claude/docs/              (supporting documentation)");
-  console.log("  tools/                     (cross-model feedback script)");
-  console.log("  .mcp.json.example          (Linear MCP server reference)");
+function installHeader({ copied, skipped }) {
+  if (skipped.length === 0) return "Installed to .claude/:";
+  return `Installed to .claude/ (${copied.length} new, ${skipped.length} already matched):`;
+}
 
-  // Configure Linear MCP
-  await configureMcp();
+function logCopiedFiles(totals) {
+  console.log(installHeader(totals));
+  console.log("  skills/vision/   (project Vision authoring skill)");
+  console.log("  skills/commit/   (4-pass atomic commit skill)");
+  console.log("  skills/craft/    (CRAFT prompt skill)");
+  console.log("  commands/linear/ (Linear workflow commands)");
+  console.log("  hooks/           (commit hook scripts)");
+  console.log("  stride/docs/     (principles, patterns, concepts)");
+  console.log("  tools/           (cross-model feedback script)");
+}
 
-  // Merge settings
-  const settingsPath = join(destRoot, ".claude/settings.json");
-  const settingsExist = existsSync(settingsPath);
+async function confirmSettingsMerge() {
+  const answer = await ask(
+    "\nMerge hook config into existing .claude/settings.local.json? [Y/n] ",
+  );
+  return !answer || answer === "y" || answer === "yes";
+}
 
-  if (settingsExist) {
-    const answer = await ask(
-      "\nMerge hook config into existing .claude/settings.json? (y/n) ",
+async function installHookConfig() {
+  const existed = existsSync(join(destRoot, ".claude/settings.local.json"));
+  if (existed && !(await confirmSettingsMerge())) {
+    console.log(
+      "Skipped settings merge. You can add the hooks manually — see README.",
     );
-    if (answer !== "y" && answer !== "yes") {
-      console.log(
-        "Skipped settings merge. You can add the hooks manually — see README.",
-      );
-      return;
-    }
+    return false;
   }
-
   mergeSettings();
   console.log(
-    settingsExist
-      ? "Merged hooks into .claude/settings.json"
-      : "Created .claude/settings.json with hook config",
+    existed
+      ? "Merged hooks into .claude/settings.local.json"
+      : "Created .claude/settings.local.json with hook config",
   );
+  return true;
+}
 
+function logAvailableSkills() {
   console.log("\nDone. Available skills:");
+  console.log(
+    "  /vision              — author the project Vision (run this first)",
+  );
   console.log("  /commit              — 4-pass atomic git commits");
+  console.log("  /craft               — CRAFT prompt framework");
   console.log("  /linear:check        — verify MCP connections");
   console.log("  /linear:start        — implement a Linear issue");
   console.log("  /linear:plan-work    — create a Linear issue");
   console.log("  /linear:fix          — address PR review feedback");
   console.log("  /linear:finish       — merge and close");
-  console.log("  /linear:next-steps   — review priorities\n");
+  console.log("  /linear:next-steps   — review priorities");
+  console.log(
+    "\nNext: run /vision to author your project's guiding light. Every /linear:* command reads VISION.md before deciding anything — without one, /linear:plan-work refuses to draft.\n",
+  );
+}
+
+function gitignoreEntries() {
+  const entries = DIRS.filter((d) => d !== ".claude/hooks").map((d) => `${d}/`);
+  return [...entries, ...HOOKS].sort();
+}
+
+async function confirmGitignoreWrite() {
+  const answer = await ask("\nAdd stride paths to .gitignore? [Y/n] ");
+  return !answer || answer === "y" || answer === "yes";
+}
+
+function writeGitignoreSection() {
+  const path = join(destRoot, ".gitignore");
+  const existing = existsSync(path) ? readFileSync(path, "utf8") : "";
+  const stripped = removeSection(existing);
+  const prefix = stripped ? `${stripped.trimEnd()}\n\n` : "";
+  writeFileSync(path, `${prefix}${buildSection(gitignoreEntries())}\n`);
+}
+
+async function configureGitignore() {
+  if (!(await confirmGitignoreWrite())) {
+    console.log("Skipped .gitignore update");
+    return;
+  }
+  writeGitignoreSection();
+  console.log("Updated .gitignore with stride paths");
+}
+
+async function main() {
+  console.log("\nstride — All the speed. None of the mess.\n");
+  installFiles();
+  await configureGitignore();
+  await configureMcp();
+  if (!(await installHookConfig())) return;
+  logAvailableSkills();
 }
 
 main();

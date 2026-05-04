@@ -90,13 +90,13 @@ python scripts/match.py --trello-dir /tmp/trello-export --linear-file /tmp/linea
 # Dry-run — writes inspection payloads to /tmp/trello-export/cards/
 python scripts/update_linear.py --match-report /tmp/trello-export/match-report.json --team Wordtracker --project "What's next (archive)" --dry-run
 
-# Apply — calls Linear directly via tools/linear_client.py
+# Apply — calls Linear directly via .claude/tools/linear_client.py
 python scripts/update_linear.py --match-report /tmp/trello-export/match-report.json --api-key-env LINEAR_WORDTRACKER_API_KEY --team Wordtracker --project "What's next (archive)" --apply
 ```
 
 In **dry-run** mode, `update_linear.py` writes one JSON payload per card to `cards/` next to the match report (e.g. `000.json`, `001.json`). These are for human inspection — review them before running `--apply`.
 
-In **apply** mode, the script calls Linear directly via `tools/linear_client.py` — resolving team, project, and state IDs up front, then calling `update_issue` / `create_issue` for each entry. No agent round-trip, no `cards/` artefacts. `--api-key-env` is required in this mode.
+In **apply** mode, the script calls Linear directly via `.claude/tools/linear_client.py` — resolving team, project, and state IDs up front, then calling `update_issue` / `create_issue` for each entry. No agent round-trip, no `cards/` artefacts. `--api-key-env` is required in this mode.
 
 ---
 

@@ -1,18 +1,16 @@
 # Getting started
 
-<mark>Vibe coding builds on quicksand. The first few stories go up fast, but a few changes later the house is tipping over and you can't tell which wall is load-bearing.</mark>
+<mark>**Vision sets the destination, Linear runs the trip, `/commit` records each step.**</mark>
 
-Vibe coding is great on day one — you describe what you want, the agent builds it, and within minutes you have a running app. But by day ten you can't tell which change broke things. By day thirty you're afraid to touch anything. By day ninety you're rewriting from scratch.
+> New here? Start with [Why Stride?](/why-stride) first — this page assumes you've decided.
 
-stride gives you a **solid foundation from the start**. Three Claude Code skills that turn you from a vibe coder into an **agentic engineer** — a [Linear](https://linear.app) workflow that structures *what the agent works on*, atomic commits that structure *how it records each change*, and prompt generation that structures *how it thinks before starting*. All without leaving the terminal.
+## Vision — the guiding light
 
-## Why atomic commits matter
+Before the loop, there's a question the loop can't answer: **what is this project for?**
 
-When AI agents write code, the quality of git history becomes a make-or-break concern.
+[`/vision`](/skills/vision) walks you through writing a `VISION.md` — seven questions, one at a time, drafted and approved before it lands at the repo root. Without it, every planner — human or AI — has to reinvent "what's this project for" from thin context. With it, the rest of stride has something concrete to measure against.
 
-Agents can produce large volumes of changes in a single session. Without discipline, those changes land as **monolithic commits** — impossible to review, difficult to revert, and dangerous to bisect. Atomic commits solve this by ensuring every commit contains *exactly one complete logical change*.
-
-The `/commit` skill encodes a **four-pass methodology** that separates content decisions from formatting standards. It catches the specific atomicity mistakes that AI agents make — grouping by session, by shared prefix, or by proximity rather than by purpose. Each commit becomes independently revertible, clearly explained, and safe to ship.
+Functionally, Vision is stride's *upstream anchor* — planning, ranking, and implementation all read it before deciding anything. You only run `/vision` once per project, then evolve it sparingly. The three loop skills below are how stride executes against the Vision.
 
 ## Linear integration
 
@@ -24,6 +22,14 @@ The `/linear` commands connect your development workflow directly to [Linear](ht
 Rather than context-switching between your editor and a browser, you can plan work, create issues, implement features, handle PR feedback, and close issues — all from within Claude Code. The five commands cover the **full development lifecycle**: from researching a problem and writing a well-structured issue, through to merging an approved pull request and marking it done.
 
 This keeps the agent *grounded in real project priorities* rather than working in isolation.
+
+## Atomic commits — the per-change discipline
+
+Inside the Linear flow, every commit point calls `/commit`. That's where the per-change discipline lives — atomic commits that keep the git history readable, revertible, and bisectable.
+
+Agents can produce large volumes of changes in a single session. Without discipline, those changes land as **monolithic commits** — impossible to review, difficult to revert, and dangerous to bisect. Atomic commits solve this by ensuring every commit contains *exactly one complete logical change*.
+
+The `/commit` skill encodes a **four-pass methodology** that separates content decisions from formatting standards. It catches the specific atomicity mistakes that AI agents make — grouping by session, by shared prefix, or by proximity rather than by purpose. Each commit becomes independently revertible, clearly explained, and safe to ship.
 
 ## The loop
 
@@ -41,23 +47,11 @@ Vibe coding produces code. [Agentic engineering](/reference/agentic-engineering)
 
 The approach is designed to compound: as AI models improve, the structured documentation gets more from them, not less.
 
-## App starters
-
-stride gives you the engineering workflow. App starters give you the project scaffold. Each starter is an opinionated template that gets you from zero to a working app in one command — with stride's skills already wired in.
-
-### [app-starter](https://github.com/webventurer/app-starter)
-
-A modern full-stack web app starter — React + TypeScript + Vite on the frontend, Hono + Neon + Clerk + Drizzle on the backend. Every layer is independently replaceable — swap one piece without rewiring the rest. Includes shadcn/ui for components, Biome for formatting, and reference docs that explain every technology choice.
-
-```bash
-gh repo clone webventurer/app-starter
-./app-starter/scripts/create.sh my-app
-```
-
 ## Next steps
 
 - [How it works](/how-it-works) — see what gets installed and how the pieces connect
 - [Install stride](/install) into your project
+- Anchor the project with [/vision](/skills/vision)
 - Learn about [atomic commits](/skills/commit)
 - Set up the [Linear workflow](/skills/linear)
 - Generate better prompts with [/craft](/skills/craft)

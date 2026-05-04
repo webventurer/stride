@@ -10,11 +10,11 @@ hero:
     alt: stride — cards flowing through a Kanban board
   actions:
     - theme: brand
-      text: Getting started
-      link: /getting-started
-    - theme: alt
-      text: Install
-      link: /install
+      text: Why Stride?
+      link: /why-stride
+    - theme: green
+      text: Need some help?
+      link: https://webventurer.github.io/stride-consult
 
 features:
   - title: Ship faster without chaos

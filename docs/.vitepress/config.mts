@@ -8,6 +8,7 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/getting-started' },
       { text: 'Skills', items: [
+        { text: '/vision', link: '/skills/vision' },
         { text: '/commit', link: '/skills/commit' },
         { text: '/linear', link: '/skills/linear' },
         { text: '/craft', link: '/skills/craft' },
@@ -18,6 +19,7 @@ export default defineConfig({
       {
         text: 'Guide',
         items: [
+          { text: 'Why Stride?', link: '/why-stride' },
           { text: 'Getting started', link: '/getting-started' },
           { text: 'How it works', link: '/how-it-works' },
           { text: 'Install', link: '/install' },
@@ -26,6 +28,7 @@ export default defineConfig({
       {
         text: 'Skills',
         items: [
+          { text: '/vision — Project vision', link: '/skills/vision' },
           { text: '/commit — Atomic commits', link: '/skills/commit' },
           { text: '/linear — Linear workflow', link: '/skills/linear' },
           { text: '/craft — Prompt generation', link: '/skills/craft' },
@@ -35,11 +38,20 @@ export default defineConfig({
         text: 'Reference',
         items: [
           { text: 'Agentic engineering', link: '/reference/agentic-engineering' },
+          { text: "Can't we just use Lovable?", link: '/reference/cant-we-just-use-lovable' },
+          { text: 'Epics and stories', link: '/reference/epics-and-user-stories' },
           { text: 'Kanban process', link: '/reference/kanban' },
           { text: 'Issue statuses', link: '/reference/issue-statuses' },
           { text: 'Issue template', link: '/reference/issue-template' },
           { text: 'Chris Beams commit style', link: '/reference/commit-style' },
           { text: 'Migration skills', link: '/reference/migration-skills' },
+        ],
+      },
+      {
+        text: 'Research',
+        items: [
+          { text: 'Sprint vs kanban', link: '/research/agile/sprint-vs-kanban' },
+          { text: 'What agile really means', link: '/research/agile/what-agile-really-means' },
         ],
       },
     ],

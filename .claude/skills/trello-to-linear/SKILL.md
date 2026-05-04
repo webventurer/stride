@@ -47,7 +47,7 @@ All scripts live in `scripts/` and follow the `/script` skill conventions.
 | `export_trello.py` | Export | Pulls all cards from a Trello board (including archived lists) — descriptions, comments, checklists — writes one JSON per list |
 | `match.py` | Match | Reads Trello export + Linear issues, matches by title (exact → normalised → fuzzy), writes match report |
 | `check_states.py` | Check | Validates that all mapped state names exist in the target Linear workspace. Run before upsert |
-| `update_linear.py` | Upsert | Reads match report and talks to Linear directly via `tools/linear_client.py`. `--dry-run` (default) writes inspection payloads to `cards/`; `--apply` calls Linear |
+| `update_linear.py` | Upsert | Reads match report and talks to Linear directly via `.claude/tools/linear_client.py`. `--dry-run` (default) writes inspection payloads to `cards/`; `--apply` calls Linear |
 | `verify.py` | Verify | Compares Trello export against Linear issues — checks counts, titles, order, and descriptions |
 
 ### Running
@@ -76,7 +76,7 @@ python scripts/verify.py --trello-dir /tmp/trello-export --linear-file /tmp/line
 - `requests` — Trello REST API calls
 - `click` — CLI parameters
 - `difflib` — fuzzy title matching (stdlib)
-- `tools/linear_client.py` — shared Linear GraphQL helpers, imported via `scripts/_bootstrap.py` (same pattern as `linear-to-linear`). `update_linear.py --apply` and `check_states.py` both call Linear directly through this client — no MCP round-trip.
+- `.claude/tools/linear_client.py` — shared Linear GraphQL helpers, imported via `scripts/_bootstrap.py` (same pattern as `linear-to-linear`). `update_linear.py --apply` and `check_states.py` both call Linear directly through this client — no MCP round-trip.
 
 ---
 

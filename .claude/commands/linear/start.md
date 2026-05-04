@@ -29,21 +29,78 @@ Fetch the issue and its comments via MCP:
 - `get_issue` with `$ARGUMENTS`
 - `list_comments` with the issue ID
 
-Extract: issue ID, title, description, status, labels, `gitBranchName`, assignee.
+Extract: issue ID, title, description, status, labels, `gitBranchName`, assignee, milestone.
 
 Extract from comments: decisions and context added after the description was written.
+
+If the issue belongs to a milestone, surface it before continuing: `This story is part of *[Milestone name]*`. One line — just enough context that the user knows which epic the work is feeding.
 
 Stop if the issue cannot be found.
 
 If the issue is assigned to someone other than the current user, warn and ask whether to proceed.
 
-### 2. Load project context
+### 2. Vision check
+
+Vision is the guiding light — implementation decisions made without it drift toward whatever feels reasonable. Before implementation begins, check that one exists.
+
+Read `VISION.md` from the repo root.
+
+- **If missing**: stop and tell the user:
+
+  ```
+  No VISION.md found at the repo root.
+
+  /linear:start needs a Vision to anchor implementation to —
+  without one, design decisions made during implementation
+  drift away from the project's stated purpose.
+
+  Run /vision first, then re-run /linear:start.
+  ```
+
+  Do not start implementation against a project with no anchor.
+
+- **If present**: read the full file and load it as context for the rest of the flow.
+
+Then, from the issue body's "Why this matters" section (loaded in step 1), surface the Vision outcome the issue serves:
+
+```
+This work serves: <outcome line from VISION.md>
+```
+
+If the issue has no "Why this matters" section, decide whether it qualifies for the legacy soft path. **The legacy path is bounded** — it's only valid for issues created before `VISION.md` existed in the repo. Compare the issue's Linear `createdAt` timestamp against the file's first-commit date (`git log --diff-filter=A --follow --format=%aI -- VISION.md | tail -1`).
+
+- **Legacy issue** (created before `VISION.md` existed): surface a soft warning and proceed:
+
+  ```
+  This issue predates Vision-anchored issue drafting — proceeding
+  without a named outcome.
+  ```
+
+- **Modern issue** (created after `VISION.md` existed): treat the missing "Why this matters" as an error. `/linear:plan-work` should have caught it. Stop and tell the user:
+
+  ```
+  This issue was created after VISION.md existed but has no
+  "Why this matters" section. It should have been drafted via
+  /linear:plan-work, which enforces the trace-back.
+
+  Either:
+  1. Edit the issue to add "Why this matters" referencing a
+     Success Criterion, then re-run /linear:start.
+  2. If the work genuinely doesn't trace to a criterion, run
+     /vision to add one, then update the issue.
+  ```
+
+  Don't start implementation against a modern issue with no anchor.
+
+<mark>**The hard gate is on `VISION.md` and (for modern issues) on the outcome reference.**</mark> No Vision = stop. Modern issue with no outcome reference = stop. Legacy issue with no outcome reference = soft warning, continue. Carry the loaded Vision and (when present) the named outcome as context throughout step 7 (Implement) — when making design decisions, reference what the work is in service of.
+
+### 3. Load project context
 
 Read project documentation using the paths in [reference/project-docs.md](reference/project-docs.md). Check what exists — only read what is found.
 
 Also check for feature docs matching the issue title, labels, or keywords.
 
-### 3. Inspect the repository state
+### 4. Inspect the repository state
 
 Run:
 
@@ -56,9 +113,9 @@ git branch -a
 
 If there are uncommitted changes, warn and stop — suggest `/commit`.
 
-Never work directly on `main`. If the current branch is `main`, proceed to step 4 to create or switch to a feature branch.
+Never work directly on `main`. If the current branch is `main`, proceed to step 5 to create or switch to a feature branch.
 
-### 4. Resolve the correct branch
+### 5. Resolve the correct branch
 
 Branch priority:
 
@@ -67,7 +124,7 @@ Branch priority:
 3. Linear `gitBranchName`
 4. Fallback pattern: `feature/<issue-id>-<slug>`
 
-If already on the correct branch (resuming from a worktree), skip to step 5.
+If already on the correct branch (resuming from a worktree), skip to step 6.
 
 #### Ask: worktree or inline?
 
@@ -75,7 +132,7 @@ If creating a new branch, ask the user:
 
 **"Run this here or in a separate worktree?"**
 
-- **Here** — create the branch in the current repo and continue to step 5
+- **Here** — create the branch in the current repo and continue to step 6
 - **Worktree** — create an isolated worktree and hand off to a new session
 
 #### Option A: inline (here)
@@ -84,7 +141,7 @@ If creating a new branch, ask the user:
 git checkout -b <branch>
 ```
 
-Continue to step 5.
+Continue to step 6.
 
 #### Option B: Worktree
 
@@ -139,12 +196,12 @@ Open a Claude Code session there with:
 cd <absolute-worktree-path>
 claude
 
-Then run /linear:start <issue-id> — it will pick up the branch and skip straight to implementation.
+Then run /linear:start <issue-id> — it will pick up the branch and continue from the Vision check onwards.
 ```
 
-**Do not continue to step 5.** The user will run `/linear:start` again from inside the worktree, where it will detect the existing branch and resume from step 5 onwards.
+**Do not continue to step 6.** The user will run `/linear:start` again from inside the worktree, where it will detect the existing branch and resume from step 6 onwards (still running the Vision check at step 2 first).
 
-### 5. Update Linear status → Doing
+### 6. Update Linear status → Doing
 
 Only update if the current status is Todo, Backlog, or Backburner.
 
@@ -152,7 +209,7 @@ Set status to **Doing** via `save_issue`.
 
 If already Doing, leave unchanged. Never set any other status in this step.
 
-### 6. Implement
+### 7. Implement
 
 Read the codebase as needed to understand existing patterns before making changes.
 
@@ -162,7 +219,9 @@ Read the codebase as needed to understand existing patterns before making change
 - Avoid unrelated refactors
 - Add or update tests where appropriate
 
-### 7. Validate
+Keep the Vision outcome from step 2 in mind throughout. When choosing between approaches of roughly equal value, prefer the one that more directly serves the named outcome.
+
+### 8. Validate
 
 Run the project's build command (e.g. `pnpm build`). Stop if it fails — show the first error and fix it before continuing.
 
@@ -170,7 +229,7 @@ If the project has tests, run them too. Fix any failures.
 
 Re-validate after fixes until the build passes cleanly.
 
-### 8. Review scope
+### 9. Review scope
 
 Run these commands to understand what the PR will contain:
 
@@ -182,17 +241,68 @@ git log main..HEAD --oneline
 
 Warn if no commits ahead of main (stop — nothing to ship). Warn if changed files look unrelated to the issue.
 
-### 9. Push
+### 10. Auto-squash similar commits
+
+Iterative refinement during step 7 leaves journey-shaped commits — "first attempt", "wait that broke X", "format pass". Before push, group them by purpose and rewrite the messages to describe **where you ended up**, not how you got there. The agent makes the call automatically — the user gates via terminal review (step 15).
+
+**Fast path.** If `git log main..HEAD --oneline` shows a single commit, skip this step entirely.
+
+**Algorithm.** Otherwise, with the diffs from step 9 in context:
+
+1. **Group by purpose.** Walk `git log main..HEAD --oneline` and decide which commits serve the same purpose. Signals that two commits belong together:
+   - They touch the same file(s) for the same reason (e.g. consecutive edits to one skill prompt while iterating on it)
+   - One refines what an earlier commit started (e.g. "first attempt" + "address feedback" + "format pass")
+   - One is a fixup — typo, formatting, lint repair — for the change just before it
+   - The Conventional-Commits prefixes match (`feat:` + `feat:` on the same area; `docs:` + `docs:` touching the same paths)
+
+   Signals that commits should stay separate:
+   - Different files, different reasons (a feature change and an unrelated bug fix in the same session)
+   - Different prefixes describing different concerns (`feat:` then `refactor:` on a different area)
+   - Distinct logical units that each merit independent revertibility
+
+   <mark>**When uncertain, leave them separate.** False positives — collapsing real changes into one commit — are worse than false negatives. Conservative grouping is the safer default.</mark>
+
+2. **For each group of 2+ commits, squash and rewrite.** For a group spanning commits `<oldest>..<newest>`:
+
+   ```bash
+   git reset --soft <commit-before-oldest>
+   git add <files-in-this-group>
+   .claude/hooks/do_commit.sh -F /tmp/squash-msg-<n>.txt
+   ```
+
+   Where `/tmp/squash-msg-<n>.txt` contains a fresh message written from the post-implementation understanding. The message describes **what the work is**, not how it got there.
+
+   - Use a Conventional Commits prefix (`feat:`, `fix:`, `docs:`, `refactor:`, etc.) and a single sentence subject under 50 characters
+   - The body explains *why* the change exists, in present tense, as if the work was right the first time
+   - Drop "first attempt", "addressed feedback", "refactor of X", "WIP" — those describe the journey, not where you ended up
+   - If the body needs bullets, list the substantive changes — not the iterations
+
+3. **Single-commit groups stay untouched.** A single commit already earns its place; rewriting it is friction with no gain.
+
+4. **After processing all groups, verify**:
+
+   ```bash
+   git log main..HEAD --oneline
+   git diff main...HEAD --stat
+   ```
+
+   Confirm the diff stat matches what was there before the squash (file changes preserved) and that the new commit count is ≤ the old count.
+
+**Reflog as recovery.** If anything goes wrong — or the user objects in step 15 — `git reflog` plus `git reset --hard <pre-squash-sha>` returns to the original commits.
+
+### 11. Push
 
 Run `git push -u origin <current-branch>` if the branch has not been pushed yet.
 
-### 10. Check for existing PR
+If this is a resume run and the branch was already pushed before the squash, use `git push --force-with-lease` instead. The squash rewrote SHAs; force-with-lease succeeds only if the remote tip matches what was last fetched, so it can't silently overwrite someone else's work.
+
+### 12. Check for existing PR
 
 Run `gh pr list --head <branch> --json url,number`.
 
-If a PR already exists, show the URL and skip to step 12.
+If a PR already exists, show the URL and skip to step 14.
 
-### 11. Create PR
+### 13. Create PR
 
 Run `gh pr create`:
 
@@ -215,18 +325,19 @@ EOF
 )"
 ```
 
-### 12. Update Linear status → In Review
+### 14. Update Linear status → In Review
 
 Move the issue to **In Review** via `save_issue`.
 
 Only after the PR is confirmed created or already exists. Skip if the issue is already In Review. Warn (but proceed) if the issue is Done.
 
-### 13. Review in terminal
+### 15. Review in terminal
 
 Show the full diff against main for the user to review:
 
 ```bash
 git diff main...HEAD
+git log main..HEAD --oneline
 ```
 
 Then display:
@@ -236,10 +347,15 @@ Then display:
 - Build: passed
 - PR URL
 - Linear status: In Review
+- Squash summary (if step 10 grouped any commits): "Squashed N commits into M"
 
 Ask: **"Does this look right, or do you want changes?"**
 
-If the user requests changes, make them, re-validate (step 7), commit, push, and show the updated diff. Repeat until the user is satisfied.
+If the user requests changes, make them, re-validate (step 8), commit, push, and show the updated diff. Repeat until the user is satisfied.
+
+If the user objects to a squash from step 10 ("don't squash these"), recover via `git reflog` to find the pre-squash SHA, then `git reset --hard <sha>`, then re-push with `--force-with-lease`.
+
+<mark>**When the user approves, stop. Do not merge.** Say "Ready for `/finish` when you are" and end. Merging is `/finish`'s job — it uses `--merge` to preserve atomic commits. Never use `--squash`.</mark>
 
 The PR is the record. The terminal is where the real review happens first.
 
@@ -249,8 +365,10 @@ The PR is the record. The terminal is where the real review happens first.
 
 - Issue ID unresolvable → stop, ask the user
 - Issue not found in Linear → stop
+- `VISION.md` missing → stop, suggest `/vision`
 - Uncommitted changes → stop, suggest `/commit`
-- On `main` with no issue branch → create branch in step 4
+- On `main` with no issue branch → create branch in step 5
 - No commits ahead of `main` → stop
 - Build fails → fix, re-validate, continue
 - PR already exists → not an error, show URL and continue
+- Squash leaves the diff stat changed (file content drift) → abort the squash, restore via reflog, leave commits as-is

@@ -83,7 +83,7 @@ This ensures each commit represents a working state of the codebase.
 
 ## The atomicity balance
 
-Atomicity has two failure modes, not one. Use [clarity through opposites](../../../docs/research/ai-patterns/clarity-through-opposites.md) to find the sweet spot:
+Atomicity has two failure modes, not one. Find the sweet spot between them:
 
 **Over-atomising** (too many commits):
 - Splitting a one-line CSS fix and a related prop addition into separate commits
@@ -136,6 +136,22 @@ git add docs/research/ai-coding/what-is-a-frame.md
 <mark>**"What is the user trying to accomplish?"** — ask this before looking at the diff.</mark>
 
 The diff tells you *what changed*. The user's intent tells you *why*. AI consistently writes commit messages that describe the mechanics of the diff ("fix image paths", "rename directory") rather than the purpose ("add PDF export with embedded images"). The commit log should read like a story of what was accomplished, not a changelog of file operations.
+
+## Describe what is, not what was
+
+<mark>**Commit messages describe the destination, not the journey.** Don't narrate the previous state — describe what the current state does.</mark>
+
+The diff already shows what changed. Narrating the previous version inside the message ("the previous intro claimed X — that's wrong, now it says Y") doubles the reader's work without adding information. Worse, the retrospective framing rots — six months later the "previous" state is gone from anyone's mind, and the message reads as confusing context-free criticism.
+
+| Avoid | Prefer |
+|:------|:-------|
+| "The previous intro claimed X. That's wrong: ..." | Describe what the intro now says |
+| "Removed the old behaviour and replaced it with..." | Describe the new behaviour |
+| "Before, the function did Y. Now it does Z." | "The function does Z" |
+| "Fixed the typo where..." | Describe the corrected text |
+| "No longer does X" | Describe what it does instead |
+
+This is the same principle as the auto-squash rule in `/linear:start` — *describe where you ended up, not how you got there.* The git log should read as if the work was right the first time. If the only context the reader has is the commit message and the diff, the message should make sense from that alone.
 
 ## Content focus blindness
 
@@ -210,6 +226,70 @@ Pre-commit hooks can accidentally cause you to commit multiple unrelated files t
 4. **Result**: your commit now includes unrelated files
 
 **Prevention**: Run the repo's hooks manually in Pass 0 (see [WORKFLOW.md](WORKFLOW.md)). This fixes all formatting upfront so hooks have nothing to fix during the actual commit.
+
+---
+
+## How to fold
+
+To fold a change into an existing commit — a typo fix, a missed edge case, a wording correction that belongs to work already in flight — collapse it into the target so the rewritten history reads as if the work was right the first time. Only the target's SHA changes; commits unrelated to the fold keep their identity.
+
+### Pattern A — Fixup sits on top of its target (common case)
+
+When the change being folded is the most recent thing on the branch and the target is `HEAD~1`, use **soft-reset + amend**. The agent can complete the fold end-to-end; no user step required.
+
+```bash
+# 1. Record the fold intent as a fixup commit (optional but recommended —
+#    creates a reflog entry the agent or user can recover from)
+git add <files>
+.claude/hooks/do_commit.sh --fixup=<sha>     # writes "fixup! <original subject>"
+
+# 2. Collapse the fixup into its target
+git reset --soft HEAD~1                       # undoes the fixup, keeps changes staged
+.claude/hooks/do_commit.sh --amend --no-edit  # folds staged changes into the target
+
+# 3. If the branch was already pushed, update the remote
+git push --force-with-lease
+```
+
+`--no-edit` keeps the target's original commit message — the journey-shaped fixup commit message disappears, and the log reads as a single coherent commit. `--force-with-lease` only overwrites the remote if its tip matches what the agent last fetched, so it can't silently clobber someone else's work.
+
+If there's no fixup commit yet (the change is still in the working tree) and the target is HEAD, skip step 1 and step 2's reset — just `git add` then `do_commit.sh --amend --no-edit`.
+
+### Pattern B — Target is older, with unrelated commits between (uncommon)
+
+The soft-reset trick collapses everything between target and HEAD into the target — wrong when there are unrelated commits in between. In that case the agent records intent and hands off:
+
+```bash
+git add <files>
+.claude/hooks/do_commit.sh --fixup=<sha>
+```
+
+Then **stop**. The harness blocks `git rebase -i`, and `--autosquash` requires `-i` to take effect. Tell the user the fixup commit is in place and they need to run `git rebase -i --autosquash <base>` locally to collapse it.
+
+### Agent capability summary
+
+| Action | Agent can do? |
+|:--|:--|
+| Write a `--fixup` commit | ✅ via `do_commit.sh --fixup=<sha>` |
+| Soft-reset + amend (Pattern A) | ✅ when fixup is on top of target |
+| Force-push-with-lease after fold | ✅ when the user has authorised it for this work |
+| `git rebase -i --autosquash` | ❌ harness blocks `-i` literally |
+| Bare `git commit --amend` | ❌ pre-tool-use hook blocks it; use `do_commit.sh --amend` |
+
+### When to fold vs. new commit
+
+| Situation | Use |
+|:--|:--|
+| Original commit on a local branch, work-in-progress | Fold (Pattern A or B) |
+| Original commit is HEAD | `do_commit.sh --amend --no-edit` directly (skip the fixup step) |
+| Original commit on `main` and pushed widely | New commit — don't rewrite shipped history without strong reason |
+
+### What not to do
+
+- ❌ `git reset --hard HEAD~N` + cherry-pick replay — clean but creates new SHAs across commits that didn't change
+- ❌ `git reset --soft <base>` + recommit chain spanning multiple commits — error-prone manual content reconstruction (the single-step soft-reset in Pattern A is fine because there's no chain to reconstruct; `--no-edit` preserves the target's message)
+- ❌ Bare `git commit --amend` — blocked by the pre-tool-use hook
+- ❌ `git rebase -i --autosquash` from the agent — `-i` blocked at harness level
 
 ---
 

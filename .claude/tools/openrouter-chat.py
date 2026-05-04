@@ -5,9 +5,9 @@
 """Chat completion via OpenRouter. Zero-dependency on stride.
 
 Usage:
-    uv run tools/openrouter-chat.py "prompt"
-    uv run tools/openrouter-chat.py "prompt" -m openai/gpt-5.4-pro
-    uv run tools/openrouter-chat.py "prompt" -s "You are a reviewer."
+    uv run .claude/tools/openrouter-chat.py "prompt"
+    uv run .claude/tools/openrouter-chat.py "prompt" -m openai/gpt-5.4-pro
+    uv run .claude/tools/openrouter-chat.py "prompt" -s "You are a reviewer."
 """
 
 import os

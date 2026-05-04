@@ -1,4 +1,4 @@
-# tools/
+# .claude/tools/
 
 Small, vendored Python utilities that live alongside the repo. Each
 file stands on its own — no package, no install, no dependency graph
@@ -109,8 +109,8 @@ API key is available. The mocked error-handling test runs
 unconditionally.
 
 ```bash
-python -m pytest tools/tests/                      # unit only
-LINEAR_E2E=1 python -m pytest tools/tests/         # live + unit
+python -m pytest .claude/tools/tests/              # unit only
+LINEAR_E2E=1 python -m pytest .claude/tools/tests/ # live + unit
 ```
 
 Set `LINEAR_TEST_API_KEY_ENV` and `LINEAR_TEST_TEAM` if you want to
@@ -135,10 +135,10 @@ from linear_client import ...
 ```
 
 The `_bootstrap.py` module sits next to the scripts and adds
-`<repo-root>/tools` to `sys.path` so the `linear_client` import
-resolves to this directory.
+`<repo-root>/.claude/tools` to `sys.path` so the `linear_client`
+import resolves to this directory.
 
 ## `openrouter-chat.py`
 
 Tiny OpenRouter CLI used by the `chorus` / plan-work feedback loops.
-Not part of the Linear client — just shares the same `tools/` home.
+Not part of the Linear client — just shares the same `.claude/tools/` home.

@@ -22,7 +22,9 @@
 
 ---
 
-Replace `[user's description]` with what the user provided:
+Replace `[user's description]` with what the user provided, and
+`[VISION]` with the full contents of `VISION.md` from the repo
+root:
 
 ```text
 CONTEXT:
@@ -31,8 +33,37 @@ has described the work as: "[user's description]". This prompt
 will be used to guide codebase research and issue drafting — it
 needs to surface why this matters, where things stand, what
 we'll do, and the expected outcome so the resulting issue is
-immediately
-actionable by a developer.
+immediately actionable by a developer.
+
+Every issue in this project must trace back to the project's
+Vision. The full Vision document follows:
+
+----- BEGIN VISION.md -----
+[VISION]
+----- END VISION.md -----
+
+The Vision shapes the draft across multiple sections, not just
+the trace-back. Use it as follows:
+
+| Vision content                  | Issue section it informs            |
+|:--------------------------------|:------------------------------------|
+| Measurable success criteria     | "Why this matters" — quote verbatim |
+| Non-Goals / what it won't do    | "What we won't do" boundary         |
+| Constraints / what can't change | "Where things stand", "How to test" |
+| Who it's for                    | Stakeholder framing and tone        |
+| Why it exists / why now         | "Why this matters" rationale        |
+
+Section headings vary across consumers — the Vision may name
+its measurable outcomes "Success Criteria", "How we know it's
+working", or similar. Identify the section listing checkable
+outcomes (typically a checkbox list or bullet list of measurable
+conditions) and use those lines as the criteria for trace-back.
+
+The drafted issue must identify which criterion the work serves
+and quote that line verbatim in the Why-this-matters section.
+If the work cannot be tied to any criterion, do not fabricate a
+connection — flag it as out-of-scope or as a signal the Vision
+needs a new criterion.
 
 ROLE:
 You are a senior product engineer with 20+ years of experience
@@ -43,8 +74,13 @@ and writing issue descriptions that a developer can start
 working on without asking clarifying questions.
 
 ACTION:
-1. Explain why this matters — the user impact, business reason,
-   or technical risk that makes this worth doing now
+1. Identify which measurable criterion from the Vision this work
+   serves and quote it verbatim, then explain why this matters —
+   the user impact, business reason, or technical risk that makes
+   this worth doing now. Let the Vision's Why / Why-now framing
+   inform the rationale. If no criterion fits, stop and report
+   this back — do not fabricate a connection. Either the work is
+   out of scope or the Vision needs a new criterion.
 2. Describe where things stand — the current state, whether
    that's a bug, a gap, or an opportunity for something new
 3. Define what we'll do — the deliverable and scope boundary
@@ -66,8 +102,11 @@ toggle to dashboard header"). Under 70 characters.
 ## Description
 
 ### Why this matters
-User impact, business reason, or technical risk that makes
-this worth doing now (1–2 sentences)
+First line: the verbatim measurable criterion from the Vision
+this work serves, in italic markdown — e.g. *"Linear board state
+matches branch state automatically as /linear:* runs"*. Then 1–2
+sentences on user impact, business reason, or technical risk
+that makes this worth doing now.
 
 ### Where things stand
 Current state — the bug, gap, or opportunity (1–2 sentences)
@@ -131,8 +170,13 @@ are right there in the issue.
 ### Why this matters
 *Sets the stakes — why this work is worth doing now.*
 
+*"Issue titles read as stakeholder outcomes, not implementation
+steps"*
+
 Every issue we create uses this template. If the format is
-broken, every card in the backlog is harder to read.
+broken, every card in the backlog is harder to read — and the
+stakeholder-readable shape we're committing to in the Vision
+gets undermined at the first hop.
 
 ### Where things stand
 *Current state — the gap, limitation, or opportunity.*

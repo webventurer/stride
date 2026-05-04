@@ -1,8 +1,20 @@
 #!/usr/bin/env node
 
-import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import {
+  existsSync,
+  lstatSync,
+  readdirSync,
+  readFileSync,
+  rmdirSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
+import { dirname, join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
+import { removeSection } from "./gitignore.mjs";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const srcRoot = join(__dirname, "..");
 const destRoot = process.cwd();
 
 if (existsSync(join(destRoot, "bin/install.mjs"))) {
@@ -13,61 +25,116 @@ if (existsSync(join(destRoot, "bin/install.mjs"))) {
 const DIRS = [
   ".claude/skills/commit",
   ".claude/skills/craft",
+  ".claude/skills/vision",
   ".claude/commands/linear",
   ".claude/hooks",
-  ".claude/docs/patterns/git",
-  ".claude/docs/concepts",
-  "tools",
+  ".claude/stride/docs/patterns/git",
+  ".claude/stride/docs/concepts",
+  ".claude/stride/docs/principles",
+  ".claude/tools",
 ];
 
-const EXAMPLE_FILES = [".mcp.json.example"];
+const HOOK_MATCHERS = [
+  "block_bare_git_commit.sh",
+  "inject_design_principles.sh",
+];
 
-const HOOK_MATCHER = "block_bare_git_commit.sh";
-
-function removeDir(dir) {
-  const full = join(destRoot, dir);
-  if (existsSync(full)) rmSync(full, { recursive: true, force: true });
+function walkFiles(root, base = root) {
+  const paths = [];
+  for (const entry of readdirSync(root)) {
+    const full = join(root, entry);
+    const stat = lstatSync(full);
+    if (stat.isSymbolicLink()) continue;
+    if (stat.isDirectory()) paths.push(...walkFiles(full, base));
+    else paths.push(relative(base, full));
+  }
+  return paths;
 }
 
-function removeFile(file) {
-  const full = join(destRoot, file);
-  if (existsSync(full)) rmSync(full);
+function removeStrideFiles(dir) {
+  const srcDir = join(srcRoot, dir);
+  const destDir = join(destRoot, dir);
+  if (!existsSync(srcDir) || !existsSync(destDir)) return;
+  for (const rel of walkFiles(srcDir)) {
+    const target = join(destDir, rel);
+    if (existsSync(target)) unlinkSync(target);
+  }
+  pruneEmptyDirs(destDir);
+  pruneEmptyAncestors(destDir);
+}
+
+function pruneEmptyDirs(dir) {
+  if (!existsSync(dir)) return;
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (lstatSync(full).isDirectory()) pruneEmptyDirs(full);
+  }
+  if (readdirSync(dir).length === 0) rmdirSync(dir);
+}
+
+function pruneEmptyAncestors(dir) {
+  const claudeRoot = join(destRoot, ".claude");
+  let current = dirname(dir);
+  while (current.length > claudeRoot.length && current.startsWith(claudeRoot)) {
+    if (!existsSync(current) || readdirSync(current).length > 0) return;
+    rmdirSync(current);
+    current = dirname(current);
+  }
+}
+
+function isStrideHook(entry) {
+  return HOOK_MATCHERS.some((m) => JSON.stringify(entry).includes(m));
 }
 
 function removeHookConfig() {
-  const settingsPath = join(destRoot, ".claude/settings.json");
+  const settingsPath = join(destRoot, ".claude/settings.local.json");
   if (!existsSync(settingsPath)) return;
 
   const settings = JSON.parse(readFileSync(settingsPath, "utf8"));
-  const hooks = settings.PreToolUse;
-  if (!Array.isArray(hooks)) return;
+  if (!settings.hooks) return;
 
-  settings.PreToolUse = hooks.filter(
-    (h) => !JSON.stringify(h).includes(HOOK_MATCHER),
-  );
-  if (settings.PreToolUse.length === 0) delete settings.PreToolUse;
+  for (const event of ["UserPromptSubmit", "PreToolUse", "PostToolUse"]) {
+    const hooks = settings.hooks[event];
+    if (!Array.isArray(hooks)) continue;
+    settings.hooks[event] = hooks.filter((h) => !isStrideHook(h));
+    if (settings.hooks[event].length === 0) delete settings.hooks[event];
+  }
 
   writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
+}
+
+function removeGitignoreSection() {
+  const path = join(destRoot, ".gitignore");
+  if (!existsSync(path)) return;
+  const stripped = removeSection(readFileSync(path, "utf8"));
+  if (!stripped.trim()) {
+    unlinkSync(path);
+    return;
+  }
+  writeFileSync(path, stripped.endsWith("\n") ? stripped : `${stripped}\n`);
 }
 
 function main() {
   console.log("\nstride — uninstalling\n");
 
-  DIRS.forEach(removeDir);
-  EXAMPLE_FILES.forEach(removeFile);
+  DIRS.forEach(removeStrideFiles);
   removeHookConfig();
+  removeGitignoreSection();
 
-  console.log("Removed:");
-  console.log("  .claude/skills/commit/     (4-pass atomic commit skill)");
-  console.log("  .claude/skills/craft/      (CRAFT prompt skill)");
-  console.log("  .claude/commands/linear/   (Linear workflow commands)");
-  console.log("  .claude/hooks/             (commit hook scripts)");
-  console.log("  .claude/docs/              (supporting documentation)");
-  console.log("  tools/                     (cross-model feedback script)");
-  console.log("  .mcp.json.example          (Linear MCP server reference)");
-  console.log("  PreToolUse hook            (from .claude/settings.json)");
+  console.log("Removed stride files from .claude/:");
+  console.log("  skills/vision/   (project Vision authoring skill)");
+  console.log("  skills/commit/   (4-pass atomic commit skill)");
+  console.log("  skills/craft/    (CRAFT prompt skill)");
+  console.log("  commands/linear/ (Linear workflow commands)");
+  console.log("  hooks/           (commit hook scripts)");
+  console.log("  stride/docs/     (principles, patterns, concepts)");
+  console.log("  tools/           (cross-model feedback script)");
+  console.log("  hooks config     (from settings.local.json)");
   console.log(
-    "\nNote: .mcp.json was not modified — remove Linear servers manually if needed.",
+    "\nOther files in shared directories (codefu symlinks, your own hooks) left untouched.",
+  );
+  console.log(
+    "Note: .mcp.json was not modified — remove Linear servers manually if needed.",
   );
   console.log("Done.\n");
 }

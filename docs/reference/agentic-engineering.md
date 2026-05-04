@@ -40,6 +40,8 @@ The cruel irony: vibe coding feels most productive at the start, when you need i
 
 Agentic engineering is the practice of imposing structure on AI agents so they produce work that is traceable, reversible, and tied to real objectives. It costs more upfront — you're trading instant momentum for a solid foundation.
 
+The first piece of that structure is the **Vision** — `VISION.md` at the repo root, captured once via [/vision](/skills/vision). Everything else (issues, commits, PRs) traces back to it. Without a Vision, every planner — human or AI — has to reinvent "what is this project for" from thin context. With one, the agent has something concrete to measure decisions against.
+
 ### What you get
 
 - **Traceable history** — every commit explains *why*, not just what. `git log` reads like a project narrative

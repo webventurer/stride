@@ -32,7 +32,7 @@ description: Copy issues between Linear workspaces — descriptions, comments, l
 
 ## Scripts
 
-All scripts live in `scripts/` and import the shared Linear client from `tools/linear_client.py` (via a small `_bootstrap.py` that puts the repo-root `tools/` directory on `sys.path`). Skill-specific file loaders live in `skill_io.py`.
+All scripts live in `scripts/` and import the shared Linear client from `.claude/tools/linear_client.py` (via a small `_bootstrap.py` that puts the `.claude/tools/` directory on `sys.path`). Skill-specific file loaders live in `skill_io.py`.
 
 | Script | Phase | What it does |
 |:-------|:------|:-------------|
@@ -91,4 +91,4 @@ python scripts/compare.py --target-api-key-env LINEAR_WORDTRACKER_API_KEY --targ
 
 ## The governing principle
 
-> _Each script owns one phase. Shared Linear client lives in `tools/linear_client.py`._
+> _Each script owns one phase. Shared Linear client lives in `.claude/tools/linear_client.py`._

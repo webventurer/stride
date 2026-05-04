@@ -25,7 +25,7 @@ Fetch the issue via MCP:
 
 - `get_issue` with `$ARGUMENTS`
 
-Extract: issue ID, title, `gitBranchName`, current status.
+Extract: issue ID, title, `gitBranchName`, current status, milestone.
 
 Stop if the issue cannot be found.
 
@@ -49,18 +49,13 @@ If anything fails, stop — do not merge. Show what failed.
 
 ### 5. Merge (preserve commits)
 
-Merge with `--merge` to preserve the atomic commits from the branch. The merge commit message summarises the work:
+Merge with `--merge` to preserve the atomic commits from the branch. The merge commit gets the default subject only — no body. The individual commits on the branch already explain what was built and why; duplicating that in the merge commit just creates drift between the two messages.
 
 ```bash
-gh pr merge <number> --merge --subject "Merge branch '<gitBranchName>'" --body "$(cat <<'EOF'
-<paragraph explaining what was built and why>
-
-Closes PG-<id>
-EOF
-)"
+gh pr merge <number> --merge --subject "Merge branch '<gitBranchName>'" --body ""
 ```
 
-The individual commits tell the detailed story. The merge commit summarises the outcome.
+Pass `--body ""` explicitly so `gh` does not fall back to the PR description.
 
 ### 6. Clean up branches, remove worktree, close VS Code
 
@@ -109,13 +104,51 @@ Please close the VS Code window for <worktree-dirname>.
 
 VS Code does not support programmatic window closing. The worktree directory is already gone, so VS Code will show an error state — the user just needs to close the window.
 
-### 7. Update Linear → done
+### 7. Confirm Vision outcome
+
+Read the issue's "Why this matters" section (loaded in step 1). If it names a Vision outcome, surface it and ask the user one yes/no question:
+
+```
+This issue claimed to advance the Vision outcome:
+  "<outcome line from VISION.md>"
+
+Did the merged work actually advance that outcome? (y/n)
+```
+
+- **Yes**: continue to step 8.
+- **No**: ask one follow-up — *"In one line, what shifted?"* — and post the user's answer as a Linear comment on the issue via `save_comment`. Then continue. The comment closes the loop: the trace-back claimed at draft time has now been verified or amended at finish time.
+
+If the issue had no "Why this matters" section (legacy soft path from `/linear:start`), skip silently.
+
+This step turns the "Why this matters" line from a write-once token into a verified reference. It's near-zero cost — one yes/no most of the time — and the rare *no* surfaces drift before it compounds.
+
+### 8. Update Linear → done
 
 Move the issue to **Done** via `save_issue`.
 
 Only set Done status. Skip if already Done. Never set any other status.
 
-### 8. Summary
+### 8b. Check milestone completion
+
+Skip this step if the issue had no milestone.
+
+Otherwise, call `list_issues` filtered by the milestone with non-Done states (`backlog`, `unstarted`, `started`). If any results come back, the milestone has remaining work — skip silently.
+
+If the result is empty, all stories in the milestone are now Done. Prompt:
+
+```
+All stories in *[Milestone name]* are complete — mark the milestone done?
+```
+
+If the user confirms, append a completion note to the milestone description via `save_milestone` (Linear has no milestone "completed" state, so a description note is the durable signal). Format:
+
+```
+Completed: <YYYY-MM-DD> — all stories Done.
+```
+
+If the user declines, leave the milestone untouched.
+
+### 9. Summary
 
 Display:
 
@@ -126,6 +159,7 @@ Display:
 - Remote branch: deleted / already gone
 - Worktree: removed / not found
 - Linear status: Done
+- Milestone (if applicable): name + completion status (`complete` if 8b marked it complete, `<n> stories remaining` otherwise)
 
 ---
 

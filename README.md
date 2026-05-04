@@ -10,6 +10,8 @@ Everything installs as plain markdown into your `.claude/` directory. No runtime
 
 ## What you get
 
+**`/vision`** — The guiding light. One canonical `VISION.md` at the repo root: what the project delivers, why it exists, what success looks like. Every issue, every feature, every architectural decision traces back to it. `/linear:plan-work` enforces this — issues drafted in a vacuum get flagged for trace-back, not just warned. Vision evolves rarely and reads as stakeholder language; the rest of stride's loop runs against it. *(Planning, ranking, and implementation all read `VISION.md` before deciding anything — that's the upstream-anchor role.)* See [the `/vision` skill](docs/skills/vision.md) for the seven-question walkthrough.
+
 **`/linear`** — Five commands covering the full development cycle. Plan work, create issues, implement on a branch, handle PR feedback, merge and close — all driven from Claude Code, all synced with [Linear](https://linear.app). Issues flow through your board automatically as you work.
 
 ![Kanban board](docs/public/kanban-board.svg)
@@ -26,7 +28,7 @@ Everything installs as plain markdown into your `.claude/` directory. No runtime
 
 The skills aren't independent — each one feeds the next.
 
-`/craft` sharpens the problem. `/linear` turns it into a tracked issue and manages the full lifecycle. `/commit` records each change as one atomic, revertible unit. Remove any piece and the loop still works, but the output gets worse.
+`/vision` sets the destination. `/craft` sharpens the problem. `/linear` turns it into a tracked issue (anchored to a Vision outcome) and manages the full lifecycle. `/commit` records each change as one atomic, revertible unit. Remove any piece and the loop still works, but the output gets worse.
 
 ## Install
 
@@ -34,7 +36,7 @@ The skills aren't independent — each one feeds the next.
 npx github:webventurer/stride
 ```
 
-This copies skills, commands, hooks, and docs into your project. It merges hook config into your existing `.claude/settings.json` (or creates one). Nothing is installed globally.
+This copies skills, commands, hooks, and docs into your project. It merges hook config into `.claude/settings.local.json` (gitignored, machine-local — your committed `settings.json` is never modified). Nothing is installed globally.
 
 ## Setup
 
@@ -67,6 +69,23 @@ make install
 # Merge, clean up, done
 /linear:finish PG-123
 ```
+
+## Migration skills
+
+Two additional skills for migrating issues between workspaces live on the `migrate` branch. They're kept separate to keep the main install lightweight — you only need them when moving cards.
+
+```bash
+git checkout migrate
+python -m venv .venv && source .venv/bin/activate
+make install
+```
+
+| Skill | What it does |
+|:------|:-------------|
+| `/linear-to-linear` | Copy issues between Linear workspaces — descriptions, comments, labels, attachments, images, and state |
+| `/trello-to-linear` | Migrate Trello cards to Linear issues — descriptions, comments, and checklists |
+
+Both skills walk you through source/target selection interactively. Each phase has its own script with dry-run support. Switch back to main when you're done: `git checkout main`.
 
 ## Why this exists
 

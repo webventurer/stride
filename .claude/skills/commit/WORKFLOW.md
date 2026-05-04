@@ -177,6 +177,7 @@ The diff tells you *what changed*. The user's intent tells you *why*. The commit
 - [ ] **Blank line after subject** line
 - [ ] **Wrap at 72 characters** maximum per line
 - [ ] **Explains WHY** not just what changed
+- [ ] **Describes what is, not what was** — no "previously this did X, now it does Y" narration ([describe what is, not what was](SKILL.md#describe-what-is-not-what-was)) — **AI frequently misses this**
 - [ ] **Start with explanatory paragraph** before bullet points
 - [ ] **Use bullet points for lists** of changes
 - [ ] **One atomic change** (can be reverted independently)
