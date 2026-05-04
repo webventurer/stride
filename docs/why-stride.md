@@ -2,7 +2,7 @@
 
 <mark>Vibe coding builds on quicksand. The first few stories go up fast, but a few changes later the house is tipping over and you can't tell which wall is load-bearing.</mark> By day ten you can't tell which change broke things. By day thirty you're afraid to touch anything. By day ninety you're rewriting from scratch.
 
-<div style="margin: 2.5rem 0;">
+<div class="inline-image">
 
 ![Vibe coding vs agentic engineering](/foundations.svg)
 
