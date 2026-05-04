@@ -1,6 +1,6 @@
 # /linear — Linear workflow
 
-Seven commands covering the full development cycle, from setup through to merge — all without leaving Claude Code.
+Eight commands covering the full development cycle, from setup through to merge — all without leaving Claude Code.
 
 ## Typical workflow
 
@@ -8,6 +8,7 @@ Seven commands covering the full development cycle, from setup through to merge 
 # Utility
 /linear:check               # verify MCP connections
 /linear:list-projects       # list all projects across workspaces
+/linear:update-vision       # push VISION.md to Linear
 /linear:next-steps          # see what needs doing
 
 # Workflow
@@ -53,7 +54,7 @@ For the related decision of *direct commit vs branch + PR* once you've decided y
 
 ## Vision is a hard prerequisite
 
-`/linear:next-steps`, `/linear:plan-work`, `/linear:start`, and `/linear:fix` all require [`VISION.md`](/skills/vision) at the repo root. If it's missing, the command stops and suggests running [/vision](/skills/vision) first — without an anchor, ranking, planning, and implementation drift toward whatever feels reasonable, exactly the failure mode stride exists to prevent.
+`/linear:update-vision`, `/linear:next-steps`, `/linear:plan-work`, `/linear:start`, and `/linear:fix` all require [`VISION.md`](/skills/vision) at the repo root. If it's missing, the command stops and suggests running [/vision](/skills/vision) first — without an anchor, ranking, planning, and implementation drift toward whatever feels reasonable, exactly the failure mode stride exists to prevent. (`/linear:update-vision` is the strictest case — it has nothing to push without `VISION.md`.)
 
 The other Linear commands (`/linear:check`, `/linear:list-projects`, `/linear:finish`) don't gate on Vision — they operate on existing issues with no fresh design decisions to anchor.
 
@@ -68,6 +69,16 @@ The other Linear commands (`/linear:check`, `/linear:list-projects`, `/linear:fi
 **List all projects across connected Linear workspaces.** Calls `list_projects` on each configured Linear MCP server and displays results grouped by workspace.
 
 **Usage**: `/linear:list-projects`
+
+### /linear:update-vision
+
+**Mirror `VISION.md` to the Linear project description.** Reads `VISION.md`, resolves the Linear project from `.linear_project`, shows the diff against the current Linear description, and — once you confirm — pushes the file's contents into the project's `description` field via `save_project`.
+
+Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). One-way only: repo → Linear, never the reverse. Idempotent — re-running with no `VISION.md` changes is a no-op.
+
+The push stays explicit so you see the diff and choose the moment, rather than `/vision` silently overwriting the Linear page on every run.
+
+**Usage**: `/linear:update-vision`
 
 ### /linear:next-steps
 
