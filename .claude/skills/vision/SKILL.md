@@ -7,7 +7,7 @@ description: Walk through writing a project Vision interactively. Asks seven que
 
 A Vision is the canonical "what is this project for" document. Written once, evolved sparingly. It frames everything downstream — every issue, every feature, every architectural decision should trace back to it.
 
-This skill walks you through writing one. It interviews you on five questions, drafts the file, shows it for approval, then writes `VISION.md` at the repo root.
+This skill walks you through writing one. It interviews you on seven questions, drafts the file, shows it for approval, then writes `VISION.md` at the repo root.
 
 ## When to use
 
@@ -53,7 +53,7 @@ If `VISION.md` already exists at the repo root, read it and show the user. Ask:
 
 ### 2. Interview, one question at a time
 
-<mark>**Don't dump all five questions at once.**</mark> Each answer informs the next prompt's nuance, and a single-shot questionnaire produces shallow answers.
+<mark>**Don't dump all seven questions at once.**</mark> Each answer informs the next prompt's nuance, and a single-shot questionnaire produces shallow answers.
 
 #### Q1 — What it delivers
 
