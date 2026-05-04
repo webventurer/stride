@@ -1,5 +1,7 @@
 # Getting started
 
+> **Vision sets the destination, Linear runs the trip, `/commit` records each step.**
+
 stride installs as four Claude Code skills — `/vision`, `/craft`, `/linear`, and `/commit` — wired together by hooks and scripts. This page walks through how the pieces fit together.
 
 > New here? Start with [Why Stride?](/why-stride) first — that's the case for using stride at all. This page assumes you've decided.
