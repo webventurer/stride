@@ -10,7 +10,7 @@ Everything installs as plain markdown into your `.claude/` directory. No runtime
 
 ## What you get
 
-**`/vision`** — The guiding light. One canonical `VISION.md` at the repo root: what the project delivers, why it exists, what success looks like. Every issue, every feature, every architectural decision traces back to it. `/linear:plan-work` enforces this — issues drafted in a vacuum get refused, not just warned. Vision evolves rarely and reads as stakeholder language; the rest of stride's loop runs against it.
+**`/vision`** — The guiding light. One canonical `VISION.md` at the repo root: what the project delivers, why it exists, what success looks like. Every issue, every feature, every architectural decision traces back to it. `/linear:plan-work` enforces this — issues drafted in a vacuum get flagged for trace-back, not just warned. Vision evolves rarely and reads as stakeholder language; the rest of stride's loop runs against it.
 
 Functionally that makes it stride's *upstream anchor* — planning, ranking, and implementation all read `VISION.md` before deciding anything. See [the `/vision` skill](docs/skills/vision.md) for the seven-question walkthrough.
 
