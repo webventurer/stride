@@ -12,14 +12,6 @@ Before the loop, there's a question the loop can't answer: **what is this projec
 
 Functionally, Vision is stride's *upstream anchor* — planning, ranking, and implementation all read it before deciding anything. You only run `/vision` once per project, then evolve it sparingly. The three loop skills below are how stride executes against the Vision.
 
-## Why atomic commits matter
-
-When AI agents write code, the quality of git history becomes a make-or-break concern.
-
-Agents can produce large volumes of changes in a single session. Without discipline, those changes land as **monolithic commits** — impossible to review, difficult to revert, and dangerous to bisect. Atomic commits solve this by ensuring every commit contains *exactly one complete logical change*.
-
-The `/commit` skill encodes a **four-pass methodology** that separates content decisions from formatting standards. It catches the specific atomicity mistakes that AI agents make — grouping by session, by shared prefix, or by proximity rather than by purpose. Each commit becomes independently revertible, clearly explained, and safe to ship.
-
 ## Linear integration
 
 ![Kanban board](/kanban-board.svg)
@@ -30,6 +22,14 @@ The `/linear` commands connect your development workflow directly to [Linear](ht
 Rather than context-switching between your editor and a browser, you can plan work, create issues, implement features, handle PR feedback, and close issues — all from within Claude Code. The five commands cover the **full development lifecycle**: from researching a problem and writing a well-structured issue, through to merging an approved pull request and marking it done.
 
 This keeps the agent *grounded in real project priorities* rather than working in isolation.
+
+## Atomic commits — the per-change discipline
+
+Inside the Linear flow, every commit point calls `/commit`. That's where the per-change discipline lives — atomic commits that keep the git history readable, revertible, and bisectable.
+
+Agents can produce large volumes of changes in a single session. Without discipline, those changes land as **monolithic commits** — impossible to review, difficult to revert, and dangerous to bisect. Atomic commits solve this by ensuring every commit contains *exactly one complete logical change*.
+
+The `/commit` skill encodes a **four-pass methodology** that separates content decisions from formatting standards. It catches the specific atomicity mistakes that AI agents make — grouping by session, by shared prefix, or by proximity rather than by purpose. Each commit becomes independently revertible, clearly explained, and safe to ship.
 
 ## The loop
 
