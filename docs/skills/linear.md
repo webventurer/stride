@@ -51,6 +51,12 @@ Three signals that mean a card *is* needed:
 
 For the related decision of *direct commit vs branch + PR* once you've decided you don't need a card, see the agent-facing [pr-vs-direct-commit reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/pr-vs-direct-commit.md) inside the installed skill — adjacent decision, different scope.
 
+## Vision is a hard prerequisite
+
+`/linear:next-steps`, `/linear:plan-work`, `/linear:start`, and `/linear:fix` all require [`VISION.md`](/skills/vision) at the repo root. If it's missing, the command stops and suggests running [/vision](/skills/vision) first — without an anchor, ranking, planning, and implementation drift toward whatever feels reasonable, exactly the failure mode stride exists to prevent.
+
+The other Linear commands (`/linear:check`, `/linear:list-projects`, `/linear:finish`) don't gate on Vision — they operate on existing issues with no fresh design decisions to anchor.
+
 ## Commands
 
 ### /linear:check
@@ -67,7 +73,7 @@ For the related decision of *direct commit vs branch + PR* once you've decided y
 
 **Review priorities and recommend next work.** Shows current work, open PRs, recently completed issues, and backlog — then recommends 1–3 concrete next actions.
 
-<mark>**Vision is a hard prerequisite.**</mark> If `VISION.md` is missing at the repo root, `/linear:next-steps` stops and suggests running [/vision](/skills/vision) first — ranking candidates without an anchor produces recommendations that drift from the project's purpose.
+Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)).
 
 Priority ordering: build failure > PRs needing fix > in-progress work > PRs needing review > approved PRs to merge > backlog. **Within each tier, ordering is refined by Vision alignment** — items advancing the least-progressed Success Criteria sit higher. Recommendations name the Vision outcome each item serves so you can see why the agent picked it.
 
@@ -80,7 +86,7 @@ For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved c
 
 **Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, optionally refines the description with CRAFT, drafts title and description, and waits for your approval before creating.
 
-<mark>**Vision is a hard prerequisite.**</mark> If `VISION.md` is missing at the repo root, the command stops and suggests running [/vision](/skills/vision) first — issues drafted in a vacuum drift from the project's purpose. With a Vision present, every draft's "Why this matters" section explicitly traces back to a Vision outcome, and the agent pushes back if the user's request can't be tied to one. When a broad description splits into multiple follow-ups, the follow-ups are ordered by Vision alignment — the one advancing the least-progressed Success Criterion sits first.
+Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). Every draft's "Why this matters" section explicitly traces back to a Vision outcome, and the agent pushes back if the user's request can't be tied to one. When a broad description splits into multiple follow-ups, the follow-ups are ordered by Vision alignment — the one advancing the least-progressed Success Criterion sits first.
 
 In `--research` mode, explores the codebase and Linear first, then adds code examples (showing how similar patterns are already implemented) and acceptance criteria (observable outcomes, not implementation steps).
 
@@ -95,7 +101,7 @@ In `--research` mode, explores the codebase and Linear first, then adds code exa
 
 **Start work on a Linear issue.** One headless flow: create or switch to the feature branch, move the issue to Doing, implement the changes, validate (build + tests), **auto-squash similar commits**, push, open a PR, move to In Review, then show the full diff for terminal review.
 
-<mark>**Vision is a hard prerequisite.**</mark> If `VISION.md` is missing at the repo root, `/linear:start` stops and suggests running [/vision](/skills/vision) first — implementation decisions made without a Vision drift toward whatever feels reasonable, exactly the failure mode stride exists to prevent. With a Vision present, the command surfaces the outcome the issue serves (extracted from its "Why this matters" section) and carries it as context throughout implementation.
+Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). The command surfaces the outcome the issue serves (extracted from its "Why this matters" section) and carries it as context throughout implementation.
 
 <mark>**While iterating, you naturally produce journey-shaped commits — "first attempt", "wait that broke X", "ok now it's fixed", "format pass". Before merge, those should be rewritten to describe where you ended up, not how you got there.**</mark>
 
@@ -114,7 +120,7 @@ Ends by asking: "Does this look right, or do you want changes?"
 
 **Address GitHub PR review feedback.** Reads review comments from GitHub (review body, line comments, past reviews), implements all requested changes in one pass, validates, pushes, and posts a summary comment on the PR.
 
-<mark>**Vision is a hard prerequisite.**</mark> If `VISION.md` is missing at the repo root, `/linear:fix` stops and suggests running [/vision](/skills/vision) first — review feedback applied without a Vision can pull implementation away from the project's stated purpose even when each individual change looks reasonable. With a Vision present, the command surfaces the outcome the parent issue serves and carries it as context while applying review feedback.
+Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). The command surfaces the outcome the parent issue serves and carries it as context while applying review feedback.
 
 Reviewer feedback takes priority over the original issue — plans evolve through review.
 
