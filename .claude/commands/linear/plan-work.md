@@ -14,7 +14,7 @@ Accepts a description and optional flags: `/plan-work --research --craft "add er
 
 ## Decision rules
 
-- **Vision is the anchor**: every issue must trace back to a Vision outcome. The draft's "Why this matters" section must reference which Vision outcome the issue serves. If it can't, flag and ask the user — the issue may be out of scope. Without `VISION.md` at the repo root, the command stops and suggests `/vision` (see step 1).
+- **Vision is the anchor**: every issue must trace back to a Vision outcome. The draft's "Why this matters" section must reference which Vision outcome the issue serves. If it can't, ask the user to choose: **add a new criterion to `VISION.md` (re-run `/vision` to evolve it), or drop the issue as out of scope**. Don't draft past this prompt — repeated trace-back failures are a signal the Vision needs updating, not that the gate should be loosened. Without `VISION.md` at the repo root, the command stops and suggests `/vision` (see step 1).
 - **Sizing first**: before drafting, determine whether the description is story-sized (one deliverable, ships as one PR) or epic-sized (a named initiative with multiple stories). Epic-sized work becomes a Milestone; story-sized work becomes an Issue linked to a Milestone if one exists.
 - One issue = one deliverable. If the description contains "and" connecting unrelated outcomes, split.
 - Default to the smallest issue that moves something forward. If the user's description is broad, propose a focused first issue plus follow-ups.
@@ -139,7 +139,12 @@ Omit the section entirely when tests don't apply.
 
 **Ground the draft in the Vision** loaded at step 1. The "Why this matters" section must explicitly reference which Vision outcome the issue serves — quote the relevant Success Criteria line or constraint, and explain how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
 
-> "I can't see how this work traces back to a Vision outcome. The Vision says: [list relevant outcomes]. Which one does this serve, or should we add this as an outcome to the Vision first?"
+> "I can't trace this work back to a Vision outcome. The Vision says: [list relevant outcomes]. Two paths:
+>
+> 1. **Add a new criterion to `VISION.md`** — re-run `/vision` to evolve the Vision, then come back. Repeated trace-back failures are a signal the Vision needs updating.
+> 2. **Drop the issue as out of scope** — the work doesn't belong in this project right now.
+>
+> Which one?"
 
 Don't draft past the user's answer. The Vision is the project's stated purpose; an issue that doesn't serve it is either out of scope or a sign the Vision needs updating.
 
