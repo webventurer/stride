@@ -67,14 +67,32 @@ Then, from the issue body's "Why this matters" section (loaded in step 1), surfa
 This work serves: <outcome line from VISION.md>
 ```
 
-If the issue has no "Why this matters" section or doesn't name a Vision outcome (legacy issue from before issues were Vision-anchored), surface a soft warning and proceed:
+If the issue has no "Why this matters" section, decide whether it qualifies for the legacy soft path. **The legacy path is bounded** — it's only valid for issues created before `VISION.md` existed in the repo. Compare the issue's Linear `createdAt` timestamp against the file's first-commit date (`git log --diff-filter=A --follow --format=%aI -- VISION.md | tail -1`).
 
-```
-This issue predates Vision-anchored issue drafting — proceeding
-without a named outcome.
-```
+- **Legacy issue** (created before `VISION.md` existed): surface a soft warning and proceed:
 
-<mark>**The hard gate is on `VISION.md`, not on the issue's outcome reference.**</mark> No Vision = stop. Vision present but the issue doesn't name an outcome = soft warning, continue. Carry the loaded Vision and (when present) the named outcome as context throughout step 7 (Implement) — when making design decisions, reference what the work is in service of.
+  ```
+  This issue predates Vision-anchored issue drafting — proceeding
+  without a named outcome.
+  ```
+
+- **Modern issue** (created after `VISION.md` existed): treat the missing "Why this matters" as an error. `/linear:plan-work` should have caught it. Stop and tell the user:
+
+  ```
+  This issue was created after VISION.md existed but has no
+  "Why this matters" section. It should have been drafted via
+  /linear:plan-work, which enforces the trace-back.
+
+  Either:
+  1. Edit the issue to add "Why this matters" referencing a
+     Success Criterion, then re-run /linear:start.
+  2. If the work genuinely doesn't trace to a criterion, run
+     /vision to add one, then update the issue.
+  ```
+
+  Don't start implementation against a modern issue with no anchor.
+
+<mark>**The hard gate is on `VISION.md` and (for modern issues) on the outcome reference.**</mark> No Vision = stop. Modern issue with no outcome reference = stop. Legacy issue with no outcome reference = soft warning, continue. Carry the loaded Vision and (when present) the named outcome as context throughout step 7 (Implement) — when making design decisions, reference what the work is in service of.
 
 ### 3. Load project context
 
