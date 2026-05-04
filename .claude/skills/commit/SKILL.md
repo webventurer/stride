@@ -231,39 +231,65 @@ Pre-commit hooks can accidentally cause you to commit multiple unrelated files t
 
 ## How to fold
 
-To fold a change into an existing commit — a typo fix, a missed edge case, a wording correction that belongs to work already in flight — use **fixup + autosquash**. Don't cherry-pick replay or soft-reset replay; both create new SHAs across commits that didn't logically change.
+To fold a change into an existing commit — a typo fix, a missed edge case, a wording correction that belongs to work already in flight — collapse it into the target so the rewritten history reads as if the work was right the first time. Only the target's SHA changes; commits unrelated to the fold keep their identity.
 
-### The pattern
+### Pattern A — Fixup sits on top of its target (common case)
+
+When the change being folded is the most recent thing on the branch and the target is `HEAD~1`, use **soft-reset + amend**. The agent can complete the fold end-to-end; no user step required.
+
+```bash
+# 1. Record the fold intent as a fixup commit (optional but recommended —
+#    creates a reflog entry the agent or user can recover from)
+git add <files>
+.claude/hooks/do_commit.sh --fixup=<sha>     # writes "fixup! <original subject>"
+
+# 2. Collapse the fixup into its target
+git reset --soft HEAD~1                       # undoes the fixup, keeps changes staged
+.claude/hooks/do_commit.sh --amend --no-edit  # folds staged changes into the target
+
+# 3. If the branch was already pushed, update the remote
+git push --force-with-lease
+```
+
+`--no-edit` keeps the target's original commit message — the journey-shaped fixup commit message disappears, and the log reads as a single coherent commit. `--force-with-lease` only overwrites the remote if its tip matches what the agent last fetched, so it can't silently clobber someone else's work.
+
+If there's no fixup commit yet (the change is still in the working tree) and the target is HEAD, skip step 1 and step 2's reset — just `git add` then `do_commit.sh --amend --no-edit`.
+
+### Pattern B — Target is older, with unrelated commits between (uncommon)
+
+The soft-reset trick collapses everything between target and HEAD into the target — wrong when there are unrelated commits in between. In that case the agent records intent and hands off:
 
 ```bash
 git add <files>
-.claude/hooks/do_commit.sh --fixup=<sha>                  # writes "fixup! <original subject>"
-GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash <base>   # collapses fixups
+.claude/hooks/do_commit.sh --fixup=<sha>
 ```
 
-The wrapper forwards `--fixup` to git unchanged. `--autosquash` rearranges the rebase plan so each fixup commit lands immediately after its target; `GIT_SEQUENCE_EDITOR=:` accepts the plan without opening an editor.
+Then **stop**. The harness blocks `git rebase -i`, and `--autosquash` requires `-i` to take effect. Tell the user the fixup commit is in place and they need to run `git rebase -i --autosquash <base>` locally to collapse it.
 
-### Agent / user split
+### Agent capability summary
 
-Agents write the fixup commit; users run the autosquash. The harness blocks `git rebase -i` for agents (interactive input not supported), but the fixup commit itself is fine.
-
-1. **Agent**: stage the change, run `do_commit.sh --fixup=<sha>`, stop.
-2. **User**: run the autosquash rebase locally to collapse the fixup.
-
-This split keeps each side doing what it can — agents record fold intent as a normal commit (debuggable, reversible, visible in the log); users keep ownership of the history rewrite.
+| Action | Agent can do? |
+|:--|:--|
+| Write a `--fixup` commit | ✅ via `do_commit.sh --fixup=<sha>` |
+| Soft-reset + amend (Pattern A) | ✅ when fixup is on top of target |
+| Force-push-with-lease after fold | ✅ when the user has authorised it for this work |
+| `git rebase -i --autosquash` | ❌ harness blocks `-i` literally |
+| Bare `git commit --amend` | ❌ pre-tool-use hook blocks it; use `do_commit.sh --amend` |
 
 ### When to fold vs. new commit
 
 | Situation | Use |
 |:--|:--|
-| Original commit on a local branch, work-in-progress | Fold |
-| Original commit is HEAD | `git commit --amend` directly (fixup unnecessary) |
+| Original commit on a local branch, work-in-progress | Fold (Pattern A or B) |
+| Original commit is HEAD | `do_commit.sh --amend --no-edit` directly (skip the fixup step) |
 | Original commit on `main` and pushed widely | New commit — don't rewrite shipped history without strong reason |
 
 ### What not to do
 
 - ❌ `git reset --hard HEAD~N` + cherry-pick replay — clean but creates new SHAs across commits that didn't change
-- ❌ `git reset --soft <base>` + recommit chain — same problem, plus error-prone manual content reconstruction
+- ❌ `git reset --soft <base>` + recommit chain spanning multiple commits — error-prone manual content reconstruction (the single-step soft-reset in Pattern A is fine because there's no chain to reconstruct; `--no-edit` preserves the target's message)
+- ❌ Bare `git commit --amend` — blocked by the pre-tool-use hook
+- ❌ `git rebase -i --autosquash` from the agent — `-i` blocked at harness level
 
 ---
 
