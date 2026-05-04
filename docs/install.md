@@ -163,7 +163,7 @@ The installer also offers to add stride's paths to your root `.gitignore` in a m
 
 ## App starters
 
-stride gives you the engineering workflow. App starters give you the project scaffold. Each starter is an opinionated template that gets you from zero to a working app in one command — with stride's skills already wired in.
+Opinionated project scaffolds for starting a new app from zero. They're not part of stride — pick one for the stack you want, then run `npx github:webventurer/stride` inside it to add the engineering workflow on top.
 
 ### [app-starter](https://github.com/webventurer/app-starter)
 
