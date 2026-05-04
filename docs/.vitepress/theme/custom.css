@@ -5,6 +5,24 @@
   --vp-code-color: #1a1a1a;
 }
 
+.VPButton.green {
+  border-color: #22c55e;
+  color: #ffffff;
+  background-color: #22c55e;
+}
+
+.VPButton.green:hover {
+  border-color: #16a34a;
+  color: #ffffff;
+  background-color: #16a34a;
+}
+
+.VPButton.green:active {
+  border-color: #15803d;
+  color: #ffffff;
+  background-color: #15803d;
+}
+
 .dark {
   --vp-c-text-1: #ffffffde;
   --vp-c-text-2: #ffffffab;

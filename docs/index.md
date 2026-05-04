@@ -15,6 +15,9 @@ hero:
     - theme: alt
       text: Install
       link: /install
+    - theme: green
+      text: Need some help?
+      link: https://webventurer.github.io/stride-consult
 
 features:
   - title: Ship faster without chaos
