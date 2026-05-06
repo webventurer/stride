@@ -15,7 +15,8 @@ Accepts a description and optional flags: `/plan-work --research --craft "add er
 ## Decision rules
 
 - **Vision is the anchor**: every issue must trace back to a Vision outcome. The draft's "Why this matters" section must reference which Vision outcome the issue serves. If it can't, ask the user to choose: **add a new criterion to `VISION.md` (re-run `/vision` to evolve it), or drop the issue as out of scope**. Don't draft past this prompt — repeated trace-back failures are a signal the Vision needs updating, not that the gate should be loosened. Without `VISION.md` at the repo root, the command stops and suggests `/vision` (see step 1).
-- **Sizing first**: before drafting, determine whether the description is story-sized (one deliverable, ships as one PR) or epic-sized (a named initiative with multiple stories). Epic-sized work becomes a Milestone; story-sized work becomes an Issue linked to a Milestone if one exists.
+- **Sizing first**: before drafting, determine whether the description is story-sized (one deliverable, ships as one PR) or epic-sized (a named initiative with multiple stories). Epic-sized work becomes a parent issue with sub-issues for each story; story-sized work becomes an issue, optionally linked to an existing epic via `parentId`.
+- **Epic title prefix**: epic-sized parent issues use `Epic: <stakeholder outcome>` as their title — the prefix makes the scope visible at a glance on the kanban board, and the post-colon part still follows the stakeholder-outcome rule. Example: `Epic: Bulk/Batch Blog Processing (parallel article pipeline)`.
 - One issue = one deliverable. If the description contains "and" connecting unrelated outcomes, split.
 - Default to the smallest issue that moves something forward. If the user's description is broad, propose a focused first issue plus follow-ups.
 - **When proposing multiple follow-ups, order them by Vision alignment** — see [reference/align-to-vision.md](reference/align-to-vision.md). The follow-up advancing the least-progressed Success Criterion sits first.
@@ -71,19 +72,21 @@ Extract the description and flags from `$ARGUMENTS`. Determine if `--research` a
 
 Ask the user: **"Is this story-sized (one deliverable, ships as one PR) or epic-sized (a named initiative with multiple stories)?"**
 
-**If story-sized** — continue to step 3 as normal. At step 10 (create issue), also call `list_milestones` for the project: if any milestones exist, ask "Link this story to an existing epic?" and if yes, set the `milestone` field on `save_issue`.
+**If story-sized** — continue to step 3 as normal. At step 10 (create issue), also call `list_issues` filtered for parent-issue epics in the project (titles starting with `Epic: `): if any exist, ask "Link this story to an existing epic?" and if yes, set the `parentId` field on `save_issue` to the chosen epic's ID. Legacy milestones — boards may still have them from before WB-279; if `list_milestones` returns any, offer them as a secondary option and use the `milestone` field instead.
 
-**If epic-sized** — follow the epic path:
+**If epic-sized** — follow the parent-issue path:
 
-1. Call `list_milestones` for the project and show any existing milestones
-2. Ask: "Create a new epic (milestone), or link the stories to an existing one?"
-3. If creating: ask for a name and one-line description, then call `save_milestone` with `name`, `description`, and `project`
-4. Confirm the milestone with the user before proceeding
-5. Ask: "What are the first 1–3 stories for this epic?" — each answer becomes a separate issue draft
-6. For each story: run the full flow from step 3 onwards (duplicate check, CRAFT if requested, draft, approval, create) with `milestone` set to the new or chosen milestone
-7. After all stories are created, summarise: list the milestone and all created issues
+1. Call `list_issues` filtered for existing parent-issue epics in the project (titles starting with `Epic: `) and show any matches.
+2. Ask: "Create a new epic, or link these stories to an existing one?"
+3. If creating: run the full flow from step 3 onwards (duplicate check, CRAFT if requested, draft, approval, create) for the **parent issue**, using [reference/EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead of ISSUE-TEMPLATE.md and prefixing the title with `Epic: `. Save the parent issue first via `save_issue` (in Backlog) and capture the returned ID.
+4. Confirm the parent issue with the user before drafting sub-issues.
+5. Ask: "What are the first 1–3 stories for this epic?" — each answer becomes a separate issue draft.
+6. For each story: run the full flow from step 3 onwards (duplicate check, CRAFT if requested, draft, approval, create) with `parentId` set to the parent issue's ID on `save_issue`. Story drafts use ISSUE-TEMPLATE.md as normal — they're stories that happen to have a parent.
+7. After all stories are created, summarise: list the parent epic and all sub-issues created underneath it.
 
-<mark>**Do not bundle all stories into one issue.** Each story is its own issue linked to the milestone.</mark>
+<mark>**Do not bundle all stories into one issue.** Each story is its own sub-issue with `parentId` set.</mark>
+
+**Legacy milestone path**: if the user explicitly wants a date-bound milestone instead of a parent-issue epic (e.g. "ship by Q2", "before launch"), use `save_milestone` and link stories via `milestone`. This stays available for date/scope-bound tracking but is no longer the default — parent-issue epics carry the narrative; milestones are time markers.
 
 ### 3. Duplicate check (all modes)
 
@@ -104,7 +107,7 @@ Handle results in two tiers:
 
 If `--craft` flag is present, run CRAFT automatically. Otherwise, ask the user: "Would you like me to run `/craft` on your description first to sharpen the issue before drafting?"
 
-- If **yes** (or `--craft`): read [reference/ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md), substitute `[user's description]` with what the user provided **and** `[VISION]` with the full contents of the `VISION.md` loaded in step 1, run `/craft` with the populated prompt, then use the refined output as the description for all subsequent steps. Substituting the entire Vision into the prompt is what lets the agent — or any model the prompt is sent to — anchor the draft on real criteria, real constraints, and real non-goals rather than guessing.
+- If **yes** (or `--craft`): read [reference/ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) for story-sized work, or [reference/EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) when drafting the parent issue on the epic-sized path. Substitute `[user's description]` with what the user provided **and** `[VISION]` with the full contents of the `VISION.md` loaded in step 1, run `/craft` with the populated prompt, then use the refined output as the description for all subsequent steps. Substituting the entire Vision into the prompt is what lets the agent — or any model the prompt is sent to — anchor the draft on real criteria, real constraints, and real non-goals rather than guessing.
 - If **no**: continue with the original description
 
 ### 5. Research (only with `--research`)
@@ -133,9 +136,11 @@ Omit the section entirely when tests don't apply.
 
 ### 7. Draft the issue
 
-**Quick mode** — use the full issue structure from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Title, Description with Why this matters, Where things stand, What we'll do, What we won't do, Expected outcome, How to test it, Assumptions to confirm).
+**Quick mode (story-sized)** — use the full issue structure from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Title, Description with Why this matters, Where things stand, What we'll do, What we won't do, Expected outcome, How to test it, Assumptions to confirm).
 
-**Research mode** — also include the research mode additions from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Implementation notes, Code examples, Related code, Related issues).
+**Quick mode (epic-sized parent issue)** — use [EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead (Title with `Epic: ` prefix, Description with Why this matters, Goal, Phases, Decision, Out of scope). Sub-issue drafts under the parent still use ISSUE-TEMPLATE.md — they're stories that happen to have a parent.
+
+**Research mode** — also include the research mode additions from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Implementation notes, Code examples, Related code, Related issues). Research mode applies to story drafts; epic parent-issue drafts stay strategic and don't accumulate research-mode sections — the implementation detail belongs on the sub-issues.
 
 **Ground the draft in the Vision** loaded at step 1. The "Why this matters" section must explicitly reference which Vision outcome the issue serves — quote the relevant Success Criteria line or constraint, and explain how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
 
