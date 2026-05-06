@@ -57,6 +57,7 @@ Read `VISION.md` from the repo root.
 | `list_issues` — state: `backlog`, project: resolved project | Linear MCP |
 | `list_issues` — state: `completed`, updatedAt: `-P7D`, project: resolved project | Linear MCP |
 | `list_milestones` — project: resolved project | Linear MCP |
+| `list_issues` — query: `Epic: `, project: resolved project (matches parent-issue epics by title prefix) | Linear MCP |
 | `gh pr list --state open --json number,title,headRefName,author,reviewDecision,reviews,url` | Bash |
 
 ### 3. Show current work
@@ -105,9 +106,9 @@ This context should influence recommendations — prefer follow-up issues or rel
 
 Combine `unstarted` and `backlog` issues into a single candidate list. Exclude issues already in `started`. Exclude issues identified as blocked. Sort by priority (Urgent first).
 
-If milestones exist for the project, ask: **"Show next steps for a specific epic, or all work?"** If the user picks an epic, filter the candidate list to issues with that milestone. If they pick all work, group the candidate list by milestone (with one group for issues that have no milestone).
+If milestones or parent-issue epics exist for the project, ask: **"Show next steps for a specific epic, or all work?"** Combine both signals when offering choices — list parent-issue epics (titles starting with `Epic: `) and milestones together as filter options, with the source labelled (e.g. "Epic: Make epics first-class kanban cards (parent issue)" vs "Q2 launch (milestone)"). If the user picks a parent-issue epic, filter the candidate list to issues whose `parentId` equals that epic's ID. If they pick a milestone, filter by `milestone`. If they pick all work, group the candidate list by epic and by milestone, with one group for issues that have neither.
 
-Show as a table per milestone (or one combined table when no milestones exist):
+Show as a table per epic/milestone (or one combined table when no epics or milestones exist):
 
 | ID | Title | Priority | Labels | Status |
 |:---|:------|:---------|:-------|:-------|

@@ -41,10 +41,10 @@ When `/linear:plan-work` creates an epic (parent issue), it asks for **the first
 | Command | Layer it operates on |
 |:--------|:---------------------|
 | `/linear:plan-work` | Epic and story creation. Asks the sizing question; routes epic-sized work through parent-issue creation, story-sized through issue creation (optionally as a sub-issue of an existing epic) |
-| `/linear:start` | Story → atomic commits. Surfaces the parent milestone if any; opens a branch and PR for the story |
+| `/linear:start` | Story → atomic commits. Surfaces the parent epic (parent issue) or milestone if any; opens a branch and PR for the story |
 | `/linear:fix` | Story (after PR review) — applies reviewer feedback as new commits |
-| `/linear:finish` | Story closure. Marks the story Done; if it was the last open story in its milestone, prompts to mark the milestone done |
-| `/linear:next-steps` | Story selection within a project or milestone. Offers an epic filter when milestones exist |
+| `/linear:finish` | Story closure. Marks the story Done; if it was the last open sub-issue in its parent epic (or last open story in its milestone), prompts to mark the epic/milestone done |
+| `/linear:next-steps` | Story selection within a project, parent-issue epic, or milestone. Offers an epic filter listing both parent-issue epics and milestones when either exists |
 
 ## Two axes: decomposition and flow
 

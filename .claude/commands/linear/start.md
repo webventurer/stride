@@ -29,11 +29,13 @@ Fetch the issue and its comments via MCP:
 - `get_issue` with `$ARGUMENTS`
 - `list_comments` with the issue ID
 
-Extract: issue ID, title, description, status, labels, `gitBranchName`, assignee, milestone.
+Extract: issue ID, title, description, status, labels, `gitBranchName`, assignee, milestone, `parentId`.
 
 Extract from comments: decisions and context added after the description was written.
 
 If the issue belongs to a milestone, surface it before continuing: `This story is part of *[Milestone name]*`. One line — just enough context that the user knows which epic the work is feeding.
+
+If `parentId` is set, fetch the parent via `get_issue` and check its title. If the title starts with `Epic: `, surface the parent-issue epic before continuing: `This story is a sub-issue of *[Epic title]* (status: [Parent status])`. Same shape as the milestone surface — one line of umbrella context. If the parent's title doesn't start with `Epic: `, the story is just a sub-issue of another issue (not a stride epic) — skip the surface silently.
 
 Stop if the issue cannot be found.
 
