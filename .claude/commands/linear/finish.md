@@ -25,7 +25,7 @@ Fetch the issue via MCP:
 
 - `get_issue` with `$ARGUMENTS`
 
-Extract: issue ID, title, `gitBranchName`, current status, milestone.
+Extract: issue ID, title, `gitBranchName`, current status, milestone, `parentId`.
 
 Stop if the issue cannot be found.
 
@@ -148,6 +148,22 @@ Completed: <YYYY-MM-DD> — all stories Done.
 
 If the user declines, leave the milestone untouched.
 
+### 8c. Check parent-issue epic completion
+
+Skip this step if the issue had no `parentId`, or if the parent's title doesn't start with `Epic: ` (the parent is a regular sub-issue parent, not a stride epic).
+
+Otherwise, call `list_issues` filtered by `parentId` with non-Done states (`backlog`, `unstarted`, `started`). If any results come back, the epic has remaining sub-issues — skip silently.
+
+If the result is empty, all sub-issues of the epic are now Done. Prompt:
+
+```
+All sub-issues of *[Epic title]* are complete — mark the epic Done?
+```
+
+If the user confirms, move the parent issue to Done via `save_issue` with `state` set to the Done status ID (resolve via `list_issue_statuses`). Unlike milestones, parent-issue epics have a real status, so closing them is a normal status transition — no description note needed.
+
+If the user declines, leave the epic untouched.
+
 ### 9. Summary
 
 Display:
@@ -160,6 +176,7 @@ Display:
 - Worktree: removed / not found
 - Linear status: Done
 - Milestone (if applicable): name + completion status (`complete` if 8b marked it complete, `<n> stories remaining` otherwise)
+- Epic (if applicable): name + completion status (`Done` if 8c moved the parent to Done, `<n> sub-issues remaining` otherwise)
 
 ---
 
