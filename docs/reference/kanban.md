@@ -6,6 +6,17 @@ Kanban is a workflow management method that visualises work as cards moving acro
 
 See [Issue statuses](/reference/issue-statuses) for how to configure these columns in Linear.
 
+## Issue vs card
+
+Kanban names the visual artefact a **card** — the rectangle on the board with title, status, and assignee, moving column by column. In stride, the card is the board rendering of a Linear **issue** — the content unit `/linear:plan-work` drafts and `/linear:start <id>` operates on. The two words name different aspects of the same artefact:
+
+| Term | Means | Used when |
+|:-----|:------|:----------|
+| **issue** | The content unit Linear's API and `/linear:*` commands operate on | Talking about planning, content, the thing with a description and status |
+| **card** | The visual artefact on a kanban board | Talking about board rendering, kanban methodology, visual flow |
+
+This page uses "card" throughout — board flow and column-by-column movement is the kanban frame. For the content side, the right word is "issue"; see the [issue template](/reference/issue-template#issue-vs-card).
+
 ## The columns
 
 | Category | Column | Purpose | Entry rule | Exit rule |
