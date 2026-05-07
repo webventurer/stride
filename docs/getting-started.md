@@ -25,7 +25,7 @@ This keeps the agent *grounded in real project priorities* rather than working i
 
 ### Stories and epics
 
-Most issues are **stories** — one deliverable, ships as one PR. When several stories serve a common purpose (bigger than a PR, smaller than the Vision), `/linear:plan-work` groups them under a parent **epic** card with sub-issues nested below. The umbrella moves through the kanban lanes alongside its sub-issues, so a non-engineer scanning the board sees the whole shape. See [Epics and stories](/reference/epics-and-user-stories) for the mechanism.
+Most issues are **stories** — one deliverable, ships as one PR. When several stories serve a common purpose (bigger than a PR, smaller than the Vision), `/linear:plan-work` groups them under a parent **epic** with sub-issues nested below. The umbrella moves through the kanban lanes alongside its sub-issues, so a non-engineer scanning the board sees the whole shape. See [Epics and stories](/reference/epics-and-user-stories) for the mechanism.
 
 ## Atomic commits — the per-change discipline
 
