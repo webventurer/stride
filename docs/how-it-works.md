@@ -7,7 +7,7 @@ stride installs as plain markdown files in your project's `.claude/` directory. 
 ```
 your-project/
 ├── VISION.md                # Project anchor — what it delivers, why,
-│                            # success criteria. Every issue traces back
+│                            # Success criteria. Every issue traces back
 └── .claude/
     ├── skills/
     │   ├── vision/          # /vision skill

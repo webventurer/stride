@@ -53,11 +53,10 @@ the trace-back. Use it as follows:
 | Who it's for                    | Stakeholder framing and tone        |
 | Why it exists / why now         | "Why this matters" rationale        |
 
-Section headings vary across consumers — the Vision may name
-its measurable outcomes "Success Criteria", "How we know it's
-working", or similar. Identify the section listing checkable
-outcomes (typically a checkbox list or bullet list of measurable
-conditions) and use those lines as the criteria for trace-back.
+The Vision names its measurable outcomes in the "Success
+criteria" section — a checkbox list of conditions you can tick
+off when delivered. Use those lines as the criteria for
+trace-back.
 
 The drafted issue must identify which criterion the work serves
 and quote that line verbatim in the Why-this-matters section.
