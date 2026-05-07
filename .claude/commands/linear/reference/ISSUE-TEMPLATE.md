@@ -173,7 +173,7 @@ are right there in the issue.
 steps"*
 
 Every issue we create uses this template. If the format is
-broken, every card in the backlog is harder to read — and the
+broken, every issue in the backlog is harder to read — and the
 stakeholder-readable shape we're committing to in the Vision
 gets undermined at the first hop.
 
@@ -195,7 +195,7 @@ Confirm the new issue template renders correctly in Linear.
 ### What we won't do
 *Draws the line so scope doesn't creep.*
 
-No changes to the template based on this card — just
+No changes to the template based on this issue — just
 validation.
 
 ### Expected outcome

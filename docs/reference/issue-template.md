@@ -2,6 +2,17 @@
 
 Every Linear issue created by [`/linear:plan-work`](/skills/linear#linear-plan-work) follows the same seven-section structure. Each heading answers a natural question so the reader can scan quickly and know exactly what the issue is about.
 
+## Issue vs card
+
+The two words name different aspects of the same artefact, so stride uses them deliberately:
+
+| Term | Means | Used when |
+|:-----|:------|:----------|
+| **issue** | The content unit Linear's API and `/linear:*` commands operate on | Talking about planning, content, the thing with a description and status |
+| **card** | The visual artefact on a kanban board | Talking about board rendering, kanban methodology, visual flow |
+
+Throughout this template, "issue" is the right word — it's the content unit you're drafting. "Card" is correct in the [Kanban process](/reference/kanban) doc and in the worked-example mock-ups ([Epic card](/reference/example-epic-card), [Story card](/reference/example-story-card)), where the topic is board rendering.
+
 ## Title
 
 The title is the first thing a stakeholder reads. Two rules:
@@ -54,7 +65,7 @@ No Vision-tracing = no issue. Issues drafted in a vacuum drift from the project'
 
 ### Why this matters
 
-Every issue we create uses this template. If the format is broken, every card in the backlog is harder to read.
+Every issue we create uses this template. If the format is broken, every issue in the backlog is harder to read.
 
 ### Where things stand
 
@@ -67,7 +78,7 @@ The issue template has new conversational headings but no one has checked whethe
 
 ### What we won't do
 
-No changes to the template based on this card — just validation.
+No changes to the template based on this issue — just validation.
 
 ### Expected outcome
 
