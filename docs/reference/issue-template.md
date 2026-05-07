@@ -11,7 +11,7 @@ The two words name different aspects of the same artefact, so stride uses them d
 | **issue** | The content unit Linear's API and `/linear:*` commands operate on | Talking about planning, content, the thing with a description and status |
 | **card** | The visual artefact on a kanban board | Talking about board rendering, kanban methodology, visual flow |
 
-Throughout this template, "issue" is the right word — it's the content unit you're drafting. "Card" is correct in the [Kanban process](/reference/kanban) doc, where the topic is board flow and column-by-column movement.
+Throughout this template, "issue" is the right word — it's the content unit you're drafting. "Card" is correct in the [Kanban process](/reference/kanban) doc and in the worked-example mock-ups ([Epic card](/reference/example-epic-card), [Story card](/reference/example-story-card)), where the topic is board rendering.
 
 ## Title
 
