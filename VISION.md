@@ -31,6 +31,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] After `/linear:update-vision` runs, the Linear project description matches `VISION.md`
 - [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
 - [ ] Issue titles read as stakeholder outcomes, not implementation steps
+- [ ] Stories with a shared purpose sit under one epic, and the epic traces back to a Vision outcome
 
 ## What can't change
 
