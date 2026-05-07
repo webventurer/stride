@@ -78,10 +78,9 @@ The separation matters because of **content focus blindness** — both people an
 
 ## The `/linear` five-command lifecycle
 
-The six commands map to how work actually moves through a board:
+The five commands map to how work actually moves through a board:
 
 ```
-/linear:check      →  verify MCP connections
 /linear:plan-work  →  create an issue
 /linear:next-steps →  see what needs doing
 /linear:start      →  branch, implement, PR
