@@ -16,11 +16,11 @@ Do **not** apply this rule for execution commands (`/linear:start`, `/linear:fix
 
 ## The rule
 
-1. **Read `VISION.md`'s Success Criteria.** That section names the outcomes the project is committed to.
+1. **Read `VISION.md`'s Success criteria.** That section names the outcomes the project is committed to.
 
-2. **For each candidate item, infer which Success Criterion it advances.** Use the issue body's "Why this matters" section — WB-256 enforces that newly drafted issues name the outcome they serve. For an issue without an explicit reference, reason from title and description about which criterion the work most plausibly advances. If the connection is genuinely unclear, treat the item as serving no specific criterion.
+2. **For each candidate item, infer which Success criterion it advances.** Use the issue body's "Why this matters" section — WB-256 enforces that newly drafted issues name the outcome they serve. For an issue without an explicit reference, reason from title and description about which criterion the work most plausibly advances. If the connection is genuinely unclear, treat the item as serving no specific criterion.
 
-3. **Order by least-progressed first.** Among candidates, surface those advancing the **least-progressed** Success Criteria higher. "Least-progressed" is a judgment based on what's visible in the project state:
+3. **Order by least-progressed first.** Among candidates, surface those advancing the **least-progressed** Success criteria higher. "Least-progressed" is a judgment based on what's visible in the project state:
 
    - Count of Done issues that referenced this criterion (fewer = less progressed)
    - Recent activity on the criterion (none in weeks = less progressed)
@@ -60,7 +60,7 @@ Format inside command output:
 1. **WB-XX — Title** — reason. Serves Vision outcome: "<criterion line from VISION.md>".
 ```
 
-If a candidate doesn't cleanly serve any Success Criterion, surface that honestly:
+If a candidate doesn't cleanly serve any Success criterion, surface that honestly:
 
 ```
 2. **WB-YY — Title** — reason. Doesn't cleanly trace to a Vision outcome — flag as a candidate for /vision review.

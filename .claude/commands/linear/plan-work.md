@@ -19,7 +19,7 @@ Accepts a description and optional flags: `/plan-work --research --craft "add er
 - **Epic title prefix**: epic-sized parent issues use `Epic: <stakeholder outcome>` as their title — the prefix makes the scope visible at a glance on the kanban board, and the post-colon part still follows the stakeholder-outcome rule. Example: `Epic: Bulk/Batch Blog Processing (parallel article pipeline)`.
 - One issue = one deliverable. If the description contains "and" connecting unrelated outcomes, split.
 - Default to the smallest issue that moves something forward. If the user's description is broad, propose a focused first issue plus follow-ups.
-- **When proposing multiple follow-ups, order them by Vision alignment** — see [reference/align-to-vision.md](reference/align-to-vision.md). The follow-up advancing the least-progressed Success Criterion sits first.
+- **When proposing multiple follow-ups, order them by Vision alignment** — see [reference/align-to-vision.md](reference/align-to-vision.md). The follow-up advancing the least-progressed Success criterion sits first.
 - Titles are imperative and start with a verb (Add, Fix, Replace, Remove…). Avoid "Investigate" unless the outcome genuinely is a report, not a code change.
 - Titles describe the outcome a stakeholder would recognise — what changes from their perspective — not the implementation. *"Background jobs run reliably after the first one"*, not *"Reset Tortoise globals between RQ jobs"*. Infrastructure exception: when there's no user-visible outcome, name the *system behaviour* that changes (e.g. "Linter accepts 100-char lines"), not the file that changes. See `docs/reference/issue-template.md` for the canonical rule and examples.
 - Never assign the issue unless the user explicitly asks.
@@ -60,7 +60,7 @@ Read `VISION.md` from the repo root.
 
   Do not draft an issue against a project with no anchor.
 
-- **If present**: read the full file and load it as context for the rest of the flow. The Success Criteria section in particular tells you what outcomes the project is committed to — the draft's "Why this matters" should connect the proposed work to one of them.
+- **If present**: read the full file and load it as context for the rest of the flow. The Success criteria section in particular tells you what outcomes the project is committed to — the draft's "Why this matters" should connect the proposed work to one of them.
 
 <mark>**This is a hard gate, not a warning.**</mark> Stop-and-suggest, don't draft-with-warning. Vision-less drafting produces issues that look fine in isolation but accumulate as drift.
 
@@ -142,7 +142,7 @@ Omit the section entirely when tests don't apply.
 
 **Research mode** — also include the research mode additions from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Implementation notes, Code examples, Related code, Related issues). Research mode applies to story drafts; epic parent-issue drafts stay strategic and don't accumulate research-mode sections — the implementation detail belongs on the sub-issues.
 
-**Ground the draft in the Vision** loaded at step 1. The "Why this matters" section must explicitly reference which Vision outcome the issue serves — quote the relevant Success Criteria line or constraint, and explain how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
+**Ground the draft in the Vision** loaded at step 1. The "Why this matters" section must explicitly reference which Vision outcome the issue serves — quote the relevant Success criteria line or constraint, and explain how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
 
 > "I can't trace this work back to a Vision outcome. The Vision says: [list relevant outcomes]. Two paths:
 >

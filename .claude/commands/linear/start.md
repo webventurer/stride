@@ -87,7 +87,7 @@ If the issue has no "Why this matters" section, decide whether it qualifies for 
 
   Either:
   1. Edit the issue to add "Why this matters" referencing a
-     Success Criterion, then re-run /linear:start.
+     Success criterion, then re-run /linear:start.
   2. If the work genuinely doesn't trace to a criterion, run
      /vision to add one, then update the issue.
   ```

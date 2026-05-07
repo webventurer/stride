@@ -43,7 +43,7 @@ Seven sections. Each answers one question. Keep it scannable — a Vision someon
 | 2 | **Who it's for** | Who specifically benefits? Who's it *not* for? |
 | 3 | **Why it exists** | What's the motivation? |
 | 4 | **Why now** | Why this moment? What changes if you wait? |
-| 5 | **How we know it's working** | What can we tick off when delivered? |
+| 5 | **Success criteria** | What can we tick off when delivered? |
 | 6 | **What can't change** | Tech, platform, compliance — anything we have to respect |
 | 7 | **What it won't do** | What's intentionally out of scope? |
 
@@ -71,13 +71,13 @@ The seven questions aren't a list of fields — they're a sequence designed so e
 | **Who it's for** *before Why* | A motivation only makes sense once you know whose motivation it is |
 | **Why it exists** *before Why now* | Establishes the standing reason before you ask about timing |
 | **Why now** *as its own section* | Most templates skip this. Without it, "we should build this" reads as evergreen — which means it's never urgent |
-| **How we know it's working** *before constraints* | Forces measurable success criteria before talk of limits softens what "done" means |
+| **Success criteria** *before constraints* | Forces measurable outcomes before talk of limits softens what "done" means |
 | **What can't change** *near the end* | Constraints land more honestly once you've written the desired outcome |
 | **What it won't do** *last* | Non-goals are the easiest to defer until you've named the actual goal |
 
 ## The hard part — measurable success criteria
 
-The Success Criteria section is where most Vision documents drift. <mark>**Adjectives are the enemy of done.**</mark> "Fast", "good", "easy", "robust" never fail clearly, so they never trigger completion — and the project drifts past the point of value.
+The Success criteria section is where most Vision documents drift. <mark>**Adjectives are the enemy of done.**</mark> "Fast", "good", "easy", "robust" never fail clearly, so they never trigger completion — and the project drifts past the point of value.
 
 | Vague (avoid) | Measurable (use) |
 |:--------------|:-----------------|
@@ -86,7 +86,7 @@ The Success Criteria section is where most Vision documents drift. <mark>**Adjec
 | The build is reliable | CI runs in under 5 minutes, fails on first error |
 | Tests catch regressions | `git bisect` finds a regression in fewer than 5 commits |
 
-If you can't tell whether a criterion has been met, it can't trigger "done". Re-read your Success Criteria — would you know how to verify each one?
+If you can't tell whether a criterion has been met, it can't trigger "done". Re-read your Success criteria — would you know how to verify each one?
 
 ## Where Vision sits in stride
 
@@ -107,7 +107,7 @@ stride's own `VISION.md` (at the repo root) is a worked example. Read it and not
 
 - The **What it delivers** opens with a stakeholder-readable line ("Manage your own dev team on a Kanban board so everything's visible — except the team is AI"), then explains the mechanics
 - **Who it's for** is sharp — "developers using Claude Code who care about codebases that survive past day 30" — and explicitly names who it's *not* for
-- **How we know it's working** has six measurable criteria, every one verifiable
+- **Success criteria** has six measurable criteria, every one verifiable
 - **What it won't do** lists five hard non-goals, each starting with "Not a..."
 
 A Vision the user actually re-reads is worth more than a 2000-word one written once and forgotten. Aim for something that fits on a single screen.

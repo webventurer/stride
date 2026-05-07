@@ -22,7 +22,7 @@ The problem isn't AI speed — it's the absence of structure around it. stride t
 
 AI coding agents are improving fast, and the structure-vs-speed trade-off compounds with model quality: every model improvement gives more leverage to a structured codebase than to a vibe-coded one. Every month without structure is a month of debt that gets harder to undo — by day 30, untangling costs more than rewriting.
 
-## How we know it's working
+## Success criteria
 
 - [ ] `npx github:webventurer/stride` installs in under 30 seconds, no global side effects
 - [ ] Every commit on a stride-managed branch passes four-pass atomicity — no monolithic commits, every message explains *why*

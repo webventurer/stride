@@ -33,7 +33,7 @@ Seven sections. Each answers one question. Keep it scannable — a Vision someon
 | 2 | **Who it's for** | Who specifically benefits? Who's it *not* for? |
 | 3 | **Why it exists** | What's the motivation? |
 | 4 | **Why now** | Why this moment? What changes if you wait? |
-| 5 | **How we know it's working** | What can we tick off when delivered? |
+| 5 | **Success criteria** | What can we tick off when delivered? |
 | 6 | **What can't change** | Tech, platform, compliance — anything we have to respect |
 | 7 | **What it won't do** | What's intentionally out of scope? |
 
@@ -89,7 +89,7 @@ Ask:
 
 If the answer is "nothing in particular", that's a signal to defer the project, not pretend it's urgent. A real *why now* names the trigger: a market shift, a deprecation, a window closing, a compounding cost.
 
-#### Q5 — How we know it's working
+#### Q5 — Success criteria
 
 Ask:
 
@@ -136,7 +136,7 @@ Render all seven answers into this structure:
 
 <answer to Q4>
 
-## How we know it's working
+## Success criteria
 
 - [ ] <criterion 1>
 - [ ] <criterion 2>
@@ -179,7 +179,7 @@ Confirm:
 
 Close with two reminders:
 
-> <mark>**Adjectives are the enemy of done.**</mark> "Fast", "good", "easy" never fail clearly, so they never trigger completion — the project drifts past the point of value. Re-read the Success Criteria you just wrote — would you know how to verify each one?
+> <mark>**Adjectives are the enemy of done.**</mark> "Fast", "good", "easy" never fail clearly, so they never trigger completion — the project drifts past the point of value. Re-read the Success criteria you just wrote — would you know how to verify each one?
 >
 > **The Vision is the only artefact downstream tooling carries forward.** Anything you didn't write here, future planners and agents have to invent. Be explicit about what matters.
 
@@ -188,7 +188,7 @@ Close with two reminders:
 ## Behaviour notes
 
 - **Don't draft from your own context.** The user's answers are the raw material. Synthesising "what the project probably wants" is the wrong job — the act of articulating is the value, and a Vision the user didn't write themselves won't anchor them.
-- **Push back on vagueness.** Especially on Success Criteria. Better to spend two extra questions than ship a Vision that lets everything count as success.
+- **Push back on vagueness.** Especially on Success criteria. Better to spend two extra questions than ship a Vision that lets everything count as success.
 - **Keep it short.** A 200-word Vision the user actually re-reads beats a 2000-word one they wrote once and forgot.
 - **Outcome-shaped, not implementation-shaped.** The What section describes what changes for the user, not what's in the codebase. "Atomic commits without leaving Claude Code" beats "a CLI built in Node" — the latter is a constraint, not a what.
 - **One overwrite confirmation per session.** If `VISION.md` already exists and the user chose Replace, don't ask again at write-time.

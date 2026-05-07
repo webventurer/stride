@@ -8,7 +8,7 @@ Review what's happening and recommend what to work on next.
 - If there are started issues assigned to the current user, treat these as the primary tasks
 - Do not recommend new work unless current tasks are blocked or completed
 - Sort backlog candidates by priority: Urgent > High > Medium > Low
-- **Within each tier, refine ordering by Vision alignment** — see [reference/align-to-vision.md](reference/align-to-vision.md). Items advancing least-progressed Success Criteria sit higher within the tier
+- **Within each tier, refine ordering by Vision alignment** — see [reference/align-to-vision.md](reference/align-to-vision.md). Items advancing least-progressed Success criteria sit higher within the tier
 - Prefer quick wins when priorities and alignment are equal (small, self-contained issues)
 - Treat issues with dependencies, blocker labels, or blocked status as blocked
 - Flag blocked issues but do not recommend them
@@ -45,7 +45,7 @@ Read `VISION.md` from the repo root.
 
   Do not rank candidates against a project with no anchor.
 
-- **If present**: read the full file and load its Success Criteria as context for step 6 (Recommend next actions).
+- **If present**: read the full file and load its Success criteria as context for step 6 (Recommend next actions).
 
 ### 2. Fetch data (all calls in parallel)
 
@@ -119,7 +119,7 @@ If the list is empty: "Backlog is empty — nothing to recommend."
 
 Apply the priority ordering: build failure > PRs needing fix > in-progress > PRs needing review > approved PRs to merge > backlog.
 
-**Within the backlog tier, apply [reference/align-to-vision.md](reference/align-to-vision.md)** to refine ordering — items advancing least-progressed Vision Success Criteria sit higher within the tier. Use the recently-completed list from step 5 plus the started/in-flight context as signals for which criteria are progressed.
+**Within the backlog tier, apply [reference/align-to-vision.md](reference/align-to-vision.md)** to refine ordering — items advancing least-progressed Vision Success criteria sit higher within the tier. Use the recently-completed list from step 5 plus the started/in-flight context as signals for which criteria are progressed.
 
 Pick 1–3 items. For each recommendation, explain briefly why it's the right next move using factors such as: priority, quick win potential, follow-up to recently completed work, unblocking other work, PR needing review, alignment with current work in progress. **Name the Vision outcome the item serves** so the user sees why the agent picked it.
 
@@ -130,7 +130,7 @@ Format:
 > 1. **PG-XX — Title** — reason. Serves Vision outcome: "<criterion line from VISION.md>".
 > 2. **PG-YY — Title** — reason. Serves Vision outcome: "<criterion line from VISION.md>".
 
-If a candidate doesn't cleanly trace to any Success Criterion, surface that honestly rather than inventing a tie-in (see [reference/align-to-vision.md](reference/align-to-vision.md) for the surfacing format).
+If a candidate doesn't cleanly trace to any Success criterion, surface that honestly rather than inventing a tie-in (see [reference/align-to-vision.md](reference/align-to-vision.md) for the surfacing format).
 
 ### 8. Offer to start
 
