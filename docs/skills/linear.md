@@ -25,36 +25,36 @@ Eight commands covering the full development cycle, from setup through to merge 
 
 ## Stories and epics
 
-Most cards are **stories** — one deliverable that ships as one PR. When several stories serve a common purpose (bigger than a PR, smaller than the Vision), `/linear:plan-work` creates a parent **epic** card and nests the stories under it as sub-issues. The lifecycle commands then surface the epic at the right moments — `/linear:start` shows it on pickup, `/linear:finish` prompts to close the epic when the last sub-issue ships, and `/linear:next-steps` lets you filter by epic. See [Epics and stories](/reference/epics-and-user-stories) for the full mechanism.
+Most issues are **stories** — one deliverable that ships as one PR. When several stories serve a common purpose (bigger than a PR, smaller than the Vision), `/linear:plan-work` creates a parent **epic** and nests the stories under it as sub-issues. The lifecycle commands then surface the epic at the right moments — `/linear:start` shows it on pickup, `/linear:finish` prompts to close the epic when the last sub-issue ships, and `/linear:next-steps` lets you filter by epic. See [Epics and stories](/reference/epics-and-user-stories) for the full mechanism.
 
-## When do you need a card?
+## When do you need an issue?
 
-Stride's gates aren't blanket *every change → card*. Cards are the planning artefact for work that earns planning. Tiny changes (typo fixes, single-sentence rewrites, a tagline tweak) can go straight to main with `/commit` — no card, no PR, no ceremony.
+Stride's gates aren't blanket *every change → issue*. Issues are the planning artefact for work that earns planning. Tiny changes (typo fixes, single-sentence rewrites, a tagline tweak) can go straight to main with `/commit` — no issue, no PR, no ceremony.
 
-Three signals that mean a card *is* needed:
+Three signals that mean an issue *is* needed:
 
 | Signal | Why |
 |:--|:--|
-| You'll go through `/linear:start` | The command needs an issue ID to read — there's nothing for it to load without a card |
-| The work is large enough that planning helps | A card forces you to write down *"Why this matters / What we'll do / What we won't do"* — useful when you'd otherwise drift |
+| You'll go through `/linear:start` | The command needs an issue ID to read — there's nothing for it to load without one |
+| The work is large enough that planning helps | An issue forces you to write down *"Why this matters / What we'll do / What we won't do"* — useful when you'd otherwise drift |
 | The work needs to be visible on the board | Stakeholders or future-you reading the Kanban want to see it |
 
-**The common-sense test:** could this be a single commit message, with no body needed beyond a sentence of *"why"*? If yes, no card. If you'd find yourself wanting *"Why this matters / What we'll do / What we won't do"* sections, that's the signal you need a card.
+**The common-sense test:** could this be a single commit message, with no body needed beyond a sentence of *"why"*? If yes, no issue. If you'd find yourself wanting *"Why this matters / What we'll do / What we won't do"* sections, that's the signal you need an issue.
 
-**The line not to cross:** wording tweaks preserve meaning (fine direct-to-main); refactors change structure (earn cards); new sections add new content (earn cards).
+**The line not to cross:** wording tweaks preserve meaning (fine direct-to-main); refactors change structure (earn an issue); new sections add new content (earn an issue).
 
 ### Examples
 
 | Change | Route | Why |
 |:--|:--|:--|
-| Fix a typo in README | No card, direct commit | Obvious, no planning needed |
-| Rewrite a sentence for clarity (preserving meaning) | No card, direct commit | Wording fix, single commit message |
-| Add a new section to a doc | Card | New content earns planning |
-| Reorder sections in a doc | Card | Structural change |
-| Add a new skill or command | Card | Behaviour change, board-visible |
-| Fix a bug in `install.mjs` | Card | Code change, deserves a PR record |
+| Fix a typo in README | No issue, direct commit | Obvious, no planning needed |
+| Rewrite a sentence for clarity (preserving meaning) | No issue, direct commit | Wording fix, single commit message |
+| Add a new section to a doc | Issue | New content earns planning |
+| Reorder sections in a doc | Issue | Structural change |
+| Add a new skill or command | Issue | Behaviour change, board-visible |
+| Fix a bug in `install.mjs` | Issue | Code change, deserves a PR record |
 
-For the related decision of *direct commit vs branch + PR* once you've decided you don't need a card, see the agent-facing [pr-vs-direct-commit reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/pr-vs-direct-commit.md) inside the installed skill — adjacent decision, different scope.
+For the related decision of *direct commit vs branch + PR* once you've decided you don't need an issue, see the agent-facing [pr-vs-direct-commit reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/pr-vs-direct-commit.md) inside the installed skill — adjacent decision, different scope.
 
 ## Vision is a hard prerequisite
 
