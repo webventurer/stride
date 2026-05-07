@@ -13,7 +13,13 @@ Above all three sits **Vision** — `VISION.md` at the repo root, written via [/
 | **Story** (slice of value) | Issue, optionally a sub-issue of an epic | Created by `/linear:plan-work`; ships as one PR |
 | **Task** (unit of work) | Atomic commit | Created during `/linear:start` as the branch accumulates commits |
 
-Milestones remain available as a Linear primitive — use them for genuinely date-bound or multi-phase tracking inside a project ("ship by Q2", "post-launch hardening"). They're no longer the default for an epic because milestones have no body, no status, and don't appear on the kanban board. Parent-issue epics carry the narrative and flow through Backlog → Doing → Done like any other card.
+## Why parent issues, not milestones?
+
+Linear's own [Parent and sub-issues docs](https://linear.app/docs/parent-and-sub-issues) frame the choice cleanly:
+
+> "Consider creating sub-issues when a set of work is too large to be a single issue but too small to be a project."
+
+That's stride's epic. A milestone is a date-bound chunking marker inside a project — it has no body, no status, no place on the board. A parent issue is a real card with all of those, so the umbrella *moves* through the lanes alongside its sub-issues, the narrative *lives* on the card, and a non-engineer scanning the board sees the epic as an actual unit of work. Milestones still have a place — they're the right answer when the chunking is "ship before X date" rather than "this is a multi-story body of work" — but for stride's epic concept, parent issues fit better.
 
 ## What each layer is
 
@@ -24,6 +30,26 @@ Milestones remain available as a Linear primitive — use them for genuinely dat
 **Task.** One atomic commit. Stride's task layer lives in git history, not Linear's sub-issue feature. Each commit is one task-sized idea, and the PR ships them together as a coherent story.
 
 **When in doubt about epic vs. story, ask: can this ship as one PR?** If yes, it's a story. If no, it's an epic. <mark>**Premature epics are clutter; missing epics are confusion.**</mark>
+
+## How epics work
+
+When `/linear:plan-work` recognises an epic-sized description, it does three things in order:
+
+1. **Drafts the parent issue** using [EPIC-TEMPLATE.md](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/EPIC-TEMPLATE.md). The body has four sections — *Why this matters / What success looks like / What we agreed / What we won't touch* — strategic only, no implementation detail. The title is prefixed `Epic: ` so the umbrella is visible at a glance on the board.
+2. **Saves the parent first** so its ID is available for the sub-issues that follow.
+3. **Drafts each story as a sub-issue** with `parentId` set to the parent. Stories use the regular [issue template](/reference/issue-template) — they're stories that happen to have a parent.
+
+After the work starts, the parent moves through the lanes like any other card (`/linear:start` opens a story, `/linear:finish` closes it; when the last sub-issue ships, `/linear:finish` prompts to mark the parent Done too).
+
+### Worked example
+
+Here's what an epic card looks like in Linear once `/linear:plan-work` has drafted the parent and the first batch of sub-issues:
+
+![Epic card example](/epic-card-example.svg)
+
+*Mock-up of an epic card. The body carries the strategic frame (Why this matters / What success looks like / What we agreed); the sub-issues panel below the description nests each story as a separate card. The umbrella's `0/8` progress chip ticks up as sub-issues close, and the parent moves through the lanes alongside them.*
+
+**The strategic frame lives on the epic; AI-implementable detail lives on each sub-issue.** That split is deliberate — an epic body that tries to enumerate all the implementation steps becomes a place where the same scope conversation happens twice (once on the epic, once on each sub-issue), and the sub-issue is the one a developer actually reads when they pick up work.
 
 ## Plan a few, ship, replan
 
