@@ -7,7 +7,7 @@ Every Linear issue created by [`/linear:plan-work`](/skills/linear#linear-plan-w
 The title is the first thing a stakeholder reads. Two rules:
 
 1. **Imperative form** — start with a verb (Add, Fix, Replace, Remove…). Avoid "Investigate" unless the outcome genuinely is a report.
-2. **Outcome, not implementation** — name the change a stakeholder would recognise from their perspective, not the line of code that delivers it. The body explains *how*; the title says *what changes for the reader*.
+2. **Outcome, not implementation** — say *what changes for the reader, not what the implementation does*. The line of code that delivers it belongs in the body; the title says *what*.
 
 ### Outcome vs. implementation
 
