@@ -41,7 +41,7 @@ When `/linear:plan-work` recognises an epic-sized description, it does three thi
 
 After the work starts, the parent moves through the lanes like any other card (`/linear:start` opens a story, `/linear:finish` closes it; when the last sub-issue ships, `/linear:finish` prompts to mark the parent Done too).
 
-For a visual mock-up of the parent and the sub-issues panel as Linear renders them, see [Example: Epic issue](/reference/example-epic-issue).
+For a visual mock-up of the parent and the sub-issues panel as Linear renders them, see [Example: Epic issue](/reference/example-epic-issue). For one of those sub-issues fully written out against the [issue template](/reference/issue-template), see [Example: Story issue](/reference/example-story-issue).
 
 **The strategic frame lives on the epic; AI-implementable detail lives on each sub-issue.** That split is deliberate — an epic body that tries to enumerate all the implementation steps becomes a place where the same scope conversation happens twice (once on the epic, once on each sub-issue), and the sub-issue is the one a developer actually reads when they pick up work.
 
