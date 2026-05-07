@@ -40,6 +40,8 @@ export default defineConfig({
           { text: 'Agentic engineering', link: '/reference/agentic-engineering' },
           { text: "Can't we just use Lovable?", link: '/reference/cant-we-just-use-lovable' },
           { text: 'Epics and stories', link: '/reference/epics-and-user-stories' },
+          { text: 'Example: Epic issue', link: '/reference/example-epic-issue' },
+          { text: 'Example: Story issue', link: '/reference/example-story-issue' },
           { text: 'Kanban process', link: '/reference/kanban' },
           { text: 'Issue statuses', link: '/reference/issue-statuses' },
           { text: 'Issue template', link: '/reference/issue-template' },

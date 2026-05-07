@@ -87,4 +87,21 @@ Visual inspection in Linear — open the issue and confirm each heading renders 
 
 The headings are deliberately conversational — they work equally well for bugs, features, and improvements. "Where things stand" is neutral: it can describe a broken API, a missing feature, or an opportunity for something new.
 
+## Companion: epic structure
+
+The seven-section template above is for **stories** — issues that ship as one PR. Epics (parent issues with sub-issues) use a shorter, strategic template instead:
+
+| # | Section | Question it answers |
+|:--|:--------|:--------------------|
+| 1 | Why this matters | Should I care, and which Vision outcome does this serve? |
+| 2 | What success looks like | What does this epic deliver as an outcome? |
+| 3 | What we agreed | What's already been decided before opening sub-issues? |
+| 4 | What we won't touch | What does this epic deliberately leave out? |
+
+The epic body deliberately has **no** "What we'll do", "How to test it", or "Assumptions to confirm" sections. Those live on each sub-issue. Putting them on the epic creates two places where the same scope conversation happens — and the sub-issue is the one a developer reads when they pick up work. The epic carries the strategic frame; the sub-issues carry the tactical detail.
+
+Epic titles are prefixed `Epic: <stakeholder outcome>` so the umbrella is visible at a glance on the kanban board. The post-colon part still follows the same outcome-not-implementation rule as story titles.
+
+For the canonical worked example and the full mechanism, see [Epics and stories](/reference/epics-and-user-stories#how-epics-work). The CRAFT prompt that draws the body out of a description lives in [`EPIC-TEMPLATE.md`](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/EPIC-TEMPLATE.md), the parallel of the [`ISSUE-TEMPLATE.md`](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/ISSUE-TEMPLATE.md) used for stories.
+
 The template avoids overlap between sections. Earlier versions had separate Goal, Acceptance criteria, and Success metric sections that all answered "how do we know it's done?" — these were merged into a single Expected outcome.

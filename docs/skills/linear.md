@@ -23,6 +23,10 @@ Eight commands covering the full development cycle, from setup through to merge 
 ![Kanban board](/kanban-board.svg)
 *Issues flow from Backlog through Doing to Done, driven entirely by `/linear` commands. See the [Kanban process](/reference/kanban) for how the columns work.*
 
+## Stories and epics
+
+Most cards are **stories** — one deliverable that ships as one PR. When several stories serve a common purpose (bigger than a PR, smaller than the Vision), `/linear:plan-work` creates a parent **epic** card and nests the stories under it as sub-issues. The lifecycle commands then surface the epic at the right moments — `/linear:start` shows it on pickup, `/linear:finish` prompts to close the epic when the last sub-issue ships, and `/linear:next-steps` lets you filter by epic. See [Epics and stories](/reference/epics-and-user-stories) for the full mechanism.
+
 ## When do you need a card?
 
 Stride's gates aren't blanket *every change → card*. Cards are the planning artefact for work that earns planning. Tiny changes (typo fixes, single-sentence rewrites, a tagline tweak) can go straight to main with `/commit` — no card, no PR, no ceremony.

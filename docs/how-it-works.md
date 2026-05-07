@@ -91,6 +91,8 @@ The six commands map to how work actually moves through a board:
 
 Each command knows about Linear statuses, GitHub PRs, and git branches. The agent moves issues through Backlog → Todo → Doing → In review → Done automatically as work progresses.
 
+Issues come in two sizes: **stories** (one PR) or **epics** (a parent issue with sub-issues, when several stories serve a common purpose smaller than the Vision). `/linear:plan-work` asks the sizing question and routes accordingly. See [Epics and stories](/reference/epics-and-user-stories) for the full mapping.
+
 ## The cross-model feedback loop
 
 `/linear:plan-work` optionally sends issue drafts to ChatGPT via OpenRouter for a second opinion before creating the issue. Three voices — Claude proposes, ChatGPT challenges, you steer — sharpen the issue through cross-model perspectives.
