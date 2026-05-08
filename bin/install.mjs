@@ -156,8 +156,13 @@ const ACTIONS = {
   conflict: (_src, _dst, rel, s) => s.conflicts.push(rel),
 };
 
-function installFile(srcFile, destFile, rel, summary) {
-  ACTIONS[planAction(srcFile, destFile)](srcFile, destFile, rel, summary);
+async function installFile(srcFile, destFile, rel, summary) {
+  const action = planAction(srcFile, destFile);
+  if (action === "conflict" && (await confirmFileOverwrite(rel))) {
+    ACTIONS.copy(srcFile, destFile, rel, summary);
+    return;
+  }
+  ACTIONS[action](srcFile, destFile, rel, summary);
 }
 
 function emptySummary() {
@@ -177,6 +182,12 @@ function symlinkedRootMatches(srcDir, rootPath) {
 
 async function confirmOverwrite(dir, resolved) {
   const prompt = `\nOverwrite ${dir} (symlinked → ${resolved}) with stride's copy? [Y/n] `;
+  const answer = await ask(prompt);
+  return !answer || answer === "y" || answer === "yes";
+}
+
+async function confirmFileOverwrite(rel) {
+  const prompt = `\nOverwrite ${rel} with stride's copy? [Y/n] `;
   const answer = await ask(prompt);
   return !answer || answer === "y" || answer === "yes";
 }
@@ -211,7 +222,7 @@ async function installDir(dir) {
     return summary;
   }
   for (const rel of walkFiles(srcDir)) {
-    installFile(
+    await installFile(
       join(srcDir, rel),
       join(destRoot, dir, rel),
       join(dir, rel),
