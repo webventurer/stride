@@ -14,7 +14,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 import { buildSection, removeSection } from "./gitignore.mjs";
@@ -438,7 +438,19 @@ async function configureGitignore() {
   console.log("Updated .gitignore with stride paths");
 }
 
+function refuseIfInsideClaudeDir() {
+  const cwd = process.cwd();
+  if (!cwd.split(sep).includes(".claude")) return;
+  console.error(
+    `\nERROR: stride must be run from a project root, not from inside a .claude/ directory.\n` +
+      `You appear to be in: ${cwd}\n` +
+      `cd to your project root and re-run.`,
+  );
+  process.exit(1);
+}
+
 async function main() {
+  refuseIfInsideClaudeDir();
   console.log("\nstride — All the speed. None of the mess.\n");
   await installFiles();
   await configureGitignore();
