@@ -223,6 +223,31 @@ Read the codebase as needed to understand existing patterns before making change
 
 Keep the Vision outcome from step 2 in mind throughout. When choosing between approaches of roughly equal value, prefer the one that more directly serves the named outcome.
 
+#### Audit the footprint
+
+Before validate, audit each new piece against the three earn-extraction criteria. <mark>**Each piece earns its place if (a) used 2+ times, (b) the name adds semantic value beyond the inline expression, or (c) it encapsulates non-trivial config / UX / domain vocabulary that would noise the call site.**</mark>
+
+Pulled by real need, not pushed by tidiness.
+
+| Criterion | What it means | Example |
+|:----------|:--------------|:--------|
+| **Used 2+ times** | DRY — multiple callers would otherwise duplicate | `formatCents()` called in three components → extract |
+| **Semantic value** | The name reads better than the inline expression | `isExpired(token)` over `Date.now() > token.exp` |
+| **Encapsulation** | Hides non-trivial config, UX, or domain concept | `confirmOverwrite(path)` wrapping a multi-line prompt |
+
+Walk through each kind of new piece:
+
+1. **For each new helper** — list its callers. If used once and the name doesn't add semantic value or encapsulate something non-trivial, **inline it**.
+2. **For each new test** — confirm it covers a path no existing test covers. **Drop duplicates.**
+3. **For each new test helper** — same rule as production: 2+ callers (DRY) or worth its weight (fixture setup, non-trivial config). Otherwise inline.
+
+After the walkthrough, surface a one-line footprint report in the terminal:
+
+```
+audited N helpers, M tests — kept all / dropped X / inlined Y
+footprint is minimal
+```
+
 ### 8. Validate
 
 Run the project's build command (e.g. `pnpm build`). Stop if it fails — show the first error and fix it before continuing.
@@ -350,6 +375,7 @@ Then display:
 - PR URL
 - Linear status: In Review
 - Squash summary (if step 10 grouped any commits): "Squashed N commits into M"
+- Footprint audit (from step 7): "kept N helpers and M tests / dropped X / inlined Y"
 
 Ask: **"Does this look right, or do you want changes?"**
 
