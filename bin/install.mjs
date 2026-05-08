@@ -193,10 +193,9 @@ function copyAndRecord(srcDir, dir, summary) {
 }
 
 async function resolveSymlinkedRoot(dir, srcDir, rootPath, summary) {
-  if (symlinkedRootMatches(srcDir, rootPath))
-    return recordAll(srcDir, dir, summary, "skipped");
+  const matches = symlinkedRootMatches(srcDir, rootPath);
   if (!(await confirmOverwrite(dir, realpathSync(rootPath))))
-    return recordAll(srcDir, dir, summary, "conflicts");
+    return recordAll(srcDir, dir, summary, matches ? "skipped" : "conflicts");
   unlinkSync(rootPath);
   copyAndRecord(srcDir, dir, summary);
 }

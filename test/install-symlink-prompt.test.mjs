@@ -32,18 +32,23 @@ function readFixture(relPath) {
   return readFileSync(join(fixtureRoot, relPath), "utf8");
 }
 
-function setupDifferingSymlink() {
+function setupMatchingSymlink() {
   const external = join(fixtureRoot, "external-tool/skills/commit");
   mkdirSync(external, { recursive: true });
   cpSync(join(strideRoot, SKILL_REL), external, { recursive: true });
-  writeFileSync(
-    join(external, "SKILL.md"),
-    "external tool's different content",
-  );
   const symlinkPath = join(fixtureRoot, SKILL_REL);
   mkdirSync(dirname(symlinkPath), { recursive: true });
   symlinkSync(external, symlinkPath);
   return { external, symlinkPath };
+}
+
+function setupDifferingSymlink() {
+  const fixture = setupMatchingSymlink();
+  writeFileSync(
+    join(fixture.external, "SKILL.md"),
+    "external tool's different content",
+  );
+  return fixture;
 }
 
 function runInstallWith(input) {
@@ -102,6 +107,16 @@ describe("install symlink prompt", () => {
     const { symlinkPath } = setupDifferingSymlink();
 
     runInstallWith("\nn\nnone\nn\n");
+
+    strictEqual(lstatSync(symlinkPath).isSymbolicLink(), false);
+    strictEqual(readFixture(SKILL_FILE_REL), readStride(SKILL_FILE_REL));
+  });
+
+  it("takes ownership of a matching-content symlink when the consumer confirms", () => {
+    resetFixture();
+    const { symlinkPath } = setupMatchingSymlink();
+
+    runInstallWith("y\nn\nnone\nn\n");
 
     strictEqual(lstatSync(symlinkPath).isSymbolicLink(), false);
     strictEqual(readFixture(SKILL_FILE_REL), readStride(SKILL_FILE_REL));

@@ -47,10 +47,10 @@ function writeFixture(relPath, content) {
   return full;
 }
 
-function runInstall() {
+function runInstall(prefix = "") {
   return execSync(`node ${join(strideRoot, "bin/install.mjs")}`, {
     cwd: fixtureRoot,
-    input: "n\nnone\nn\n",
+    input: `${prefix}n\nnone\nn\n`,
     stdio: ["pipe", "pipe", "pipe"],
   });
 }
@@ -92,7 +92,7 @@ describe("install hash-compare", () => {
     strictEqual(readFixture(SKILL_FILE_REL), "consumer modified this skill");
   });
 
-  it("follows symlinks when a skill is installed as a directory-target symlink", () => {
+  it("keeps a matching-content symlink intact when the consumer declines the prompt", () => {
     resetFixture();
     const external = join(fixtureRoot, "external-tool/skills/commit");
     mkdirSync(dirname(external), { recursive: true });
@@ -101,7 +101,7 @@ describe("install hash-compare", () => {
     mkdirSync(dirname(symlinkPath), { recursive: true });
     symlinkSync(external, symlinkPath);
 
-    runInstall();
+    runInstall("n\n");
 
     strictEqual(lstatSync(symlinkPath).isSymbolicLink(), true);
     strictEqual(readFixture(SKILL_FILE_REL), readStride(SKILL_FILE_REL));
