@@ -131,6 +131,22 @@ git add docs/research/ai-coding/what-is-a-frame.md
 
 ---
 
+## Patterns that DO belong together
+
+Some pairings look like two commits but are genuinely one atomic change. Splitting them ships a broken intermediate state.
+
+- **Tests with new code** — if the production code is new in this commit (not pre-existing), the test file belongs with it. Splitting would ship an intermediate commit where the class exists but is unverified. (The inverse rule — tests for pre-existing code are separate — is in the "Common AI atomicity mistakes" list above.)
+
+- **New link target with the links to it** — when you add a new definition, reference page, or glossary entry AND repoint existing mentions to it, keep both in one commit. Splitting would leave an intermediate commit where the target exists but nothing links to it — or where links point at the old target which has been removed but the new one isn't yet in place. The atomic state is: target exists AND is used.
+
+- **Deletion with its cleanup** — removing a concept means deleting its definition AND retargeting anything that pointed at it. Splitting would leave dead links for the duration of one commit.
+
+- **Rename with all its callers** — renaming a function and updating every call-site is one commit. Splitting would leave compile/runtime errors between the two commits.
+
+**The shared pattern**: if splitting would make any intermediate commit non-working (dead links, unverified code, broken builds, orphaned definitions), the pieces are one atomic change. The [coherence test](#the-coherence-test) catches this — *"would removing a file leave a hole?"* — because each piece *is* load-bearing for the others.
+
+---
+
 ## Intent before diff
 
 <mark>**"What is the user trying to accomplish?"** — ask this before looking at the diff.</mark>
