@@ -223,6 +223,10 @@ Read the codebase as needed to understand existing patterns before making change
 
 Keep the Vision outcome from step 2 in mind throughout. When choosing between approaches of roughly equal value, prefer the one that more directly serves the named outcome.
 
+#### YAGNI gate
+
+Before writing each piece, apply [The test](../../stride/docs/principles/design-decisions.md#the-test) from the design-decisions doc — does it close doors, add complexity for a requirement that doesn't exist yet, or confuse a first-time reader? If a piece fails any of the three, drop or simplify before writing further.
+
 #### Audit the footprint
 
 Before validate, audit each new piece against the three earn-extraction criteria. <mark>**Each piece earns its place if (a) used 2+ times, (b) the name adds semantic value beyond the inline expression, or (c) it encapsulates non-trivial config / UX / domain vocabulary that would noise the call site.**</mark>
