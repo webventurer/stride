@@ -9,7 +9,9 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  realpathSync,
   statSync,
+  unlinkSync,
   writeFileSync,
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
@@ -162,11 +164,52 @@ function emptySummary() {
   return { copied: [], skipped: [], conflicts: [] };
 }
 
-function installDir(dir) {
+function isSymlinkedRoot(rootPath) {
+  return existsSync(rootPath) && lstatSync(rootPath).isSymbolicLink();
+}
+
+function symlinkedRootMatches(srcDir, rootPath) {
+  return walkFiles(srcDir).every((rel) => {
+    const dest = join(rootPath, rel);
+    return existsSync(dest) && contentsMatch(join(srcDir, rel), dest);
+  });
+}
+
+async function confirmOverwrite(dir, resolved) {
+  const prompt = `\nOverwrite ${dir} (symlinked → ${resolved}) with stride's copy? [y/N] `;
+  return ["y", "yes"].includes(await ask(prompt));
+}
+
+function recordAll(srcDir, dir, summary, bucket) {
+  for (const rel of walkFiles(srcDir)) summary[bucket].push(join(dir, rel));
+}
+
+function copyAndRecord(srcDir, dir, summary) {
+  for (const rel of walkFiles(srcDir)) {
+    copyFile(join(srcDir, rel), join(destRoot, dir, rel));
+    summary.copied.push(join(dir, rel));
+  }
+}
+
+async function resolveSymlinkedRoot(dir, srcDir, rootPath, summary) {
+  if (symlinkedRootMatches(srcDir, rootPath))
+    return recordAll(srcDir, dir, summary, "skipped");
+  if (!(await confirmOverwrite(dir, realpathSync(rootPath))))
+    return recordAll(srcDir, dir, summary, "conflicts");
+  unlinkSync(rootPath);
+  copyAndRecord(srcDir, dir, summary);
+}
+
+async function installDir(dir) {
   const srcDir = join(srcRoot, dir);
-  const summary = emptySummary();
-  if (!existsSync(srcDir)) return summary;
+  if (!existsSync(srcDir)) return emptySummary();
   assertUnderClaudeDir(dir);
+  const summary = emptySummary();
+  const rootPath = join(destRoot, dir);
+  if (isSymlinkedRoot(rootPath)) {
+    await resolveSymlinkedRoot(dir, srcDir, rootPath, summary);
+    return summary;
+  }
   for (const rel of walkFiles(srcDir)) {
     installFile(
       join(srcDir, rel),
@@ -196,9 +239,9 @@ function makeExecutable(hook) {
   if (existsSync(path)) chmodSync(path, 0o755);
 }
 
-function copyFiles() {
+async function copyFiles() {
   const totals = emptySummary();
-  for (const dir of DIRS) mergeSummary(totals, installDir(dir));
+  for (const dir of DIRS) mergeSummary(totals, await installDir(dir));
   HOOKS.forEach(makeExecutable);
   if (totals.conflicts.length > 0) reportConflictsAndExit(totals.conflicts);
   return totals;
@@ -295,8 +338,8 @@ function mergeSettings() {
   writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 }
 
-function installFiles() {
-  logCopiedFiles(copyFiles());
+async function installFiles() {
+  logCopiedFiles(await copyFiles());
 }
 
 function installHeader({ copied, skipped }) {
@@ -386,7 +429,7 @@ async function configureGitignore() {
 
 async function main() {
   console.log("\nstride — All the speed. None of the mess.\n");
-  installFiles();
+  await installFiles();
   await configureGitignore();
   await configureMcp();
   if (!(await installHookConfig())) return;
