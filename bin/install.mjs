@@ -181,13 +181,13 @@ function symlinkedRootMatches(srcDir, rootPath) {
 }
 
 async function confirmOverwrite(dir, resolved) {
-  const prompt = `\nOverwrite ${dir} (symlinked → ${resolved}) with stride's copy? [Y/n] `;
+  const prompt = `Overwrite ${dir} (symlinked → ${resolved}) with stride's copy? [Y/n] `;
   const answer = await ask(prompt);
   return !answer || answer === "y" || answer === "yes";
 }
 
 async function confirmFileOverwrite(rel) {
-  const prompt = `\nOverwrite ${rel} with stride's copy? [Y/n] `;
+  const prompt = `Overwrite ${rel} with stride's copy? [Y/n] `;
   const answer = await ask(prompt);
   return !answer || answer === "y" || answer === "yes";
 }
@@ -359,7 +359,7 @@ function installHeader({ copied, skipped }) {
 }
 
 function logCopiedFiles(totals) {
-  console.log(installHeader(totals));
+  console.log(`\n${installHeader(totals)}`);
   console.log("  skills/vision/   (project Vision authoring skill)");
   console.log("  skills/commit/   (4-pass atomic commit skill)");
   console.log("  skills/craft/    (CRAFT prompt skill)");
