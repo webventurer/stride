@@ -176,8 +176,9 @@ function symlinkedRootMatches(srcDir, rootPath) {
 }
 
 async function confirmOverwrite(dir, resolved) {
-  const prompt = `\nOverwrite ${dir} (symlinked → ${resolved}) with stride's copy? [y/N] `;
-  return ["y", "yes"].includes(await ask(prompt));
+  const prompt = `\nOverwrite ${dir} (symlinked → ${resolved}) with stride's copy? [Y/n] `;
+  const answer = await ask(prompt);
+  return !answer || answer === "y" || answer === "yes";
 }
 
 function recordAll(srcDir, dir, summary, bucket) {
