@@ -55,11 +55,11 @@ function runInstall(prefix = "") {
   });
 }
 
-function runInstallExpectFailure() {
+function runInstallExpectFailure(prefix = "") {
   try {
     execSync(`node ${join(strideRoot, "bin/install.mjs")}`, {
       cwd: fixtureRoot,
-      input: "n\nnone\nn\n",
+      input: `${prefix}n\nnone\nn\n`,
       stdio: ["pipe", "pipe", "pipe"],
     });
     return null;
@@ -80,16 +80,34 @@ describe("install hash-compare", () => {
     strictEqual(readFixture(SKILL_FILE_REL), readStride(SKILL_FILE_REL));
   });
 
-  it("surfaces the conflict when target content differs from stride's source", () => {
+  it("surfaces the conflict when the consumer declines the overwrite prompt", () => {
     resetFixture();
     writeFixture(SKILL_FILE_REL, "consumer modified this skill");
 
-    const result = runInstallExpectFailure();
+    const result = runInstallExpectFailure("n\n");
 
     notStrictEqual(result, null, "install should exit with non-zero status");
     strictEqual(result.status, 1);
     match(result.stderr, /SKILL\.md/);
     strictEqual(readFixture(SKILL_FILE_REL), "consumer modified this skill");
+  });
+
+  it("overwrites a differing file when the consumer confirms", () => {
+    resetFixture();
+    writeFixture(SKILL_FILE_REL, "consumer modified this skill");
+
+    runInstall("y\n");
+
+    strictEqual(readFixture(SKILL_FILE_REL), readStride(SKILL_FILE_REL));
+  });
+
+  it("defaults to overwrite when the consumer just presses Enter", () => {
+    resetFixture();
+    writeFixture(SKILL_FILE_REL, "consumer modified this skill");
+
+    runInstall("\n");
+
+    strictEqual(readFixture(SKILL_FILE_REL), readStride(SKILL_FILE_REL));
   });
 
   it("keeps a matching-content symlink intact when the consumer declines the prompt", () => {
@@ -115,7 +133,7 @@ describe("install hash-compare", () => {
     const skillMd = join(fixtureRoot, SKILL_FILE_REL);
     rmSync(skillMd);
 
-    const result = runInstallExpectFailure();
+    const result = runInstallExpectFailure("n\n");
 
     notStrictEqual(result, null);
     strictEqual(result.status, 1);
