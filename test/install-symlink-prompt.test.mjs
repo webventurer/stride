@@ -96,4 +96,14 @@ describe("install symlink prompt", () => {
     match(result.stderr, /SKILL\.md/);
     strictEqual(lstatSync(symlinkPath).isSymbolicLink(), true);
   });
+
+  it("defaults to overwrite when the user just presses Enter", () => {
+    resetFixture();
+    const { symlinkPath } = setupDifferingSymlink();
+
+    runInstallWith("\nn\nnone\nn\n");
+
+    strictEqual(lstatSync(symlinkPath).isSymbolicLink(), false);
+    strictEqual(readFixture(SKILL_FILE_REL), readStride(SKILL_FILE_REL));
+  });
 });
