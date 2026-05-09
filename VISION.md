@@ -30,6 +30,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 
 - [ ] Every commit on a stride-managed branch passes four-pass atomicity — no monolithic commits, every message explains *why*
 - [ ] The common path through every `/linear:*` command runs without prompts; interruptions appear only when stride detects friction worth the user's judgement
+- [ ] Every multi-step stride interaction discloses its scope upfront — number of steps, time estimate, escape hatch — so the user is never trapped in an open-ended sequence
 - [ ] When you list the commits this branch is adding, the story reads naturally to a non-engineer scanning top-to-bottom (`git log main..HEAD --oneline` to check)
 - [ ] Issue titles read as stakeholder outcomes, not implementation steps
 - [ ] The card moves through Backlog → Doing → In Review → Done as `/linear:*` runs — no manual clicks on the board
