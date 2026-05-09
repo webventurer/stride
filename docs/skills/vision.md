@@ -62,7 +62,8 @@ Seven sections is heavier than the standard five-section product vision template
    - **Full** — seven questions, one at a time, pushing back on vagueness; opens with the upfront count + time estimate, prefixes each prompt with `(N/7)`, and accepts `skip` on any question to leave a `_TBD_` placeholder for later
 4. Assembles the draft and shows it for review
 5. Writes `VISION.md` at the repo root only after explicit approval
-6. Closes with two reminders — the adjective trap, and the "downstream tooling carries this forward" point
+6. Offers to sync to Linear (gated) — *"Push this Vision to the Linear project description now?"*. Yes hands off to [`/linear:update-vision`](/skills/linear#linearupdate-vision); no leaves a hint and continues. The gate keeps you in control when iterating without polluting Linear with intermediate writes
+7. Closes with two reminders — the adjective trap, and the "downstream tooling carries this forward" point
 
 If a `VISION.md` already exists, the skill asks before overwriting.
 

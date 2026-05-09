@@ -238,7 +238,24 @@ Confirm:
 >
 > This is the project's anchor — every issue, every feature, every architectural decision should trace back here."
 
-### 7. Final torch
+### 7. Sync to Linear (gated)
+
+Once `VISION.md` is on disk, ask:
+
+> "Push this Vision to the Linear project description now? (y/n)"
+
+- **Yes** → invoke [`/linear:update-vision`](../../commands/linear/update-vision.md). That command runs its own diff-and-confirm gate, so the user reviews the actual diff before anything writes to Linear. When `/linear:update-vision` finishes (whether it wrote, declined the diff, or short-circuited as identical), continue to step 8.
+- **No** → skip Linear sync. Surface a one-line hint and continue to step 8:
+
+  > *"Run `/linear:update-vision` whenever you're ready to push."*
+
+**Failure handling.** If `/linear:update-vision` errors out (`.linear_project` missing, project not found, `save_project` fails), do not abort `/vision`. The file *was* written successfully — that's the primary deliverable. Surface the failure clearly, name the retry path, and continue to step 8:
+
+> *"Vision was written to `VISION.md`. Linear sync failed: `<error>`. Run `/linear:update-vision` after fixing to retry."*
+
+The two gates are different decisions: this step's gate asks *"engage with Linear sync at all?"*; `/linear:update-vision`'s internal gate asks *"here's the actual diff, confirm?"*. Both stay — one decides scope, the other reviews content.
+
+### 8. Final torch
 
 Close with two reminders:
 
