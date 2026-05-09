@@ -18,21 +18,23 @@ Vibe coding feels best on day one. By day ten you can't tell which change broke 
 
 The problem isn't AI speed — it's the absence of structure around it. stride trades a few minutes of setup for months of maintainability, and the structure compounds: as AI models improve, structured docs get *more* from them, not less.
 
+Structure doesn't have to mean obstruction. Stride's discipline is shaped as guardrails — they steer, they don't block. The common path runs without prompts; friction appears only where it carries signal worth your judgement.
+
 ## Why now
 
 AI coding agents are improving fast, and the structure-vs-speed trade-off compounds with model quality: every model improvement gives more leverage to a structured codebase than to a vibe-coded one. Every month without structure is a month of debt that gets harder to undo — by day 30, untangling costs more than rewriting.
 
 ## Success criteria
 
-- [ ] `npx github:webventurer/stride` installs in under 30 seconds, no global side effects
 - [ ] Every commit on a stride-managed branch passes four-pass atomicity — no monolithic commits, every message explains *why*
-- [ ] When you list the commits this branch is adding, the story reads naturally to a non-engineer scanning top-to-bottom (`git log main..HEAD --oneline` to check)
-- [ ] Linear board state matches branch state automatically as `/linear:*` runs (Backlog → Doing → In Review → Done)
-- [ ] After `/linear:update-vision` runs, the Linear project description matches `VISION.md`
 - [ ] The common path through every `/linear:*` command runs without prompts; interruptions appear only when stride detects friction worth the user's judgement
-- [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
+- [ ] When you list the commits this branch is adding, the story reads naturally to a non-engineer scanning top-to-bottom (`git log main..HEAD --oneline` to check)
 - [ ] Issue titles read as stakeholder outcomes, not implementation steps
+- [ ] The card moves through Backlog → Doing → In Review → Done as `/linear:*` runs — no manual clicks on the board
 - [ ] Stories with a shared purpose sit under one epic, and the epic traces back to a Vision outcome
+- [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
+- [ ] After `/linear:update-vision` runs, the Linear project description matches `VISION.md`
+- [ ] `npx github:webventurer/stride` installs in under 30 seconds, no global side effects
 
 ## What can't change
 
