@@ -104,6 +104,19 @@ In `--research` mode, explores the codebase and Linear first, then adds code exa
 
 The `--worktree` flag is the place to opt into an isolated workspace — after the issue is created, the command sets up a git worktree at `../<repo-dirname>-<issue-id-lowercase>`, opens VS Code there, and hands off to a new Claude Code session. `/linear:start` runs inline by default; if you want a worktree, decide at planning time, not start time.
 
+**Story is the default; epic when warranted.** Most descriptions are story-sized — one deliverable that ships as one PR — so `/linear:plan-work` skips the sizing question and proceeds straight to drafting.
+
+After CRAFT (if used), the agent runs **size-sensing** on the description and looks for epic-shape signals:
+
+- multiple `and`-joined outcomes that don't share a single purpose
+- references to phases or rollouts
+- descriptions that resist a single stakeholder-readable PR title
+- roadmap-shaped length and structure
+
+If signals fire, a soft prompt offers three paths — break into an epic with sub-issues, narrow to one story, or proceed as one story. The user always has final say.
+
+When you already know it's epic-sized, pass `--epic` to skip sensing and go straight to the parent-issue flow.
+
 **Usage**:
 
 - `/linear:plan-work "add dark mode toggle"` — quick mode
@@ -111,6 +124,7 @@ The `--worktree` flag is the place to opt into an isolated workspace — after t
 - `/linear:plan-work --craft "add dark mode toggle"` — auto-run [CRAFT prompt refinement](/skills/craft)
 - `/linear:plan-work --research --craft "description"` — research + CRAFT combined
 - `/linear:plan-work --worktree "description"` — also set up an isolated worktree after creation
+- `/linear:plan-work --epic "Bulk blog processing across 200 articles"` — skip size-sensing, draft as a parent-issue epic
 
 ### /linear:start
 
