@@ -10,6 +10,8 @@ A Vision is the canonical "what is this project for" document. Written once, evo
 
 *Vision sits above the loop — issues, features, and architectural decisions trace back to it.*
 
+*Think of it as the project's lantern: its light cascades down to epics, stories, and commits. When the lantern is honest, every layer below stays oriented; when it dims, the layers drift, one quietly at a time.*
+
 </div>
 
 <div>
