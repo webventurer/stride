@@ -5,7 +5,11 @@ description: Walk through writing a project Vision interactively. Asks seven que
 
 # /vision — author a project Vision
 
-A Vision is the canonical "what is this project for" document. Written once, evolved sparingly. It frames everything downstream — every issue, every feature, every architectural decision should trace back to it.
+A Vision is the canonical "what is this project for" document. Written once, evolved sparingly.
+
+A good Vision is **load-bearing**: it anchors decisions, names the constraints, and refuses to drift into adjective soup. Iterations sharpen it; they don't bloat it. Future-you, a future agent, or a new contributor should be able to read it in 2–3 minutes and know what the project is, who it's for, and what it won't do.
+
+Every issue, every feature, every architectural decision traces back to it.
 
 This skill walks you through writing one. It interviews you on seven questions, drafts the file, shows it for approval, then writes `VISION.md` at the repo root.
 
