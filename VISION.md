@@ -26,15 +26,15 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 
 ## Success criteria
 
-- [ ] `npx github:webventurer/stride` installs in under 30 seconds, no global side effects
 - [ ] Every commit on a stride-managed branch passes four-pass atomicity — no monolithic commits, every message explains *why*
-- [ ] When you list the commits this branch is adding, the story reads naturally to a non-engineer scanning top-to-bottom (`git log main..HEAD --oneline` to check)
-- [ ] Linear board state matches branch state automatically as `/linear:*` runs (Backlog → Doing → In Review → Done)
-- [ ] After `/linear:update-vision` runs, the Linear project description matches `VISION.md`
 - [ ] The common path through every `/linear:*` command runs without prompts; interruptions appear only when stride detects friction worth the user's judgement
-- [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
+- [ ] When you list the commits this branch is adding, the story reads naturally to a non-engineer scanning top-to-bottom (`git log main..HEAD --oneline` to check)
 - [ ] Issue titles read as stakeholder outcomes, not implementation steps
+- [ ] Linear board state matches branch state automatically as `/linear:*` runs (Backlog → Doing → In Review → Done)
 - [ ] Stories with a shared purpose sit under one epic, and the epic traces back to a Vision outcome
+- [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
+- [ ] After `/linear:update-vision` runs, the Linear project description matches `VISION.md`
+- [ ] `npx github:webventurer/stride` installs in under 30 seconds, no global side effects
 
 ## What can't change
 
