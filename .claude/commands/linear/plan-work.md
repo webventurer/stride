@@ -1,6 +1,6 @@
 # Plan work and create a Linear issue
 
-Accepts a description and optional flags: `/plan-work --research --craft --worktree "add error handling to API calls"`. With `--worktree`, the command also sets up an isolated git worktree for the new issue after creation.
+Accepts a description and optional flags: `/plan-work --research --craft --worktree --epic "add error handling to API calls"`. With `--worktree`, the command also sets up an isolated git worktree for the new issue after creation. With `--epic`, it skips size-sensing and goes straight to the parent-issue flow.
 
 ## Modes
 
@@ -12,11 +12,12 @@ Accepts a description and optional flags: `/plan-work --research --craft --workt
 - `--research` — explore codebase and Linear before drafting (adds implementation notes, code examples, related code and issues)
 - `--craft` — auto-run CRAFT prompt refinement without asking (skips the interactive prompt in step 4)
 - `--worktree` — after issue creation, set up an isolated git worktree at `../<repo-dirname>-<issue-id-lowercase>` and hand off to a new Claude Code session (see step 12). `/linear:start` runs inline by default; pass this flag at planning time if the work needs an isolated workspace.
+- `--epic` — skip size-sensing and go straight to the epic-sized parent-issue flow (see step 4b). Pass this when you already know the description is a named initiative with multiple stories.
 
 ## Decision rules
 
 - **Vision is the anchor**: every issue must trace back to a Vision outcome. The draft's "Why this matters" section must reference which Vision outcome the issue serves. If it can't, ask the user to choose: **add a new criterion to `VISION.md` (re-run `/vision` to evolve it), or drop the issue as out of scope**. Don't draft past this prompt — repeated trace-back failures are a signal the Vision needs updating, not that the gate should be loosened. Without `VISION.md` at the repo root, the command stops and suggests `/vision` (see step 1).
-- **Sizing first**: before drafting, determine whether the description is story-sized (one deliverable, ships as one PR) or epic-sized (a named initiative with multiple stories). Epic-sized work becomes a parent issue with sub-issues for each story; story-sized work becomes an issue, optionally linked to an existing epic via `parentId`.
+- **Story is the default; epic when warranted**: most descriptions are story-sized (one deliverable, ships as one PR), and stride defaults to that without asking. Epic-sized work (a named initiative with multiple stories) is reached two ways — the `--epic` flag, or size-sensing surfacing a soft prompt when epic-shape signals fire (see step 4b). Epic-sized work becomes a parent issue with sub-issues for each story; story-sized work becomes an issue, optionally linked to an existing epic via `parentId`.
 - **Epic title prefix**: epic-sized parent issues use `Epic: <stakeholder outcome>` as their title — the prefix makes the scope visible at a glance on the kanban board, and the post-colon part still follows the stakeholder-outcome rule. Example: `Epic: Bulk/Batch Blog Processing (parallel article pipeline)`.
 - One issue = one deliverable. If the description contains "and" connecting unrelated outcomes, split.
 - Default to the smallest issue that moves something forward. If the user's description is broad, propose a focused first issue plus follow-ups.
@@ -67,27 +68,7 @@ Read `VISION.md` from the repo root.
 
 ### 2. Parse arguments
 
-Extract the description and flags from `$ARGUMENTS`. Determine if `--research`, `--craft`, and/or `--worktree` are present.
-
-### 2b. Sizing gate
-
-Ask the user: **"Is this story-sized (one deliverable, ships as one PR) or epic-sized (a named initiative with multiple stories)?"**
-
-**If story-sized** — continue to step 3 as normal. At step 10 (create issue), also call `list_issues` filtered for parent-issue epics in the project (titles starting with `Epic: `): if any exist, ask "Link this story to an existing epic?" and if yes, set the `parentId` field on `save_issue` to the chosen epic's ID. Legacy milestones — boards may still have them from before WB-279; if `list_milestones` returns any, offer them as a secondary option and use the `milestone` field instead.
-
-**If epic-sized** — follow the parent-issue path:
-
-1. Call `list_issues` filtered for existing parent-issue epics in the project (titles starting with `Epic: `) and show any matches.
-2. Ask: "Create a new epic, or link these stories to an existing one?"
-3. If creating: run the full flow from step 3 onwards (duplicate check, CRAFT if requested, draft, approval, create) for the **parent issue**, using [reference/EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead of ISSUE-TEMPLATE.md and prefixing the title with `Epic: `. Save the parent issue first via `save_issue` (in Backlog) and capture the returned ID.
-4. Confirm the parent issue with the user before drafting sub-issues.
-5. Ask: "What are the first 1–3 stories for this epic?" — each answer becomes a separate issue draft.
-6. For each story: run the full flow from step 3 onwards (duplicate check, CRAFT if requested, draft, approval, create) with `parentId` set to the parent issue's ID on `save_issue`. Story drafts use ISSUE-TEMPLATE.md as normal — they're stories that happen to have a parent.
-7. After all stories are created, summarise: list the parent epic and all sub-issues created underneath it.
-
-<mark>**Do not bundle all stories into one issue.** Each story is its own sub-issue with `parentId` set.</mark>
-
-**Legacy milestone path**: if the user explicitly wants a date-bound milestone instead of a parent-issue epic (e.g. "ship by Q2", "before launch"), use `save_milestone` and link stories via `milestone`. This stays available for date/scope-bound tracking but is no longer the default — parent-issue epics carry the narrative; milestones are time markers.
+Extract the description and flags from `$ARGUMENTS`. Determine if `--research`, `--craft`, `--worktree`, and/or `--epic` are present.
 
 ### 3. Duplicate check (all modes)
 
@@ -110,6 +91,49 @@ If `--craft` flag is present, run CRAFT automatically. Otherwise, ask the user: 
 
 - If **yes** (or `--craft`): read [reference/ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) for story-sized work, or [reference/EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) when drafting the parent issue on the epic-sized path. Substitute `[user's description]` with what the user provided **and** `[VISION]` with the full contents of the `VISION.md` loaded in step 1, run `/craft` with the populated prompt, then use the refined output as the description for all subsequent steps. Substituting the entire Vision into the prompt is what lets the agent — or any model the prompt is sent to — anchor the draft on real criteria, real constraints, and real non-goals rather than guessing.
 - If **no**: continue with the original description
+
+### 4b. Size — story by default, epic when warranted
+
+Story is the default. Most descriptions are story-sized — one deliverable that ships as one PR — and asking every invocation imposes epic-shaped overhead on the common case. Skip this step and continue to step 5 unless one of the following triggers fires.
+
+**Trigger 1 — `--epic` flag.** If `--epic` was parsed in step 2, skip size-sensing entirely and follow the **epic-sized path** below.
+
+**Trigger 2 — size-sensing detects epic shape.** Read the description (the `--craft`-refined version from step 4 if `--craft` was used; otherwise the raw input). Look for **epic-shape signals**:
+
+- Multiple `and`-joined outcomes that don't share a single purpose
+- References to *"phases"*, *"stages"*, *"milestones"*, *"Q2"*, *"by launch"*, *"rollout"*, etc.
+- A description that resists a single stakeholder-readable PR title without joining unrelated ideas with `and`
+- Length and structure that suggest a roadmap rather than a deliverable (5+ paragraphs of *"first we'll, then we'll, then we'll"*)
+
+If any signals fire, surface a **soft prompt** — not a forced gate:
+
+> *"This sounds epic-sized — I'm seeing [name the signals: multiple phases / unrelated outcomes / a rollout shape]. Want to break it into stories under an epic, narrow this to one story-sized deliverable, or proceed as one story?"*
+
+Three paths:
+
+- **Break into epic** → follow the **epic-sized path** below.
+- **Narrow to story** → ask which slice to file as the first story; defer the rest. Continue to step 5 with the narrowed description as story-sized.
+- **No, it's one story** → continue to step 5 as story-sized.
+
+If no signals fire, skip silently and continue to step 5 as story-sized. The common path stays frictionless.
+
+<mark>**Size-sensing offers, doesn't force.**</mark> When signals are detected, the agent asks; the user always has final say. Auto-flipping silently would be a worse failure mode than the old forced ask.
+
+**Story-sized path** (default / "no, it's one story" / "narrow to story") — continue to step 5 as normal. At step 10 (create issue), also call `list_issues` filtered for parent-issue epics in the project (titles starting with `Epic: `): if any exist, ask "Link this story to an existing epic?" and if yes, set the `parentId` field on `save_issue` to the chosen epic's ID. Legacy milestones — boards may still have them from before WB-279; if `list_milestones` returns any, offer them as a secondary option and use the `milestone` field instead.
+
+**Epic-sized path** (`--epic` / "break into epic") — follow the parent-issue path:
+
+1. Call `list_issues` filtered for existing parent-issue epics in the project (titles starting with `Epic: `) and show any matches.
+2. Ask: "Create a new epic, or link these stories to an existing one?"
+3. If creating: run duplicate check (step 3), CRAFT if requested (step 4), then steps 5 onwards (research, test consideration, draft, approval, create) for the **parent issue** — skip step 4b on the recursion since size has already been decided. Use [reference/EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead of ISSUE-TEMPLATE.md and prefix the title with `Epic: `. Save the parent issue first via `save_issue` (in Backlog) and capture the returned ID.
+4. Confirm the parent issue with the user before drafting sub-issues.
+5. Ask: "What are the first 1–3 stories for this epic?" — each answer becomes a separate issue draft.
+6. For each story: run duplicate check (step 3), CRAFT if requested (step 4), then steps 5 onwards with `parentId` set to the parent issue's ID on `save_issue` — again skip step 4b. Story drafts use ISSUE-TEMPLATE.md as normal — they're stories that happen to have a parent.
+7. After all stories are created, summarise: list the parent epic and all sub-issues created underneath it.
+
+<mark>**Do not bundle all stories into one issue.** Each story is its own sub-issue with `parentId` set.</mark>
+
+**Legacy milestone path**: if the user explicitly wants a date-bound milestone instead of a parent-issue epic (e.g. "ship by Q2", "before launch"), use `save_milestone` and link stories via `milestone`. This stays available for date/scope-bound tracking but is no longer the default — parent-issue epics carry the narrative; milestones are time markers.
 
 ### 5. Research (only with `--research`)
 
