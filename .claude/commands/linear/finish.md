@@ -164,6 +164,50 @@ If the user confirms, move the parent issue to Done via `save_issue` with `state
 
 If the user declines, leave the epic untouched.
 
+### 8d. Sync Vision if it changed
+
+Detect whether the merged PR's diff included `VISION.md`:
+
+```bash
+merge_commit=$(git -C <main-repo-path> log -1 --format=%H)
+git -C <main-repo-path> diff <merge_commit>^..<merge_commit> --name-only
+```
+
+If `VISION.md` is **not** in the file list, skip this entire step silently — no prompt, no noise. The common case (a PR that didn't touch Vision) sees no extra friction.
+
+If `VISION.md` **is** in the file list, surface a one-line note and run `/linear:update-vision`'s flow inline:
+
+```
+This PR changed VISION.md — sync to Linear?
+```
+
+Then:
+
+1. Read `VISION.md` from the repo root.
+2. Resolve the Linear project from `.linear_project`.
+3. Call `get_project` to fetch the current Linear description.
+4. Compare against `VISION.md` (after trimming surrounding whitespace).
+   - **Identical**: report *"Linear project description already matches VISION.md — no update needed"* and continue to step 9.
+   - **Different**: show the diff and ask:
+
+     ```
+     Replace the Linear project description with VISION.md? (y/n)
+     ```
+
+5. On `y`: call `save_project` with the full `VISION.md` contents as `description`. On `n`: skip the write and continue to step 9.
+
+If any step in the sync flow fails (`.linear_project` missing, project not found via `list_projects`, `save_project` errors), surface the failure clearly and continue to step 9. The issue is already Done from step 8 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
+
+Track the outcome for the summary in step 9:
+
+| State | When |
+|:------|:-----|
+| `applied` | Diff existed and `save_project` succeeded |
+| `declined` | Diff existed and user picked `n` |
+| `already in sync` | No diff, identical-check short-circuited |
+| `failed: <reason>` | Sync attempted but errored |
+| *(omitted)* | `VISION.md` was not in the merged diff |
+
 ### 9. Summary
 
 Display:
@@ -177,6 +221,7 @@ Display:
 - Linear status: Done
 - Milestone (if applicable): name + completion status (`complete` if 8b marked it complete, `<n> stories remaining` otherwise)
 - Epic (if applicable): name + completion status (`Done` if 8c moved the parent to Done, `<n> sub-issues remaining` otherwise)
+- Vision sync (if `VISION.md` was in the merged diff): `applied` / `declined` / `already in sync` / `failed: <reason>` (per step 8d). Omit the row if VISION.md wasn't touched.
 
 ---
 
