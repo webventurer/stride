@@ -51,14 +51,21 @@ If anything fails, stop — do not merge. Show what failed.
 
 <mark>**This step fires *before* the merge.**</mark> When trace drift is caught here, the catch is still actionable — the criterion can ride alongside its originating feature on the same branch, instead of needing a follow-up `VISION.md` PR.
 
-Read the issue's "Why this matters" section (loaded in step 1). If it names a Vision outcome, surface it and ask the user one yes/no question:
+Read the issue's "Why this matters" section (loaded in step 1). If it names a Vision outcome, **first run `git log main..HEAD --oneline`** to capture the branch's commit subjects — they're the user's reminder of what just shipped. Then surface the commits and the trace-back question in one block:
 
 ```
+Branch ready to merge:
+  - <commit 1>
+  - <commit 2>
+  - ...
+
 This issue claimed to advance the Vision outcome:
   "<outcome line from VISION.md>"
 
-Did the merged work actually advance that outcome? (y/n)
+Did the work actually advance that outcome? (y/n)
 ```
+
+The commit subjects are already authored to be informative (atomic-commits discipline) — they're the canonical summary of what shipped. Showing them right above the question lets the user answer in seconds instead of scrolling back to recall the work. Single-commit branches still get the block (one entry) — consistent shape, no special-case logic.
 
 - **Yes**: continue to step 6 (Merge).
 - **No**: ask one follow-up — *"In one line, what shifted?"* — and post the user's answer as a Linear comment on the issue via `save_comment`. Then ask:
