@@ -1,5 +1,7 @@
 # Vision: stride
 
+> Apply guardrails, not walls. Encourage discipline but don't obstruct flow.
+
 ## What it delivers
 
 Manage your own dev team on a Kanban board so everything's visible — except the team is AI.
