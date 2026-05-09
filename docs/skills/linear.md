@@ -102,12 +102,15 @@ Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). Every draft's 
 
 In `--research` mode, explores the codebase and Linear first, then adds code examples (showing how similar patterns are already implemented) and acceptance criteria (observable outcomes, not implementation steps).
 
+The `--worktree` flag is the place to opt into an isolated workspace — after the issue is created, the command sets up a git worktree at `../<repo-dirname>-<issue-id-lowercase>`, opens VS Code there, and hands off to a new Claude Code session. `/linear:start` runs inline by default; if you want a worktree, decide at planning time, not start time.
+
 **Usage**:
 
 - `/linear:plan-work "add dark mode toggle"` — quick mode
 - `/linear:plan-work --research "add PostHog integration"` — research mode
 - `/linear:plan-work --craft "add dark mode toggle"` — auto-run [CRAFT prompt refinement](/skills/craft)
 - `/linear:plan-work --research --craft "description"` — research + CRAFT combined
+- `/linear:plan-work --worktree "description"` — also set up an isolated worktree after creation
 
 ### /linear:start
 
@@ -119,7 +122,7 @@ Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). The command su
 
 The agent groups commits by purpose and squashes similar ones into single commits with rewritten messages. Conservative by default — when uncertain whether two commits belong together, they stay separate. The user gates via terminal review and can recover the original commits via reflog if a squash was wrong.
 
-Trusts the issue — the plan was agreed during `/plan-work`. No approval gate mid-flow.
+Trusts the issue — the plan was agreed during `/plan-work`. No approval gate mid-flow. Branches are created inline by default — no "worktree or inline?" prompt. To run on a worktree instead, opt in at planning time via `/linear:plan-work --worktree`.
 
 Ends by asking: "Does this look right, or do you want changes?"
 
