@@ -51,7 +51,29 @@ If anything fails, stop — do not merge. Show what failed.
 
 <mark>**This step fires *before* the merge.**</mark> When trace drift is caught here, the catch is still actionable — the criterion can ride alongside its originating feature on the same branch, instead of needing a follow-up `VISION.md` PR.
 
-Read the issue's "Why this matters" section (loaded in step 1). If it names a Vision outcome, **first run `git log main..HEAD --oneline`** to capture the branch's commit subjects — they're the user's reminder of what just shipped. Then surface the commits and the trace-back question in one block:
+If the issue has no "Why this matters" section (legacy soft path from `/linear:start`), skip silently and continue to step 6.
+
+Otherwise, run a **silent trace check** *before* deciding whether to prompt the user. Inputs (already in context from step 1 and the steps above):
+
+- The criterion the issue's *Why this matters* section claims to advance.
+- The branch's commit subjects: `git log main..HEAD --oneline`.
+- The full `VISION.md` Success criteria list.
+
+Read the commit subjects against the Success criteria and apply the [*revise, don't stretch*](https://github.com/webventurer/stride/blob/main/docs/patterns/revise-dont-stretch.md) strain test to the issue's stated trace. <mark>**Don't ask the user whether the trace fits — judge it yourself, then decide whether to interrupt.**</mark> Three outcomes follow.
+
+#### Match — silent confirmation
+
+The issue's stated trace matches the agent's best-fit criterion *and* the fit is unambiguous. Surface a single line and continue to step 6:
+
+```
+Trace verified against "<criterion>" — proceeding to merge.
+```
+
+No y/n prompt. The common path runs without interruption (Vision criterion #3).
+
+#### Drift — surface the difference, let the user pick
+
+The agent's best-fit differs from the issue's stated trace, *or* the stated trace is strained (one of the strain signals trips). Surface both candidates with the commit reminder so the user can decide:
 
 ```
 Branch ready to merge:
@@ -59,30 +81,40 @@ Branch ready to merge:
   - <commit 2>
   - ...
 
-This issue claimed to advance the Vision outcome:
-  "<outcome line from VISION.md>"
+Issue's stated trace:
+  "<stated criterion>"
 
-Did the work actually advance that outcome? (y/n)
+Agent's best-fit reading:
+  "<alternative criterion>"
+
+Which fits the work? (stated / alternative / something else)
 ```
 
-The commit subjects are already authored to be informative (atomic-commits discipline) — they're the canonical summary of what shipped. Showing them right above the question lets the user answer in seconds instead of scrolling back to recall the work. Single-commit branches still get the block (one entry) — consistent shape, no special-case logic.
+The commit subjects are authored to be informative (atomic-commits discipline) — they're the canonical summary of what shipped. Single-commit branches still get the block.
 
-- **Yes**: continue to step 6 (Merge).
-- **No**: ask one follow-up — *"In one line, what shifted?"* — and post the user's answer as a Linear comment on the issue via `save_comment`. Then ask:
+- **stated**: the agent was overconfident; user override stands. Continue to step 6 (Merge).
+- **alternative**: post a one-line Linear comment via `save_comment` naming the agent's drift catch and the user-picked criterion. Continue to step 6. The drift is named on the issue; the body isn't auto-rewritten.
+- **something else**: drop into the missing-criterion path below.
 
-  ```
-  Stop and add the criterion to VISION.md before merging? (y/n)
-  ```
+#### Something else — missing criterion path
 
-  - **Yes**: pause the flow. Tell the user:
+Ask one follow-up — *"In one line, what shifted?"* — and post the user's answer as a Linear comment on the issue via `save_comment`. Then ask:
 
-    > *"Add the criterion to `VISION.md`, run `/commit` to add it as a separate atomic commit on this branch, then re-run `/linear:finish`."*
+```
+Stop and add the criterion to VISION.md before merging? (y/n)
+```
 
-    Exit cleanly. Do not merge. Re-running `/linear:finish` re-runs validation (step 4) on the new commit, then re-asks the Vision-confirm — which should now answer *yes* against the just-added criterion.
+- **Yes**: pause the flow. Tell the user:
 
-  - **No**: continue to step 6 (Merge). The drift is named in the comment but not amended; the user can file a follow-up `VISION.md` PR if they want.
+  > *"Add the criterion to `VISION.md`, run `/commit` to add it as a separate atomic commit on this branch, then re-run `/linear:finish`."*
 
-If the issue had no "Why this matters" section (legacy soft path from `/linear:start`), skip silently and continue to step 6.
+  Exit cleanly. Do not merge. Re-running `/linear:finish` re-runs validation (step 4) and re-runs the trace check — which should now match against the just-added criterion.
+
+- **No**: continue to step 6 (Merge). The drift is named in the comment but not amended; the user can file a follow-up `VISION.md` PR if they want.
+
+#### When in doubt, ask
+
+If the agent is genuinely uncertain whether the trace matches — neither obviously clean nor obviously drifted — fall back to the **drift** branch and surface both candidates rather than auto-confirming. <mark>**A false silent confirmation is worse than a borderline prompt:** the silent path's whole value is *trustworthy* trace verification, not speed at the cost of accuracy.</mark>
 
 This step turns the "Why this matters" line from a write-once token into a verified reference — and (with the *Yes, stop* branch) makes the catch *amendable*: a missing criterion rides alongside its originating feature instead of needing a separate PR.
 
