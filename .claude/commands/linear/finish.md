@@ -92,7 +92,7 @@ Which fits the work? (stated / alternative / something else)
 
 The commit subjects are authored to be informative (atomic-commits discipline) — they're the canonical summary of what shipped. Single-commit branches still get the block.
 
-<mark>**Explain the drift in plain English.**</mark> Describe what the doc or feature actually does in concrete terms, what the criterion actually says, and why the connection lands. Avoid stride-internal vocabulary (`Distinction`, `operationalises`, `gate`, `judgement-worthy`, `trace` as a noun) in user-facing copy — the reader may know nothing about stride's meta-cognitive framework. If a 12-year-old wouldn't understand it, rewrite. See [`clear-speak`](https://github.com/webventurer/stride/blob/main/.claude/skills/clear-speak/SKILL.md) for the standard.
+<mark>**Explain the drift in plain English.**</mark> Describe what the doc or feature actually does in concrete terms, what the criterion actually says, and why the connection lands. Avoid stride-internal vocabulary (`Distinction`, `operationalises`, `gate`, `judgement-worthy`, `trace` as a noun) in user-facing copy — the reader may know nothing about stride's meta-cognitive framework. If a 12-year-old wouldn't understand it, rewrite.
 
 A worked before/after, from the WB-297 dogfood that made this rule explicit:
 
