@@ -35,6 +35,12 @@ export default defineConfig({
         ],
       },
       {
+        text: 'Patterns',
+        items: [
+          { text: "Revise, don't stretch", link: '/patterns/revise-dont-stretch' },
+        ],
+      },
+      {
         text: 'Reference',
         items: [
           { text: 'Agentic engineering', link: '/reference/agentic-engineering' },
