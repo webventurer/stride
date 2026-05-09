@@ -38,12 +38,18 @@ Accepts a description and optional flags: `/plan-work --research --craft --workt
 
 First, check `$ARGUMENTS` for the `--project <name>` flag.
 
-- **If `--project <name>` is present** (cross-project mode): validate the named project exists by calling `list_projects` and matching by name. If it doesn't resolve, stop and tell the user the project name didn't match — ask them to verify the spelling. Do not proceed to drafting on a typo. If it resolves, use the named project for all Linear API calls in this command and **mark the run as cross-project mode** — step 1 (Vision check) is skipped and step 7 swaps the Vision-grounding requirement for a cross-project note.
+- **If `--project <name>` is present** (cross-project mode): use the flag's value as the project name. **Mark the run as cross-project mode** — step 1 (Vision check) is skipped and step 7 swaps the Vision-grounding requirement for a cross-project note.
 - **Otherwise** (within-project mode), check for a `.linear_project` file in the repository root.
   - If **found**: read the project name from it.
   - If **not found**: list available projects via `list_projects`, ask the user to choose, and save their selection to `.linear_project`. Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it.
 
-Use the resolved project name for all Linear API calls in this command.
+**Resolve the UUID** (both modes). Call `list_projects` filtered by the resolved name and extract the `id` field — this is the project's UUID.
+
+- **Zero matches**: stop and tell the user the name doesn't resolve. Ask them to verify the spelling. Do not proceed to drafting on a typo.
+- **One match**: store the UUID alongside the name. Use it as the `project` parameter on every `save_issue` call (step 10 and any nested calls in step 4b's epic-sized path).
+- **Multiple matches**: show the candidates and ask the user to disambiguate.
+
+<mark>**The Linear MCP `save_issue` requires a UUID for the `project` field — passing a name silently drops the project assignment.** The issue ends up team-scoped only, invisible to project boards and `/linear:next-steps`. The bug is silent at create time, so the resolution must happen before any `save_issue` call.</mark>
 
 ### 1. Vision check
 
@@ -238,10 +244,12 @@ First, resolve the Backlog status ID — call `list_issue_statuses` for the team
 ```
 save_issue with:
   - team: resolved team
-  - project: resolved project
+  - project: <project UUID from step 0 — must be the UUID, not the name>
   - state: <Backlog status ID from list_issue_statuses>
   - title, description, priority, and labels from the draft
 ```
+
+The `project` field is a UUID, not a name. Passing the name silently drops the assignment — see step 0's resolution.
 
 Do not assign the issue unless the user explicitly requested it.
 
