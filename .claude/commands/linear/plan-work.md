@@ -1,6 +1,6 @@
-# Plan work and create a Linear issue (optional --research mode)
+# Plan work and create a Linear issue
 
-Accepts a description and optional flags: `/plan-work --research --craft "add error handling to API calls"`
+Accepts a description and optional flags: `/plan-work --research --craft --worktree "add error handling to API calls"`. With `--worktree`, the command also sets up an isolated git worktree for the new issue after creation.
 
 ## Modes
 
@@ -11,6 +11,7 @@ Accepts a description and optional flags: `/plan-work --research --craft "add er
 
 - `--research` — explore codebase and Linear before drafting (adds implementation notes, code examples, related code and issues)
 - `--craft` — auto-run CRAFT prompt refinement without asking (skips the interactive prompt in step 4)
+- `--worktree` — after issue creation, set up an isolated git worktree at `../<repo-dirname>-<issue-id-lowercase>` and hand off to a new Claude Code session (see step 12). `/linear:start` runs inline by default; pass this flag at planning time if the work needs an isolated workspace.
 
 ## Decision rules
 
@@ -66,7 +67,7 @@ Read `VISION.md` from the repo root.
 
 ### 2. Parse arguments
 
-Extract the description and flags from `$ARGUMENTS`. Determine if `--research` and/or `--craft` are present.
+Extract the description and flags from `$ARGUMENTS`. Determine if `--research`, `--craft`, and/or `--worktree` are present.
 
 ### 2b. Sizing gate
 
@@ -211,6 +212,58 @@ Display:
 - Linear issue identifier (e.g., PG-184)
 - URL to the issue
 - Branch name from Linear's `gitBranchName` field
+
+### 12. Set up worktree (only with `--worktree`)
+
+Skip if `--worktree` was not passed in step 2. Otherwise, set up an isolated worktree for the new issue.
+
+Resolve the worktree path from the repo name and issue ID:
+
+```
+../<repo-dirname>-<issue-id-lowercase>
+```
+
+For example, if the repo is `lander` and the issue is `PG-210`, the worktree path is `../lander-pg-210`.
+
+Create the worktree using the branch name from Linear's `gitBranchName`:
+
+```bash
+git worktree add ../<repo-dirname>-<issue-id-lowercase> -b <gitBranchName>
+```
+
+Open VS Code in the worktree:
+
+```bash
+code <worktree-path>
+```
+
+If `code` is not found, warn the user:
+
+```
+⚠ `code` command not found. VS Code must be open in the worktree for the workflow to work.
+
+Fix: open VS Code, press Cmd+Shift+P, run "Shell Command: Install 'code' command in PATH".
+
+For VS Code Insiders, add to ~/.bash_profile or ~/.zprofile:
+export PATH="$PATH:/Applications/Visual Studio Code - Insiders.app/Contents/Resources/app/bin"
+```
+
+Then display the worktree summary and end the command — the user continues in a new Claude Code session:
+
+```
+The worktree is ready:
+
+- Path: <absolute-worktree-path>
+- Branch: <branch-name>
+- Linear: <issue-id> — <status>
+
+Open a Claude Code session there with:
+
+cd <absolute-worktree-path>
+claude
+
+Then run /linear:start <issue-id> — it will pick up the branch and continue from the Vision check onwards.
+```
 
 ## Error handling
 
