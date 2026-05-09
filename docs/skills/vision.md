@@ -6,7 +6,7 @@
 
 A Vision is the canonical "what is this project for" document. Written once, evolved sparingly. It's the anchor every issue, every feature, and every architectural decision should trace back to.
 
-`/vision` walks you through writing one. It interviews you on seven questions one at a time, drafts the file, shows it for approval, then writes `VISION.md` at the repo root.
+`/vision` walks you through writing one. It offers two modes — **short** (one question, ~2 minutes, CRAFT-assembled) for small projects, and **full** (seven questions, ~15 minutes, one at a time) for substantial products. Either way it drafts the file, shows it for approval, then writes `VISION.md` at the repo root.
 
 *Vision sits above the loop — issues, features, and architectural decisions trace back to it.*
 
@@ -26,6 +26,8 @@ A Vision is the canonical "what is this project for" document. Written once, evo
 - Starting a new project that doesn't yet have a Vision
 - Bootstrapping a Vision for an existing project that grew up without one
 - Any consumer repo where someone wants to capture product intent before writing more code
+
+Pick **short mode** when the work is a small dashboard, a side-tool, or anything where the seven-question interview would feel disproportionate. Pick **full mode** for substantial products where the act of articulating each section is itself the value. A short-Vision project can graduate to full Vision later by re-running `/vision`.
 
 ## When NOT to use
 
@@ -54,10 +56,13 @@ Seven sections is heavier than the standard five-section product vision template
 `/vision` is an interactive interview, not a fill-in-the-blanks form. <mark>**Each answer informs the next prompt's nuance** — a single-shot questionnaire produces shallow answers.</mark>
 
 1. Greets you and explains what a Vision is for
-2. Asks the seven questions one at a time, pushing back on vagueness
-3. Assembles the draft and shows it for review
-4. Writes `VISION.md` at the repo root only after explicit approval
-5. Closes with two reminders — the adjective trap, and the "downstream tooling carries this forward" point
+2. **Asks which mode** — short or full — before any interview question fires (forced gate, not a flag)
+3. Runs the chosen interview:
+   - **Short** — one rich question; CRAFT assembles all seven sections from the answer, marking inferred sections for review
+   - **Full** — seven questions, one at a time, pushing back on vagueness
+4. Assembles the draft and shows it for review
+5. Writes `VISION.md` at the repo root only after explicit approval
+6. Closes with two reminders — the adjective trap, and the "downstream tooling carries this forward" point
 
 If a `VISION.md` already exists, the skill asks before overwriting.
 
