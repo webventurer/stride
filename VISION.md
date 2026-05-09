@@ -18,6 +18,8 @@ Vibe coding feels best on day one. By day ten you can't tell which change broke 
 
 The problem isn't AI speed — it's the absence of structure around it. stride trades a few minutes of setup for months of maintainability, and the structure compounds: as AI models improve, structured docs get *more* from them, not less.
 
+Structure doesn't have to mean obstruction. Stride's discipline is shaped as guardrails — they steer, they don't block. The common path runs without prompts; friction appears only where it carries signal worth your judgement.
+
 ## Why now
 
 AI coding agents are improving fast, and the structure-vs-speed trade-off compounds with model quality: every model improvement gives more leverage to a structured codebase than to a vibe-coded one. Every month without structure is a month of debt that gets harder to undo — by day 30, untangling costs more than rewriting.
