@@ -1,6 +1,6 @@
 # Plan work and create a Linear issue
 
-Accepts a description and optional flags: `/plan-work --research --craft --worktree --epic "add error handling to API calls"`. With `--worktree`, the command also sets up an isolated git worktree for the new issue after creation. With `--epic`, it skips size-sensing and goes straight to the parent-issue flow.
+Accepts a description and optional flags: `/plan-work --research --craft --worktree --epic --project <name> "add error handling to API calls"`. With `--worktree`, the command also sets up an isolated git worktree for the new issue after creation. With `--epic`, it skips size-sensing and goes straight to the parent-issue flow. With `--project`, it files the issue against a different Linear project and skips the Vision check (for quick adds when the target repo isn't cloned locally).
 
 ## Modes
 
@@ -13,10 +13,11 @@ Accepts a description and optional flags: `/plan-work --research --craft --workt
 - `--craft` — auto-run CRAFT prompt refinement without asking (skips the interactive prompt in step 4)
 - `--worktree` — after issue creation, set up an isolated git worktree at `../<repo-dirname>-<issue-id-lowercase>` and hand off to a new Claude Code session (see step 12). `/linear:start` runs inline by default; pass this flag at planning time if the work needs an isolated workspace.
 - `--epic` — skip size-sensing and go straight to the epic-sized parent-issue flow (see step 4b). Pass this when you already know the description is a named initiative with multiple stories.
+- `--project <name>` — file the issue against the named Linear project instead of the current repo's `.linear_project`. Skips the Vision check entirely (the current repo's Vision doesn't apply to another project's work). Use this for quick cross-project adds when the target project's repo isn't cloned locally. The target project must exist in Linear; mistyped names fail fast at step 0.
 
 ## Decision rules
 
-- **Vision is the anchor**: every issue must trace back to a Vision outcome. The draft's "Why this matters" section must reference which Vision outcome the issue serves. If it can't, ask the user to choose: **add a new criterion to `VISION.md` (re-run `/vision` to evolve it), or drop the issue as out of scope**. Don't draft past this prompt — repeated trace-back failures are a signal the Vision needs updating, not that the gate should be loosened. Without `VISION.md` at the repo root, the command stops and suggests `/vision` (see step 1).
+- **Vision is the anchor** (within-project mode): every issue must trace back to a Vision outcome. The draft's "Why this matters" section must reference which Vision outcome the issue serves. If it can't, ask the user to choose: **add a new criterion to `VISION.md` (re-run `/vision` to evolve it), or drop the issue as out of scope**. Don't draft past this prompt — repeated trace-back failures are a signal the Vision needs updating, not that the gate should be loosened. Without `VISION.md` at the repo root, the command stops and suggests `/vision` (see step 1). **Cross-project mode** (`--project` flag) skips this rule entirely — the current repo's Vision doesn't apply to another project's work; full Vision anchoring happens later when the target project's `/linear:start` picks up the issue.
 - **Story is the default; epic when warranted**: most descriptions are story-sized (one deliverable, ships as one PR), and stride defaults to that without asking. Epic-sized work (a named initiative with multiple stories) is reached two ways — the `--epic` flag, or size-sensing surfacing a soft prompt when epic-shape signals fire (see step 4b). Epic-sized work becomes a parent issue with sub-issues for each story; story-sized work becomes an issue, optionally linked to an existing epic via `parentId`.
 - **Epic title prefix**: epic-sized parent issues use `Epic: <stakeholder outcome>` as their title — the prefix makes the scope visible at a glance on the kanban board, and the post-colon part still follows the stakeholder-outcome rule. Example: `Epic: Bulk/Batch Blog Processing (parallel article pipeline)`.
 - One issue = one deliverable. If the description contains "and" connecting unrelated outcomes, split.
@@ -35,14 +36,22 @@ Accepts a description and optional flags: `/plan-work --research --craft --workt
 
 ### 0. Resolve project
 
-Check for a `.linear_project` file in the repository root.
+First, check `$ARGUMENTS` for the `--project <name>` flag.
 
-- If **found**: read the project name from it
-- If **not found**: list available projects via `list_projects`, ask the user to choose, and save their selection to `.linear_project`. Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it.
+- **If `--project <name>` is present** (cross-project mode): validate the named project exists by calling `list_projects` and matching by name. If it doesn't resolve, stop and tell the user the project name didn't match — ask them to verify the spelling. Do not proceed to drafting on a typo. If it resolves, use the named project for all Linear API calls in this command and **mark the run as cross-project mode** — step 1 (Vision check) is skipped and step 7 swaps the Vision-grounding requirement for a cross-project note.
+- **Otherwise** (within-project mode), check for a `.linear_project` file in the repository root.
+  - If **found**: read the project name from it.
+  - If **not found**: list available projects via `list_projects`, ask the user to choose, and save their selection to `.linear_project`. Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it.
 
 Use the resolved project name for all Linear API calls in this command.
 
 ### 1. Vision check
+
+**Skip this step entirely if cross-project mode is active** (the `--project` flag was passed in step 0). Surface a one-line note and continue to step 2:
+
+> *"Cross-project mode: filing into <project name>. Vision check skipped. Run `/linear:plan-work` from inside <project name>'s repo for full Vision-anchored planning."*
+
+Otherwise (within-project mode), run the Vision check below.
 
 Vision is the guiding light — every issue drafted by stride must trace back to a Vision outcome. Before sizing or drafting, check that one exists.
 
@@ -68,7 +77,7 @@ Read `VISION.md` from the repo root.
 
 ### 2. Parse arguments
 
-Extract the description and flags from `$ARGUMENTS`. Determine if `--research`, `--craft`, `--worktree`, and/or `--epic` are present.
+Extract the description and flags from `$ARGUMENTS`. Determine if `--research`, `--craft`, `--worktree`, and/or `--epic` are present. (`--project` is parsed earlier in step 0 because project resolution and the Vision-check skip both depend on it.)
 
 ### 3. Duplicate check (all modes)
 
@@ -167,7 +176,7 @@ Omit the section entirely when tests don't apply.
 
 **Research mode** — also include the research mode additions from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Implementation notes, Code examples, Related code, Related issues). Research mode applies to story drafts; epic parent-issue drafts stay strategic and don't accumulate research-mode sections — the implementation detail belongs on the sub-issues.
 
-**Ground the draft in the Vision** loaded at step 1. The "Why this matters" section must explicitly reference which Vision outcome the issue serves — quote the relevant Success criteria line or constraint, and explain how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
+**Ground the draft in the Vision** loaded at step 1 — *within-project mode only*. The "Why this matters" section must explicitly reference which Vision outcome the issue serves — quote the relevant Success criteria line or constraint, and explain how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
 
 > "I can't trace this work back to a Vision outcome. The Vision says: [list relevant outcomes]. Two paths:
 >
@@ -177,6 +186,12 @@ Omit the section entirely when tests don't apply.
 > Which one?"
 
 Don't draft past the user's answer. The Vision is the project's stated purpose; an issue that doesn't serve it is either out of scope or a sign the Vision needs updating.
+
+**Cross-project mode** (`--project` flag was passed): the current repo's Vision doesn't apply. Replace the *"Why this matters → Vision criterion"* requirement with a single line:
+
+> *"Cross-project draft — Vision anchoring deferred. Re-anchor via `/linear:start` from within the target project's repo when the work is picked up."*
+
+Everything else in the draft (sizing, *Where things stand*, *What we'll do*, *What we won't do*, *Expected outcome*, *How to test it*, *Assumptions to confirm*) is filled as normal from the user's description, optionally CRAFT-sharpened.
 
 Apply the priority, labels, and scope guidance from the decision rules above.
 
