@@ -12,10 +12,13 @@
 
 | # | Section | Question it answers |
 |:--|:--------|:--------------------|
-| 1 | Why this matters | Should I care, and which Vision outcome does this serve? |
-| 2 | What success looks like | What does this epic deliver as an outcome? |
-| 3 | What we agreed | What's already been decided before opening sub-issues? |
-| 4 | What we won't touch | What does this epic deliberately leave out? |
+| 1 | Summary | What's the shape of this epic in 30 seconds? |
+| 2 | Why this matters | Should I care, and which Vision outcome does this serve? |
+| 3 | What success looks like | What does this epic deliver as an outcome? |
+| 4 | What we agreed | What's already been decided before opening sub-issues? |
+| 5 | What we won't touch | What does this epic deliberately leave out? |
+
+<mark>**Summary leads. Plain language, no jargon, no Vision references yet** — Vision-grounding lives in *Why this matters* immediately after.</mark> Same shape as story issues — three short paragraphs that make the epic's purpose scannable in 30 seconds.
 
 <mark>**The epic body has no "What we'll do", "How to test it", or "Assumptions to confirm" sections.** Those live on each sub-issue. Putting them on the epic creates two places where the same scope conversation happens — and the sub-issue is the one a developer reads when they pick up work.</mark>
 
@@ -49,11 +52,16 @@ The Vision shapes the draft across multiple sections:
 
 | Vision content                  | Epic section it informs                |
 |:--------------------------------|:---------------------------------------|
+| (none — kept Vision-free)       | "Summary" — plain language only        |
 | Measurable success criteria     | "Why this matters" — quote verbatim    |
 | Why it exists / why now         | "Why this matters" rationale           |
 | Constraints / what can't change | "What we won't touch" boundary         |
 | Non-Goals / what it won't do    | "What we won't touch" boundary         |
 | Who it's for                    | Stakeholder framing and tone           |
+
+The Summary deliberately avoids Vision references — it leads
+with what the epic *is* in plain language, so the trace-back in
+"Why this matters" lands against an already-articulated purpose.
 
 The Vision names its measurable outcomes in the "Success
 criteria" section — a checkbox list of conditions you can tick
@@ -75,18 +83,24 @@ an epic body's job is to align everyone on why the work matters
 and where the boundary is — the sub-issues handle the how.
 
 ACTION:
-1. Identify which measurable criterion from the Vision this work
+1. Write a plain-language Summary first — three short paragraphs:
+   the problem (what umbrella gap the epic addresses), the fix
+   (what the epic delivers as a body of work), and optionally
+   what stays the same. No jargon, no Vision references, no
+   sub-issue detail. The Summary is what someone scans in 30
+   seconds to know the shape of the epic.
+2. Identify which measurable criterion from the Vision this work
    serves and quote it verbatim, then explain why this matters —
    the user impact, business reason, or technical risk that makes
    this worth doing now. If no criterion fits, stop and report
    this back — do not fabricate a connection.
-2. Describe what success looks like — the outcome the epic
+3. Describe what success looks like — the outcome the epic
    delivers. Outcome, not implementation. A reader should know
    what changes when the last sub-issue closes.
-3. Capture what we agreed — approach chosen, options discarded,
+4. Capture what we agreed — approach chosen, options discarded,
    anything that affects how sub-issues will be drafted. Omit
    if no decisions have been made yet.
-4. Define what we won't touch — the epic's deliberate edges.
+5. Define what we won't touch — the epic's deliberate edges.
    Helps reviewers spot scope drift on sub-issues that appear
    under it later.
 
@@ -100,14 +114,25 @@ same stakeholder-outcome rule as story titles. Under 70
 characters total. Example: `Epic: Bulk/Batch Blog Processing
 (parallel article pipeline)`.
 
-## Description
+## Summary
+
+**The problem.** Plain-language statement of what umbrella gap
+the epic addresses. No jargon, no Vision references, no sub-issue
+detail. 2–4 sentences.
+
+**The fix.** What the epic delivers as a body of work. Often a
+small before/after table when the structural shape matters.
+2–4 sentences or a table.
+
+**What stays the same.** (Optional — include when the epic adds
+to existing capability rather than replacing it.) What's preserved.
 
 ### Why this matters
 First line: the verbatim measurable criterion from the Vision
-this work serves, in italic markdown — e.g. *"Linear board state
-matches branch state automatically as /linear:* runs"*. Then 2–4
-sentences on user impact, business reason, or technical risk
-that makes the whole epic worth doing now.
+this work serves, in italic markdown — e.g. *"Stories with a
+shared purpose sit under one epic, and the epic traces back to a
+Vision outcome"*. Then 2–4 sentences on user impact, business
+reason, or technical risk that makes the whole epic worth doing now.
 
 ### What success looks like
 One paragraph: the outcome a reader sees when the last sub-issue
@@ -136,8 +161,16 @@ shape of the work.
 
 > **Title**: `Epic: Make epics first-class kanban cards`
 
+## Summary
+
+**The problem.** Epic-sized work in stride was tracked as Linear milestones, but milestones don't appear on the kanban board, have no body, and have no status. So the epic narrative lived nowhere natural and was invisible to anyone scanning the board.
+
+**The fix.** Switch epics from milestones to parent issues with sub-issues. Each epic becomes a real card with a full body, status transitions, and board presence. Sub-issues nest underneath.
+
+**What stays the same.** Milestones remain available for date-bound tracking — they just stop being the default for "epic-shaped work".
+
 ### Why this matters
-*"Linear board state matches branch state automatically as `/linear:*` runs (Backlog → Doing → In Review → Done)"*
+*"Stories with a shared purpose sit under one epic, and the epic traces back to a Vision outcome"*
 
 Epic-sized work in stride was created as Linear milestones, but milestones have no body, no status, and don't appear on the kanban board. So the epic narrative had nowhere natural to live, and the umbrella was invisible to anyone scanning the board. Switching epics to parent issues with sub-issues turns each epic into a real card with full body and board presence.
 

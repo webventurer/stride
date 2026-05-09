@@ -176,9 +176,11 @@ Omit the section entirely when tests don't apply.
 
 ### 7. Draft the issue
 
-**Quick mode (story-sized)** — use the full issue structure from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Title, Description with Why this matters, Where things stand, What we'll do, What we won't do, Expected outcome, How to test it, Assumptions to confirm).
+<mark>**Lead with Summary.**</mark> Every draft opens with a `## Summary` section — three short paragraphs in plain language: *the problem*, *the fix* (often a small before/after table), and optionally *what stays the same*. No jargon, no Vision references, no implementation detail. The Summary is what someone scans in 30 seconds to know the shape of the work; the Vision-grounding lives in *Why this matters* immediately after.
 
-**Quick mode (epic-sized parent issue)** — use [EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead (Title with `Epic: ` prefix, Description with Why this matters, Goal, Phases, Decision, Out of scope). Sub-issue drafts under the parent still use ISSUE-TEMPLATE.md — they're stories that happen to have a parent.
+**Quick mode (story-sized)** — use the full issue structure from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Title, Summary, Why this matters, Where things stand, What we'll do, What we won't do, Expected outcome, How to test it, Assumptions to confirm).
+
+**Quick mode (epic-sized parent issue)** — use [EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead (Title with `Epic: ` prefix, Summary, Why this matters, What success looks like, What we agreed, What we won't touch). Sub-issue drafts under the parent still use ISSUE-TEMPLATE.md — they're stories that happen to have a parent.
 
 **Research mode** — also include the research mode additions from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) (Implementation notes, Code examples, Related code, Related issues). Research mode applies to story drafts; epic parent-issue drafts stay strategic and don't accumulate research-mode sections — the implementation detail belongs on the sub-issues.
 

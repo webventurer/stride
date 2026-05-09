@@ -12,13 +12,16 @@
 
 | # | Section | Question it answers |
 |:--|:--------|:--------------------|
-| 1 | Why this matters | Should I care? |
-| 2 | Where things stand | What's the current state? |
-| 3 | What we'll do | What's the plan? |
-| 4 | What we won't do | Where's the boundary? |
-| 5 | Expected outcome | How do we know it's done? |
-| 6 | How to test it | How do we verify? |
-| 7 | Assumptions to confirm | What's still uncertain? |
+| 1 | Summary | What's the shape of this in 30 seconds? |
+| 2 | Why this matters | Should I care? |
+| 3 | Where things stand | What's the current state? |
+| 4 | What we'll do | What's the plan? |
+| 5 | What we won't do | Where's the boundary? |
+| 6 | Expected outcome | How do we know it's done? |
+| 7 | How to test it | How do we verify? |
+| 8 | Assumptions to confirm | What's still uncertain? |
+
+<mark>**Summary leads. Plain language, no jargon, no Vision references yet** — Vision-grounding lives in *Why this matters* immediately after.</mark> The Summary's job is to make the issue's purpose scannable in 30 seconds, so the reader (and `/linear:finish`'s Vision-confirm) doesn't have to re-read the dense detail to remember what shipped.
 
 ---
 
@@ -47,11 +50,16 @@ the trace-back. Use it as follows:
 
 | Vision content                  | Issue section it informs            |
 |:--------------------------------|:------------------------------------|
+| (none — kept Vision-free)       | "Summary" — plain language only     |
 | Measurable success criteria     | "Why this matters" — quote verbatim |
 | Non-Goals / what it won't do    | "What we won't do" boundary         |
 | Constraints / what can't change | "Where things stand", "How to test" |
 | Who it's for                    | Stakeholder framing and tone        |
 | Why it exists / why now         | "Why this matters" rationale        |
+
+The Summary deliberately avoids Vision references — it leads
+with what the work *is* in plain language, so the trace-back in
+"Why this matters" lands against an already-articulated purpose.
 
 The Vision names its measurable outcomes in the "Success
 criteria" section — a checkbox list of conditions you can tick
@@ -73,23 +81,29 @@ and writing issue descriptions that a developer can start
 working on without asking clarifying questions.
 
 ACTION:
-1. Identify which measurable criterion from the Vision this work
+1. Write a plain-language Summary first — three short paragraphs:
+   the problem (what's broken / missing), the fix (what the change
+   does, often a small before/after table), and optionally what
+   stays the same. No jargon, no Vision references, no implementation
+   detail. The Summary is what someone scans in 30 seconds to know
+   the shape of the work.
+2. Identify which measurable criterion from the Vision this work
    serves and quote it verbatim, then explain why this matters —
    the user impact, business reason, or technical risk that makes
    this worth doing now. Let the Vision's Why / Why-now framing
    inform the rationale. If no criterion fits, stop and report
    this back — do not fabricate a connection. Either the work is
    out of scope or the Vision needs a new criterion.
-2. Describe where things stand — the current state, whether
+3. Describe where things stand — the current state, whether
    that's a bug, a gap, or an opportunity for something new
-3. Define what we'll do — the deliverable and scope boundary
-4. Define what we won't do — scope exclusions, only if
+4. Define what we'll do — the deliverable and scope boundary
+5. Define what we won't do — scope exclusions, only if
    genuinely useful
-5. Define the expected outcome — observable results that prove
+6. Define the expected outcome — observable results that prove
    it's done, plus measurable metrics if applicable
-6. Describe how to test it — expected behaviour, edge cases,
+7. Describe how to test it — expected behaviour, edge cases,
    error conditions (omit for docs, config, or exploratory work)
-7. Flag any ambiguities or assumptions that need confirming
+8. Flag any ambiguities or assumptions that need confirming
 
 FORMAT:
 Return a structured brief matching the Linear issue template:
@@ -98,12 +112,22 @@ Return a structured brief matching the Linear issue template:
 Concise, imperative, starting with a verb (e.g., "Add dark mode
 toggle to dashboard header"). Under 70 characters.
 
-## Description
+## Summary
+
+**The problem.** Plain-language statement of what's broken,
+missing, or causing friction. No jargon, no Vision references.
+2–4 sentences.
+
+**The fix.** What the change does. Often a small before/after
+table when the diff is structural. 2–4 sentences or a table.
+
+**What stays the same.** (Optional — include when behaviour is
+being added rather than replaced.) What's preserved by the change.
 
 ### Why this matters
 First line: the verbatim measurable criterion from the Vision
-this work serves, in italic markdown — e.g. *"Linear board state
-matches branch state automatically as /linear:* runs"*. Then 1–2
+this work serves, in italic markdown — e.g. *"Every multi-step
+stride interaction discloses its scope upfront"*. Then 1–2
 sentences on user impact, business reason, or technical risk
 that makes this worth doing now.
 
@@ -165,6 +189,17 @@ are right there in the issue.
 ## Example issue
 
 > **Verify new issue template format renders correctly**
+
+## Summary
+
+**The problem.** The issue template just got new conversational
+headings, but no one has rendered an issue from it in Linear yet
+— so we don't know whether the markdown displays cleanly across
+Linear's board, detail, and sidebar views.
+
+**The fix.** Create one placeholder issue using the new template
+and visually inspect each section in Linear. No template changes
+ship from this work — pure validation.
 
 ### Why this matters
 *Sets the stakes — why this work is worth doing now.*

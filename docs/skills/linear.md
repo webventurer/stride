@@ -119,6 +119,8 @@ When you already know it's epic-sized, pass `--epic` to skip sensing and go stra
 
 **Cross-project quick add.** Sometimes you're working in repo `foo` and notice a task that belongs in project `bar` — and you don't have `bar` cloned locally. Pass `--project <name>` to file the issue against `bar` without leaving `foo`. The Vision check is skipped (the current repo's Vision doesn't apply to another project's work) and the issue lands in `bar`'s Backlog. When `bar`'s owner picks it up via `/linear:start` from inside `bar`'s repo, full Vision-anchored implementation kicks in there.
 
+**Issues open with a plain-language summary.** Every plan-work draft leads with a `## Summary` section — three short paragraphs (the problem / the fix / what stays the same) in plain language, before the dense detail. The summary makes the issue's purpose scannable in 30 seconds, so reviewers and the `/linear:finish` Vision-confirm prompt don't have to re-read the body to remember what shipped.
+
 **Usage**:
 
 - `/linear:plan-work "add dark mode toggle"` — quick mode
