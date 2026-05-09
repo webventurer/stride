@@ -59,7 +59,7 @@ Seven sections is heavier than the standard five-section product vision template
 2. **Asks which mode** — short or full — before any interview question fires (forced gate, not a flag)
 3. Runs the chosen interview:
    - **Short** — one rich question; CRAFT assembles all seven sections from the answer, marking inferred sections for review
-   - **Full** — seven questions, one at a time, pushing back on vagueness
+   - **Full** — seven questions, one at a time, pushing back on vagueness; opens with the upfront count + time estimate, prefixes each prompt with `(N/7)`, and accepts `skip` on any question to leave a `_TBD_` placeholder for later
 4. Assembles the draft and shows it for review
 5. Writes `VISION.md` at the repo root only after explicit approval
 6. Closes with two reminders — the adjective trap, and the "downstream tooling carries this forward" point
