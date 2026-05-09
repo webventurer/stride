@@ -47,7 +47,39 @@ Run the project's build command (e.g. `pnpm build`). If the project has tests, r
 
 If anything fails, stop — do not merge. Show what failed.
 
-### 5. Merge (preserve commits)
+### 5. Confirm Vision outcome (before merge)
+
+<mark>**This step fires *before* the merge.**</mark> When trace drift is caught here, the catch is still actionable — the criterion can ride alongside its originating feature on the same branch, instead of needing a follow-up `VISION.md` PR.
+
+Read the issue's "Why this matters" section (loaded in step 1). If it names a Vision outcome, surface it and ask the user one yes/no question:
+
+```
+This issue claimed to advance the Vision outcome:
+  "<outcome line from VISION.md>"
+
+Did the merged work actually advance that outcome? (y/n)
+```
+
+- **Yes**: continue to step 6 (Merge).
+- **No**: ask one follow-up — *"In one line, what shifted?"* — and post the user's answer as a Linear comment on the issue via `save_comment`. Then ask:
+
+  ```
+  Stop and add the criterion to VISION.md before merging? (y/n)
+  ```
+
+  - **Yes**: pause the flow. Tell the user:
+
+    > *"Add the criterion to `VISION.md`, run `/commit` to add it as a separate atomic commit on this branch, then re-run `/linear:finish`."*
+
+    Exit cleanly. Do not merge. Re-running `/linear:finish` re-runs validation (step 4) on the new commit, then re-asks the Vision-confirm — which should now answer *yes* against the just-added criterion.
+
+  - **No**: continue to step 6 (Merge). The drift is named in the comment but not amended; the user can file a follow-up `VISION.md` PR if they want.
+
+If the issue had no "Why this matters" section (legacy soft path from `/linear:start`), skip silently and continue to step 6.
+
+This step turns the "Why this matters" line from a write-once token into a verified reference — and (with the *Yes, stop* branch) makes the catch *amendable*: a missing criterion rides alongside its originating feature instead of needing a separate PR.
+
+### 6. Merge (preserve commits)
 
 Merge with `--merge` to preserve the atomic commits from the branch. The merge commit gets the default subject only — no body. The individual commits on the branch already explain what was built and why; duplicating that in the merge commit just creates drift between the two messages.
 
@@ -57,7 +89,7 @@ gh pr merge <number> --merge --subject "Merge branch '<gitBranchName>'" --body "
 
 Pass `--body ""` explicitly so `gh` does not fall back to the PR description.
 
-### 6. Clean up branches, remove worktree, close VS Code
+### 7. Clean up branches, remove worktree, close VS Code
 
 Detect the main repo path. Run `git worktree list` — the first entry is the main repo:
 
@@ -73,13 +105,13 @@ Derive the worktree path from the repo name and issue ID:
 ../<repo-dirname>-<issue-id-lowercase>
 ```
 
-**Step 6a — Switch to main and pull:**
+**Step 7a — Switch to main and pull:**
 
 ```bash
 git -C <main-repo-path> checkout main && git -C <main-repo-path> pull
 ```
 
-**Step 6b — Remove worktree:**
+**Step 7b — Remove worktree:**
 
 Remove the worktree first — git refuses to delete a branch that a worktree is checked out on.
 
@@ -89,38 +121,20 @@ git -C <main-repo-path> worktree remove <worktree-path>
 
 If the worktree directory does not exist, skip silently. If `git worktree remove` fails due to untracked files, use `--force`.
 
-**Step 6c — Delete branches:**
+**Step 7c — Delete branches:**
 
 Now that the worktree is gone, the branch can be deleted:
 
 - **Local**: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently
 - **Remote**: `git -C <main-repo-path> push origin --delete <gitBranchName>` — if already deleted (GitHub may auto-delete), skip silently
 
-**Step 6d — Ask user to close VS Code:**
+**Step 7d — Ask user to close VS Code:**
 
 ```
 Please close the VS Code window for <worktree-dirname>.
 ```
 
 VS Code does not support programmatic window closing. The worktree directory is already gone, so VS Code will show an error state — the user just needs to close the window.
-
-### 7. Confirm Vision outcome
-
-Read the issue's "Why this matters" section (loaded in step 1). If it names a Vision outcome, surface it and ask the user one yes/no question:
-
-```
-This issue claimed to advance the Vision outcome:
-  "<outcome line from VISION.md>"
-
-Did the merged work actually advance that outcome? (y/n)
-```
-
-- **Yes**: continue to step 8.
-- **No**: ask one follow-up — *"In one line, what shifted?"* — and post the user's answer as a Linear comment on the issue via `save_comment`. Then continue. The comment closes the loop: the trace-back claimed at draft time has now been verified or amended at finish time.
-
-If the issue had no "Why this matters" section (legacy soft path from `/linear:start`), skip silently.
-
-This step turns the "Why this matters" line from a write-once token into a verified reference. It's near-zero cost — one yes/no most of the time — and the rare *no* surfaces drift before it compounds.
 
 ### 8. Update Linear → done
 
@@ -232,6 +246,7 @@ Display:
 - No PR found → stop, nothing to merge
 - Uncommitted changes → stop, suggest `/commit`
 - Tests fail → stop, do not merge
+- Vision-confirm answered "no" + user picks "stop and add criterion" → exit cleanly, do not merge (re-run after adding the criterion commit)
 - Branch not fully merged → stop, warn (never force-delete)
 - Local branch already deleted → skip silently
 - Remote branch already deleted → skip silently
