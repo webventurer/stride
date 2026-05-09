@@ -98,13 +98,23 @@ Hand the assembled draft to step 4. The user reviews and edits at the approval g
 
 *Run this step only if "full" was chosen in step 2.*
 
+Open with the upfront disclosure — count, time estimate, skip affordance:
+
+> "I'll ask 7 questions about the project — should take ~5 minutes. Type `skip` on any question to leave it blank for later."
+
 <mark>**Don't dump all seven questions at once.**</mark> Each answer informs the next prompt's nuance, and a single-shot questionnaire produces shallow answers.
+
+**Skip handling.** When the user's answer to any question is the single word `skip` (case-insensitive), treat it as an explicit skip:
+
+- Don't push back, don't re-prompt — move directly to the next question.
+- Track the question number as skipped (for surfacing at the approval gate in step 5).
+- In step 4's assembled draft, render that section's content as `_TBD — answer later via /vision_` instead of the missing answer.
 
 #### Q1 — What it delivers
 
 Ask:
 
-> "**What** does this project deliver? One or two paragraphs. Aim for something a stakeholder who's never seen the code could understand."
+> "(1/7) **What** does this project deliver? One or two paragraphs. Aim for something a stakeholder who's never seen the code could understand."
 
 Wait for the answer. Push back gently if it's vague or implementation-heavy ("a Python CLI" — that's *how*, not *what*).
 
@@ -112,7 +122,7 @@ Wait for the answer. Push back gently if it's vague or implementation-heavy ("a 
 
 Ask:
 
-> "**Who specifically benefits** when this lands? And just as important — who's it *not* for?"
+> "(2/7) **Who specifically benefits** when this lands? And just as important — who's it *not* for?"
 
 Push back on "everyone" — that usually means "no-one in particular". A specific group with specific needs gives the project a real target; a generic audience gives planners no traction for trade-offs.
 
@@ -122,7 +132,7 @@ Asking this *before* Why is deliberate. A motivation only makes sense once you k
 
 Ask:
 
-> "**Why** does this exist? What's the motivation — business, technical, personal? What changes when the project succeeds?"
+> "(3/7) **Why** does this exist? What's the motivation — business, technical, personal? What changes when the project succeeds?"
 
 The answer helps future planners make trade-offs. Push back if the answer is just "because we need it" — what would *not having it* cost?
 
@@ -130,7 +140,7 @@ The answer helps future planners make trade-offs. Push back if the answer is jus
 
 Ask:
 
-> "**Why now?** What changes if you wait six months?"
+> "(4/7) **Why now?** What changes if you wait six months?"
 
 If the answer is "nothing in particular", that's a signal to defer the project, not pretend it's urgent. A real *why now* names the trigger: a market shift, a deprecation, a window closing, a compounding cost.
 
@@ -138,7 +148,7 @@ If the answer is "nothing in particular", that's a signal to defer the project, 
 
 Ask:
 
-> "**How do we know it's working?** List 3–7 concrete, checkable criteria — things you could tick off when delivered. Examples: 'Sign-up completes in under 30 seconds end-to-end', 'Page loads in under 2 seconds on a 3G connection', 'CI runs in under 5 minutes'."
+> "(5/7) **How do we know it's working?** List 3–7 concrete, checkable criteria — things you could tick off when delivered. Examples: 'Sign-up completes in under 30 seconds end-to-end', 'Page loads in under 2 seconds on a 3G connection', 'CI runs in under 5 minutes'."
 
 This is the most important section. Adjectives are the enemy of "done" — "fast", "good", "robust" never fail clearly, so they never trigger completion. Push back hard and ask for measurable conditions instead.
 
@@ -146,7 +156,7 @@ This is the most important section. Adjectives are the enemy of "done" — "fast
 
 Ask:
 
-> "**What can't change?** Tech stack, platform, compliance, deployment target — anything the project must respect."
+> "(6/7) **What can't change?** Tech stack, platform, compliance, deployment target — anything the project must respect."
 
 Common: language choice, framework, runtime, hosted environment, regulatory rules, team expertise. An empty list is a valid answer if there genuinely are no hard constraints.
 
@@ -154,7 +164,7 @@ Common: language choice, framework, runtime, hosted environment, regulatory rule
 
 Ask:
 
-> "**What does this project explicitly *not* do?** This prevents scope creep down the line. What's intentionally out of bounds?"
+> "(7/7) **What does this project explicitly *not* do?** This prevents scope creep down the line. What's intentionally out of bounds?"
 
 Non-goals keep the project tight. Encourage at least 2–3.
 
@@ -209,6 +219,12 @@ Ask:
 If the user requests changes, revise and re-show. Repeat until approved. Do not write the file before explicit approval.
 
 For short-mode drafts, draw the user's attention to any sections marked `<!-- inferred — adjust as needed -->` — those are the highest-value review targets.
+
+For full-mode drafts where the user skipped one or more questions, surface the skipped sections before asking for approval:
+
+> "You skipped: Q3 (Why it exists), Q6 (What can't change). Continue and write `VISION.md` with `_TBD_` placeholders, or fill them in now?"
+
+If the user picks *fill in now*, ask the skipped questions in order; otherwise continue to step 6 with the placeholders intact. Re-running `/vision` later in edit mode lets the user fill them in any time.
 
 ### 6. Write the file
 
