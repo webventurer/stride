@@ -92,6 +92,16 @@ Which fits the work? (stated / alternative / something else)
 
 The commit subjects are authored to be informative (atomic-commits discipline) — they're the canonical summary of what shipped. Single-commit branches still get the block.
 
+<mark>**Explain the drift in plain English.**</mark> Describe what the doc or feature actually does in concrete terms, what the criterion actually says, and why the connection lands. Avoid stride-internal vocabulary (`Distinction`, `operationalises`, `gate`, `judgement-worthy`, `trace` as a noun) in user-facing copy — the reader may know nothing about stride's meta-cognitive framework. If a 12-year-old wouldn't understand it, rewrite. See [`clear-speak`](https://github.com/webventurer/stride/blob/main/.claude/skills/clear-speak/SKILL.md) for the standard.
+
+A worked before/after, from the WB-297 dogfood that made this rule explicit:
+
+> **Abstract first attempt:** *"The friction Distinction is the test maintainers reach for to decide whether friction is judgement-worthy. It operationalises criterion #3 — every 'is this gate firing on the right thing?' question runs through this Distinction."*
+>
+> **Plain-English follow-up:** *"What the doc does: it helps stride's maintainers decide what to do when a user complains that something in stride is annoying. Two possibilities — either the user is doing the wrong kind of work (stride is right to push back), or the gate is firing on a use case nobody designed for (stride should be calibrated). Criterion #3 says stride shouldn't interrupt unless the interruption is worth the user's attention. The doc is the test for which interruptions earn their place."*
+
+Same content, ten times the readability.
+
 - **stated**: the agent was overconfident; user override stands. Continue to step 6 (Merge).
 - **alternative**: post a one-line Linear comment via `save_comment` naming the agent's drift catch and the user-picked criterion. Continue to step 6. The drift is named on the issue; the body isn't auto-rewritten.
 - **something else**: drop into the missing-criterion path below.
