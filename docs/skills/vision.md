@@ -35,6 +35,8 @@ Pick **short mode** when the work is a small dashboard, a side-tool, or anything
 - You want per-story scope — that's a Linear issue, not a Vision
 - You want an implementation plan — that's [`/linear:plan-work`](/skills/linear#linearplan-work), not this
 
+If `/vision`'s framing feels like friction in your context, the [friction Distinction](/patterns/friction-distinction) is the doc to reach for — it helps you decide whether the friction is signal (the work doesn't belong here) or context-mismatch (the gate needs calibrating for your case).
+
 ## What goes in a Vision
 
 Seven sections. Each answers one question. Keep it scannable — a Vision someone can't read in two minutes won't anchor anything.

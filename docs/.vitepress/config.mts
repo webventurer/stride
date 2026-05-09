@@ -37,6 +37,7 @@ export default defineConfig({
       {
         text: 'Patterns',
         items: [
+          { text: 'Friction Distinction', link: '/patterns/friction-distinction' },
           { text: "Revise, don't stretch", link: '/patterns/revise-dont-stretch' },
         ],
       },
