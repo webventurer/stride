@@ -117,6 +117,8 @@ If signals fire, a soft prompt offers three paths — break into an epic with su
 
 When you already know it's epic-sized, pass `--epic` to skip sensing and go straight to the parent-issue flow.
 
+**Cross-project quick add.** Sometimes you're working in repo `foo` and notice a task that belongs in project `bar` — and you don't have `bar` cloned locally. Pass `--project <name>` to file the issue against `bar` without leaving `foo`. The Vision check is skipped (the current repo's Vision doesn't apply to another project's work) and the issue lands in `bar`'s Backlog. When `bar`'s owner picks it up via `/linear:start` from inside `bar`'s repo, full Vision-anchored implementation kicks in there.
+
 **Usage**:
 
 - `/linear:plan-work "add dark mode toggle"` — quick mode
@@ -125,6 +127,7 @@ When you already know it's epic-sized, pass `--epic` to skip sensing and go stra
 - `/linear:plan-work --research --craft "description"` — research + CRAFT combined
 - `/linear:plan-work --worktree "description"` — also set up an isolated worktree after creation
 - `/linear:plan-work --epic "Bulk blog processing across 200 articles"` — skip size-sensing, draft as a parent-issue epic
+- `/linear:plan-work --project bar "task description"` — file into a different Linear project, skip the Vision check
 
 ### /linear:start
 
