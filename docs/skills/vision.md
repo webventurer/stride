@@ -16,7 +16,7 @@ A Vision is the canonical "what is this project for" document. Written once, evo
 
 <div>
 
-![Vision lightbulb](/lightbulb.svg)
+![Vision lantern](/lantern.svg)
 
 </div>
 
