@@ -7,10 +7,10 @@ Workflow: edit `VISION.md` → `/linear:update-vision` → confirm the diff → 
 ## Rules
 
 - `VISION.md` at the repo root is the source of truth — this command is one-way (repo → Linear)
-- Always show the user what will change and require explicit confirmation before writing
+- For existing projects: show the diff, require explicit confirmation before writing, and never touch metadata other than `description`
+- For new projects (no `.linear_project`): the user supplies the name, `VISION.md` becomes the initial description, the team is resolved from `list_teams` — no diff exists to confirm
 - If `VISION.md` and the current Linear description already match, skip the write — report and stop
-- Never touch other project metadata (target date, state, priority, summary, teams)
-- The user's `.linear_project` selection drives which project is updated
+- The user's `.linear_project` selection drives which project is updated (or is written on first create)
 
 ---
 
@@ -37,8 +37,32 @@ Read `VISION.md` from the repo root.
 
 Check for a `.linear_project` file in the repository root.
 
-- If **found**: read the project name from it
-- If **not found**: list available projects via `list_projects`, ask the user to choose, and save their selection to `.linear_project`. Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it.
+- If **found**: read the project name from it and continue to step 3.
+- If **not found**: list available projects via `list_projects` and offer two choices:
+
+  1. **Pick an existing project** — choose from the list. Save the selection to `.linear_project`.
+  2. **Create a new project** — follow [Create new project](#create-new-project) below.
+
+  Once `.linear_project` exists, check the repo's `.gitignore` — if `.linear_project` isn't listed, append it. Then route: path 1 continues to step 3 (fetch the existing project's description), path 2 continues to step 6 (confirm — `save_project` already wrote the description on creation, so the fetch / diff / write steps are no-ops).
+
+#### Create new project
+
+When the user picks *Create new project*:
+
+1. Ask for the project name.
+2. Resolve the Linear team:
+   - Call `list_teams`
+   - If exactly one team is returned, use it
+   - Otherwise, ask the user to choose
+   - If no teams are returned, stop — the user has no team to create projects on
+3. Call `save_project` with:
+   - `team`: the resolved team
+   - `name`: the user-supplied name
+   - `description`: the full contents of `VISION.md` (pass markdown directly — do not escape newlines or special characters)
+
+   If `save_project` fails (for example the user lacks permission to create projects on the team), surface the error and stop — do not retry silently.
+
+4. Save the new project name to `.linear_project`. Carry the project URL from `save_project`'s response forward — step 6 will display it.
 
 ### 3. Get the current project state
 
@@ -91,7 +115,8 @@ End the command — no further status changes, no follow-up commits.
 ## Error handling
 
 - `VISION.md` missing → stop, suggest `/vision`
-- `.linear_project` missing → resolve interactively per step 2
+- `.linear_project` missing → resolve interactively per step 2 (pick existing or create new)
 - Project not found in Linear → stop, ask the user to verify `.linear_project`
+- `list_teams` returns no teams (create-new path) → stop, ask the user to verify Linear access
 - User declines the diff → stop without writing
 - `save_project` fails → show the error and stop; do not retry silently
