@@ -1,6 +1,6 @@
 # Plan work and create a Linear issue
 
-Accepts a description and optional flags: `/plan-work --research --craft --worktree --epic --project <name> "add error handling to API calls"`. With `--worktree`, the command also sets up an isolated git worktree for the new issue after creation. With `--epic`, it skips size-sensing and goes straight to the parent-issue flow. With `--project`, it files the issue against a different Linear project and skips the Vision check (for quick adds when the target repo isn't cloned locally).
+Accepts a description and optional flags: `/plan-work --research --craft --worktree --epic --bug --project <name> "add error handling to API calls"`. With `--worktree`, the command also sets up an isolated git worktree for the new issue after creation. With `--epic`, it skips size-sensing and goes straight to the parent-issue flow. With `--bug`, it skips shape-sensing and drafts straight to the bug template. With `--project`, it files the issue against a different Linear project and skips the Vision check (for quick adds when the target repo isn't cloned locally).
 
 ## Modes
 
@@ -13,6 +13,7 @@ Accepts a description and optional flags: `/plan-work --research --craft --workt
 - `--craft` — auto-run CRAFT prompt refinement without asking (skips the interactive prompt in step 4)
 - `--worktree` — after issue creation, set up an isolated git worktree at `../<repo-dirname>-<issue-id-lowercase>` and hand off to a new Claude Code session (see step 12). `/linear:start` runs inline by default; pass this flag at planning time if the work needs an isolated workspace.
 - `--epic` — skip size-sensing and go straight to the epic-sized parent-issue flow (see step 4b). Pass this when you already know the description is a named initiative with multiple stories.
+- `--bug` — skip shape-sensing and draft straight to the bug template (see step 4c). Pass this when you already know the description is a bug report (symptoms + repro + gap), not a feature request.
 - `--project <name>` — file the issue against the named Linear project instead of the current repo's `.linear_project`. Skips the Vision check entirely (the current repo's Vision doesn't apply to another project's work). Use this for quick cross-project adds when the target project's repo isn't cloned locally. The target project must exist in Linear; mistyped names fail fast at step 0.
 
 ## Decision rules
@@ -20,6 +21,7 @@ Accepts a description and optional flags: `/plan-work --research --craft --workt
 - **Vision is the anchor** (within-project mode): every issue must trace back to a Vision outcome. The draft's "Why this matters" section must reference which Vision outcome the issue serves. If it can't, ask the user to choose: **add a new criterion to `VISION.md` (re-run `/vision` to evolve it), or drop the issue as out of scope**. Before either path, see [*revise, don't stretch*](https://github.com/webventurer/stride/blob/main/docs/patterns/revise-dont-stretch.md) — a strained trace is itself a signal that often resolves with a revision rather than a Vision evolution. Don't draft past this prompt — repeated trace-back failures are a signal the Vision needs updating, not that the gate should be loosened. Without `VISION.md` at the repo root, the command stops and suggests `/vision` (see step 1). **Cross-project mode** (`--project` flag) skips this rule entirely — the current repo's Vision doesn't apply to another project's work; full Vision anchoring happens later when the target project's `/linear:start` picks up the issue.
 - **Story is the default; epic when warranted**: most descriptions are story-sized (one deliverable, ships as one PR), and stride defaults to that without asking. Epic-sized work (a named initiative with multiple stories) is reached two ways — the `--epic` flag, or size-sensing surfacing a soft prompt when epic-shape signals fire (see step 4b). Epic-sized work becomes a parent issue with sub-issues for each story; story-sized work becomes an issue, optionally linked to an existing epic via `parentId`.
 - **Epic title prefix**: epic-sized parent issues use `Epic: <stakeholder outcome>` as their title — the prefix makes the scope visible at a glance on the kanban board, and the post-colon part still follows the stakeholder-outcome rule. Example: `Epic: Bulk/Batch Blog Processing (parallel article pipeline)`.
+- **Feature is the default; bug when warranted**: most descriptions are feature-shaped (*"add / build / ship X"*) and use the story template — that's the default without asking. Bug-shaped work (*"X is broken / fails / silently no-ops"*) is reached two ways — the `--bug` flag, or shape-sensing surfacing a soft prompt when bug-shape signals fire (see step 4c). Bug-shaped work uses [BUG-TEMPLATE.md](reference/BUG-TEMPLATE.md) — symptoms / repro / expected vs actual / suspected causes as first-class sections, instead of burying diagnosis under *"Where things stand"*. Shape and size are independent: a feature can be story- or epic-sized, and so can a bug.
 - One issue = one deliverable. If the description contains "and" connecting unrelated outcomes, split. When new work surfaces during an in-flight issue, see [*new issue, not new scope*](https://github.com/webventurer/stride/blob/main/docs/patterns/new-issue-not-new-scope.md) — file the new work separately rather than expanding the current issue's scope.
 - Default to the smallest issue that moves something forward. If the user's description is broad, propose a focused first issue plus follow-ups.
 - **When proposing multiple follow-ups, order them by Vision alignment** — see [reference/align-to-vision.md](reference/align-to-vision.md). The follow-up advancing the least-progressed Success criterion sits first.
@@ -83,7 +85,7 @@ Read `VISION.md` from the repo root.
 
 ### 2. Parse arguments
 
-Extract the description and flags from `$ARGUMENTS`. Determine if `--research`, `--craft`, `--worktree`, and/or `--epic` are present. (`--project` is parsed earlier in step 0 because project resolution and the Vision-check skip both depend on it.)
+Extract the description and flags from `$ARGUMENTS`. Determine if `--research`, `--craft`, `--worktree`, `--epic`, and/or `--bug` are present. (`--project` is parsed earlier in step 0 because project resolution and the Vision-check skip both depend on it.)
 
 ### 3. Duplicate check (all modes)
 
@@ -150,6 +152,33 @@ If no signals fire, skip silently and continue to step 5 as story-sized. The com
 
 **Legacy milestone path**: if the user explicitly wants a date-bound milestone instead of a parent-issue epic (e.g. "ship by Q2", "before launch"), use `save_milestone` and link stories via `milestone`. This stays available for date/scope-bound tracking but is no longer the default — parent-issue epics carry the narrative; milestones are time markers.
 
+### 4c. Shape — feature by default, bug when warranted
+
+Feature is the default. Most descriptions are feature-shaped — *"add / build / ship / replace X"* — and asking every invocation imposes bug-shaped overhead on the common case. Skip this step and continue to step 5 unless one of the following triggers fires.
+
+**Trigger 1 — `--bug` flag.** If `--bug` was parsed in step 2, skip shape-sensing entirely and mark the draft as bug-shaped — step 7 will route to [BUG-TEMPLATE.md](reference/BUG-TEMPLATE.md).
+
+**Trigger 2 — shape-sensing detects bug shape.** Read the description (the `--craft`-refined version from step 4 if `--craft` was used; otherwise the raw input). Look for **bug-shape signals**:
+
+- Failure-mode keywords: *broken, fails, silently, no-op, regression, throws, crashes, errors out, doesn't work, stuck*
+- Verb is *fix*, not *add / build / ship / replace*
+- The description names a symptom and a missing behaviour, not a desired capability
+
+If any signals fire, surface a **soft prompt** — not a forced gate:
+
+> *"This sounds bug-shaped — I'm seeing [name the signals: e.g. 'silently' / 'fails to' / verb is 'fix']. Use the bug template (symptoms / repro / expected vs actual / suspected causes), or treat as a feature?"*
+
+Two paths:
+
+- **Use bug template** → mark the draft as bug-shaped; step 7 routes to BUG-TEMPLATE.md.
+- **Treat as feature** → continue to step 5 with the description treated as feature-shaped.
+
+If no signals fire, skip silently and continue to step 5 — feature-shaped is the default.
+
+<mark>**Shape-sensing offers, doesn't force.**</mark> Same pattern as size-sensing — the agent asks when signals fire; the user always has final say. Auto-flipping silently would be a worse failure mode than the old forced ask.
+
+**Shape and size are independent.** A feature can be story- or epic-sized, and so can a bug. When both the epic-sized path (step 4b) and bug-shaped marker are active, the parent issue uses EPIC-TEMPLATE.md and sub-issues use BUG-TEMPLATE.md. No `EPIC-BUG-TEMPLATE` exists — bug at epic scale is rare enough that the two-template composition handles it.
+
 ### 5. Research (only with `--research`)
 
 - Search the codebase for 2–5 relevant files using Grep/Glob — summarise patterns or constraints, avoid exhaustive repository analysis
@@ -178,9 +207,11 @@ Omit the section entirely when tests don't apply.
 
 <mark>**Read the linked template before drafting** — its sections are the source of truth, not this step's summary. Don't draft from memory or from the prose around the link; open the file and follow it.</mark>
 
-**Story drafts** — use the full issue structure from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md). With `--research`, also append the research-mode additions described in that template.
+**Story drafts** (feature-shaped, story-sized — the default path) — use the full issue structure from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md). With `--research`, also append the research-mode additions described in that template.
 
-**Epic parent-issue drafts** — use [EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead. Sub-issues under the parent use ISSUE-TEMPLATE.md — they're stories that happen to have a parent. Research mode never applies to the epic itself; that detail belongs on each sub-issue.
+**Bug drafts** (bug-shaped, story-sized — `--bug` flag or the bug-shape branch of step 4c) — use [BUG-TEMPLATE.md](reference/BUG-TEMPLATE.md) instead. Symptoms / repro / expected vs actual / suspected causes are first-class sections, in place of *"Where things stand"* and *"What we'll do"*. With `--research`, append the research-mode additions described in that template.
+
+**Epic parent-issue drafts** — use [EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead. Sub-issues under the parent default to ISSUE-TEMPLATE.md — they're stories that happen to have a parent. When the epic is also bug-shaped (`--epic --bug`), sub-issues use BUG-TEMPLATE.md instead. Research mode never applies to the epic itself; that detail belongs on each sub-issue.
 
 **Ground the draft in the Vision** loaded at step 1 — *within-project mode only*. The "Why this matters" section must explicitly reference which Vision outcome the issue serves — quote the relevant Success criteria line or constraint, and explain how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
 
