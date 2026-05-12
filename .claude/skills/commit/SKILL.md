@@ -273,14 +273,17 @@ If there's no fixup commit yet (the change is still in the working tree) and the
 
 ### Pattern B — Target is older, with unrelated commits between (uncommon)
 
-The soft-reset trick collapses everything between target and HEAD into the target — wrong when there are unrelated commits in between. In that case the agent records intent and hands off:
+The soft-reset trick collapses everything between target and HEAD into the target — wrong when there are unrelated commits in between. Use autosquash with a no-op sequence editor instead:
 
 ```bash
 git add <files>
 .claude/hooks/do_commit.sh --fixup=<sha>
+GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash <sha>~1
 ```
 
-Then **stop**. The harness blocks `git rebase -i`, and `--autosquash` requires `-i` to take effect. Tell the user the fixup commit is in place and they need to run `git rebase -i --autosquash <base>` locally to collapse it.
+`--autosquash` only takes effect with `-i`, but `-i` doesn't have to mean "human in the loop" — `GIT_SEQUENCE_EDITOR=:` makes the "edit the todo list" step a no-op, so git accepts the autosquash arrangement as-is. The base of the rebase is the commit *before* the target, so the target is replayed and the fixup folds into it; unrelated commits above ride on top with their messages preserved (new SHAs because their parent changed).
+
+If the branch was already pushed, update the remote with `git push --force-with-lease`.
 
 ### Agent capability summary
 
@@ -289,7 +292,7 @@ Then **stop**. The harness blocks `git rebase -i`, and `--autosquash` requires `
 | Write a `--fixup` commit | ✅ via `do_commit.sh --fixup=<sha>` |
 | Soft-reset + amend (Pattern A) | ✅ when fixup is on top of target |
 | Force-push-with-lease after fold | ✅ when the user has authorised it for this work |
-| `git rebase -i --autosquash` | ❌ harness blocks `-i` literally |
+| `git rebase -i --autosquash` | ✅ with `GIT_SEQUENCE_EDITOR=:` to accept the autosquash arrangement non-interactively |
 | Bare `git commit --amend` | ❌ pre-tool-use hook blocks it; use `do_commit.sh --amend` |
 
 ### When to fold vs. new commit
@@ -305,7 +308,7 @@ Then **stop**. The harness blocks `git rebase -i`, and `--autosquash` requires `
 - ❌ `git reset --hard HEAD~N` + cherry-pick replay — clean but creates new SHAs across commits that didn't change
 - ❌ `git reset --soft <base>` + recommit chain spanning multiple commits — error-prone manual content reconstruction (the single-step soft-reset in Pattern A is fine because there's no chain to reconstruct; `--no-edit` preserves the target's message)
 - ❌ Bare `git commit --amend` — blocked by the pre-tool-use hook
-- ❌ `git rebase -i --autosquash` from the agent — `-i` blocked at harness level
+- ❌ Bare `git rebase -i` — opens an editor the agent can't drive; pass `GIT_SEQUENCE_EDITOR=:` to make it non-interactive
 
 ---
 
