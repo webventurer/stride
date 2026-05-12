@@ -30,6 +30,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 
 - [ ] When new work strains against older criteria, the Vision can be updated to reflect what was learned — `VISION.md` evolves with the work, not separately from it
 - [ ] Every commit on a stride-managed branch passes four-pass atomicity — no monolithic commits, every message explains *why*
+- [ ] Right tool for right job: every branch in a stride skill points at the artifact designed for its case — story drafts to `ISSUE-TEMPLATE.md`, epic drafts to `EPIC-TEMPLATE.md` — and never falls back to a generic "whatever's around" default
 - [ ] The common path through every `/linear:*` command runs without prompts; interruptions appear only when stride detects friction worth the user's judgement
 - [ ] Every multi-step stride interaction discloses its scope upfront — number of steps, time estimate, escape hatch — so the user is never trapped in an open-ended sequence
 - [ ] When you list the commits this branch is adding, the story reads naturally to a non-engineer scanning top-to-bottom (`git log main..HEAD --oneline` to check)
