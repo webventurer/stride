@@ -178,11 +178,9 @@ Omit the section entirely when tests don't apply.
 
 <mark>**Read the linked template before drafting** — its sections are the source of truth, not this step's summary. Don't draft from memory or from the prose around the link; open the file and follow it.</mark>
 
-**Quick mode (story-sized)** — use the full issue structure from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md).
+**Story drafts** — use the full issue structure from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md). With `--research`, also append the research-mode additions described in that template.
 
-**Quick mode (epic-sized parent issue)** — use [EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead. Sub-issue drafts under the parent still use ISSUE-TEMPLATE.md — they're stories that happen to have a parent.
-
-**Research mode** — also include the research mode additions from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md). Research mode applies to story drafts; epic parent-issue drafts stay strategic and don't accumulate research-mode sections — the implementation detail belongs on the sub-issues.
+**Epic parent-issue drafts** — use [EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead. Sub-issues under the parent use ISSUE-TEMPLATE.md — they're stories that happen to have a parent. Research mode never applies to the epic itself; that detail belongs on each sub-issue.
 
 **Ground the draft in the Vision** loaded at step 1 — *within-project mode only*. The "Why this matters" section must explicitly reference which Vision outcome the issue serves — quote the relevant Success criteria line or constraint, and explain how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
 
