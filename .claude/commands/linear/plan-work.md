@@ -18,21 +18,32 @@ Accepts a description and optional flags: `/plan-work --research --craft --workt
 
 ## Decision rules
 
+### Anchoring
+
 - **Vision is the anchor** (within-project mode): every issue must trace back to a Vision outcome. The draft's "Why this matters" section must reference which Vision outcome the issue serves. If it can't, ask the user to choose: **add a new criterion to `VISION.md` (re-run `/vision` to evolve it), or drop the issue as out of scope**. Before either path, see [*revise, don't stretch*](https://github.com/webventurer/stride/blob/main/docs/patterns/revise-dont-stretch.md) — a strained trace is itself a signal that often resolves with a revision rather than a Vision evolution. Don't draft past this prompt — repeated trace-back failures are a signal the Vision needs updating, not that the gate should be loosened. Without `VISION.md` at the repo root, the command stops and suggests `/vision` (see step 1). **Cross-project mode** (`--project` flag) skips this rule entirely — the current repo's Vision doesn't apply to another project's work; full Vision anchoring happens later when the target project's `/linear:start` picks up the issue.
-- **Story is the default; epic when warranted**: most descriptions are story-sized (one deliverable, ships as one PR), and stride defaults to that without asking. Epic-sized work (a named initiative with multiple stories) is reached two ways — the `--epic` flag, or size-sensing surfacing a soft prompt when epic-shape signals fire (see step 5). Epic-sized work becomes a parent issue with sub-issues for each story; story-sized work becomes an issue, optionally linked to an existing epic via `parentId`.
-- **Epic title prefix**: epic-sized parent issues use `Epic: <stakeholder outcome>` as their title — the prefix makes the scope visible at a glance on the kanban board, and the post-colon part still follows the stakeholder-outcome rule. Example: `Epic: Bulk/Batch Blog Processing (parallel article pipeline)`.
-- **Feature is the default; bug when warranted**: most descriptions are feature-shaped (*"add / build / ship X"*) and use the story template — that's the default without asking. Bug-shaped work (*"X is broken / fails / silently no-ops"*) is reached two ways — the `--bug` flag, or shape-sensing surfacing a soft prompt when bug-shape signals fire (see step 6). Bug-shaped work uses [BUG-TEMPLATE.md](reference/BUG-TEMPLATE.md) — symptoms / repro / expected vs actual / suspected causes as first-class sections, instead of burying diagnosis under *"Where things stand"*. Shape and size are independent: a feature can be story- or epic-sized, and so can a bug.
 - One issue = one deliverable. If the description contains "and" connecting unrelated outcomes, split. When new work surfaces during an in-flight issue, see [*new issue, not new scope*](https://github.com/webventurer/stride/blob/main/docs/patterns/new-issue-not-new-scope.md) — file the new work separately rather than expanding the current issue's scope.
 - Default to the smallest issue that moves something forward. If the user's description is broad, propose a focused first issue plus follow-ups.
 - **When proposing multiple follow-ups, order them by Vision alignment** — see [reference/align-to-vision.md](reference/align-to-vision.md). The follow-up advancing the least-progressed Success criterion sits first.
+
+### Defaults & modes
+
+- **Story is the default; epic when warranted**: most descriptions are story-sized (one deliverable, ships as one PR), and stride defaults to that without asking. Epic-sized work (a named initiative with multiple stories) is reached two ways — the `--epic` flag, or size-sensing surfacing a soft prompt when epic-shape signals fire (see step 5). Epic-sized work becomes a parent issue with sub-issues for each story; story-sized work becomes an issue, optionally linked to an existing epic via `parentId`.
+- **Epic title prefix**: epic-sized parent issues use `Epic: <stakeholder outcome>` as their title — the prefix makes the scope visible at a glance on the kanban board, and the post-colon part still follows the stakeholder-outcome rule. Example: `Epic: Bulk/Batch Blog Processing (parallel article pipeline)`.
+- **Feature is the default; bug when warranted**: most descriptions are feature-shaped (*"add / build / ship X"*) and use the story template — that's the default without asking. Bug-shaped work (*"X is broken / fails / silently no-ops"*) is reached two ways — the `--bug` flag, or shape-sensing surfacing a soft prompt when bug-shape signals fire (see step 6). Bug-shaped work uses [BUG-TEMPLATE.md](reference/BUG-TEMPLATE.md) — symptoms / repro / expected vs actual / suspected causes as first-class sections, instead of burying diagnosis under *"Where things stand"*. Shape and size are independent: a feature can be story- or epic-sized, and so can a bug.
+
+### Drafting style
+
 - Titles are imperative and start with a verb (Add, Fix, Replace, Remove…). Avoid "Investigate" unless the outcome genuinely is a report, not a code change.
 - Titles describe the outcome a stakeholder would recognise — what changes from their perspective — not the implementation. *"Background jobs run reliably after the first one"*, not *"Reset Tortoise globals between RQ jobs"*. Infrastructure exception: when there's no user-visible outcome, name the *system behaviour* that changes (e.g. "Linter accepts 100-char lines"), not the file that changes. See `docs/reference/issue-template.md` for the canonical rule and examples.
-- Never assign the issue unless the user explicitly asks.
 - Labels are optional — suggest at most 3, only when clearly relevant. Prefer no labels over speculative ones.
 - Priority defaults to Medium. Only upgrade if the user says it's urgent or the description implies user-facing impact (breakage, a time-sensitive launch, etc.).
 - Research mode exists to improve the draft, not to produce an audit. Cap file exploration at 2–5 relevant files; summarise patterns, don't catalogue the repo.
+
+### Process
+
 - Duplicate handling is two-tier: exact/near-exact → warn strongly and ask; similar/related → mention briefly and continue.
 - The user always gets final approval before creation. Never auto-create.
+- Never assign the issue unless the user explicitly asks.
 
 ## Steps
 
