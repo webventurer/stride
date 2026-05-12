@@ -1,6 +1,6 @@
 # CRAFT prompt template for Linear issue creation
 
-> **What this is**: A CRAFT prompt template used by `plan-work.md` step 3 to turn a vague user description into a precise brief before research and drafting.
+> **What this is**: A CRAFT prompt template used by `plan-work.md` step 4 to turn a vague user description into a precise brief before research and drafting.
 >
 > **Why it exists**: Users often describe work loosely — "add error handling" or "fix the dashboard". Running this through CRAFT produces a structured brief (why it matters, where things stand, what we'll do, expected outcome) that gives the research step (4) precise targets and the drafting step (6) concrete material to work with.
 >
