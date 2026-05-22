@@ -157,7 +157,15 @@ If no signals fire, skip silently and continue to step 7 as story-sized. The com
 4. Confirm the parent issue with the user before drafting sub-issues.
 5. Ask: "What are the first 1–3 stories for this epic?" — each answer becomes a separate issue draft.
 6. For each story: run duplicate check (step 3), CRAFT if requested (step 4), then steps 7 onwards with `parentId` set to the parent issue's ID on `save_issue` — again skip step 5. Story drafts use ISSUE-TEMPLATE.md as normal — they're stories that happen to have a parent.
-7. After all stories are created, summarise: list the parent epic and all sub-issues created underneath it.
+7. **Position the epic at the top of the project's Backlog, order the sub-issues beneath it in drafting order, then summarise.**
+
+   The Linear MCP `save_issue` doesn't yet accept `sortOrder`, so until it does, the agent sets positions via Linear's GraphQL API directly using the per-team key in `LINEAR_<TEAM>_API_KEY` (e.g. `LINEAR_WEBVENTURER_API_KEY`). Lower `sortOrder` = higher on the board; leave a gap of ~100 below the epic so future epics have room. The drafting-order rule respects the sequence the user chose by deciding which sub-issue to file first.
+
+   Recipe: fetch the project's current minimum Backlog `sortOrder`, then `issueUpdate` the epic to `min − 100` and each sub-issue to `epic + 1`, `+ 2`, … in drafting order.
+
+   If the key isn't available, skip the ordering and append to the summary: *"Sub-issues created but couldn't be auto-ordered — set `LINEAR_<TEAM>_API_KEY` to enable, or drag them into sequence on the board."*
+
+   On success, the summary names the parent epic and the sub-issues in their new board order.
 
 <mark>**Do not bundle all stories into one issue.** Each story is its own sub-issue with `parentId` set.</mark>
 
