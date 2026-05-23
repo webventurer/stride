@@ -45,8 +45,8 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 ## What can't change
 
 - Currently Claude Code is the only supported AI agent — AgentSDK integration would unlock others
-- Plain markdown only — no runtime, no build step, no compiled binaries
-- Linear via MCP — no Jira, no GitHub Projects support
+- Plain markdown in stride's own footprint — no runtime, no build step, no compiled binaries inside `.claude/`. Consumer-side prerequisites (e.g. `gh`, `uv`, `jq`, Linear CLI) are acceptable when they're lightweight and install in a single step.
+- Linear only — no Jira, no GitHub Projects support
 - `npx` install — consumers need npm
 - Bash/zsh required for hooks (Windows requires WSL)
 - Opinionated: prescribes Linear, commit format, workflow. Disagreeing means fighting the tool
