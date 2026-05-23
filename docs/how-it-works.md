@@ -7,7 +7,7 @@ stride installs as plain markdown files in your project's `.claude/` directory. 
 ```
 your-project/
 ├── VISION.md                # Project anchor — what it delivers, why,
-│                            # success criteria. Every issue traces back
+│                            # Success criteria. Every issue traces back
 └── .claude/
     ├── skills/
     │   ├── vision/          # /vision skill
@@ -78,10 +78,9 @@ The separation matters because of **content focus blindness** — both people an
 
 ## The `/linear` five-command lifecycle
 
-The six commands map to how work actually moves through a board:
+The five commands map to how work actually moves through a board:
 
 ```
-/linear:check      →  verify MCP connections
 /linear:plan-work  →  create an issue
 /linear:next-steps →  see what needs doing
 /linear:start      →  branch, implement, PR
@@ -90,6 +89,8 @@ The six commands map to how work actually moves through a board:
 ```
 
 Each command knows about Linear statuses, GitHub PRs, and git branches. The agent moves issues through Backlog → Todo → Doing → In review → Done automatically as work progresses.
+
+Issues come in two sizes: **stories** (one PR) or **epics** (a parent issue with sub-issues, when several stories serve a common purpose smaller than the Vision). `/linear:plan-work` asks the sizing question and routes accordingly. See [Epics and stories](/reference/epics-and-user-stories) for the full mapping.
 
 ## The cross-model feedback loop
 

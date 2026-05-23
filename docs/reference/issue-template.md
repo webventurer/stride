@@ -2,12 +2,23 @@
 
 Every Linear issue created by [`/linear:plan-work`](/skills/linear#linear-plan-work) follows the same seven-section structure. Each heading answers a natural question so the reader can scan quickly and know exactly what the issue is about.
 
+## Issue vs card
+
+The two words name different aspects of the same artefact, so stride uses them deliberately:
+
+| Term | Means | Used when |
+|:-----|:------|:----------|
+| **issue** | The content unit Linear's API and `/linear:*` commands operate on | Talking about planning, content, the thing with a description and status |
+| **card** | The visual artefact on a kanban board | Talking about board rendering, kanban methodology, visual flow |
+
+Throughout this template, "issue" is the right word — it's the content unit you're drafting. "Card" is correct in the [Kanban process](/reference/kanban) doc and in the worked-example mock-ups ([Epic card](/reference/example-epic-card), [Story card](/reference/example-story-card)), where the topic is board rendering.
+
 ## Title
 
 The title is the first thing a stakeholder reads. Two rules:
 
 1. **Imperative form** — start with a verb (Add, Fix, Replace, Remove…). Avoid "Investigate" unless the outcome genuinely is a report.
-2. **Outcome, not implementation** — name the change a stakeholder would recognise from their perspective, not the line of code that delivers it. The body explains *how*; the title says *what changes for the reader*.
+2. **Outcome, not implementation** — say *what changes for the reader, not what the implementation does*. The body explains *how*; the title says *what* changes for the reader.
 
 ### Outcome vs. implementation
 
@@ -44,7 +55,7 @@ Sections 4, 6, and 7 are optional — omit them when they don't add value.
 
 ### Why this matters: trace back to Vision
 
-This section names the **Vision outcome** the issue serves — quote the relevant Success Criterion line from [`VISION.md`](/) and explain how the work moves toward it. [`/linear:plan-work`](/skills/linear#linear-plan-work) enforces this: every draft must reference a Success Criterion, and the agent pushes back if the user's request can't be tied to one. Either the work is out of scope, or the Vision needs a new outcome.
+This section names the **Vision outcome** the issue serves — quote the relevant Success criterion line from [`VISION.md`](/) and explain how the work moves toward it. [`/linear:plan-work`](/skills/linear#linear-plan-work) enforces this: every draft must reference a Success criterion, and the agent pushes back if the user's request can't be tied to one. Either the work is out of scope, or the Vision needs a new outcome.
 
 No Vision-tracing = no issue. Issues drafted in a vacuum drift from the project's purpose; the rule lives here so the doc matches the behaviour the command already enforces.
 
@@ -54,7 +65,7 @@ No Vision-tracing = no issue. Issues drafted in a vacuum drift from the project'
 
 ### Why this matters
 
-Every issue we create uses this template. If the format is broken, every card in the backlog is harder to read.
+Every issue we create uses this template. If the format is broken, every issue in the backlog is harder to read.
 
 ### Where things stand
 
@@ -67,7 +78,7 @@ The issue template has new conversational headings but no one has checked whethe
 
 ### What we won't do
 
-No changes to the template based on this card — just validation.
+No changes to the template based on this issue — just validation.
 
 ### Expected outcome
 
@@ -86,5 +97,22 @@ Visual inspection in Linear — open the issue and confirm each heading renders 
 ## Design principles
 
 The headings are deliberately conversational — they work equally well for bugs, features, and improvements. "Where things stand" is neutral: it can describe a broken API, a missing feature, or an opportunity for something new.
+
+## Companion: epic structure
+
+The seven-section template above is for **stories** — issues that ship as one PR. Epics (parent issues with sub-issues) use a shorter, strategic template instead:
+
+| # | Section | Question it answers |
+|:--|:--------|:--------------------|
+| 1 | Why this matters | Should I care, and which Vision outcome does this serve? |
+| 2 | What success looks like | What does this epic deliver as an outcome? |
+| 3 | What we agreed | What's already been decided before opening sub-issues? |
+| 4 | What we won't touch | What does this epic deliberately leave out? |
+
+The epic body deliberately has **no** "What we'll do", "How to test it", or "Assumptions to confirm" sections. Those live on each sub-issue. Putting them on the epic creates two places where the same scope conversation happens — and the sub-issue is the one a developer reads when they pick up work. The epic carries the strategic frame; the sub-issues carry the tactical detail.
+
+Epic titles are prefixed `Epic: <stakeholder outcome>` so the umbrella is visible at a glance on the kanban board. The post-colon part still follows the same outcome-not-implementation rule as story titles.
+
+For the canonical worked example and the full mechanism, see [Epics and stories](/reference/epics-and-user-stories#how-epics-work). The CRAFT prompt that draws the body out of a description lives in [`EPIC-TEMPLATE.md`](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/EPIC-TEMPLATE.md), the parallel of the [`ISSUE-TEMPLATE.md`](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/ISSUE-TEMPLATE.md) used for stories.
 
 The template avoids overlap between sections. Earlier versions had separate Goal, Acceptance criteria, and Success metric sections that all answered "how do we know it's done?" — these were merged into a single Expected outcome.

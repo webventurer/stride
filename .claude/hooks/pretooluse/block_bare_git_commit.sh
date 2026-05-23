@@ -13,7 +13,7 @@ COMMAND=$(jq -r '.tool_input.command // ""')
 
 echo "$COMMAND" | grep -qE '\bgit\s+commit\b' || exit 0
 
-cat <<EOF
+cat >&2 <<EOF
 BLOCKED: bare "git commit" is not allowed.
 
 You MUST invoke the /commit skill using the Skill tool before committing.

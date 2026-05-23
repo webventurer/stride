@@ -6,7 +6,7 @@
 
 Usage:
     uv run .claude/tools/openrouter-chat.py "prompt"
-    uv run .claude/tools/openrouter-chat.py "prompt" -m openai/gpt-5.4-pro
+    uv run .claude/tools/openrouter-chat.py "prompt" -m ~openai/gpt-latest
     uv run .claude/tools/openrouter-chat.py "prompt" -s "You are a reviewer."
 """
 
@@ -20,7 +20,7 @@ import httpx
 dotenv.load_dotenv(Path.home() / ".env")
 
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
-DEFAULT_MODEL = "openai/gpt-5.4"
+DEFAULT_MODEL = "~openai/gpt-latest"
 DEFAULT_MAX_TOKENS = 4000
 
 

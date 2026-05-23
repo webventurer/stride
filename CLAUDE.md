@@ -6,7 +6,7 @@ This file shapes behaviour on every turn. Discoverable details (commands, archit
 
 [`VISION.md`](VISION.md) at the repo root is stride's guiding light. Every issue, every feature, every architectural decision traces back to it. If a request can't be tied to a Vision outcome, push back — either the work is out of scope, or the Vision needs a new outcome. *(Planning, ranking, and implementation all read `VISION.md` before deciding anything — that's the upstream-anchor role.)*
 
-The Success Criteria section names the outcomes the project is committed to — use them when ranking work, framing issues, or making implementation trade-offs.
+The Success criteria section names the outcomes the project is committed to — use them when ranking work, framing issues, or making implementation trade-offs.
 
 ## Critical rules
 

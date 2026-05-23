@@ -35,11 +35,21 @@ export default defineConfig({
         ],
       },
       {
+        text: 'Patterns',
+        items: [
+          { text: 'Friction Distinction', link: '/patterns/friction-distinction' },
+          { text: 'New issue, not new scope', link: '/patterns/new-issue-not-new-scope' },
+          { text: "Revise, don't stretch", link: '/patterns/revise-dont-stretch' },
+        ],
+      },
+      {
         text: 'Reference',
         items: [
           { text: 'Agentic engineering', link: '/reference/agentic-engineering' },
           { text: "Can't we just use Lovable?", link: '/reference/cant-we-just-use-lovable' },
           { text: 'Epics and stories', link: '/reference/epics-and-user-stories' },
+          { text: 'Example: Epic card', link: '/reference/example-epic-card' },
+          { text: 'Example: Story card', link: '/reference/example-story-card' },
           { text: 'Kanban process', link: '/reference/kanban' },
           { text: 'Issue statuses', link: '/reference/issue-statuses' },
           { text: 'Issue template', link: '/reference/issue-template' },

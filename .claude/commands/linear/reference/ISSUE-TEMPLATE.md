@@ -1,6 +1,6 @@
 # CRAFT prompt template for Linear issue creation
 
-> **What this is**: A CRAFT prompt template used by `plan-work.md` step 3 to turn a vague user description into a precise brief before research and drafting.
+> **What this is**: A CRAFT prompt template used by `plan-work.md` step 4 to turn a vague user description into a precise brief before research and drafting.
 >
 > **Why it exists**: Users often describe work loosely — "add error handling" or "fix the dashboard". Running this through CRAFT produces a structured brief (why it matters, where things stand, what we'll do, expected outcome) that gives the research step (4) precise targets and the drafting step (6) concrete material to work with.
 >
@@ -53,11 +53,10 @@ the trace-back. Use it as follows:
 | Who it's for                    | Stakeholder framing and tone        |
 | Why it exists / why now         | "Why this matters" rationale        |
 
-Section headings vary across consumers — the Vision may name
-its measurable outcomes "Success Criteria", "How we know it's
-working", or similar. Identify the section listing checkable
-outcomes (typically a checkbox list or bullet list of measurable
-conditions) and use those lines as the criteria for trace-back.
+The Vision names its measurable outcomes in the "Success
+criteria" section — a checkbox list of conditions you can tick
+off when delivered. Use those lines as the criteria for
+trace-back.
 
 The drafted issue must identify which criterion the work serves
 and quote that line verbatim in the Why-this-matters section.
@@ -174,7 +173,7 @@ are right there in the issue.
 steps"*
 
 Every issue we create uses this template. If the format is
-broken, every card in the backlog is harder to read — and the
+broken, every issue in the backlog is harder to read — and the
 stakeholder-readable shape we're committing to in the Vision
 gets undermined at the first hop.
 
@@ -196,7 +195,7 @@ Confirm the new issue template renders correctly in Linear.
 ### What we won't do
 *Draws the line so scope doesn't creep.*
 
-No changes to the template based on this card — just
+No changes to the template based on this issue — just
 validation.
 
 ### Expected outcome

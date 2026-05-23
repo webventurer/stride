@@ -23,34 +23,38 @@ Eight commands covering the full development cycle, from setup through to merge 
 ![Kanban board](/kanban-board.svg)
 *Issues flow from Backlog through Doing to Done, driven entirely by `/linear` commands. See the [Kanban process](/reference/kanban) for how the columns work.*
 
-## When do you need a card?
+## Stories and epics
 
-Stride's gates aren't blanket *every change → card*. Cards are the planning artefact for work that earns planning. Tiny changes (typo fixes, single-sentence rewrites, a tagline tweak) can go straight to main with `/commit` — no card, no PR, no ceremony.
+Most issues are **stories** — one deliverable that ships as one PR. When several stories serve a common purpose (bigger than a PR, smaller than the Vision), `/linear:plan-work` creates a parent **epic** and nests the stories under it as sub-issues. The lifecycle commands then surface the epic at the right moments — `/linear:start` shows it on pickup, `/linear:finish` prompts to close the epic when the last sub-issue ships, and `/linear:next-steps` lets you filter by epic. See [Epics and stories](/reference/epics-and-user-stories) for the full mechanism.
 
-Three signals that mean a card *is* needed:
+## When do you need an issue?
+
+Stride's gates aren't blanket *every change → issue*. Issues are the planning artefact for work that earns planning. Tiny changes (typo fixes, single-sentence rewrites, a tagline tweak) can go straight to main with `/commit` — no issue, no PR, no ceremony.
+
+Three signals that mean an issue *is* needed:
 
 | Signal | Why |
 |:--|:--|
-| You'll go through `/linear:start` | The command needs an issue ID to read — there's nothing for it to load without a card |
-| The work is large enough that planning helps | A card forces you to write down *"Why this matters / What we'll do / What we won't do"* — useful when you'd otherwise drift |
+| You'll go through `/linear:start` | The command needs an issue ID to read — there's nothing for it to load without one |
+| The work is large enough that planning helps | An issue forces you to write down *"Why this matters / What we'll do / What we won't do"* — useful when you'd otherwise drift |
 | The work needs to be visible on the board | Stakeholders or future-you reading the Kanban want to see it |
 
-**The common-sense test:** could this be a single commit message, with no body needed beyond a sentence of *"why"*? If yes, no card. If you'd find yourself wanting *"Why this matters / What we'll do / What we won't do"* sections, that's the signal you need a card.
+**The common-sense test:** could this be a single commit message, with no body needed beyond a sentence of *"why"*? If yes, no issue. If you'd find yourself wanting *"Why this matters / What we'll do / What we won't do"* sections, that's the signal you need an issue.
 
-**The line not to cross:** wording tweaks preserve meaning (fine direct-to-main); refactors change structure (earn cards); new sections add new content (earn cards).
+**The line not to cross:** wording tweaks preserve meaning (fine direct-to-main); refactors change structure (earn an issue); new sections add new content (earn an issue).
 
 ### Examples
 
 | Change | Route | Why |
 |:--|:--|:--|
-| Fix a typo in README | No card, direct commit | Obvious, no planning needed |
-| Rewrite a sentence for clarity (preserving meaning) | No card, direct commit | Wording fix, single commit message |
-| Add a new section to a doc | Card | New content earns planning |
-| Reorder sections in a doc | Card | Structural change |
-| Add a new skill or command | Card | Behaviour change, board-visible |
-| Fix a bug in `install.mjs` | Card | Code change, deserves a PR record |
+| Fix a typo in README | No issue, direct commit | Obvious, no planning needed |
+| Rewrite a sentence for clarity (preserving meaning) | No issue, direct commit | Wording fix, single commit message |
+| Add a new section to a doc | Issue | New content earns planning |
+| Reorder sections in a doc | Issue | Structural change |
+| Add a new skill or command | Issue | Behaviour change, board-visible |
+| Fix a bug in `install.mjs` | Issue | Code change, deserves a PR record |
 
-For the related decision of *direct commit vs branch + PR* once you've decided you don't need a card, see the agent-facing [pr-vs-direct-commit reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/pr-vs-direct-commit.md) inside the installed skill — adjacent decision, different scope.
+For the related decision of *direct commit vs branch + PR* once you've decided you don't need an issue, see the agent-facing [pr-vs-direct-commit reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/pr-vs-direct-commit.md) inside the installed skill — adjacent decision, different scope.
 
 ## Vision is a hard prerequisite
 
@@ -86,7 +90,7 @@ The push stays explicit so you see the diff and choose the moment, rather than `
 
 Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)).
 
-Priority ordering: build failure > PRs needing fix > in-progress work > PRs needing review > approved PRs to merge > backlog. **Within each tier, ordering is refined by Vision alignment** — items advancing the least-progressed Success Criteria sit higher. Recommendations name the Vision outcome each item serves so you can see why the agent picked it.
+Priority ordering: build failure > PRs needing fix > in-progress work > PRs needing review > approved PRs to merge > backlog. **Within each tier, ordering is refined by Vision alignment** — items advancing the least-progressed Success criteria sit higher. Recommendations name the Vision outcome each item serves so you can see why the agent picked it.
 
 For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved comments. PRs needing fix are surfaced above new backlog work.
 
@@ -94,9 +98,26 @@ For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved c
 
 **Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, optionally refines the description with CRAFT, drafts title and description, and waits for your approval before creating.
 
-Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). Every draft's "Why this matters" section explicitly traces back to a Vision outcome, and the agent pushes back if the user's request can't be tied to one. When a broad description splits into multiple follow-ups, the follow-ups are ordered by Vision alignment — the one advancing the least-progressed Success Criterion sits first.
+Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). Every draft's "Why this matters" section explicitly traces back to a Vision outcome, and the agent pushes back if the user's request can't be tied to one. When a broad description splits into multiple follow-ups, the follow-ups are ordered by Vision alignment — the one advancing the least-progressed Success criterion sits first.
 
 In `--research` mode, explores the codebase and Linear first, then adds code examples (showing how similar patterns are already implemented) and acceptance criteria (observable outcomes, not implementation steps).
+
+The `--worktree` flag is the place to opt into an isolated workspace — after the issue is created, the command sets up a git worktree at `../<repo-dirname>-<issue-id-lowercase>`, opens VS Code there, and hands off to a new Claude Code session. `/linear:start` runs inline by default; if you want a worktree, decide at planning time, not start time.
+
+**Story is the default; epic when warranted.** Most descriptions are story-sized — one deliverable that ships as one PR — so `/linear:plan-work` skips the sizing question and proceeds straight to drafting.
+
+After CRAFT (if used), the agent runs **size-sensing** on the description and looks for epic-shape signals:
+
+- multiple `and`-joined outcomes that don't share a single purpose
+- references to phases or rollouts
+- descriptions that resist a single stakeholder-readable PR title
+- roadmap-shaped length and structure
+
+If signals fire, a soft prompt offers three paths — break into an epic with sub-issues, narrow to one story, or proceed as one story. The user always has final say.
+
+When you already know it's epic-sized, pass `--epic` to skip sensing and go straight to the parent-issue flow.
+
+**Cross-project quick add.** Sometimes you're working in repo `foo` and notice a task that belongs in project `bar` — and you don't have `bar` cloned locally. Pass `--project <name>` to file the issue against `bar` without leaving `foo`. The Vision check is skipped (the current repo's Vision doesn't apply to another project's work) and the issue lands in `bar`'s Backlog. When `bar`'s owner picks it up via `/linear:start` from inside `bar`'s repo, full Vision-anchored implementation kicks in there.
 
 **Usage**:
 
@@ -104,6 +125,9 @@ In `--research` mode, explores the codebase and Linear first, then adds code exa
 - `/linear:plan-work --research "add PostHog integration"` — research mode
 - `/linear:plan-work --craft "add dark mode toggle"` — auto-run [CRAFT prompt refinement](/skills/craft)
 - `/linear:plan-work --research --craft "description"` — research + CRAFT combined
+- `/linear:plan-work --worktree "description"` — also set up an isolated worktree after creation
+- `/linear:plan-work --epic "Bulk blog processing across 200 articles"` — skip size-sensing, draft as a parent-issue epic
+- `/linear:plan-work --project bar "task description"` — file into a different Linear project, skip the Vision check
 
 ### /linear:start
 
@@ -115,7 +139,7 @@ Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). The command su
 
 The agent groups commits by purpose and squashes similar ones into single commits with rewritten messages. Conservative by default — when uncertain whether two commits belong together, they stay separate. The user gates via terminal review and can recover the original commits via reflog if a squash was wrong.
 
-Trusts the issue — the plan was agreed during `/plan-work`. No approval gate mid-flow.
+Trusts the issue — the plan was agreed during `/plan-work`. No approval gate mid-flow. Branches are created inline by default — no "worktree or inline?" prompt. To run on a worktree instead, opt in at planning time via `/linear:plan-work --worktree`.
 
 Ends by asking: "Does this look right, or do you want changes?"
 

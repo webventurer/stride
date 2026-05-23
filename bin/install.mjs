@@ -9,10 +9,12 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  realpathSync,
   statSync,
+  unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 import { buildSection, removeSection } from "./gitignore.mjs";
@@ -154,21 +156,73 @@ const ACTIONS = {
   conflict: (_src, _dst, rel, s) => s.conflicts.push(rel),
 };
 
-function installFile(srcFile, destFile, rel, summary) {
-  ACTIONS[planAction(srcFile, destFile)](srcFile, destFile, rel, summary);
+async function installFile(srcFile, destFile, rel, summary) {
+  const action = planAction(srcFile, destFile);
+  if (action === "conflict" && (await confirmFileOverwrite(rel))) {
+    ACTIONS.copy(srcFile, destFile, rel, summary);
+    return;
+  }
+  ACTIONS[action](srcFile, destFile, rel, summary);
 }
 
 function emptySummary() {
   return { copied: [], skipped: [], conflicts: [] };
 }
 
-function installDir(dir) {
-  const srcDir = join(srcRoot, dir);
-  const summary = emptySummary();
-  if (!existsSync(srcDir)) return summary;
-  assertUnderClaudeDir(dir);
+function isSymlinkedRoot(rootPath) {
+  return existsSync(rootPath) && lstatSync(rootPath).isSymbolicLink();
+}
+
+function symlinkedRootMatches(srcDir, rootPath) {
+  return walkFiles(srcDir).every((rel) => {
+    const dest = join(rootPath, rel);
+    return existsSync(dest) && contentsMatch(join(srcDir, rel), dest);
+  });
+}
+
+async function confirmOverwrite(dir, resolved) {
+  const prompt = `Overwrite ${dir} (symlinked → ${resolved}) with stride's copy? [Y/n] `;
+  const answer = await ask(prompt);
+  return !answer || answer === "y" || answer === "yes";
+}
+
+async function confirmFileOverwrite(rel) {
+  const prompt = `Overwrite ${rel} with stride's copy? [Y/n] `;
+  const answer = await ask(prompt);
+  return !answer || answer === "y" || answer === "yes";
+}
+
+function recordAll(srcDir, dir, summary, bucket) {
+  for (const rel of walkFiles(srcDir)) summary[bucket].push(join(dir, rel));
+}
+
+function copyAndRecord(srcDir, dir, summary) {
   for (const rel of walkFiles(srcDir)) {
-    installFile(
+    copyFile(join(srcDir, rel), join(destRoot, dir, rel));
+    summary.copied.push(join(dir, rel));
+  }
+}
+
+async function resolveSymlinkedRoot(dir, srcDir, rootPath, summary) {
+  const matches = symlinkedRootMatches(srcDir, rootPath);
+  if (!(await confirmOverwrite(dir, realpathSync(rootPath))))
+    return recordAll(srcDir, dir, summary, matches ? "skipped" : "conflicts");
+  unlinkSync(rootPath);
+  copyAndRecord(srcDir, dir, summary);
+}
+
+async function installDir(dir) {
+  const srcDir = join(srcRoot, dir);
+  if (!existsSync(srcDir)) return emptySummary();
+  assertUnderClaudeDir(dir);
+  const summary = emptySummary();
+  const rootPath = join(destRoot, dir);
+  if (isSymlinkedRoot(rootPath)) {
+    await resolveSymlinkedRoot(dir, srcDir, rootPath, summary);
+    return summary;
+  }
+  for (const rel of walkFiles(srcDir)) {
+    await installFile(
       join(srcDir, rel),
       join(destRoot, dir, rel),
       join(dir, rel),
@@ -196,9 +250,9 @@ function makeExecutable(hook) {
   if (existsSync(path)) chmodSync(path, 0o755);
 }
 
-function copyFiles() {
+async function copyFiles() {
   const totals = emptySummary();
-  for (const dir of DIRS) mergeSummary(totals, installDir(dir));
+  for (const dir of DIRS) mergeSummary(totals, await installDir(dir));
   HOOKS.forEach(makeExecutable);
   if (totals.conflicts.length > 0) reportConflictsAndExit(totals.conflicts);
   return totals;
@@ -295,8 +349,8 @@ function mergeSettings() {
   writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 }
 
-function installFiles() {
-  logCopiedFiles(copyFiles());
+async function installFiles() {
+  logCopiedFiles(await copyFiles());
 }
 
 function installHeader({ copied, skipped }) {
@@ -305,7 +359,7 @@ function installHeader({ copied, skipped }) {
 }
 
 function logCopiedFiles(totals) {
-  console.log(installHeader(totals));
+  console.log(`\n${installHeader(totals)}`);
   console.log("  skills/vision/   (project Vision authoring skill)");
   console.log("  skills/commit/   (4-pass atomic commit skill)");
   console.log("  skills/craft/    (CRAFT prompt skill)");
@@ -384,9 +438,21 @@ async function configureGitignore() {
   console.log("Updated .gitignore with stride paths");
 }
 
+function refuseIfInsideClaudeDir() {
+  const cwd = process.cwd();
+  if (!cwd.split(sep).includes(".claude")) return;
+  console.error(
+    `\nERROR: stride must be run from a project root, not from inside a .claude/ directory.\n` +
+      `You appear to be in: ${cwd}\n` +
+      `cd to your project root and re-run.`,
+  );
+  process.exit(1);
+}
+
 async function main() {
+  refuseIfInsideClaudeDir();
   console.log("\nstride — All the speed. None of the mess.\n");
-  installFiles();
+  await installFiles();
   await configureGitignore();
   await configureMcp();
   if (!(await installHookConfig())) return;

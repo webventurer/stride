@@ -6,15 +6,17 @@
 
 A Vision is the canonical "what is this project for" document. Written once, evolved sparingly. It's the anchor every issue, every feature, and every architectural decision should trace back to.
 
-`/vision` walks you through writing one. It interviews you on seven questions one at a time, drafts the file, shows it for approval, then writes `VISION.md` at the repo root.
+`/vision` walks you through writing one. It offers two modes — **short** (one question, ~2 minutes, CRAFT-assembled) for small projects, and **full** (seven questions, ~15 minutes, one at a time) for substantial products. Either way it drafts the file, shows it for approval, then writes `VISION.md` at the repo root.
 
 *Vision sits above the loop — issues, features, and architectural decisions trace back to it.*
+
+*Think of it as the project's lantern: its light cascades down to epics, stories, and commits. When the lantern is honest, every layer below stays oriented; when it dims, the layers drift, one quietly at a time.*
 
 </div>
 
 <div>
 
-![Vision lightbulb](/lightbulb.svg)
+![Vision lantern](/lantern.svg)
 
 </div>
 
@@ -27,11 +29,15 @@ A Vision is the canonical "what is this project for" document. Written once, evo
 - Bootstrapping a Vision for an existing project that grew up without one
 - Any consumer repo where someone wants to capture product intent before writing more code
 
+Pick **short mode** when the work is a small dashboard, a side-tool, or anything where the seven-question interview would feel disproportionate. Pick **full mode** for substantial products where the act of articulating each section is itself the value. A short-Vision project can graduate to full Vision later by re-running `/vision`.
+
 ## When NOT to use
 
 - The project already has a good `VISION.md` and you just want edits — go direct
 - You want per-story scope — that's a Linear issue, not a Vision
 - You want an implementation plan — that's [`/linear:plan-work`](/skills/linear#linearplan-work), not this
+
+If `/vision`'s framing feels like friction in your context, the [friction Distinction](/patterns/friction-distinction) is the doc to reach for — it helps you decide whether the friction is signal (the work doesn't belong here) or context-mismatch (the gate needs calibrating for your case).
 
 ## What goes in a Vision
 
@@ -43,7 +49,7 @@ Seven sections. Each answers one question. Keep it scannable — a Vision someon
 | 2 | **Who it's for** | Who specifically benefits? Who's it *not* for? |
 | 3 | **Why it exists** | What's the motivation? |
 | 4 | **Why now** | Why this moment? What changes if you wait? |
-| 5 | **How we know it's working** | What can we tick off when delivered? |
+| 5 | **Success criteria** | What can we tick off when delivered? |
 | 6 | **What can't change** | Tech, platform, compliance — anything we have to respect |
 | 7 | **What it won't do** | What's intentionally out of scope? |
 
@@ -54,10 +60,14 @@ Seven sections is heavier than the standard five-section product vision template
 `/vision` is an interactive interview, not a fill-in-the-blanks form. <mark>**Each answer informs the next prompt's nuance** — a single-shot questionnaire produces shallow answers.</mark>
 
 1. Greets you and explains what a Vision is for
-2. Asks the seven questions one at a time, pushing back on vagueness
-3. Assembles the draft and shows it for review
-4. Writes `VISION.md` at the repo root only after explicit approval
-5. Closes with two reminders — the adjective trap, and the "downstream tooling carries this forward" point
+2. **Asks which mode** — short or full — before any interview question fires (forced gate, not a flag)
+3. Runs the chosen interview:
+   - **Short** — one rich question; CRAFT assembles all seven sections from the answer, marking inferred sections for review
+   - **Full** — seven questions, one at a time, pushing back on vagueness; opens with the upfront count + time estimate, prefixes each prompt with `(N/7)`, and accepts `skip` on any question to leave a `_TBD_` placeholder for later
+4. Assembles the draft and shows it for review
+5. Writes `VISION.md` at the repo root only after explicit approval
+6. Offers to sync to Linear (gated) — *"Push this Vision to the Linear project description now?"*. Yes hands off to [`/linear:update-vision`](/skills/linear#linearupdate-vision); no leaves a hint and continues. The gate keeps you in control when iterating without polluting Linear with intermediate writes
+7. Closes with two reminders — the adjective trap, and the "downstream tooling carries this forward" point
 
 If a `VISION.md` already exists, the skill asks before overwriting.
 
@@ -71,13 +81,13 @@ The seven questions aren't a list of fields — they're a sequence designed so e
 | **Who it's for** *before Why* | A motivation only makes sense once you know whose motivation it is |
 | **Why it exists** *before Why now* | Establishes the standing reason before you ask about timing |
 | **Why now** *as its own section* | Most templates skip this. Without it, "we should build this" reads as evergreen — which means it's never urgent |
-| **How we know it's working** *before constraints* | Forces measurable success criteria before talk of limits softens what "done" means |
+| **Success criteria** *before constraints* | Forces measurable outcomes before talk of limits softens what "done" means |
 | **What can't change** *near the end* | Constraints land more honestly once you've written the desired outcome |
 | **What it won't do** *last* | Non-goals are the easiest to defer until you've named the actual goal |
 
 ## The hard part — measurable success criteria
 
-The Success Criteria section is where most Vision documents drift. <mark>**Adjectives are the enemy of done.**</mark> "Fast", "good", "easy", "robust" never fail clearly, so they never trigger completion — and the project drifts past the point of value.
+The Success criteria section is where most Vision documents drift. <mark>**Adjectives are the enemy of done.**</mark> "Fast", "good", "easy", "robust" never fail clearly, so they never trigger completion — and the project drifts past the point of value.
 
 | Vague (avoid) | Measurable (use) |
 |:--------------|:-----------------|
@@ -86,7 +96,7 @@ The Success Criteria section is where most Vision documents drift. <mark>**Adjec
 | The build is reliable | CI runs in under 5 minutes, fails on first error |
 | Tests catch regressions | `git bisect` finds a regression in fewer than 5 commits |
 
-If you can't tell whether a criterion has been met, it can't trigger "done". Re-read your Success Criteria — would you know how to verify each one?
+If you can't tell whether a criterion has been met, it can't trigger "done". Re-read your Success criteria — would you know how to verify each one?
 
 ## Where Vision sits in stride
 
@@ -107,7 +117,7 @@ stride's own `VISION.md` (at the repo root) is a worked example. Read it and not
 
 - The **What it delivers** opens with a stakeholder-readable line ("Manage your own dev team on a Kanban board so everything's visible — except the team is AI"), then explains the mechanics
 - **Who it's for** is sharp — "developers using Claude Code who care about codebases that survive past day 30" — and explicitly names who it's *not* for
-- **How we know it's working** has six measurable criteria, every one verifiable
+- **Success criteria** has six measurable criteria, every one verifiable
 - **What it won't do** lists five hard non-goals, each starting with "Not a..."
 
 A Vision the user actually re-reads is worth more than a 2000-word one written once and forgotten. Aim for something that fits on a single screen.
