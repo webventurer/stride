@@ -25,6 +25,71 @@ Worth flagging since you've already got `linear-webventurer` MCP wired into `.mc
 
 For most people, **linctl** looks like the best dedicated Linear CLI for Claude workflows right now, because it's purpose-built for agents like Claude Code and is designed around issue listing, creation, and workflow actions from the terminal.
 
+## Spike findings (WB-391)
+
+Measured on macOS Apple Silicon, 2026-05-23, with `linctl 0.1.8` against four stride-linked Linear workspaces.
+
+### What works
+
+- **Multi-workspace via env-var prefix** — `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl whoami` cleanly switches between Webventurer (`WB`), Personal (`MIK`), and Wordtracker (`WD`) workspaces. Each returns its own team UUID and issue count. No `~/.linctl-auth.json` persistence needed; one-line prefix per invocation works.
+- **`sortOrder` mutation via raw GraphQL** — `linctl graphql 'mutation { issueUpdate(id: ..., input: { sortOrder: ... }) { success issue { sortOrder } } }'` works. Confirmed by reading-then-rewriting WB-391's `sortOrder` at value 36 (idempotent no-op). This gives us the **WB-388 outcome for free** — no Python-client extension needed if we migrate.
+- **`--json` output** — issue read returns 12KB clean structured JSON; `issue list --newer-than 1_week_ago` returns 117KB. Same data MCP would surface, no schema preamble.
+- **Latency** — read operations 170–220ms, network-bound to `api.linear.app`. Comparable to MCP per call; the CLI binary itself adds <10ms.
+
+### What doesn't work / costs
+
+- **Install footprint is 240MB, not 10MB.** `brew install linctl` on macOS ARM pulled Go 1.26.3 (228.6MB) as a build dependency *and* the linctl binary (9.9MB). The tap doesn't publish pre-built bottles for Apple Silicon, so brew compiles from source. The Go install persists. This is a real cost the README doesn't telegraph.
+- **`brew install linctl` violates the Vision constraint** *"Plain markdown only — no runtime, no build step, no compiled binaries"* — not in stride's footprint, but in **stride consumers'**. Migrating to linctl means every stride user runs `brew install linctl` to use `/linear:*` skills. Not the same as a runtime *in* stride, but it's a runtime *next to* stride that stride now requires.
+
+### Migration surface area
+
+| Skill file | MCP call sites |
+|:---|---:|
+| `plan-work.md` | 14 |
+| `finish.md` | 8 |
+| `next-steps.md` | 6 |
+| `start.md` | 5 |
+| `fix.md` | 2 |
+| `list-projects.md` | 1 |
+| `update-vision.md` | 1 |
+| **Total** | **37 across 7 files** |
+
+Eight unique MCP tools referenced: `get_issue`, `list_issues`, `list_comments`, `list_projects`, `list_issue_statuses`, `list_milestones`, `save_issue`, `save_comment`. Each has a roughly direct linctl equivalent (`linctl issue get`, `linctl issue list`, `linctl comments list`, etc.) plus `linctl graphql` as the escape hatch for anything not covered (`list_milestones` may need this).
+
+Moderate migration. One focused session at the larger files (`plan-work.md`, `finish.md`), one for the rest.
+
+### Token economy
+
+Not directly measurable from inside the spike session, but the structural argument holds:
+
+- MCP session pays a one-time schema-load cost per Linear server (the r/Linear figure is ~60k tokens for the Linear MCP alone). With four `linear-*` servers wired in `.mcp.json`, the cost is multiplied — though only servers actually called in the session matter for the LLM's working memory.
+- linctl pays *nothing* up front. Each bash call is a one-shot input/output pair.
+- For a typical `/linear:start → /linear:finish` cycle (5–10 MCP operations), linctl saves roughly the schema-load cost — call it ~60k tokens — leaving the agent that much more headroom to reason.
+
+### Decision
+
+**Lean migrate, but the install cost is a Vision-level decision that must happen first.**
+
+The agent-experience win is real and measurable in principle (token economy + same per-call latency). The migration is moderate. The win directly serves *"The common path through every `/linear:*` command runs without prompts; interruptions appear only when stride detects friction worth the user's judgement"* — schema bloat IS friction, just at the substrate level rather than the workflow level.
+
+But: `brew install linctl` adds a 240MB Go-toolchain install to every stride consumer's machine. That fights *"Plain markdown only — no runtime, no build step, no compiled binaries"* in spirit even if stride's own footprint stays markdown.
+
+**Recommended sequence:**
+
+1. **First, evolve the Vision** — relax the constraint to read something like *"Plain markdown only in stride's own footprint. Consumer-side prerequisites must be lightweight binaries with one-step install paths."* That's the gating decision; without it, migration goes against the project's stated purpose.
+2. **Then file the migration follow-ups** — (a) replace MCP calls in `/linear:*` skills with linctl invocations, (b) document `brew install linctl` (and the Go dependency) as a stride prereq, (c) deprecate `.claude/tools/linear_client.py` once no skill imports it, (d) close WB-388 (sortOrder kwarg) as superseded.
+3. **WB-385 (`/linear:quick`) is unaffected** — it still wants ship-then-file behaviour; just calls linctl instead of MCP.
+
+**If the Vision evolution doesn't pass:** keep MCP + `linear_client.py`. WB-388 stays in play. The schema-bloat cost remains but is an acceptable trade against the install-footprint constraint.
+
+### What stayed unchanged
+
+- `.mcp.json` — Linear MCP servers still configured; spike didn't touch them.
+- `.claude/tools/linear_client.py` — vendored module untouched on main.
+- The Rust CLI (Finesssee/linear-cli) — not tested; remains the fallback option if linctl's `brew install` cost is a blocker and we want a `cargo install` alternative (which is *also* a runtime — same constraint problem, different package manager).
+
+---
+
 ## Linear CLIs surveyed
 
 - **linctl** — <https://github.com/dorkitude/linctl>
