@@ -41,6 +41,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
 - [ ] After `/linear:update-vision` runs, the Linear project description matches `VISION.md`
 - [ ] `npx github:webventurer/stride` installs in under 30 seconds, no global side effects
+- [ ] Setup is the simplest path that works — a prereq-doctor names any missing tool and how to install it, integrations authenticate from `~/.env` API keys alone, and nothing requires `.mcp.json` or copying config between repos
 
 ## What can't change
 
