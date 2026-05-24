@@ -28,16 +28,35 @@ export function prereqReport(missing) {
   ];
 }
 
+// What native Windows sees instead of the (POSIX-only) tool probes. WSL is
+// stride's supported Windows path — the hooks and linctl both need a POSIX
+// shell — so say that plainly rather than report every tool "missing".
+export function windowsReport() {
+  return [
+    "stride requires WSL on Windows — its commit hooks and the linctl CLI",
+    "both need a bash/zsh shell. Install WSL, then run the install from",
+    "inside it. See the Windows section of docs/install.md.",
+  ];
+}
+
 // Blocking gate: print the report, and stop the installer if anything is
 // missing — stride's /linear:* workflow can't run without these tools, so
-// installing half of stride leaves a broken state.
+// installing half of stride leaves a broken state. On native Windows the
+// POSIX `command -v` probe can't run at all, so point at WSL instead of
+// reporting a misleading all-missing result.
 export function requirePrerequisites(
   isPresent = onPath,
   log = console.log,
   exit = process.exit,
+  platform = process.platform,
 ) {
-  const missing = missingPrereqs(isPresent);
   log("");
+  if (platform === "win32") {
+    for (const line of windowsReport()) log(line);
+    exit(1);
+    return;
+  }
+  const missing = missingPrereqs(isPresent);
   for (const line of prereqReport(missing)) log(line);
   if (missing.length > 0) exit(1);
 }
