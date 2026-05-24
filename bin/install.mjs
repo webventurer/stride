@@ -18,6 +18,7 @@ import { dirname, join, relative, sep } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 import { buildSection, removeSection } from "./gitignore.mjs";
+import { requirePrerequisites } from "./prereqs.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, "..");
@@ -452,6 +453,7 @@ function refuseIfInsideClaudeDir() {
 async function main() {
   refuseIfInsideClaudeDir();
   console.log("\nstride — All the speed. None of the mess.\n");
+  requirePrerequisites();
   await installFiles();
   await configureGitignore();
   await configureMcp();
