@@ -24,6 +24,14 @@
 /linear:finish PG-X         → squash merge, clean up, Done
 ```
 
+For a change too small to plan up front, skip the card-first cycle:
+
+```
+/linear:quick "small fix"   → implement, review, then say a ship phrase
+  ... you review the diff in the terminal, then say "ship it" ...
+                            → merge + file the card retroactively in Done
+```
+
 ## What's an "issue"?
 
 It's the universal term for a **tracked item** — something that needs attention. The word comes from bug tracking ("there's an issue with X"), but it got stretched to cover everything: features, bugs, tasks, research, chores.

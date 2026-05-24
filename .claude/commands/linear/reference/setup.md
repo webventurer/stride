@@ -22,6 +22,7 @@ This guide covers how to connect Claude Code to Linear via linctl, using a per-w
 | Command | What it does |
 |:--------|:-------------|
 | `/linear:plan-work` | Draft and create a Linear issue with optional `--research` and `--craft` flags |
+| `/linear:quick` | Ship a small change first, then file the card after merge (born Done) — for work too small to plan up front |
 | `/linear:start` | Branch, implement, validate, open PR, and review the diff in the terminal |
 | `/linear:fix` | Address GitHub PR review feedback, validate, push, and comment on the PR |
 | `/linear:finish` | Squash merge an approved PR, delete branches, mark issue Done |

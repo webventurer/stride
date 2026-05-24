@@ -1,0 +1,167 @@
+# Quick: ship a small change, then file the card
+
+Ship a small, well-scoped change and file the Linear card *after* it merges — so a copy tweak or padding fix doesn't pay the up-front card-drafting tax. The card lands directly in **Done**, pointing at the merged PR.
+
+Two ways in:
+
+- **Describe it** — `/linear:quick "tighten the hero heading spacing"`: branch, implement, review, ship.
+- **Already did it** — make the change first, then run `/linear:quick`: it picks up your existing diff and files the card to match what you just created.
+
+Either way: review → **you say a ship phrase** → Vision trace → merge → file the Done card (or hold it to bundle with later changes).
+
+<mark>**Not a replacement for `/linear:plan-work`.**</mark> This is for changes whose shape is obvious and whose diff fits in one terminal scroll — copy/wording, design tweaks, doc polish, single-file refactors, config tweaks, dead-code removal. Anything that crosses files non-trivially, touches a shared contract or public API, needs a migration, or carries scope/risk uncertainty still earns the card-first discipline of `/linear:plan-work`.
+
+> **Not `/loop`.** `/loop` is scheduled re-invocation of a command; `/linear:quick` is a one-shot ship-then-file flow. Same first four letters, unrelated.
+
+## The ship gate
+
+The merge fires **only** when you say an explicit ship phrase: **`ship`, `ship it`, `quick`, `jfdi`, `go`**. <mark>**The agent never decides on its own that the change is ready to merge.**</mark> No phrase, no merge — "looks done to me" and silent timeouts are not triggers.
+
+## Rules
+
+- Never work directly on `main` — existing uncommitted changes on `main` move to a branch first
+- Never merge without one of the ship phrases above
+- Use `--merge` (not `--squash`) to preserve atomic commits
+- Keep scope to one change — if the diff grows past a one-scroll review, stop and suggest `/linear:plan-work`
+- <mark>**Don't shortcut the Vision trace.** A drift is surfaced for your decision — exactly as `/linear:finish` does — *before* the merge, while the catch is still actionable.</mark>
+- The card is filed once, directly in **Done** — or deferred to bundle with later changes
+
+---
+
+## Steps
+
+### 1. Vision check
+
+Read `VISION.md` from the repo root. If missing, stop and suggest `/vision` (same hard gate as the other commands). If present, load the full Success criteria — step 6 traces the change against them.
+
+### 2. Find the change
+
+Run `git status -sb` and `git log main..HEAD --oneline`. Two paths:
+
+- **Retrospective** (you made the change first): the working tree has uncommitted changes, or the current branch already has commits ahead of `main`. Use them. If the changes are uncommitted **on `main`**, create `quick/<slug>` and commit them with `/commit` first (never ship from `main`). If they're already on a feature branch, stay on it.
+- **Describe-then-build** (clean tree, description given): create the branch and implement in step 3.
+
+```bash
+git checkout main && git checkout -b quick/<slug>
+```
+
+Derive `<slug>` from the description, or from the diff in the retrospective path.
+
+### 3. Implement *(describe-then-build path only — skip if the change already exists)*
+
+Make the change iteratively with the user, with the same discipline as `/linear:start` step 7:
+
+- [YAGNI gate](../../stride/docs/principles/design-decisions.md#the-test) — drop anything that closes doors or adds unused complexity
+- **Footprint audit** — each new helper/test earns its place (used 2+ times, adds semantic value, or encapsulates non-trivial config)
+- Follow the project's coding standards
+
+If the change starts crossing files non-trivially or the diff outgrows one terminal scroll, **stop** and tell the user this is `/linear:plan-work` territory now.
+
+### 4. Validate
+
+Run the project's build and tests. Fix failures and re-run until clean. Never ship with a failing build.
+
+### 5. Review in the terminal
+
+Show the full diff and the commit log:
+
+```bash
+git diff main...HEAD
+git log main..HEAD --oneline
+```
+
+Then ask: **"Ship it? (say `ship` / `ship it` / `quick` / `jfdi` / `go`, or tell me what to change.)"**
+
+If the user requests changes, make them, re-validate (step 4), and show the updated diff. Repeat until they say a ship phrase. <mark>**Until then, do nothing irreversible.**</mark>
+
+### 6. On the ship phrase — trace Vision, then merge
+
+Only once the user says a ship phrase. **First run the Vision trace check — the same judgement `/linear:finish` makes, not a rubber stamp.** With the diff and commit subjects in hand, read them against the `VISION.md` Success criteria and pick the best-fit criterion:
+
+- **Match** — the change clearly serves one criterion. Surface a single line and continue to the merge:
+
+  ```
+  Trace verified against "<criterion>" — shipping.
+  ```
+
+- **Drift / no clear fit** — surface it in plain English and let the user decide *before* the merge:
+
+  ```
+  This change ships: <one-line description of the diff>
+  Closest Vision criterion: "<best-fit>"
+  But the fit is thin because <why>.
+
+  Ship anyway against that criterion, pick a better one, or add a
+  new criterion to VISION.md first? (ship / <criterion> / add)
+  ```
+
+  - **ship / pick** → continue to the merge; the chosen criterion becomes the card's *Why this matters*.
+  - **add** → pause. Tell the user: *"Add the criterion to `VISION.md`, `/commit` it on this branch, then say a ship phrase again."* Don't merge. (The merge is still ahead, so the catch rides on the same branch — no follow-up PR needed.)
+
+The merge hasn't happened yet, so a drift is fully actionable here. Once the trace is settled, merge:
+
+```bash
+git push -u origin quick/<slug>
+gh pr create --title "<imperative summary>" --body "$(cat <<'EOF'
+## Summary
+<1–2 bullets: what changed and why>
+EOF
+)"
+gh pr merge <number> --merge --subject "Merge branch 'quick/<slug>'" --body ""
+```
+
+`--merge` keeps the atomic commits. Capture the merged PR URL.
+
+### 7. File the card now, or hold it to bundle
+
+Ask:
+
+```
+File the card now, or delay to bundle with more changes? (file / delay)
+```
+
+- **delay** — hold this PR's URL, summary, and confirmed Vision criterion in the session's **pending bundle**, and skip filing. Tell the user it'll fold into the next `file`. The change is already shipped; only the card is deferred. (The bundle lives in this working session — a later `/linear:quick` that files picks it up.)
+- **file** — create one card in **Done** covering this change *and every PR held in the pending bundle*, then attach each PR *(auth per [reference/workflow.md](reference/workflow.md))*:
+
+  ```bash
+  LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue create \
+    -t <TEAM> --project "<project>" --state Done \
+    --title "<imperative summary of the change(s)>" \
+    --description "<what shipped (per PR), plus a Why this matters line citing the Vision criterion>" --json
+  LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue attach <new-id> --pr <merged-PR-URL>
+  # ...repeat issue attach for each PR in the bundle
+  ```
+
+  Resolve the project from `.linear_project` and the team key from `linctl team list --json`. The PR links make the Linear ↔ git ↔ PR trail whole even though the branch carried no issue ID. Clear the pending bundle once filed.
+
+### 8. Clean up
+
+```bash
+git checkout main && git pull --ff-only
+git branch -d quick/<slug>
+git push origin --delete quick/<slug>
+```
+
+If GitHub auto-deleted the remote branch on merge, skip that silently.
+
+### 9. Summary
+
+Display:
+
+- The change (one line) and the merged PR URL
+- Card: filed in **Done** — `<identifier>` with the PR(s) attached — *or* `held (bundle of N pending)`
+- Build: passed
+- Branch: deleted
+- Vision: the criterion the change serves (from step 6)
+
+---
+
+## Error handling
+
+- `VISION.md` missing → stop, suggest `/vision`
+- Uncommitted changes on `main` → branch + `/commit` before shipping (never ship from `main`)
+- Build/tests fail → fix before shipping; never merge red
+- No ship phrase given → never merge; keep iterating
+- Vision drift, user picks **add** → stop, don't merge; resume after the criterion is committed
+- Change outgrew a one-scroll diff → stop, suggest `/linear:plan-work`
+- `linctl issue create` / `attach` fails after merge → surface it; the PR is already merged, so re-running the file step (with the bundle intact) recovers the card
