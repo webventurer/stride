@@ -21,11 +21,13 @@ Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if Gi
 
 ### 1. Read the Linear issue
 
-Fetch the issue via MCP:
+Fetch the issue via linctl *(auth per [reference/workflow.md](reference/workflow.md))*:
 
-- `get_issue` with `$ARGUMENTS`
+```bash
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue get $ARGUMENTS --json
+```
 
-Extract: issue ID, title, `gitBranchName`, current status, milestone, `parentId`.
+Extract from the JSON: identifier, title, `gitBranchName`, current state, project milestone (if any), parent issue.
 
 Stop if the issue cannot be found.
 
@@ -103,12 +105,12 @@ A worked before/after, from the WB-297 dogfood that made this rule explicit:
 Same content, ten times the readability.
 
 - **stated**: the agent was overconfident; user override stands. Continue to step 6 (Merge).
-- **alternative**: post a one-line Linear comment via `save_comment` naming the agent's drift catch and the user-picked criterion. Continue to step 6. The drift is named on the issue; the body isn't auto-rewritten.
+- **alternative**: post a one-line Linear comment via `linctl comment create <issue-id> --body "..."` naming the agent's drift catch and the user-picked criterion. Continue to step 6. The drift is named on the issue; the body isn't auto-rewritten.
 - **something else**: drop into the missing-criterion path below.
 
 #### Something else — missing criterion path
 
-Ask one follow-up — *"In one line, what shifted?"* — and post the user's answer as a Linear comment on the issue via `save_comment`. Then ask:
+Ask one follow-up — *"In one line, what shifted?"* — and post the user's answer as a Linear comment on the issue via `linctl comment create <issue-id> --body "..."`. Then ask:
 
 ```
 Stop and add the criterion to VISION.md before merging? (y/n)
@@ -187,7 +189,11 @@ VS Code does not support programmatic window closing. The worktree directory is 
 
 ### 8. Update Linear → done
 
-Move the issue to **Done** via `save_issue`.
+Move the issue to **Done**:
+
+```bash
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue update $ARGUMENTS --state Done
+```
 
 Only set Done status. Skip if already Done. Never set any other status.
 
@@ -195,15 +201,21 @@ Only set Done status. Skip if already Done. Never set any other status.
 
 Skip this step if the issue had no milestone.
 
-Otherwise, call `list_issues` filtered by the milestone with non-Done states (`backlog`, `unstarted`, `started`). If any results come back, the milestone has remaining work — skip silently.
+Otherwise, fetch issues attached to the milestone in non-Done states (linctl has no typed milestone command, so `linear_cli.py` provides it):
 
-If the result is empty, all stories in the milestone are now Done. Prompt:
+```bash
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py milestone-open-issues <milestone-UUID>
+```
+
+If any nodes come back, the milestone has remaining work — skip silently.
+
+If the nodes list is empty, all stories in the milestone are now Done. Prompt:
 
 ```
 All stories in *[Milestone name]* are complete — mark the milestone done?
 ```
 
-If the user confirms, append a completion note to the milestone description via `save_milestone` (Linear has no milestone "completed" state, so a description note is the durable signal). Format:
+If the user confirms, append a completion note to the milestone description via `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py update-milestone-description <milestone-UUID> --description "..."` (Linear has no milestone "completed" state, so a description note is the durable signal). Format:
 
 ```
 Completed: <YYYY-MM-DD> — all stories Done.
@@ -215,7 +227,13 @@ If the user declines, leave the milestone untouched.
 
 Skip this step if the issue had no `parentId`, or if the parent's title doesn't start with `Epic: ` (the parent is a regular sub-issue parent, not a stride epic).
 
-Otherwise, call `list_issues` filtered by `parentId` with non-Done states (`backlog`, `unstarted`, `started`). If any results come back, the epic has remaining sub-issues — skip silently.
+Otherwise, fetch the parent epic's open sub-issues (`<parent-id>` is the parent UUID, `parent.id` from the `linctl issue get` at step 1):
+
+```bash
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py list-by-parent <parent-id> | jq '[.[] | select(.state.type as $t | ["backlog","unstarted","started"] | index($t))]'
+```
+
+If any items come back, the epic has remaining sub-issues — skip silently.
 
 If the result is empty, all sub-issues of the epic are now Done. Prompt:
 
@@ -223,7 +241,13 @@ If the result is empty, all sub-issues of the epic are now Done. Prompt:
 All sub-issues of *[Epic title]* are complete — mark the epic Done?
 ```
 
-If the user confirms, move the parent issue to Done via `save_issue` with `state` set to the Done status ID (resolve via `list_issue_statuses`). Unlike milestones, parent-issue epics have a real status, so closing them is a normal status transition — no description note needed.
+If the user confirms, move the parent issue to Done:
+
+```bash
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue update <parent-id> --state Done
+```
+
+linctl accepts state names directly — no separate ID lookup needed. Unlike milestones, parent-issue epics have a real status, so closing them is a normal status transition — no description note needed.
 
 If the user declines, leave the epic untouched.
 
@@ -248,7 +272,10 @@ Then:
 
 1. Read `VISION.md` from the repo root.
 2. Resolve the Linear project from `.linear_project`.
-3. Call `get_project` to fetch the current Linear description.
+3. Fetch the current Linear description:
+   ```bash
+   LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project get "<project-name>" --json
+   ```
 4. Compare against `VISION.md` (after trimming surrounding whitespace).
    - **Identical**: report *"Linear project description already matches VISION.md — no update needed"* and continue to step 9.
    - **Different**: show the diff and ask:
@@ -257,15 +284,19 @@ Then:
      Replace the Linear project description with VISION.md? (y/n)
      ```
 
-5. On `y`: call `save_project` with the full `VISION.md` contents as `description`. On `n`: skip the write and continue to step 9.
+5. On `y`:
+   ```bash
+   LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project update <project-id> --description "$(cat VISION.md)"
+   ```
+   On `n`: skip the write and continue to step 9.
 
-If any step in the sync flow fails (`.linear_project` missing, project not found via `list_projects`, `save_project` errors), surface the failure clearly and continue to step 9. The issue is already Done from step 8 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
+If any step in the sync flow fails (`.linear_project` missing, project not found, `linctl project update` errors), surface the failure clearly and continue to step 9. The issue is already Done from step 8 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
 
 Track the outcome for the summary in step 9:
 
 | State | When |
 |:------|:-----|
-| `applied` | Diff existed and `save_project` succeeded |
+| `applied` | Diff existed and `linctl project update` succeeded |
 | `declined` | Diff existed and user picked `n` |
 | `already in sync` | No diff, identical-check short-circuited |
 | `failed: <reason>` | Sync attempted but errored |

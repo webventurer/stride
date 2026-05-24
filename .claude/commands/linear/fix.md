@@ -23,12 +23,14 @@ Workflow: `/plan-work` → `/start` (includes terminal review) → **`/fix`** (i
 
 ### 1. Read the Linear issue
 
-Fetch the issue via MCP:
+Fetch the issue via linctl *(auth per [reference/workflow.md](reference/workflow.md))*:
 
-- `get_issue` with `$ARGUMENTS`
-- `list_comments` with the issue ID
+```bash
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue get $ARGUMENTS --json
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl comment list $ARGUMENTS --json
+```
 
-Extract: issue ID, title, `gitBranchName`.
+Extract from the issue JSON: identifier, title, `gitBranchName`.
 
 Stop if the issue cannot be found.
 

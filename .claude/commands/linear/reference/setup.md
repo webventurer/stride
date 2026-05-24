@@ -35,7 +35,7 @@ Copy `.mcp.json.example` to `.mcp.json` and choose OAuth (single org) or API key
 
 ### 2. Verify the connection
 
-Run `/linear:check` to confirm each configured Linear server responds. It calls `list_teams` on each server and reports which workspace it's connected to.
+Run `/linear:check` to confirm linctl can authenticate against each `LINEAR_<TEAM>_API_KEY` set in `~/.env`. It runs `linctl whoami` per key and reports which workspace each one resolves to.
 
 ### 3. Install the Linear GitHub integration
 

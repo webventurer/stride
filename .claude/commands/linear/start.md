@@ -25,18 +25,20 @@ Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if Gi
 
 ### 1. Read the Linear issue
 
-Fetch the issue and its comments via MCP:
+Fetch the issue and its comments via linctl *(auth per [reference/workflow.md](reference/workflow.md))*:
 
-- `get_issue` with `$ARGUMENTS`
-- `list_comments` with the issue ID
+```bash
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue get $ARGUMENTS --json
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl comment list $ARGUMENTS --json
+```
 
-Extract: issue ID, title, description, status, labels, `gitBranchName`, assignee, milestone, `parentId`.
+Extract from the issue JSON: identifier, title, description, state, labels, `gitBranchName`, assignee, project, project milestone (if any), parent issue.
 
 Extract from comments: decisions and context added after the description was written.
 
-If the issue belongs to a milestone, surface it before continuing: `This story is part of *[Milestone name]*`. One line — just enough context that the user knows which epic the work is feeding.
+If the issue is attached to a project milestone, surface it before continuing: `This story is part of *[Milestone name]*`. One line — just enough context that the user knows which milestone the work is feeding.
 
-If `parentId` is set, fetch the parent via `get_issue` and check its title. If the title starts with `Epic: `, surface the parent-issue epic before continuing: `This story is a sub-issue of *[Epic title]* (status: [Parent status])`. Same shape as the milestone surface — one line of umbrella context. If the parent's title doesn't start with `Epic: `, the story is just a sub-issue of another issue (not a stride epic) — skip the surface silently.
+If the issue has a parent, fetch the parent via `linctl issue get <parent-id> --json` and check its title. If the title starts with `Epic: `, surface the parent-issue epic before continuing: `This story is a sub-issue of *[Epic title]* (status: [Parent status])`. Same shape as the milestone surface — one line of umbrella context. If the parent's title doesn't start with `Epic: `, the story is just a sub-issue of another issue (not a stride epic) — skip the surface silently.
 
 Stop if the issue cannot be found.
 
@@ -141,11 +143,13 @@ Continue to step 6.
 
 ### 6. Update Linear status → Doing
 
-Only update if the current status is Todo, Backlog, or Backburner.
+Only update if the current state is Todo, Backlog, or Backburner.
 
-Set status to **Doing** via `save_issue`.
+```bash
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue update $ARGUMENTS --state Doing
+```
 
-If already Doing, leave unchanged. Never set any other status in this step.
+If already Doing, leave unchanged. Never set any other state in this step.
 
 ### 7. Implement
 
@@ -294,7 +298,9 @@ EOF
 
 ### 14. Update Linear status → In Review
 
-Move the issue to **In Review** via `save_issue`.
+```bash
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue update $ARGUMENTS --state "In Review"
+```
 
 Only after the PR is confirmed created or already exists. Skip if the issue is already In Review. Warn (but proceed) if the issue is Done.
 

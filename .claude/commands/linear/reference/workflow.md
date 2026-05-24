@@ -31,6 +31,22 @@ A new feature is an "issue" in Linear/GitHub/Jira. It's not that the feature *is
 
 It's like how every email is called a "message" whether it's a question, an announcement, or a complaint. "Message" is the container; the content varies.
 
+## How skills talk to Linear
+
+Stride's `/linear:*` skills call [linctl](https://github.com/dorkitude/linctl) — a brew-installable Go CLI — to drive Linear. Every invocation in a skill file is implicitly prefixed with the per-workspace API key from `~/.env`:
+
+```bash
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl <verb> ...
+```
+
+Substitute `<TEAM>` with the workspace name you're driving against (e.g. `LINEAR_ORG1_API_KEY`, `LINEAR_ORG2_API_KEY`). The per-workspace variables live in `~/.env` per [setup.md](setup.md). One stride install can drive multiple Linear workspaces — the env-var-per-team pattern is how you switch between them per invocation.
+
+**Reading skill files:** call sites in `/linear:*` workflows are written without the prefix to keep them scannable. The first `linctl` line in each skill carries an inline reminder; subsequent calls follow the same pattern.
+
+**JSON for agents:** all linctl calls used by skills add `--json` so the agent gets structured output to parse with `jq`. Without `--json`, linctl prints human-readable text.
+
+**Why linctl, not the Linear MCP:** see [docs/research/linear-mcp-vs-cli.md](../../../../docs/research/linear-mcp-vs-cli.md). Short version: MCP loads ~60k tokens of schema before the agent reasons; linctl loads zero.
+
 ## Reviewing PRs in VS Code
 
 To review pull requests directly in VS Code, install the [GitHub Pull Requests](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github) extension. It lets you browse, review, and comment on PRs with in-editor line comments — no need to switch to the browser.
