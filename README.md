@@ -38,10 +38,12 @@ npx github:webventurer/stride
 
 This copies skills, commands, hooks, and docs into your project. It merges hook config into `.claude/settings.local.json` (gitignored, machine-local — your committed `settings.json` is never modified). Nothing is installed globally.
 
+Before your first `/linear:*` command, install the prerequisites — `gh`, `uv`, `linctl`, `jq` — and add your Linear API key to `~/.env`. See [Install](/install) for the one-time setup.
+
 ## Quick start
 
 ```bash
-# Verify Linear MCP connections
+# Verify linctl can reach your Linear workspaces
 /linear:check
 
 # See what needs doing
