@@ -1,0 +1,17 @@
+{
+  "_comment": "Single source of truth for the Linear workflow states stride's /linear:* commands use. Grouped by Linear's state type. `transitions` names the state each workflow step targets. /linear:check verifies these against the live board (linctl team state list <TEAM>). Adapting stride to a workspace whose states are named differently is an edit to this one file.",
+  "states": {
+    "backlog": ["Backburner", "Backlog"],
+    "unstarted": ["Todo"],
+    "started": ["Doing", "In Review", "Waiting"],
+    "completed": ["Done"],
+    "canceled": ["Canceled"],
+    "duplicate": ["Duplicate"]
+  },
+  "transitions": {
+    "create": "Backlog",
+    "start": "Doing",
+    "review": "In Review",
+    "finish": "Done"
+  }
+}

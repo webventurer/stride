@@ -47,6 +47,12 @@ Substitute `<TEAM>` with the workspace name you're driving against (e.g. `LINEAR
 
 **Why linctl, not the Linear MCP:** see [docs/research/linear-mcp-vs-cli.md](../../../../docs/research/linear-mcp-vs-cli.md). Short version: MCP loads ~60k tokens of schema before the agent reasons; linctl loads zero.
 
+## Workflow states
+
+The state names the `/linear:*` commands move issues through — `Backlog` on create, `Doing` on start, `In Review` after the PR, `Done` on finish — are defined once in [`linear_statuses.json`](../linear_statuses.json), grouped by Linear's state type and mapped to each workflow transition. That file is the source of truth for the names stride uses and for the type groups `/linear:next-steps` filters on.
+
+The call sites keep readable literals (`linctl issue update <id> --state Doing`) for scannability — but the canonical list is the JSON. `/linear:check` diffs it against the live board (via `linear_cli.py state-drift`) and flags any state stride expects that the board doesn't have, catching the silent-no-op trap a name mismatch causes (e.g. `In Progress` matching nothing). Adapting stride to a workspace whose states are named differently starts here: edit the JSON, then run `/linear:check` to confirm the board matches.
+
 ## Reviewing PRs in VS Code
 
 To review pull requests directly in VS Code, install the [GitHub Pull Requests](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github) extension. It lets you browse, review, and comment on PRs with in-editor line comments — no need to switch to the browser.
