@@ -1,0 +1,208 @@
+"""Tests for linear_cli.
+
+linear_cli builds GraphQL and shells out to `linctl graphql`, so these
+tests are pure-function and subprocess-mocked — they run without network,
+linctl, or LINEAR_E2E. Live behaviour is exercised by driving a real
+/linear:* cycle, not from here.
+
+Run with:
+    python -m pytest tools/tests/test_linear_cli.py
+"""
+
+import json
+import subprocess
+import sys
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+# Add the tools directory to the path so we can import linear_cli
+TOOLS_DIR = Path(__file__).parent.parent
+sys.path.insert(0, str(TOOLS_DIR))
+
+from linear_cli import (  # noqa: E402
+    LinctlError,
+    create_milestone,
+    graphql_data,
+    issues_query,
+    linctl_graphql,
+    list_by_parent,
+    list_by_project_state,
+    list_milestones,
+    milestone_open_issues,
+    min_backlog_sort_order,
+    raise_for_failure,
+    search_by_project,
+    set_sort_order,
+    update_milestone_description,
+)
+
+
+def ok_run(data: dict) -> subprocess.CompletedProcess:
+    return subprocess.CompletedProcess([], returncode=0, stdout=json.dumps({"data": data}), stderr="")
+
+
+def issues(nodes: list) -> dict:
+    return {"issues": {"nodes": nodes}}
+
+
+def sent_query(mock: MagicMock) -> str:
+    args = mock.call_args[0][0]
+    return args[args.index("--query") + 1]
+
+
+def sent_variables(mock: MagicMock) -> dict:
+    args = mock.call_args[0][0]
+    return json.loads(args[args.index("--variables") + 1])
+
+
+# ---- plumbing ----
+
+def test_issues_query_embeds_params_filters_and_node_fields():
+    query = issues_query("$x: String!", "project: { name: { eq: $x } }")
+
+    assert query.startswith("query($x: String!)")
+    assert "project: { name: { eq: $x } }" in query
+    assert "identifier title state { name type }" in query
+
+
+def test_graphql_data_returns_data_payload():
+    stdout = json.dumps({"data": {"issues": {"nodes": [{"identifier": "WB-1"}]}}})
+
+    assert graphql_data(stdout) == {"issues": {"nodes": [{"identifier": "WB-1"}]}}
+
+
+def test_graphql_data_raises_on_graphql_errors():
+    stdout = json.dumps({"errors": [{"message": "bad filter"}]})
+
+    with pytest.raises(LinctlError) as excinfo:
+        graphql_data(stdout)
+
+    assert "bad filter" in str(excinfo.value)
+
+
+def test_raise_for_failure_raises_with_stderr_on_nonzero():
+    result = subprocess.CompletedProcess([], returncode=1, stdout="", stderr="boom")
+
+    with pytest.raises(LinctlError) as excinfo:
+        raise_for_failure(result)
+
+    assert "boom" in str(excinfo.value)
+
+
+def test_raise_for_failure_passes_on_zero():
+    result = subprocess.CompletedProcess([], returncode=0, stdout="{}", stderr="")
+
+    raise_for_failure(result)  # does not raise
+
+
+def test_linctl_graphql_raises_on_subprocess_failure():
+    failed = subprocess.CompletedProcess([], returncode=1, stdout="", stderr="auth error")
+
+    with patch("linear_cli.subprocess.run", return_value=failed):
+        with pytest.raises(LinctlError) as excinfo:
+            linctl_graphql("query { x }", {})
+
+    assert "auth error" in str(excinfo.value)
+
+
+# ---- issue queries ----
+
+def test_search_by_project_passes_variables_and_returns_nodes():
+    with patch("linear_cli.subprocess.run", return_value=ok_run(issues([{"identifier": "WB-1"}]))) as mock:
+        result = search_by_project("Stride", "linctl")
+
+    assert result == [{"identifier": "WB-1"}]
+    assert sent_variables(mock) == {"project": "Stride", "text": "linctl"}
+    assert "searchableContent: { contains: $text }" in sent_query(mock)
+
+
+def test_list_by_project_state_adds_since_filter_when_given():
+    with patch("linear_cli.subprocess.run", return_value=ok_run(issues([]))) as mock:
+        list_by_project_state("Stride", "Done", since="-P1W")
+
+    assert sent_variables(mock)["since"] == "-P1W"
+    assert "createdAt: { gt: $since }" in sent_query(mock)
+
+
+def test_list_by_project_state_omits_since_when_absent():
+    with patch("linear_cli.subprocess.run", return_value=ok_run(issues([]))) as mock:
+        list_by_project_state("Stride", "Done")
+
+    assert "since" not in sent_variables(mock)
+    assert "createdAt" not in sent_query(mock)
+
+
+def test_list_by_parent_filters_by_parent_id():
+    with patch("linear_cli.subprocess.run", return_value=ok_run(issues([]))) as mock:
+        list_by_parent("uuid-123")
+
+    assert sent_variables(mock) == {"parent": "uuid-123"}
+    assert "parent: { id: { eq: $parent } }" in sent_query(mock)
+
+
+# ---- milestones ----
+
+def test_list_milestones_extracts_nested_nodes():
+    data = {"project": {"projectMilestones": {"nodes": [{"id": "m1", "name": "Phase 1"}]}}}
+    with patch("linear_cli.subprocess.run", return_value=ok_run(data)):
+        assert list_milestones("proj-1") == [{"id": "m1", "name": "Phase 1"}]
+
+
+def test_milestone_open_issues_filters_open_states():
+    data = {"projectMilestone": {"issues": {"nodes": [{"identifier": "WB-9"}]}}}
+    with patch("linear_cli.subprocess.run", return_value=ok_run(data)) as mock:
+        result = milestone_open_issues("m1")
+
+    assert result == [{"identifier": "WB-9"}]
+    assert '["backlog", "unstarted", "started"]' in sent_query(mock)
+
+
+def test_create_milestone_includes_target_date_when_given():
+    data = {"projectMilestoneCreate": {"projectMilestone": {"id": "m2", "name": "Q4"}}}
+    with patch("linear_cli.subprocess.run", return_value=ok_run(data)) as mock:
+        result = create_milestone("proj-1", "Q4", target_date="2026-12-31")
+
+    assert result == {"id": "m2", "name": "Q4"}
+    assert sent_variables(mock)["target"] == "2026-12-31"
+    assert "targetDate: $target" in sent_query(mock)
+
+
+def test_create_milestone_omits_target_date_when_absent():
+    data = {"projectMilestoneCreate": {"projectMilestone": {"id": "m3", "name": "Q4"}}}
+    with patch("linear_cli.subprocess.run", return_value=ok_run(data)) as mock:
+        create_milestone("proj-1", "Q4")
+
+    assert "target" not in sent_variables(mock)
+    assert "targetDate" not in sent_query(mock)
+
+
+def test_update_milestone_description_returns_success():
+    data = {"projectMilestoneUpdate": {"success": True}}
+    with patch("linear_cli.subprocess.run", return_value=ok_run(data)):
+        assert update_milestone_description("m1", "Completed: 2026-05-24") is True
+
+
+# ---- board order ----
+
+def test_min_backlog_sort_order_returns_first_value():
+    data = {"project": {"issues": {"nodes": [{"sortOrder": -120450}]}}}
+    with patch("linear_cli.subprocess.run", return_value=ok_run(data)):
+        assert min_backlog_sort_order("proj-1") == -120450
+
+
+def test_min_backlog_sort_order_returns_none_when_empty():
+    data = {"project": {"issues": {"nodes": []}}}
+    with patch("linear_cli.subprocess.run", return_value=ok_run(data)):
+        assert min_backlog_sort_order("proj-1") is None
+
+
+def test_set_sort_order_passes_float_and_returns_success():
+    data = {"issueUpdate": {"success": True}}
+    with patch("linear_cli.subprocess.run", return_value=ok_run(data)) as mock:
+        result = set_sort_order("issue-1", -120550.0)
+
+    assert result is True
+    assert sent_variables(mock) == {"id": "issue-1", "order": -120550.0}
+    assert "$order: Float!" in sent_query(mock)
