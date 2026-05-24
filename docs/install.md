@@ -113,6 +113,10 @@ Get your API keys at [linear.app/settings/api](https://linear.app/settings/api) 
 
 This confirms that each configured Linear server responds and shows which workspace it's connected to.
 
+### Linear board — set the view to Manual sort
+
+stride sequences your work by each issue's position on the board (`/linear:plan-work` places new issues; you arrange the backlog into the order you'll tackle it). **Set your Linear board — or whichever view you use for stride work — to "Manual" sort.** Under a Priority, Created, or Updated sort, Linear ignores those positions and stride's execution order looks scrambled. Board sort is a per-view UI setting, so stride can't set it for you.
+
 ### GitHub CLI
 
 Install the [GitHub CLI](https://cli.github.com/) (`gh`) for PR operations:
