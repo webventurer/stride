@@ -21,7 +21,7 @@ Review what's happening and recommend what to work on next.
 Check for a `.linear_project` file in the repository root.
 
 - If **found**: read the project name from it
-- If **not found**: list available projects via `list_projects`, ask the user to choose, and save their selection to `.linear_project`. Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it.
+- If **not found**: list available projects (`LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project list --json` — auth per [reference/workflow.md](reference/workflow.md)), ask the user to choose, and save their selection to `.linear_project`. Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it.
 
 Use the resolved project name for all Linear API calls in this command.
 
@@ -49,16 +49,18 @@ Read `VISION.md` from the repo root.
 
 ### 2. Fetch data (all calls in parallel)
 
-| Call | Tool |
-|:-----|:-----|
-| `get_user` — authenticated user | Linear MCP |
-| `list_issues` — state: `started`, project: resolved project | Linear MCP |
-| `list_issues` — state: `unstarted`, project: resolved project | Linear MCP |
-| `list_issues` — state: `backlog`, project: resolved project | Linear MCP |
-| `list_issues` — state: `completed`, updatedAt: `-P7D`, project: resolved project | Linear MCP |
-| `list_milestones` — project: resolved project | Linear MCP |
-| `list_issues` — query: `Epic: `, project: resolved project (matches parent-issue epics by title prefix) | Linear MCP |
-| `gh pr list --state open --json number,title,headRefName,author,reviewDecision,reviews,url` | Bash |
+All `linctl` and `linear_cli.py` calls below are implicitly prefixed with `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY` per [reference/workflow.md](reference/workflow.md).
+
+| Call | Purpose |
+|:-----|:--------|
+| `linctl whoami --json` | Authenticated user |
+| `uv run .claude/tools/linear_cli.py list-by-project-state --project "<project>" --state "In Progress"` | Started issues |
+| `uv run .claude/tools/linear_cli.py list-by-project-state --project "<project>" --state Todo` | Unstarted issues |
+| `uv run .claude/tools/linear_cli.py list-by-project-state --project "<project>" --state Backlog` | Backlog issues |
+| `uv run .claude/tools/linear_cli.py list-by-project-state --project "<project>" --state Done --since -P1W` | Recently completed |
+| `uv run .claude/tools/linear_cli.py list-milestones <project-UUID>` | Milestones (no typed linctl command) |
+| `uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "` | Parent-issue epics (matched by title prefix) |
+| `gh pr list --state open --json number,title,headRefName,author,reviewDecision,reviews,url` | Open PRs |
 
 ### 3. Show current work
 

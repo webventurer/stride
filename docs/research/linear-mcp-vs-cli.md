@@ -82,6 +82,23 @@ But: `brew install linctl` adds a 240MB Go-toolchain install to every stride con
 
 **If the Vision evolution doesn't pass:** keep MCP + `linear_client.py`. WB-388 stays in play. The schema-bloat cost remains but is an acceptable trade against the install-footprint constraint.
 
+### End-to-end path benchmark (WB-393)
+
+Measured 2026-05-24, WB workspace, against the same 6-step path that `/linear:start → /linear:finish` walks: **create → get → move to In Progress → comment → move to Done → cancel**. linctl runs the whole sequence in one scripted bash call (one agent round-trip); MCP needs one tool call per step (six agent round-trips).
+
+| | `linctl` (1 round-trip) | MCP (6 round-trips) |
+|:---|---:|---:|
+| Runs (s) | 2.78 / 2.85 / 3.53 / 10.53 / 10.96 / 14.71 / 16.04 | 24.02 / 24.95 / 33.87 |
+| **Median** | **10.53s** | **24.95s** |
+| Min–max | 2.78–16.04 | 24.02–33.87 |
+| Speed-up at median | **~2.4×** | — |
+
+**The win is round-trip collapsing, not a faster API.** Both tools hit the same Linear backend at the same per-op latency (~0.5–2.5s/op, which is why linctl's time is bimodal). linctl wins because the agent scripts all six ops into a single bash call — one model turn — while MCP forces six model turns. Those five extra turns are a fixed ~20s tax that no network speed removes. The distributions **never overlap**: linctl's slowest run (16.04s) still beats MCP's fastest (24.02s).
+
+**Caveat — this is linctl's best light.** The 2.4× holds wherever the agent can script the whole sequence up front (the mechanical guts of `/start` and `/finish`). At a human-gated step (`/plan-work` waiting for approval), both tools take one round-trip and the gap collapses to the per-op API difference.
+
+**Reliability edge.** Across these runs, MCP `save_issue` accepted `state: "In Progress"` and **silently no-opped** (returned `Backlog`, no error); `Done`/`Canceled` applied. linctl resolved every state by name correctly. State transitions are the most error-prone Linear operation in the workflow, so this matters beyond speed.
+
 ### What stayed unchanged
 
 - `.mcp.json` — Linear MCP servers still configured; spike didn't touch them.

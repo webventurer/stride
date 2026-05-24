@@ -6,7 +6,11 @@ Show all projects in the connected Linear workspace.
 
 ### 1. Fetch projects
 
-Call `list_projects` to retrieve all active projects.
+Fetch all active projects via linctl *(auth per [reference/workflow.md](reference/workflow.md))*:
+
+```bash
+LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project list --json
+```
 
 ### 2. Display
 
