@@ -54,7 +54,7 @@ All `linctl` and `linear_cli.py` calls below are implicitly prefixed with `LINCT
 | Call | Purpose |
 |:-----|:--------|
 | `linctl whoami --json` | Authenticated user |
-| `uv run .claude/tools/linear_cli.py list-by-project-state --project "<project>" --state "In Progress"` | Started issues |
+| `uv run .claude/tools/linear_cli.py list-by-project-state-type --project "<project>" --type started` | Started issues (spans all started-type states, e.g. Doing / In Review / Waiting) |
 | `uv run .claude/tools/linear_cli.py list-by-project-state --project "<project>" --state Todo` | Unstarted issues |
 | `uv run .claude/tools/linear_cli.py list-by-project-state --project "<project>" --state Backlog` | Backlog issues |
 | `uv run .claude/tools/linear_cli.py list-by-project-state --project "<project>" --state Done --since -P1W` | Recently completed |

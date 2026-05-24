@@ -16,6 +16,9 @@ linctl's auth (LINCTL_API_KEY). No second auth path, no `requests`.
         search_by_project(project, text)              text search in a project
         list_by_project_state(project, state, since)  project + state, opt.
                                                       created since (e.g. -P1W)
+        list_by_project_state_type(project, type)     project + state TYPE
+                                                      (started/unstarted/...) —
+                                                      spans all states in a group
         list_by_parent(parent_id)                     sub-issues of a parent
     Milestones
         list_milestones(project_id)                   {id, name} per milestone
@@ -100,6 +103,14 @@ def list_by_project_state(project: str, state: str, since: str | None = None) ->
         filters += " createdAt: { gt: $since }"
         variables["since"] = since
     return linctl_graphql(issues_query(params, filters), variables)["issues"]["nodes"]
+
+
+def list_by_project_state_type(project: str, state_type: str) -> list:
+    query = issues_query(
+        "$project: String!, $type: String!",
+        "project: { name: { eq: $project } } state: { type: { eq: $type } }",
+    )
+    return linctl_graphql(query, {"project": project, "type": state_type})["issues"]["nodes"]
 
 
 def list_by_parent(parent_id: str) -> list:
@@ -213,6 +224,13 @@ def search_by_project_cmd(project: str, text: str):
 @click.option("--since", default=None, help="ISO8601 duration/datetime, e.g. -P1W")
 def list_by_project_state_cmd(project: str, state: str, since: str):
     click.echo(json.dumps(list_by_project_state(project, state, since)))
+
+
+@cli.command("list-by-project-state-type")
+@click.option("--project", required=True)
+@click.option("--type", "state_type", required=True, help="State type: started, unstarted, backlog, completed, canceled")
+def list_by_project_state_type_cmd(project: str, state_type: str):
+    click.echo(json.dumps(list_by_project_state_type(project, state_type)))
 
 
 @cli.command("list-by-parent")
