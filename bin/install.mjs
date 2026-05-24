@@ -327,6 +327,7 @@ function logAvailableSkills() {
   console.log("  /linear:setup        — provision Linear workflow states");
   console.log("  /linear:start        — implement a Linear issue");
   console.log("  /linear:plan-work    — create a Linear issue");
+  console.log("  /linear:quick        — ship a small change, file the card after");
   console.log("  /linear:fix          — address PR review feedback");
   console.log("  /linear:finish       — merge and close");
   console.log("  /linear:next-steps   — review priorities");

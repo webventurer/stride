@@ -1,6 +1,6 @@
 # /linear — Linear workflow
 
-Nine commands covering the full development cycle, from setup through to merge — all without leaving Claude Code.
+Ten commands covering the full development cycle, from setup through to merge — all without leaving Claude Code.
 
 ## Typical workflow
 
@@ -19,6 +19,9 @@ Nine commands covering the full development cycle, from setup through to merge �
   # ... someone reviews on GitHub ...
 /linear:fix PG-X            # address GitHub review feedback (if any)
 /linear:finish PG-X         # squash merge, clean up, Done
+
+# Ship-then-file (small changes)
+/linear:quick "small fix"   # implement, say "ship it", merge + file the card in Done
 ```
 
 ![Kanban board](/kanban-board.svg)
@@ -133,6 +136,16 @@ When you already know it's epic-sized, pass `--epic` to skip sensing and go stra
 - `/linear:plan-work --worktree "description"` — also set up an isolated worktree after creation
 - `/linear:plan-work --epic "Bulk blog processing across 200 articles"` — skip size-sensing, draft as a parent-issue epic
 - `/linear:plan-work --project bar "task description"` — file into a different Linear project, skip the Vision check
+
+### /linear:quick
+
+**Ship a small change, then file the card after.** For work too small to plan up front — a copy tweak, a padding fix, a doc-link repair — the up-front card *is* the friction. `/linear:quick` inverts the order: review the diff, and when you say a ship phrase (`ship` / `ship it` / `quick` / `jfdi` / `go`) it merges with `--merge` and files the Linear card **born directly in Done** with the merged PR attached. The board shows a finished card pointing at the PR — no Backlog → Doing → In Review journey, because the work bypassed those states by design.
+
+Two ways in: **describe it** (`/linear:quick "..."` — branch, implement, ship) or **already did it** (make the change first, then run `/linear:quick` to file the card matching your existing diff).
+
+The merge fires *only* on an explicit ship phrase — the agent never decides on its own that a change is ready. If the change grows past a one-scroll diff or crosses files non-trivially, it stops and points you back to `/linear:plan-work`. The Vision trace runs *before* the merge and is **surfaced like `/linear:finish`** — a drift is shown for your decision (ship against the best-fit criterion, pick a better one, or add one to `VISION.md` first), not silently shortcut. After the merge you can **file the card now or hold it to bundle** several small changes into one Done card.
+
+**Usage**: `/linear:quick "tighten the hero heading spacing"`
 
 ### /linear:start
 
