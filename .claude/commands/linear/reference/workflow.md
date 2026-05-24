@@ -51,6 +51,14 @@ Substitute `<TEAM>` with the workspace name you're driving against (e.g. `LINEAR
 
 To review pull requests directly in VS Code, install the [GitHub Pull Requests](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github) extension. It lets you browse, review, and comment on PRs with in-editor line comments — no need to switch to the browser.
 
+## Board ordering — set the view to Manual sort
+
+stride sequences your work by setting each issue's position on the board — `/linear:plan-work` places new issues, and you arrange the backlog into the order you'll tackle it. **That order only shows if your Linear board (or the view you use for stride work) is sorted by "Manual".**
+
+If the view is sorted by **Priority**, **Created**, or **Updated** instead, Linear ignores the manual positions entirely, and stride's execution order looks scrambled — cards group by priority or date rather than the sequence you set. The fix is one setting: open the view's sort menu and choose **Manual**.
+
+Board sort is a per-view setting in Linear's UI, so stride can't set it for you — hence this note rather than an automated step.
+
 ## Commands
 
 ### `/linear:next-steps`
