@@ -4,6 +4,7 @@ import {
   missingPrereqs,
   prereqReport,
   requirePrerequisites,
+  windowsReport,
 } from "../bin/prereqs.mjs";
 
 describe("missingPrereqs", () => {
@@ -75,5 +76,51 @@ describe("requirePrerequisites", () => {
     );
 
     strictEqual(exited, false);
+  });
+
+  it("points native Windows at WSL and exits non-zero without probing", () => {
+    const out = [];
+    let exitCode = null;
+    let probed = false;
+    requirePrerequisites(
+      () => {
+        probed = true;
+        return false;
+      },
+      (line) => out.push(line),
+      (code) => {
+        exitCode = code;
+      },
+      "win32",
+    );
+
+    ok(out.some((l) => l.includes("requires WSL on Windows")));
+    strictEqual(probed, false); // never shells out to the POSIX-only probe
+    strictEqual(exitCode, 1);
+  });
+
+  it("uses the command -v probe path on linux/darwin", () => {
+    const out = [];
+    let exitCode = null;
+    requirePrerequisites(
+      () => false,
+      (line) => out.push(line),
+      (code) => {
+        exitCode = code;
+      },
+      "linux",
+    );
+
+    ok(out.some((l) => l.startsWith("Missing prerequisites")));
+    strictEqual(exitCode, 1);
+  });
+});
+
+describe("windowsReport", () => {
+  it("points at WSL and the install docs", () => {
+    const lines = windowsReport();
+
+    ok(lines[0].includes("requires WSL on Windows"));
+    ok(lines.some((l) => l.includes("docs/install.md")));
   });
 });
