@@ -24,7 +24,9 @@ brew install gh uv linctl jq
 
 ### Windows
 
-`gh`, `uv`, and `jq` have native installers (winget / scoop / MSI). `linctl` has none — use WSL (then follow the macOS steps), or build it from source with Go.
+**WSL is the supported Windows path.** stride's commit hooks need a bash/zsh shell — the [Vision](https://github.com/webventurer/stride/blob/main/VISION.md) states plainly that *"Bash/zsh required for hooks (Windows requires WSL)."* Install [WSL](https://learn.microsoft.com/windows/wsl/install), then follow the macOS steps above inside it (`brew tap dorkitude/linctl && brew install gh uv linctl jq`).
+
+`gh`, `uv`, and `jq` do have native Windows installers (winget / scoop / MSI) if you only need those — but `linctl` has none, so a native install still leaves you building it from source with Go (`go install`), and the hooks won't run without WSL anyway. Pick WSL up front.
 
 ### Connect Linear
 
