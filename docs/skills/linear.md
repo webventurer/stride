@@ -1,12 +1,13 @@
 # /linear — Linear workflow
 
-Eight commands covering the full development cycle, from setup through to merge — all without leaving Claude Code.
+Nine commands covering the full development cycle, from setup through to merge — all without leaving Claude Code.
 
 ## Typical workflow
 
 ```bash
 # Utility
-/linear:check               # verify Linear access (linctl)
+/linear:check               # verify Linear access + board matches statuses JSON
+/linear:setup               # provision workflow states (non-destructive)
 /linear:list-projects       # list all projects across workspaces
 /linear:update-vision       # push VISION.md to Linear
 /linear:next-steps          # see what needs doing
@@ -66,7 +67,11 @@ The other Linear commands (`/linear:check`, `/linear:list-projects`, `/linear:fi
 
 ### /linear:check
 
-**Verify Linear access.** Runs `linctl whoami` for each `LINEAR_<TEAM>_API_KEY` in `~/.env` to confirm it authenticates. Reports results as a table showing the key, status, and which workspace it resolves to.
+**Verify Linear access.** Runs `linctl whoami` for each `LINEAR_<TEAM>_API_KEY` in `~/.env` to confirm it authenticates, then checks the board's workflow states match `linear_statuses.json` and flags any drift. Reports results as a table showing the key, status, and which workspace it resolves to.
+
+### /linear:setup
+
+**Provision Linear workflow states.** Reads `linear_statuses.json` and creates the workflow states the workspace is missing, ordering them to match — so `/linear:start` / `/linear:finish` transitions land instead of silently no-opping on a missing column. Non-destructive (never deletes or renames a state) and idempotent (a workspace already in sync is left untouched).
 
 ### /linear:list-projects
 

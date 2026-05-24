@@ -12,7 +12,8 @@ This guide covers how to connect Claude Code to Linear via linctl, using a per-w
 
 | Command | What it does |
 |:--------|:-------------|
-| `/linear:check` | Verify linctl auth — confirm each `LINEAR_<TEAM>_API_KEY` resolves |
+| `/linear:check` | Verify linctl auth — confirm each `LINEAR_<TEAM>_API_KEY` resolves, and the board matches `linear_statuses.json` |
+| `/linear:setup` | Provision the workspace's workflow states from `linear_statuses.json` — creates missing columns, reorders to sequence, never deletes |
 | `/linear:list-projects` | List all projects across connected Linear workspaces |
 | `/linear:next-steps` | Review priorities, surface PRs needing fix, recommend what to work on next |
 
