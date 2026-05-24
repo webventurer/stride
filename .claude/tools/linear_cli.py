@@ -16,6 +16,9 @@ linctl's auth (LINCTL_API_KEY). No second auth path, no `requests`.
         search_by_project(project, text)              text search in a project
         list_by_project_state(project, state, since)  project + state, opt.
                                                       created since (e.g. -P1W)
+        list_by_project_state_type(project, type)     project + state TYPE
+                                                      (started/unstarted/...) —
+                                                      spans all states in a group
         list_by_parent(parent_id)                     sub-issues of a parent
     Milestones
         list_milestones(project_id)                   {id, name} per milestone
@@ -85,8 +88,7 @@ def issues_query(params: str, filters: str) -> str:
 def search_by_project(project: str, text: str) -> list:
     query = issues_query(
         "$project: String!, $text: String!",
-        "project: { name: { eq: $project } } "
-        "searchableContent: { contains: $text }",
+        "project: { name: { eq: $project } } searchableContent: { contains: $text }",
     )
     return linctl_graphql(query, {"project": project, "text": text})["issues"]["nodes"]
 
@@ -100,6 +102,16 @@ def list_by_project_state(project: str, state: str, since: str | None = None) ->
         filters += " createdAt: { gt: $since }"
         variables["since"] = since
     return linctl_graphql(issues_query(params, filters), variables)["issues"]["nodes"]
+
+
+def list_by_project_state_type(project: str, state_type: str) -> list:
+    query = issues_query(
+        "$project: String!, $type: String!",
+        "project: { name: { eq: $project } } state: { type: { eq: $type } }",
+    )
+    return linctl_graphql(query, {"project": project, "type": state_type})["issues"][
+        "nodes"
+    ]
 
 
 def list_by_parent(parent_id: str) -> list:
@@ -131,7 +143,9 @@ def milestone_open_issues(milestone_id: str) -> list:
     return data["projectMilestone"]["issues"]["nodes"]
 
 
-def create_milestone(project_id: str, name: str, target_date: str | None = None) -> dict:
+def create_milestone(
+    project_id: str, name: str, target_date: str | None = None
+) -> dict:
     params = "$project: String!, $name: String!"
     fields = "projectId: $project, name: $name"
     variables = {"project": project_id, "name": name}
@@ -143,7 +157,9 @@ def create_milestone(project_id: str, name: str, target_date: str | None = None)
         f"mutation({params}) {{ projectMilestoneCreate(input: {{ {fields} }}) "
         "{ projectMilestone { id name } } }"
     )
-    return linctl_graphql(query, variables)["projectMilestoneCreate"]["projectMilestone"]
+    return linctl_graphql(query, variables)["projectMilestoneCreate"][
+        "projectMilestone"
+    ]
 
 
 def update_milestone_description(milestone_id: str, description: str) -> bool:
@@ -179,7 +195,7 @@ def update_project_content(project_id: str, content: str) -> bool:
 
 def min_backlog_sort_order(project_id: str) -> float | None:
     query = (
-        'query($project: String!) { project(id: $project) { '
+        "query($project: String!) { project(id: $project) { "
         'issues(first: 1, filter: { state: { type: { eq: "backlog" } } }) '
         "{ nodes { sortOrder } } } }"
     )
@@ -192,7 +208,9 @@ def set_sort_order(issue_id: str, sort_order: float) -> bool:
         "mutation($id: String!, $order: Float!) { "
         "issueUpdate(id: $id, input: { sortOrder: $order }) { success } }"
     )
-    return linctl_graphql(query, {"id": issue_id, "order": sort_order})["issueUpdate"]["success"]
+    return linctl_graphql(query, {"id": issue_id, "order": sort_order})["issueUpdate"][
+        "success"
+    ]
 
 
 @click.group()
@@ -213,6 +231,18 @@ def search_by_project_cmd(project: str, text: str):
 @click.option("--since", default=None, help="ISO8601 duration/datetime, e.g. -P1W")
 def list_by_project_state_cmd(project: str, state: str, since: str):
     click.echo(json.dumps(list_by_project_state(project, state, since)))
+
+
+@cli.command("list-by-project-state-type")
+@click.option("--project", required=True)
+@click.option(
+    "--type",
+    "state_type",
+    required=True,
+    help="State type: started, unstarted, backlog, completed, canceled",
+)
+def list_by_project_state_type_cmd(project: str, state_type: str):
+    click.echo(json.dumps(list_by_project_state_type(project, state_type)))
 
 
 @cli.command("list-by-parent")

@@ -29,6 +29,7 @@ from linear_cli import (  # noqa: E402
     linctl_graphql,
     list_by_parent,
     list_by_project_state,
+    list_by_project_state_type,
     list_milestones,
     milestone_open_issues,
     min_backlog_sort_order,
@@ -134,6 +135,15 @@ def test_list_by_project_state_omits_since_when_absent():
 
     assert "since" not in sent_variables(mock)
     assert "createdAt" not in sent_query(mock)
+
+
+def test_list_by_project_state_type_filters_by_type():
+    # "Started issues" spans Doing/In Review/Waiting — filter by state TYPE, not a name.
+    with patch("linear_cli.subprocess.run", return_value=ok_run(issues([]))) as mock:
+        list_by_project_state_type("Stride", "started")
+
+    assert sent_variables(mock) == {"project": "Stride", "type": "started"}
+    assert "state: { type: { eq: $type } }" in sent_query(mock)
 
 
 def test_list_by_parent_filters_by_parent_id():
