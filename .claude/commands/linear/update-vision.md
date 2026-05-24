@@ -1,17 +1,19 @@
 # Mirror VISION.md to the Linear project
 
-Push the contents of `VISION.md` into the Linear project's `content` field — the long-form project document — so the Linear project page reflects the canonical Vision.
+Push `VISION.md` into the Linear project so the project page reflects the canonical Vision: the full document into the `content` field, and the opening tagline into the `description` field — the **subtitle** shown under the project name.
 
 Workflow: edit `VISION.md` → `/linear:update-vision` → confirm the diff → Linear updated.
 
-> **Why `content`, not `description`, and why `linear_cli.py`:** a project's `description` is a short, length-limited summary — writing a full Vision to it fails with a GraphQL `Argument Validation Error`. The Vision belongs in `content` (the document body). `linctl` has no typed command for `content` (its `project get`/`project update` only touch `description`), so this command reads and writes `content` through `.claude/tools/linear_cli.py`, which uses `linctl graphql` under the hood.
+> **The two fields, and why `linear_cli.py`:** a project's `description` is a short, length-limited summary (the subtitle); its `content` is the long-form document body (the Vision). Writing a full Vision to `description` fails with a GraphQL `Argument Validation Error`, so the Vision goes in `content`. `linctl` has no typed command for `content` (its `project get`/`project update` only touch `description`), so this command reads and writes `content` through `.claude/tools/linear_cli.py` (which uses `linctl graphql`), and writes the short subtitle directly via `linctl project update --description`.
 
 ## Rules
 
 - `VISION.md` at the repo root is the source of truth — this command is one-way (repo → Linear)
-- For existing projects: show the diff, require explicit confirmation before writing, and never touch metadata other than `content`
-- For new projects (no `.linear_project`): the user supplies the name, `VISION.md` becomes the initial `content`, the team is resolved from `linctl team list` — no diff exists to confirm
-- If `VISION.md` and the current Linear `content` already match, skip the write — report and stop
+- Two fields are mirrored: `content` (the full document) and `description` (the subtitle, from VISION.md's opening blockquote tagline). Touch no other metadata
+- For existing projects: show what will change, require explicit confirmation before writing
+- For new projects (no `.linear_project`): the user supplies the name, `VISION.md` becomes the initial `content` and its tagline the subtitle, the team is resolved from `linctl team list` — no diff exists to confirm
+- If both `content` and subtitle already match `VISION.md`, skip the write — report and stop
+- If `VISION.md` has no opening blockquote, leave the subtitle untouched — never blank an existing one
 - The user's `.linear_project` selection drives which project is updated (or is written on first create)
 
 ---
@@ -65,12 +67,13 @@ When the user picks *Create new project*:
    - If exactly one team is returned, use its `key` (e.g. `WB`)
    - Otherwise, ask the user to choose
    - If no teams are returned, stop — the user has no team to create projects on
-3. Create the project (name + team only — the Vision goes into `content` next, not the length-limited `description`):
+3. Create the project with the subtitle set from VISION.md's tagline — its opening blockquote, the `>` line under the H1 (the short `description` field; the full Vision goes into `content` next). Omit `--description` if VISION.md has no opening blockquote:
 
    ```bash
    LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project create \
      -t <TEAM-KEY> \
      --name "<project-name>" \
+     --description "<tagline>" \
      --json
    ```
 
@@ -89,55 +92,74 @@ When the user picks *Create new project*:
 
 ### 3. Get the current project state
 
-`linctl project get` takes a project **ID**, not a name — so resolve the id (and URL) from the project list by name, then fetch the current `content` via `linear_cli.py` (linctl can't read `content`):
+`linctl project get` takes a project **ID**, not a name — so resolve the id, URL, and current subtitle (`description`) from the project list by name, then fetch the current `content` via `linear_cli.py` (linctl can't read `content`):
 
 ```bash
 LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project list --json \
-  | jq -r --arg name "<project-name-from-.linear_project>" '.[] | select(.name == $name) | {id, url}'
+  | jq -r --arg name "<project-name-from-.linear_project>" '.[] | select(.name == $name) | {id, url, description}'
 LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py get-project-content <project-id>
 ```
 
+The **subtitle** is VISION.md's opening blockquote — the `>` tagline directly under the H1 (already in front of you from step 1's read; take the line without its `> ` marker). If VISION.md has no opening blockquote, there's no subtitle to sync this run.
+
 Capture:
 
-- Project ID (needed for the update in step 5) and URL — from the `project list` filter
+- Project ID (for the writes in step 5) and URL — from the `project list` filter
 - Current `content` — from `get-project-content` (raw markdown)
+- Current subtitle — the `description` from the `project list` filter
+- VISION.md tagline — the extracted blockquote (empty if VISION.md has none)
 
 If no project matches the name, stop and tell the user the name in `.linear_project` doesn't match any project they have access to.
 
 ### 4. Compare and decide
 
-Compare the contents of `VISION.md` against the current Linear `content` (after trimming surrounding whitespace). Linear normalises markdown on save — notably it rewrites `-` list markers to `*` — so a byte-exact match is unattainable even straight after a sync; compare on substance, and treat a difference that is *only* list-marker style as already in sync.
+`/linear:update-vision` mirrors two fields: the full document (`content`) and the subtitle (`description`). Compare each:
 
-- **Identical**: report and stop:
+- **Content** — `VISION.md` vs the current Linear `content` (after trimming surrounding whitespace). Linear normalises markdown on save — notably `-` list markers become `*`, and it wraps link URLs in `<>` — so a byte-exact match is unattainable; compare on substance and treat normalisation-only differences as in sync.
+- **Subtitle** — the extracted tagline vs the current `description`. If VISION.md has no opening blockquote (empty tagline), the subtitle is **out of scope** for this run — never blank an existing subtitle.
+
+Then:
+
+- **Both already match**: report and stop:
 
   ```
-  Linear project content already matches VISION.md — no update needed.
+  Linear already matches VISION.md (content + subtitle) — no update needed.
   ```
 
-- **Different**: show the user what will change. Display the unified diff or a clear before/after — the agent picks the form that reads best. Then ask:
+- **Either differs**: show what will change (the content diff and/or the old→new subtitle), then ask:
 
   ```
-  Replace the Linear project content with VISION.md? (y/n)
+  Replace the Linear content and/or subtitle with VISION.md? (y/n)
   ```
 
   If the user declines, stop without writing.
 
 ### 5. Write
 
-Only after explicit yes:
+Only after explicit yes — write whichever field differs:
 
-```bash
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py \
-  update-project-content <project-id-from-step-3> --content "$(cat VISION.md)"
-```
+- **Content** (if it differs) — via `linear_cli.py` (the Vision is long; `linctl project update --description` can't carry it):
 
-The `$(cat VISION.md)` substitution preserves markdown newlines and special characters. The helper returns `true` on success.
+  ```bash
+  LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py \
+    update-project-content <project-id-from-step-3> --content "$(cat VISION.md)"
+  ```
+
+- **Subtitle** (if it differs and the tagline is non-empty) — directly via linctl, since `description` is the short field `--description` is meant for:
+
+  ```bash
+  LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project update <project-id-from-step-3> \
+    --description "<tagline-from-step-3>"
+  ```
+
+The `$(cat VISION.md)` substitution preserves markdown newlines and special characters.
 
 ### 6. Confirm
 
 Display:
 
-- Linear project content: Updated
+- Linear project content: Updated / unchanged
+- Linear project subtitle: Updated / unchanged / skipped (no tagline)
 - Project URL
 
 End the command — no further status changes, no follow-up commits.
