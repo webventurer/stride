@@ -54,7 +54,7 @@ Report per workspace:
 | Webventurer | ✅ in sync | — |
 | Org2 | ⚠️ drift | `In Review` (started) missing |
 
-If a workspace drifts, the fix is a human one: rename the board state to match `linear_statuses.json`, or edit the JSON to match the board. stride doesn't auto-reconcile — the board is the source of truth for what *exists*, the JSON for what stride *uses*.
+If a workspace drifts, the fix is a human one: rename the board state to match `linear_statuses.json`, or edit the JSON to match the board. stride doesn't auto-reconcile — the board is the source of truth for what *exists*, the JSON for what stride *uses*. When the drift is *missing* states (not a rename), suggest running [`/linear:setup`](setup.md) to provision them — but only as a suggestion; never run it automatically from `/linear:check`.
 
 ### 4. Summary
 

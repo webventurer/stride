@@ -7,7 +7,8 @@
 **Utility:**
 
 ```
-/linear:check               → verify linctl auth per workspace
+/linear:check               → verify linctl auth + board matches statuses JSON
+/linear:setup               → provision workflow states (non-destructive)
 /linear:list-projects       → list all projects across workspaces
 /linear:next-steps          → see what needs doing
 ```

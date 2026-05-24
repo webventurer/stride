@@ -25,6 +25,7 @@ from linear_cli import (  # noqa: E402
     LinctlError,
     board_states,
     create_milestone,
+    create_workflow_state,
     declared_states,
     graphql_data,
     issues_query,
@@ -36,7 +37,9 @@ from linear_cli import (  # noqa: E402
     milestone_open_issues,
     min_backlog_sort_order,
     project_content,
+    provision_states,
     raise_for_failure,
+    reorder_canonical,
     search_by_project,
     set_sort_order,
     state_drift,
@@ -307,3 +310,75 @@ def test_load_statuses_parses_the_repo_config():
 
     assert "states" in config and "transitions" in config
     assert "Doing" in config["states"]["started"]
+
+
+# ---- workflow-state provisioning ----
+
+ONE_TYPE = {"started": ["Doing", "In Review"]}
+
+
+def test_create_workflow_state_passes_typed_input_and_color():
+    data = {"workflowStateCreate": {"workflowState": {"id": "s1", "name": "Doing"}}}
+    with patch("linear_cli.subprocess.run", return_value=ok_run(data)) as mock:
+        create_workflow_state("team-1", "Doing", "started", "#f2c94c", 2.0)
+
+    assert sent_variables(mock)["input"] == {
+        "teamId": "team-1",
+        "name": "Doing",
+        "type": "started",
+        "color": "#f2c94c",
+        "position": 2.0,
+    }
+    assert "workflowStateCreate(input: $input)" in sent_query(mock)
+
+
+def test_reorder_canonical_skips_when_already_in_json_order():
+    # Doing before In Review by position — matches ONE_TYPE order, so no writes.
+    pos = {"Doing": 2.0, "In Review": 1069.0}
+    ids = {"Doing": "d", "In Review": "r"}
+    with patch("linear_cli.set_state_position") as set_pos:
+        assert reorder_canonical(ONE_TYPE, pos, ids) == []
+    set_pos.assert_not_called()
+
+
+def test_reorder_canonical_fixes_out_of_order_states():
+    # In Review sits before Doing by position — must be reordered to JSON order.
+    pos = {"Doing": 5.0, "In Review": 2.0}
+    ids = {"Doing": "d", "In Review": "r"}
+    with patch("linear_cli.set_state_position") as set_pos:
+        result = reorder_canonical(ONE_TYPE, pos, ids)
+
+    assert result == ["Doing", "In Review"]
+    assert set_pos.call_count == 2
+
+
+def test_provision_states_creates_missing_and_reports_them():
+    board = {"teams": {"nodes": [{"id": "t1", "states": {"nodes": [
+        {"id": "b", "name": "Backlog", "type": "backlog", "position": 0.0},
+    ]}}]}}
+    created_state = {"workflowStateCreate": {"workflowState": {"id": "new"}}}
+
+    def fake_run(args: list, **kwargs) -> subprocess.CompletedProcess:
+        query = args[args.index("--query") + 1]
+        return ok_run(board if "teams(" in query else created_state)
+
+    with patch("linear_cli.subprocess.run", side_effect=fake_run):
+        with patch("linear_cli.load_statuses", return_value={"states": {"backlog": ["Backlog"], "started": ["Doing"]}}):
+            result = provision_states("WB")
+
+    assert result["created"] == [{"name": "Doing", "type": "started"}]
+    assert result["in_sync"] is False
+
+
+def test_provision_states_in_sync_when_board_has_all_canonical():
+    board = {"teams": {"nodes": [{"id": "t1", "states": {"nodes": [
+        {"id": "b", "name": "Backlog", "type": "backlog", "position": 0.0},
+        {"id": "d", "name": "Doing", "type": "started", "position": 1.0},
+    ]}}]}}
+    with patch("linear_cli.subprocess.run", return_value=ok_run(board)) as mock:
+        with patch("linear_cli.load_statuses", return_value={"states": {"backlog": ["Backlog"], "started": ["Doing"]}}):
+            result = provision_states("WB")
+
+    assert result == {"created": [], "reordered": [], "in_sync": True}
+    # only the read query ran — no create/update mutations
+    assert mock.call_count == 1
