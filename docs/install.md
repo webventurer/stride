@@ -6,37 +6,39 @@ npx github:webventurer/stride
 
 This copies skills, commands, hooks, and tools into your project's `.claude/` directory and merges hook config into your `.claude/settings.local.json` (gitignored, machine-local).
 
-## Next: anchor your project with `/vision`
+That command installs stride itself, not the CLIs the workflow relies on — see **What you need to install first** below, before your first `/linear:*` command.
 
-Once stride is installed, run `/vision` before anything else:
+## What you need to install first
 
-```
-/vision
-```
-
-It walks you through seven questions and writes `VISION.md` at the repo root — what the project delivers, why it exists, what success looks like. Vision is the project's guiding light. Functionally that makes it stride's upstream anchor — every `/linear:*` command reads it before deciding anything: `/linear:plan-work` won't draft an issue without it, and `/linear:start` / `/linear:fix` use it to ground implementation decisions.
-
-Skipping this step means your first `/linear:plan-work` call stops with a hard-gate error. See [the `/vision` skill](/skills/vision) for the full walkthrough.
-
-## Uninstall
-
-```bash
-npx -p github:webventurer/stride stride-uninstall
-```
-
-This removes all copied directories, the example file, and strips the stride hook from `.claude/settings.local.json`. Your `.mcp.json` is left untouched — remove Linear servers manually if needed.
-
-## Requirements
-
-### Claude Code
-
-Install the [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI:
+stride needs [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plus four CLIs on your PATH — `gh`, `uv`, `linctl`, `jq` (used across the `/linear:*` skills, the commit hook, and the Python tools). On macOS:
 
 ```bash
 npm install -g @anthropic-ai/claude-code
+brew tap dorkitude/linctl
+brew install gh uv linctl jq
 ```
 
+### Linux
+
+`gh`, `uv`, and `jq` install from your package manager; `linctl` uses the same brew tap as above, or `nix profile install github:dorkitude/linctl`.
+
+### Windows
+
+`gh`, `uv`, and `jq` have native installers (winget / scoop / MSI). `linctl` has none — use WSL (then follow the macOS steps), or build it from source with Go.
+
+### Connect Linear
+
+stride's `/linear:*` skills reach Linear through **linctl**, authenticated by a per-workspace API key in `~/.env` — no `.mcp.json`, no OAuth. Add one key per workspace:
+
+```
+LINEAR_<TEAM>_API_KEY=lin_api_...
+```
+
+Get a key at [linear.app/settings/api](https://linear.app/settings/api) (one per workspace). Every `/linear:*` call is implicitly prefixed `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl …` — see [the workflow reference](/reference/workflow). Verify the connection with `/linear:check`.
+
 ### Linear MCP server
+
+> **Superseded by linctl** — see *Linear access* above. The `/linear:*` skills no longer use the Linear MCP server; `~/.env` API keys are all you need. This section is retained only during transition and will be removed — skip it for a fresh install.
 
 The `/linear` commands need Linear's [official MCP server](https://linear.app/docs/mcp). There are two ways to connect — **OAuth** (simplest) or **API key** (needed for multiple orgs).
 
@@ -113,45 +115,38 @@ Get your API keys at [linear.app/settings/api](https://linear.app/settings/api) 
 
 This confirms that each configured Linear server responds and shows which workspace it's connected to.
 
-### Linear board — set the view to Manual sort
+### Set the Linear board to Manual sort
 
 stride sequences your work by each issue's position on the board (`/linear:plan-work` places new issues; you arrange the backlog into the order you'll tackle it). **Set your Linear board — or whichever view you use for stride work — to "Manual" sort.** Under a Priority, Created, or Updated sort, Linear ignores those positions and stride's execution order looks scrambled. Board sort is a per-view UI setting, so stride can't set it for you.
 
-### GitHub CLI
+### Authenticate GitHub and OpenRouter
 
-Install the [GitHub CLI](https://cli.github.com/) (`gh`) for PR operations:
+- **GitHub** — run `gh auth login`.
+- **OpenRouter** — only needed for `/linear:plan-work`'s cross-model feedback (it sends drafts to ChatGPT via [OpenRouter](https://openrouter.ai/)). Add `OPEN_ROUTER_API_KEY=sk-or-...` to `~/.env` — [get a key](https://openrouter.ai/keys).
+
+## Next: anchor your project with `/vision`
+
+Once stride is installed, run `/vision` before anything else:
+
+```
+/vision
+```
+
+It walks you through seven questions and writes `VISION.md` at the repo root — what the project delivers, why it exists, what success looks like. Vision is the project's guiding light. Functionally that makes it stride's upstream anchor — every `/linear:*` command reads it before deciding anything: `/linear:plan-work` won't draft an issue without it, and `/linear:start` / `/linear:fix` use it to ground implementation decisions.
+
+Skipping this step means your first `/linear:plan-work` call stops with a hard-gate error. See [the `/vision` skill](/skills/vision) for the full walkthrough.
+
+## Uninstall
 
 ```bash
-brew install gh                # macOS
-# or: https://cli.github.com/ for other platforms
+npx -p github:webventurer/stride stride-uninstall
 ```
 
-Then authenticate:
-
-```bash
-gh auth login
-```
-
-## Python tools
-
-The cross-model feedback loop in `/linear:plan-work` uses a Python script to send drafts to ChatGPT via [OpenRouter](https://openrouter.ai/). Dependencies are managed inline with [uv](https://docs.astral.sh/uv/) — no venv or `pip install` needed.
-
-```bash
-brew install uv                # macOS
-# or: curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-Add your OpenRouter API key to `~/.env`:
-
-```
-OPEN_ROUTER_API_KEY=sk-or-...
-```
-
-Get your key at [openrouter.ai/keys](https://openrouter.ai/keys).
+This removes all copied directories, the example file, and strips the stride hook from `.claude/settings.local.json`. Your `.mcp.json` is left untouched — remove Linear servers manually if needed.
 
 ## What gets installed
 
-```bash
+```text
 .claude/
 ├── skills/commit/       # skill + workflow + reference docs
 ├── skills/craft/        # CRAFT prompt skill
