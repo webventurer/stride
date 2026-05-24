@@ -32,10 +32,12 @@ from linear_cli import (  # noqa: E402
     list_milestones,
     milestone_open_issues,
     min_backlog_sort_order,
+    project_content,
     raise_for_failure,
     search_by_project,
     set_sort_order,
     update_milestone_description,
+    update_project_content,
 )
 
 
@@ -182,6 +184,31 @@ def test_update_milestone_description_returns_success():
     data = {"projectMilestoneUpdate": {"success": True}}
     with patch("linear_cli.subprocess.run", return_value=ok_run(data)):
         assert update_milestone_description("m1", "Completed: 2026-05-24") is True
+
+
+# ---- project content ----
+
+def test_linctl_graphql_isolates_stdin():
+    # linctl treats a piped stdin as a competing query source alongside --query;
+    # the subprocess call must close stdin or every live graphql call fails.
+    with patch("linear_cli.subprocess.run", return_value=ok_run({"viewer": {"id": "u1"}})) as mock:
+        linctl_graphql("{ viewer { id } }", {})
+    assert mock.call_args.kwargs.get("stdin") == subprocess.DEVNULL
+
+
+def test_project_content_returns_content():
+    data = {"project": {"content": "# Vision: stride\n\n..."}}
+    with patch("linear_cli.subprocess.run", return_value=ok_run(data)):
+        assert project_content("proj-1") == "# Vision: stride\n\n..."
+
+
+def test_update_project_content_passes_content_and_returns_success():
+    data = {"projectUpdate": {"success": True}}
+    with patch("linear_cli.subprocess.run", return_value=ok_run(data)) as mock:
+        result = update_project_content("proj-1", "# Vision: stride")
+
+    assert result is True
+    assert sent_variables(mock) == {"id": "proj-1", "content": "# Vision: stride"}
 
 
 # ---- board order ----
