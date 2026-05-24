@@ -22,7 +22,7 @@ function seedInstalled({ gitignore = "n" } = {}) {
   mkdirSync(fixtureRoot, { recursive: true });
   execSync(`node ${join(strideRoot, "bin/install.mjs")}`, {
     cwd: fixtureRoot,
-    input: `${gitignore}\nnone\nn\n`,
+    input: `${gitignore}\nn\n`,
     stdio: ["pipe", "pipe", "pipe"],
   });
 }
@@ -180,7 +180,7 @@ describe("uninstall footprint", () => {
     mkdirSync(fixtureRoot, { recursive: true });
     execSync(`node ${join(strideRoot, "bin/install.mjs")}`, {
       cwd: fixtureRoot,
-      input: "y\nnone\nn\n",
+      input: "y\nn\n",
       stdio: ["pipe", "pipe", "pipe"],
     });
 

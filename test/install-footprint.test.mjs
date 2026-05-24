@@ -37,8 +37,8 @@ function seedFixture() {
 }
 
 function runInstall({ gitignore = "n" } = {}) {
-  // Prompts in order: gitignore, MCP (none), settings merge (n).
-  const input = `${gitignore}\nnone\nn\n`;
+  // Prompts in order: gitignore, settings merge (n).
+  const input = `${gitignore}\nn\n`;
   execSync(`node ${join(strideRoot, "bin/install.mjs")}`, {
     cwd: fixtureRoot,
     input,

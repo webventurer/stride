@@ -133,9 +133,6 @@ function main() {
   console.log(
     "\nOther files in shared directories (codefu symlinks, your own hooks) left untouched.",
   );
-  console.log(
-    "Note: .mcp.json was not modified — remove Linear servers manually if needed.",
-  );
   console.log("Done.\n");
 }
 
