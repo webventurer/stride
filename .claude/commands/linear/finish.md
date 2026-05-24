@@ -271,26 +271,27 @@ This PR changed VISION.md — sync to Linear?
 Then:
 
 1. Read `VISION.md` from the repo root.
-2. Resolve the Linear project from `.linear_project`. Get its id (and URL) from the project list by name — `linctl project get` takes an ID, not a name: `linctl project list --json | jq -r --arg name "<project-name>" '.[] | select(.name == $name) | {id, url}'`.
-3. Fetch the current project `content` (the Vision lives in `content`, not the length-limited `description`; linctl can't read `content`, so use `linear_cli.py`):
+2. Resolve the Linear project from `.linear_project`. Get its id, URL, and current subtitle (`description`) from the project list by name — `linctl project get` takes an ID, not a name: `linctl project list --json | jq -r --arg name "<project-name>" '.[] | select(.name == $name) | {id, url, description}'`.
+3. Fetch the current project `content` via `linear_cli.py` (the Vision lives in `content`, not the length-limited `description`; linctl can't read `content`). The subtitle is VISION.md's opening blockquote — the `>` line under the H1 (read it from the file loaded in sub-step 1):
    ```bash
    LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py get-project-content <project-id>
    ```
-4. Compare against `VISION.md` (after trimming surrounding whitespace). Linear normalises markdown on save (e.g. `-` list markers become `*`), so treat a difference that is *only* list-marker style as already in sync.
-   - **Identical**: report *"Linear project content already matches VISION.md — no update needed"* and continue to step 9.
-   - **Different**: show the diff and ask:
+4. Compare both fields against `VISION.md` (after trimming surrounding whitespace). Linear normalises markdown on save (e.g. `-` list markers become `*`), so treat normalisation-only differences as in sync. The subtitle is the tagline vs the current `description`; skip the subtitle if VISION.md has no opening blockquote (never blank an existing one).
+   - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 9.
+   - **Either differs**: show what will change (content diff and/or old→new subtitle) and ask:
 
      ```
-     Replace the Linear project content with VISION.md? (y/n)
+     Replace the Linear content and/or subtitle with VISION.md? (y/n)
      ```
 
-5. On `y`:
+5. On `y`, write whichever differs:
    ```bash
    LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py update-project-content <project-id> --content "$(cat VISION.md)"
+   LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project update <project-id> --description "<tagline-from-step-3>"
    ```
-   On `n`: skip the write and continue to step 9.
+   On `n`: skip the writes and continue to step 9.
 
-If any step in the sync flow fails (`.linear_project` missing, project not found, `update-project-content` errors), surface the failure clearly and continue to step 9. The issue is already Done from step 8 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
+If any step in the sync flow fails (`.linear_project` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 9. The issue is already Done from step 8 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
 
 Track the outcome for the summary in step 9:
 
