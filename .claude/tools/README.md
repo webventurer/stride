@@ -9,8 +9,8 @@ beyond `requests` / `httpx` / `click`.
 A small Python client for the Linear GraphQL API. Built to power the
 `linear-to-linear` and `trello-to-linear` migration skills in this
 repo, but reusable in any Python script that needs to create issues,
-projects, labels, or attachments in Linear without going through the
-Linear MCP.
+projects, labels, or attachments in Linear straight through the
+GraphQL API.
 
 ### Vendor contract
 

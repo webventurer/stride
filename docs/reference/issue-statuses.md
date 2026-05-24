@@ -25,7 +25,7 @@ The board column names come from your team's issue statuses.
 
 Renaming a status updates the corresponding board column label for that team. See the [Kanban process](/reference/kanban) for what each column means and how work flows between them.
 
-**Note:** Issue statuses can only be configured through the Linear UI — the API and MCP don't support creating, renaming, or reordering status definitions.
+**Note:** Issue statuses can only be configured through the Linear UI — the API doesn't support creating, renaming, or reordering status definitions.
 
 ### Recommended statuses
 

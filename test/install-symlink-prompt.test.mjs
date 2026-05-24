@@ -79,7 +79,7 @@ describe("install symlink prompt", () => {
     resetFixture();
     const { external, symlinkPath } = setupDifferingSymlink();
 
-    runInstallWith("y\nn\nnone\nn\n");
+    runInstallWith("y\nn\nn\n");
 
     strictEqual(lstatSync(symlinkPath).isSymbolicLink(), false);
     strictEqual(readFixture(SKILL_FILE_REL), readStride(SKILL_FILE_REL));
@@ -94,7 +94,7 @@ describe("install symlink prompt", () => {
     resetFixture();
     const { symlinkPath } = setupDifferingSymlink();
 
-    const result = runInstallWithExpectFailure("n\nn\nnone\nn\n");
+    const result = runInstallWithExpectFailure("n\nn\nn\n");
 
     notStrictEqual(result, null, "install should exit with non-zero status");
     strictEqual(result.status, 1);
@@ -106,7 +106,7 @@ describe("install symlink prompt", () => {
     resetFixture();
     const { symlinkPath } = setupDifferingSymlink();
 
-    runInstallWith("\nn\nnone\nn\n");
+    runInstallWith("\nn\nn\n");
 
     strictEqual(lstatSync(symlinkPath).isSymbolicLink(), false);
     strictEqual(readFixture(SKILL_FILE_REL), readStride(SKILL_FILE_REL));
@@ -116,7 +116,7 @@ describe("install symlink prompt", () => {
     resetFixture();
     const { symlinkPath } = setupMatchingSymlink();
 
-    runInstallWith("y\nn\nnone\nn\n");
+    runInstallWith("y\nn\nn\n");
 
     strictEqual(lstatSync(symlinkPath).isSymbolicLink(), false);
     strictEqual(readFixture(SKILL_FILE_REL), readStride(SKILL_FILE_REL));

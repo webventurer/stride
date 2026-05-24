@@ -7,7 +7,7 @@
 **Utility:**
 
 ```
-/linear:check               → verify MCP connections
+/linear:check               → verify linctl auth per workspace
 /linear:list-projects       → list all projects across workspaces
 /linear:next-steps          → see what needs doing
 ```

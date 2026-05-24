@@ -50,7 +50,7 @@ function writeFixture(relPath, content) {
 function runInstall(prefix = "") {
   return execSync(`node ${join(strideRoot, "bin/install.mjs")}`, {
     cwd: fixtureRoot,
-    input: `${prefix}n\nnone\nn\n`,
+    input: `${prefix}n\nn\n`,
     stdio: ["pipe", "pipe", "pipe"],
   });
 }
@@ -59,7 +59,7 @@ function runInstallExpectFailure(prefix = "") {
   try {
     execSync(`node ${join(strideRoot, "bin/install.mjs")}`, {
       cwd: fixtureRoot,
-      input: `${prefix}n\nnone\nn\n`,
+      input: `${prefix}n\nn\n`,
       stdio: ["pipe", "pipe", "pipe"],
     });
     return null;

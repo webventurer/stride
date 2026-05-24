@@ -259,84 +259,6 @@ async function copyFiles() {
   return totals;
 }
 
-const LINEAR_OAUTH = {
-  linear: {
-    command: "npx",
-    args: ["-y", "mcp-remote", "https://mcp.linear.app/mcp"],
-  },
-};
-
-const LINEAR_API_KEY = {
-  "linear-org1": {
-    command: "npx",
-    args: [
-      "-y",
-      "mcp-remote",
-      "https://mcp.linear.app/mcp",
-      "--header",
-      "Authorization:Bearer ${LINEAR_ORG1_API_KEY}",
-    ],
-    env: { LINEAR_ORG1_API_KEY: "${LINEAR_ORG1_API_KEY}" },
-  },
-  "linear-org2": {
-    command: "npx",
-    args: [
-      "-y",
-      "mcp-remote",
-      "https://mcp.linear.app/mcp",
-      "--header",
-      "Authorization:Bearer ${LINEAR_ORG2_API_KEY}",
-    ],
-    env: { LINEAR_ORG2_API_KEY: "${LINEAR_ORG2_API_KEY}" },
-  },
-};
-
-function isApiKey(method) {
-  return method === "api" || method === "apikey";
-}
-
-function readMcpConfig(path) {
-  if (!existsSync(path)) return { mcpServers: {} };
-  const config = JSON.parse(readFileSync(path, "utf8"));
-  config.mcpServers = config.mcpServers || {};
-  return config;
-}
-
-function writeMcpConfig(path, config) {
-  writeFileSync(path, `${JSON.stringify(config, null, 2)}\n`);
-}
-
-function hasLinearMcp(mcpPath) {
-  if (!existsSync(mcpPath)) return false;
-  const config = JSON.parse(readFileSync(mcpPath, "utf8"));
-  const servers = Object.keys(config.mcpServers || {});
-  return servers.some((s) => s.toLowerCase().includes("linear"));
-}
-
-async function configureMcp() {
-  const mcpPath = join(destRoot, ".mcp.json");
-  if (hasLinearMcp(mcpPath)) {
-    console.log("Linear MCP already configured in .mcp.json — skipping");
-    return;
-  }
-  const method = await ask(
-    "Linear MCP: oauth (single org), api (multiple orgs), or none? [none] ",
-  );
-  if (!method || method === "none" || method === "n" || method === "skip") {
-    console.log("Skipped Linear MCP setup");
-    return;
-  }
-  const servers = isApiKey(method) ? LINEAR_API_KEY : LINEAR_OAUTH;
-  const config = readMcpConfig(mcpPath);
-  deepMerge(config.mcpServers, servers);
-  writeMcpConfig(mcpPath, config);
-  console.log(
-    isApiKey(method)
-      ? "Configured Linear MCP (API key — add LINEAR_ORG1_API_KEY and LINEAR_ORG2_API_KEY to ~/.env)"
-      : "Configured Linear MCP (OAuth — browser login on first use)",
-  );
-}
-
 function mergeSettings() {
   const settingsPath = join(destRoot, ".claude/settings.local.json");
   mkdirSync(dirname(settingsPath), { recursive: true });
@@ -401,7 +323,7 @@ function logAvailableSkills() {
   );
   console.log("  /commit              — 4-pass atomic git commits");
   console.log("  /craft               — CRAFT prompt framework");
-  console.log("  /linear:check        — verify MCP connections");
+  console.log("  /linear:check        — verify Linear access (linctl)");
   console.log("  /linear:start        — implement a Linear issue");
   console.log("  /linear:plan-work    — create a Linear issue");
   console.log("  /linear:fix          — address PR review feedback");
@@ -456,7 +378,6 @@ async function main() {
   requirePrerequisites();
   await installFiles();
   await configureGitignore();
-  await configureMcp();
   if (!(await installHookConfig())) return;
   logAvailableSkills();
 }

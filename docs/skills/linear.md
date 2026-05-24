@@ -6,7 +6,7 @@ Eight commands covering the full development cycle, from setup through to merge 
 
 ```bash
 # Utility
-/linear:check               # verify MCP connections
+/linear:check               # verify Linear access (linctl)
 /linear:list-projects       # list all projects across workspaces
 /linear:update-vision       # push VISION.md to Linear
 /linear:next-steps          # see what needs doing
@@ -66,17 +66,17 @@ The other Linear commands (`/linear:check`, `/linear:list-projects`, `/linear:fi
 
 ### /linear:check
 
-**Verify Linear MCP connections.** Reads `.mcp.json`, finds all Linear server entries, and calls `list_teams` on each to confirm it responds. Reports results as a table showing server name, status, and workspace.
+**Verify Linear access.** Runs `linctl whoami` for each `LINEAR_<TEAM>_API_KEY` in `~/.env` to confirm it authenticates. Reports results as a table showing the key, status, and which workspace it resolves to.
 
 ### /linear:list-projects
 
-**List all projects across connected Linear workspaces.** Calls `list_projects` on each configured Linear MCP server and displays results grouped by workspace.
+**List all projects across connected Linear workspaces.** Runs `linctl project list` for each configured `LINEAR_<TEAM>_API_KEY` and displays results grouped by workspace.
 
 **Usage**: `/linear:list-projects`
 
 ### /linear:update-vision
 
-**Mirror `VISION.md` to the Linear project description.** Reads `VISION.md`, resolves the Linear project from `.linear_project`, shows the diff against the current Linear description, and — once you confirm — pushes the file's contents into the project's `description` field via `save_project`.
+**Mirror `VISION.md` to the Linear project.** Reads `VISION.md`, resolves the Linear project from `.linear_project`, shows the diff against the current Linear content, and — once you confirm — pushes the file's contents into the project's `content` field via linctl.
 
 Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). One-way only: repo → Linear, never the reverse. Idempotent — re-running with no `VISION.md` changes is a no-op.
 
@@ -184,7 +184,7 @@ The squash commit message reads as if the work was done right the first time —
 
 ## Setup
 
-See the [install guide](/install#linear-mcp-server) for MCP server configuration. The commands also require the [GitHub CLI](https://cli.github.com/) for PR operations.
+See the [install guide](/install#connect-linear) for connecting Linear via linctl. The commands also require the [GitHub CLI](https://cli.github.com/) for PR operations.
 
 ### Reviewing PRs in VS Code
 

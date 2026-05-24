@@ -1,18 +1,18 @@
-# Linear MCP setup
+# Linear setup
 
 > **AI Assistant Note**: Reference this document when setting up Linear integration for a new project.
 
-This guide covers how to connect Claude Code to Linear via the MCP server.
+This guide covers how to connect Claude Code to Linear via linctl, using a per-workspace API key in `~/.env`.
 
 ## Quick reference
 
-**Prerequisites**: A Linear workspace and Claude Code with the Linear MCP server configured.
+**Prerequisites**: A Linear workspace, `linctl` installed, and a `LINEAR_<TEAM>_API_KEY` in `~/.env` (see the [install guide](/install)).
 
 **Utility commands:**
 
 | Command | What it does |
 |:--------|:-------------|
-| `/linear:check` | Verify MCP connections — confirm each Linear server responds |
+| `/linear:check` | Verify linctl auth — confirm each `LINEAR_<TEAM>_API_KEY` resolves |
 | `/linear:list-projects` | List all projects across connected Linear workspaces |
 | `/linear:next-steps` | Review priorities, surface PRs needing fix, recommend what to work on next |
 
@@ -27,11 +27,17 @@ This guide covers how to connect Claude Code to Linear via the MCP server.
 
 See [workflow.md](workflow.md) for detailed command docs and typical flow.
 
-## Setting up the Linear MCP server
+## Connecting to Linear
 
-### 1. Configure the MCP server
+### 1. Add your API key
 
-Copy `.mcp.json.example` to `.mcp.json` and choose OAuth (single org) or API key (multiple orgs). See the [install guide](/install#linear-mcp-server) for both configurations.
+stride's `/linear:*` skills reach Linear through [linctl](https://github.com/dorkitude/linctl) using a per-workspace API key — no `.mcp.json`, no OAuth. Add one key per workspace to `~/.env`:
+
+```
+LINEAR_<TEAM>_API_KEY=lin_api_...
+```
+
+Get a key at [linear.app/settings/api](https://linear.app/settings/api). See the [install guide](/install) for the full prerequisite list.
 
 ### 2. Verify the connection
 

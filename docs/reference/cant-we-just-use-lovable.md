@@ -84,7 +84,7 @@ If you are reading this with a Lovable project that has hit its ceiling, the pat
 
 1. **Export to GitHub** — Lovable supports this directly. Your code comes out as a real React + Vite + Tailwind + Supabase repo.
 2. **Point Claude Code at it** — open the repo locally, install Stride with `npx github:webventurer/stride`.
-3. **Wire up Linear** — `/linear:check` confirms MCP, `/linear:plan-work` starts putting existing features onto a board.
+3. **Wire up Linear** — `/linear:check` confirms linctl access, `/linear:plan-work` starts putting existing features onto a board.
 4. **Commit discipline from here forward** — `/commit` on every change. The past is what it is; the future is atomic.
 
 You keep the code Lovable generated. You inherit a better loop for changing it.

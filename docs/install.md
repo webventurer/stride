@@ -36,85 +36,6 @@ LINEAR_<TEAM>_API_KEY=lin_api_...
 
 Get a key at [linear.app/settings/api](https://linear.app/settings/api) (one per workspace). Every `/linear:*` call is implicitly prefixed `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl …` — see [the workflow reference](/reference/workflow). Verify the connection with `/linear:check`.
 
-### Linear MCP server
-
-> **Superseded by linctl** — see *Linear access* above. The `/linear:*` skills no longer use the Linear MCP server; `~/.env` API keys are all you need. This section is retained only during transition and will be removed — skip it for a fresh install.
-
-The `/linear` commands need Linear's [official MCP server](https://linear.app/docs/mcp). There are two ways to connect — **OAuth** (simplest) or **API key** (needed for multiple orgs).
-
-Create `.mcp.json` in your repo root using one of the snippets below:
-
-#### OAuth (single org)
-
-Uses browser-based login — no keys to manage:
-
-```json
-{
-  "mcpServers": {
-    "linear": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.linear.app/mcp"]
-    }
-  }
-}
-```
-
-On first use, a browser window opens to authenticate. The token is cached locally.
-
-#### API key (multiple orgs)
-
-When you need separate connections to different Linear orgs — add one entry per org with its own API key:
-
-```json
-{
-  "mcpServers": {
-    "linear-org1": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://mcp.linear.app/mcp",
-        "--header",
-        "Authorization:Bearer ${LINEAR_ORG1_API_KEY}"
-      ],
-      "env": {
-        "LINEAR_ORG1_API_KEY": "${LINEAR_ORG1_API_KEY}"
-      }
-    },
-    "linear-org2": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://mcp.linear.app/mcp",
-        "--header",
-        "Authorization:Bearer ${LINEAR_ORG2_API_KEY}"
-      ],
-      "env": {
-        "LINEAR_ORG2_API_KEY": "${LINEAR_ORG2_API_KEY}"
-      }
-    }
-  }
-}
-```
-
-Each entry points to the same `mcp.linear.app/mcp` endpoint but authenticates with a different key. Add the keys to your `~/.env`:
-
-```
-LINEAR_ORG1_API_KEY=lin_api_...
-LINEAR_ORG2_API_KEY=lin_api_...
-```
-
-Get your API keys at [linear.app/settings/api](https://linear.app/settings/api) — one per org. Replace `org1`/`org2` with meaningful names (e.g. `LINEAR_ACME_API_KEY`).
-
-#### Verify the connection
-
-```
-/linear:check
-```
-
-This confirms that each configured Linear server responds and shows which workspace it's connected to.
-
 ### Set the Linear board to Manual sort
 
 stride sequences your work by each issue's position on the board (`/linear:plan-work` places new issues; you arrange the backlog into the order you'll tackle it). **Set your Linear board — or whichever view you use for stride work — to "Manual" sort.** Under a Priority, Created, or Updated sort, Linear ignores those positions and stride's execution order looks scrambled. Board sort is a per-view UI setting, so stride can't set it for you.
@@ -142,7 +63,7 @@ Skipping this step means your first `/linear:plan-work` call stops with a hard-g
 npx -p github:webventurer/stride stride-uninstall
 ```
 
-This removes all copied directories, the example file, and strips the stride hook from `.claude/settings.local.json`. Your `.mcp.json` is left untouched — remove Linear servers manually if needed.
+This removes all copied directories, the example file, and strips the stride hook from `.claude/settings.local.json`.
 
 ## What gets installed
 
