@@ -23,7 +23,9 @@ sys.path.insert(0, str(TOOLS_DIR))
 
 from linear_cli import (  # noqa: E402
     LinctlError,
+    board_states,
     create_milestone,
+    declared_states,
     graphql_data,
     issues_query,
     linctl_graphql,
@@ -37,6 +39,7 @@ from linear_cli import (  # noqa: E402
     raise_for_failure,
     search_by_project,
     set_sort_order,
+    state_drift,
     update_milestone_description,
     update_project_content,
 )
@@ -243,3 +246,64 @@ def test_set_sort_order_passes_float_and_returns_success():
     assert result is True
     assert sent_variables(mock) == {"id": "issue-1", "order": -120550.0}
     assert "$order: Float!" in sent_query(mock)
+
+
+# ---- workflow-state drift ----
+
+def teams(nodes: list) -> dict:
+    return {"teams": {"nodes": nodes}}
+
+
+def test_board_states_filters_by_team_key_and_flattens_nodes():
+    data = teams([{"states": {"nodes": [{"name": "Doing", "type": "started"}]}}])
+    with patch("linear_cli.subprocess.run", return_value=ok_run(data)) as mock:
+        result = board_states("WB")
+
+    assert result == [{"name": "Doing", "type": "started"}]
+    assert sent_variables(mock) == {"key": "WB"}
+    assert "key: { eq: $key }" in sent_query(mock)
+
+
+def test_board_states_returns_empty_when_no_team_matches():
+    with patch("linear_cli.subprocess.run", return_value=ok_run(teams([]))):
+        assert board_states("NOPE") == []
+
+
+def test_declared_states_flattens_grouped_names_into_typed_pairs():
+    config = {"states": {"started": ["Doing", "In Review"], "completed": ["Done"]}}
+
+    assert declared_states(config) == {
+        ("Doing", "started"),
+        ("In Review", "started"),
+        ("Done", "completed"),
+    }
+
+
+def test_state_drift_flags_declared_state_missing_from_board():
+    statuses = {"states": {"started": ["Doing", "In Progress"]}}
+    board = teams([{"states": {"nodes": [{"name": "Doing", "type": "started"}]}}])
+    with patch("linear_cli.subprocess.run", return_value=ok_run(board)):
+        with patch("linear_cli.load_statuses", return_value=statuses):
+            assert state_drift("WB") == [{"name": "In Progress", "type": "started"}]
+
+
+def test_state_drift_empty_when_board_carries_every_declared_state():
+    statuses = {"states": {"started": ["Doing"]}}
+    board = teams(
+        [{"states": {"nodes": [
+            {"name": "Doing", "type": "started"},
+            {"name": "Done", "type": "completed"},
+        ]}}]
+    )
+    with patch("linear_cli.subprocess.run", return_value=ok_run(board)):
+        with patch("linear_cli.load_statuses", return_value=statuses):
+            assert state_drift("WB") == []
+
+
+def test_load_statuses_parses_the_repo_config():
+    from linear_cli import load_statuses as real_load
+
+    config = real_load()
+
+    assert "states" in config and "transitions" in config
+    assert "Doing" in config["states"]["started"]

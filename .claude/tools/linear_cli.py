@@ -31,6 +31,10 @@ linctl's auth (LINCTL_API_KEY). No second auth path, no `requests`.
     Board order
         min_backlog_sort_order(project_id)            lowest Backlog sortOrder
         set_sort_order(issue_id, sort_order)          -> success bool
+    Workflow-state drift
+        state_drift(team_key)                         states stride declares
+                                                      (linear_statuses.json) that
+                                                      the board lacks — [] = in sync
 
 Usage (deps auto-installed by uv; LINCTL_API_KEY for the workspace):
     LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py \\
@@ -41,8 +45,13 @@ Requires Python 3.10+ and `linctl` on PATH.
 
 import json
 import subprocess
+from pathlib import Path
 
 import click
+
+STATUSES_PATH = (
+    Path(__file__).resolve().parent.parent / "commands/linear/linear_statuses.json"
+)
 
 
 class LinctlError(Exception):
@@ -213,6 +222,41 @@ def set_sort_order(issue_id: str, sort_order: float) -> bool:
     ]
 
 
+# ---- Workflow-state drift (linctl team state list is per-team; this diffs it
+#      against linear_statuses.json — the names stride uses — to catch the
+#      silent no-op a name mismatch causes, e.g. WB-401's "In Progress") ----
+
+
+def board_states(team_key: str) -> list:
+    query = (
+        "query($key: String!) { teams(filter: { key: { eq: $key } }, first: 1) "
+        "{ nodes { states { nodes { name type } } } } }"
+    )
+    nodes = linctl_graphql(query, {"key": team_key})["teams"]["nodes"]
+    return nodes[0]["states"]["nodes"] if nodes else []
+
+
+def first_team_key() -> str | None:
+    nodes = linctl_graphql("query { teams(first: 1) { nodes { key } } }", {})["teams"][
+        "nodes"
+    ]
+    return nodes[0]["key"] if nodes else None
+
+
+def declared_states(config: dict) -> set:
+    return {(name, t) for t, names in config["states"].items() for name in names}
+
+
+def load_statuses() -> dict:
+    return json.loads(STATUSES_PATH.read_text())
+
+
+def state_drift(team_key: str | None = None) -> list:
+    board = {(s["name"], s["type"]) for s in board_states(team_key or first_team_key())}
+    missing = declared_states(load_statuses()) - board
+    return [{"name": n, "type": t} for n, t in sorted(missing)]
+
+
 @click.group()
 def cli():
     """Linear operations the /linear:* skills need that linctl can't express."""
@@ -302,6 +346,12 @@ def min_backlog_sort_order_cmd(project_id: str):
 @click.option("--sort-order", type=float, required=True)
 def set_sort_order_cmd(issue_id: str, sort_order: float):
     click.echo(json.dumps(set_sort_order(issue_id, sort_order)))
+
+
+@cli.command("state-drift")
+@click.option("--team", "team_key", default=None, help="Team key (e.g. WB); defaults to the key's first team")
+def state_drift_cmd(team_key: str):
+    click.echo(json.dumps(state_drift(team_key)))
 
 
 if __name__ == "__main__":
