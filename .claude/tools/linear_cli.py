@@ -22,6 +22,9 @@ linctl's auth (LINCTL_API_KEY). No second auth path, no `requests`.
         milestone_open_issues(milestone_id)           non-Done issues in it
         create_milestone(project_id, name, target)    -> {id, name}
         update_milestone_description(id, description)  -> success bool
+    Project content
+        project_content(project_id)                   project `content` (Vision doc)
+        update_project_content(project_id, content)   -> success bool
     Board order
         min_backlog_sort_order(project_id)            lowest Backlog sortOrder
         set_sort_order(issue_id, sort_order)          -> success bool
@@ -48,6 +51,7 @@ def linctl_graphql(query: str, variables: dict) -> dict:
         ["linctl", "graphql", "--query", query, "--variables", json.dumps(variables)],
         capture_output=True,
         text=True,
+        stdin=subprocess.DEVNULL,  # else linctl reads the piped stdin as a competing query source
     )
     raise_for_failure(result)
     return graphql_data(result.stdout)
@@ -152,6 +156,24 @@ def update_milestone_description(milestone_id: str, description: str) -> bool:
     return data["projectMilestoneUpdate"]["success"]
 
 
+# ---- Project content (linctl project update --description is length-limited
+#      and targets the wrong field — the Vision doc lives in `content`) ----
+
+
+def project_content(project_id: str) -> str | None:
+    query = "query($id: String!) { project(id: $id) { content } }"
+    return linctl_graphql(query, {"id": project_id})["project"]["content"]
+
+
+def update_project_content(project_id: str, content: str) -> bool:
+    query = (
+        "mutation($id: String!, $content: String!) { "
+        "projectUpdate(id: $id, input: { content: $content }) { success } }"
+    )
+    data = linctl_graphql(query, {"id": project_id, "content": content})
+    return data["projectUpdate"]["success"]
+
+
 # ---- Board order (linctl issue update has no --sort-order flag) ----
 
 
@@ -224,6 +246,19 @@ def create_milestone_cmd(project_id: str, name: str, target_date: str):
 @click.option("--description", required=True)
 def update_milestone_description_cmd(milestone_id: str, description: str):
     click.echo(json.dumps(update_milestone_description(milestone_id, description)))
+
+
+@cli.command("get-project-content")
+@click.argument("project_id")
+def get_project_content_cmd(project_id: str):
+    click.echo(project_content(project_id) or "")
+
+
+@cli.command("update-project-content")
+@click.argument("project_id")
+@click.option("--content", required=True)
+def update_project_content_cmd(project_id: str, content: str):
+    click.echo(json.dumps(update_project_content(project_id, content)))
 
 
 @cli.command("min-backlog-sort-order")
