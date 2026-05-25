@@ -70,7 +70,7 @@ The other Linear commands (`/linear:check`, `/linear:list-projects`, `/linear:fi
 
 ### /linear:check
 
-**Verify Linear access.** Runs `linctl whoami` for each `LINEAR_<TEAM>_API_KEY` in `~/.env` to confirm it authenticates, then checks the board's workflow states match `linear_statuses.json` and flags any drift. Reports results as a table showing the key, status, and which workspace it resolves to.
+**Verify Linear access.** Runs `linctl whoami` for each `LINEAR_<TEAM>_API_KEY` in `~/.env` to confirm it authenticates, then checks that every team's board carries the workflow states in `linear_statuses.json` and flags any drift. Because boards are per-team, it reports one row per team — a multi-team workspace gets each team checked, not just the first. If a team's board drifts, it points you at [`/linear:setup`](/skills/linear) for that team (it never reconciles the board itself).
 
 ### /linear:setup
 
