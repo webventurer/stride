@@ -57,8 +57,8 @@ Report one row per team:
 
 | Workspace | Team | Board match | Drift |
 |:----------|:-----|:------------|:------|
-| Webventurer | WB | ✅ in sync | — |
-| Webventurer | TES | ⚠️ drift | `In Review` (started) missing |
+| Org1 | ENG | ✅ in sync | — |
+| Org1 | OPS | ⚠️ drift | `In Review` (started) missing |
 
 If a team drifts, point the user at [`/linear:setup`](setup.md) for that team — on an empty board it provisions the states to match; on a populated board it reports the target order for the human to apply (rename the board state to match `linear_statuses.json`, or edit the JSON to match the board). stride never auto-reconciles — the board is the source of truth for what *exists*, the JSON for what stride *uses*. Only ever suggest `/linear:setup`; never run it automatically from `/linear:check`.
 
