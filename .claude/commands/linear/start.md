@@ -4,7 +4,7 @@ Implement, validate, and open a PR in one headless flow.
 
 Accepts a Linear issue ID as argument: `/start PG-205`
 
-If no argument is given, infer the issue ID from the current branch name (extract `PG-\d+` pattern). If neither works, ask the user.
+If no argument is given, infer the issue ID from the current branch name (extract the `[A-Z]+-\d+` pattern, e.g. `PG-205`). If neither works, ask the user.
 
 Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if GitHub review feedback) → `/finish`
 
