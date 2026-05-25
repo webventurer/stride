@@ -36,10 +36,10 @@ from linear_cli import (  # noqa: E402
     list_milestones,
     milestone_open_issues,
     min_backlog_sort_order,
+    order_states,
     project_content,
     provision_states,
     raise_for_failure,
-    reorder_canonical,
     search_by_project,
     set_sort_order,
     state_drift,
@@ -332,28 +332,34 @@ def test_create_workflow_state_passes_typed_input_and_color():
     assert "workflowStateCreate(input: $input)" in sent_query(mock)
 
 
-def test_reorder_canonical_skips_when_already_in_json_order():
+def test_order_states_skips_when_already_in_json_order():
     # Doing before In Review by position — matches ONE_TYPE order, so no writes.
-    pos = {"Doing": 2.0, "In Review": 1069.0}
+    board = [
+        {"name": "Doing", "position": 2.0},
+        {"name": "In Review", "position": 1069.0},
+    ]
     ids = {"Doing": "d", "In Review": "r"}
     with patch("linear_cli.set_state_position") as set_pos:
-        assert reorder_canonical(ONE_TYPE, pos, ids) == []
+        assert order_states(ONE_TYPE, board, ids) == []
     set_pos.assert_not_called()
 
 
-def test_reorder_canonical_fixes_out_of_order_states():
+def test_order_states_fixes_out_of_order_states():
     # In Review sits before Doing by position — must be reordered to JSON order.
-    pos = {"Doing": 5.0, "In Review": 2.0}
+    board = [
+        {"name": "Doing", "position": 5.0},
+        {"name": "In Review", "position": 2.0},
+    ]
     ids = {"Doing": "d", "In Review": "r"}
     with patch("linear_cli.set_state_position") as set_pos:
-        result = reorder_canonical(ONE_TYPE, pos, ids)
+        result = order_states(ONE_TYPE, board, ids)
 
     assert result == ["Doing", "In Review"]
     assert set_pos.call_count == 2
 
 
 def test_provision_states_creates_missing_and_reports_them():
-    board = {"teams": {"nodes": [{"id": "t1", "states": {"nodes": [
+    board = {"teams": {"nodes": [{"id": "t1", "issues": {"nodes": []}, "states": {"nodes": [
         {"id": "b", "name": "Backlog", "type": "backlog", "position": 0.0},
     ]}}]}}
     created_state = {"workflowStateCreate": {"workflowState": {"id": "new"}}}
@@ -371,7 +377,7 @@ def test_provision_states_creates_missing_and_reports_them():
 
 
 def test_provision_states_in_sync_when_board_has_all_canonical():
-    board = {"teams": {"nodes": [{"id": "t1", "states": {"nodes": [
+    board = {"teams": {"nodes": [{"id": "t1", "issues": {"nodes": []}, "states": {"nodes": [
         {"id": "b", "name": "Backlog", "type": "backlog", "position": 0.0},
         {"id": "d", "name": "Doing", "type": "started", "position": 1.0},
     ]}}]}}
@@ -379,6 +385,12 @@ def test_provision_states_in_sync_when_board_has_all_canonical():
         with patch("linear_cli.load_statuses", return_value={"states": {"backlog": ["Backlog"], "started": ["Doing"]}}):
             result = provision_states("WB")
 
-    assert result == {"created": [], "reordered": [], "in_sync": True}
+    assert result == {
+        "mode": "provisioned",
+        "created": [],
+        "deleted": [],
+        "reordered": [],
+        "in_sync": True,
+    }
     # only the read query ran — no create/update mutations
     assert mock.call_count == 1
