@@ -8,7 +8,7 @@
 
 | Pass | Action | Goal |
 |:-----|:-------|:-----|
-| 0 | **Pre-flight** | Fix formatting, identify atomic changes |
+| 0 | **Pre-flight** | Identify atomic changes |
 | 1 | **Content** | Stage selectively, verify one logical change |
 | 2 | **Standards** | Verify message format against checklists |
 | 3 | **Final review** | Sanity check before committing |
@@ -24,24 +24,15 @@ Read [SKILL.md](SKILL.md) first — it contains the coherence test, AI atomicity
 
 ## Pass 0: Pre-flight
 
-**Goal**: Clean slate before staging.
+**Goal**: Understand the changes and plan the atomic commits before staging.
 
-### Step 1: Run formatting
+> <mark>**`/commit` does not run a formatter.**</mark> Formatting is a separate concern from deciding what belongs in a commit — running a whole-repo formatter here reformats unrelated files and pollutes the atomic commit. Keep the tree formatted on its own axis: your editor, or a manual `pnpm fix` landed as its own `style:` commit.
 
-<mark>**Run the formatter first. Every time. No exceptions.** If the pre-commit hook finds anything to fix, it changes the working tree but not the staged copy — leaving an orphaned diff after every commit.</mark>
-
-| If this exists | Language | Formatter/linter | Run |
-|:---------------|:---------|:------------------|:----|
-| `.pre-commit-config.yaml` | Python | Ruff (via pre-commit) | `pre-commit run --all-files` |
-| `package.json` with `fix` script | JS/TS | Biome (via pnpm) | `pnpm fix` |
-
-<mark>**Use `pnpm fix`, not `npx lefthook run pre-commit`.**</mark> Lefthook only formats staged files — running it before staging is a no-op, and running it after staging defeats the purpose (the pre-commit hook does the same thing). `pnpm fix` formats all files regardless of staging state, so running it first ensures the hook has nothing left to change. A mixed repo (Python + JS) will have `pre-commit` *and* `pnpm fix` — run both. If none exist, skip — hooks will run during `git commit`.
-
-### Step 2: See what changed
+### Step 1: See what changed
 
 Run `git status` to see all changed files and `git diff` to understand the changes.
 
-### Step 3: Per-file independence gate
+### Step 2: Per-file independence gate
 
 <mark>**If 2+ files are changed, STOP. Write one sentence per file before doing anything else:**</mark>
 
@@ -70,7 +61,7 @@ check_markdown_links.py      → Excludes hooks directories from link checking
 
 This prevents concept-level grouping ("they're both about X") from overriding file-level independence. Write the sentences first, then let the sentences decide.
 
-### Step 3b: Shared-file bleed check
+### Step 2b: Shared-file bleed check
 
 <mark>**If a file appears in multiple commit groups, it contains two concerns. Do not commit the whole file with either group.**</mark>
 
@@ -93,7 +84,7 @@ After grouping, scan for files that serve more than one commit. Common examples:
 
 When no file appears in multiple commit groups, report **"No shared-file bleed"** and move on.
 
-### Step 4: Count the commits
+### Step 3: Count the commits
 
 Ask: could any subset of these changes be reverted independently and still make sense?
 
@@ -340,7 +331,7 @@ component-per-directory architecture, zero Tailwind.
 
 <mark>**All four passes must complete before the commit is final.**</mark>
 
-- [ ] Pre-flight: formatting fixed, atomic changes identified
+- [ ] Pre-flight: atomic changes identified
 - [ ] Content: files staged selectively, coherence test passed
 - [ ] Standards: message format verified against checklists
 - [ ] Final review: sanity check passed

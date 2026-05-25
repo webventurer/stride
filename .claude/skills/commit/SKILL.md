@@ -241,7 +241,7 @@ Pre-commit hooks can accidentally cause you to commit multiple unrelated files t
 3. You run `git add -A` to include the fixes
 4. **Result**: your commit now includes unrelated files
 
-**Prevention**: Run the repo's hooks manually in Pass 0 (see [WORKFLOW.md](WORKFLOW.md)). This fixes all formatting upfront so hooks have nothing to fix during the actual commit.
+**Prevention**: Keep formatting off the commit path entirely. `/commit` runs no formatter (see [WORKFLOW.md](WORKFLOW.md) Pass 0), so there's no whole-repo reformatting to drag unrelated files in. Format via your editor, or run `pnpm fix` on its own and land the result as a separate `style:` commit. If a consumer's git hook reformats files mid-commit, stage only the files for *this* change — never `git add -A` the hook's other fixes.
 
 ---
 
