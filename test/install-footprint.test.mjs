@@ -94,7 +94,7 @@ describe("install footprint", () => {
     strictEqual(existsSync(join(claudeDir, "skills/commit")), true);
     strictEqual(existsSync(join(claudeDir, "commands/linear")), true);
     strictEqual(existsSync(join(claudeDir, "hooks")), true);
-    strictEqual(existsSync(join(claudeDir, "tools/openrouter-chat.py")), true);
+    strictEqual(existsSync(join(claudeDir, "tools/openrouter_cli.py")), true);
   });
 
   it("writes the stride section to .gitignore when accepted", () => {

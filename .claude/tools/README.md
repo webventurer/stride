@@ -223,7 +223,7 @@ network, linctl, or `LINEAR_E2E`:
 python -m pytest .claude/tools/tests/test_linear_cli.py
 ```
 
-## `openrouter-chat.py`
+## `openrouter_cli.py`
 
 Tiny OpenRouter CLI used by the `chorus` / plan-work feedback loops.
 Not part of the Linear client — just shares the same `.claude/tools/` home.
