@@ -10,6 +10,7 @@ import {
   readdirSync,
   readFileSync,
   realpathSync,
+  rmdirSync,
   statSync,
   unlinkSync,
   writeFileSync,
@@ -19,6 +20,7 @@ import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 import { buildSection, removeSection } from "./gitignore.mjs";
 import { requirePrerequisites } from "./prereqs.mjs";
+import { REMOVED_PATHS } from "./removed-paths.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, "..");
@@ -369,6 +371,59 @@ async function configureGitignore() {
   console.log("Updated .gitignore with stride paths");
 }
 
+function realFileUnderDest(rel) {
+  let current = destRoot;
+  for (const part of rel.split("/")) {
+    current = join(current, part);
+    if (!existsSync(current) || lstatSync(current).isSymbolicLink()) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function orphansPresent() {
+  return REMOVED_PATHS.filter(realFileUnderDest);
+}
+
+async function confirmPrune(orphans) {
+  console.log(
+    "\nThese files are from an older stride version and are no longer shipped:",
+  );
+  for (const rel of orphans) console.log(`  ${rel}`);
+  const answer = await ask("Remove them? [Y/n] ");
+  return !answer || answer === "y" || answer === "yes";
+}
+
+function pruneEmptyAncestors(start) {
+  const claudeRoot = join(destRoot, ".claude");
+  let current = dirname(start);
+  while (current.length > claudeRoot.length && current.startsWith(claudeRoot)) {
+    if (!existsSync(current) || readdirSync(current).length > 0) return;
+    rmdirSync(current);
+    current = dirname(current);
+  }
+}
+
+function removeOrphan(rel) {
+  const target = join(destRoot, rel);
+  unlinkSync(target);
+  pruneEmptyAncestors(target);
+}
+
+async function pruneRemovedPaths() {
+  const orphans = orphansPresent();
+  if (orphans.length === 0) return;
+  if (!(await confirmPrune(orphans))) {
+    console.log("Skipped — left the older files in place.");
+    return;
+  }
+  orphans.forEach(removeOrphan);
+  console.log(
+    `Removed ${orphans.length} file(s) from an older stride version.`,
+  );
+}
+
 function refuseIfInsideClaudeDir() {
   const cwd = process.cwd();
   if (!cwd.split(sep).includes(".claude")) return;
@@ -385,6 +440,7 @@ async function main() {
   console.log("\nstride — All the speed. None of the mess.\n");
   requirePrerequisites();
   await installFiles();
+  await pruneRemovedPaths();
   await configureGitignore();
   if (!(await installHookConfig())) return;
   logAvailableSkills();
