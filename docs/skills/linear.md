@@ -145,6 +145,18 @@ Two ways in: **describe it** (`/linear:quick "..."` — branch, implement, ship)
 
 The merge fires *only* on an explicit ship phrase — the agent never decides on its own that a change is ready. If the change grows past a one-scroll diff or crosses files non-trivially, it stops and points you back to `/linear:plan-work`. The Vision trace runs *before* the merge and is **surfaced like `/linear:finish`** — a drift is shown for your decision (ship against the best-fit criterion, pick a better one, or add one to `VISION.md` first), not silently shortcut. After the merge you can **file the card now or hold it to bundle** several small changes into one Done card.
 
+**Good candidates for the fast loop.** The fast-loop fits work where the shape is already obvious from the description and the diff fits comfortably in one terminal scroll. Examples:
+
+- **Design tweaks** — typography, spacing, colour swap, padding adjustment, icon switch
+- **Copy and wording** — typo fix, sentence rewrite, heading rename, button-label change
+- **Documentation polish** — broken link, formatting consistency, sentence break, list normalisation
+- **Single-file refactors** — extract a variable, rename a function within one file, inline a one-off helper
+- **Config tweaks** — adjust a threshold, update a default, change a constant
+- **Dead code removal** — orphaned imports, unused functions, dead branches the diff makes obvious
+- **Comment / docstring additions** — when the *what* is obvious from the code but the *why* isn't
+
+**When not to reach for `/linear:quick`:** the change crosses files in non-trivial ways, touches a public API or shared contract, requires migration, evolves the Vision, or carries any uncertainty about scope or risk. Those still earn the card-first discipline of `/linear:plan-work`.
+
 **Usage**: `/linear:quick "tighten the hero heading spacing"`
 
 ### /linear:start
