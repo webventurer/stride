@@ -37,7 +37,7 @@ If a workspace fails, show the error and suggest checking:
 
 ### 3. Verify each team's board matches stride's states
 
-The state names stride uses (`Doing`, `In Review`, `Done`, `Backlog`, …) live in one place: [`linear_statuses.json`](linear_statuses.json). A name that doesn't exist on the board silently no-ops — the trap WB-401 hit with `In Progress`. This step confirms every state stride declares actually exists on the live board.
+The state names stride uses (`Doing`, `In Review`, `Done`, `Backlog`, …) live in one place: [`linear_statuses.json`](linear_statuses.json). A name that doesn't exist on the board silently no-ops — e.g. a board state named `In Progress` when stride uses `Doing`. This step confirms every state stride declares actually exists on the live board.
 
 **Boards are per-team, not per-workspace** — a workspace can hold several teams, each with its own board, so check every team rather than assuming the first. For each connected workspace, list its teams *(auth per [reference/workflow.md](reference/workflow.md))*:
 

@@ -149,13 +149,13 @@ If no signals fire, skip silently and continue to step 7 as story-sized. The com
 
 <mark>**Size-sensing offers, doesn't force.**</mark> When signals are detected, the agent asks; the user always has final say. Auto-flipping silently would be a worse failure mode than the old forced ask.
 
-**Story-sized path** (default / "no, it's one story" / "narrow to story") — continue to step 7 as normal. At step 12 (create issue), also search for parent-issue epics in the project (`LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "`): if any exist, ask "Link this story to an existing epic?" and if yes, set the parent after creation via `linctl issue update <new-id> --parent <epic-id>`. Legacy milestones — boards may still have them from before WB-279; if `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py list-milestones <project-UUID>` returns any, offer them as a secondary option and use the `--project-milestone "<name>"` flag on `linctl issue create` instead.
+**Story-sized path** (default / "no, it's one story" / "narrow to story") — continue to step 7 as normal. At step 12 (create issue), also search for parent-issue epics in the project (`LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "`): if any exist, ask "Link this story to an existing epic?" and if yes, set the parent after creation via `linctl issue update <new-id> --parent <epic-id>`. Legacy milestones — boards may still have them from before stride moved to parent-issue epics; if `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py list-milestones <project-UUID>` returns any, offer them as a secondary option and use the `--project-milestone "<name>"` flag on `linctl issue create` instead.
 
 **Epic-sized path** (`--epic` / "break into epic") — follow the parent-issue path:
 
 1. Search for existing parent-issue epics in the project (`LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "`) and show any matches.
 2. Ask: "Create a new epic, or link these stories to an existing one?"
-3. If creating: run duplicate check (step 3), CRAFT if requested (step 4), then steps 7 onwards (research, test consideration, draft, approval, create) for the **parent issue** — skip step 5 on the recursion since size has already been decided. Use [reference/EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead of ISSUE-TEMPLATE.md and prefix the title with `Epic: `. Create the parent issue first via `linctl issue create -t <TEAM> --title "Epic: ..." --project "<project>" --state Backlog --json` and capture the returned identifier (e.g. `WB-NNN`).
+3. If creating: run duplicate check (step 3), CRAFT if requested (step 4), then steps 7 onwards (research, test consideration, draft, approval, create) for the **parent issue** — skip step 5 on the recursion since size has already been decided. Use [reference/EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead of ISSUE-TEMPLATE.md and prefix the title with `Epic: `. Create the parent issue first via `linctl issue create -t <TEAM> --title "Epic: ..." --project "<project>" --state Backlog --json` and capture the returned identifier (e.g. `PG-NNN`).
 4. Confirm the parent issue with the user before drafting sub-issues.
 5. Ask: "What are the first 1–3 stories for this epic?" — each answer becomes a separate issue draft.
 6. For each story: run duplicate check (step 3), CRAFT if requested (step 4), then steps 7 onwards. Create via `linctl issue create --project "<project>" --state Backlog ...` and then immediately set the parent via `linctl issue update <new-id> --parent <epic-id>`. linctl's create command doesn't have a `--parent` flag — the two-step pattern is canonical. Story drafts use ISSUE-TEMPLATE.md as normal — they're stories that happen to have a parent.
@@ -308,7 +308,7 @@ LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue create \
   --json
 ```
 
-Capture the issue identifier (e.g. `WB-184`) from the JSON output. If the draft is a sub-issue of an existing epic, follow up with `linctl issue update <new-id> --parent <epic-id>`. If sortOrder positioning is required (epic-sized path step 7), follow the ordering recipe there.
+Capture the issue identifier (e.g. `PG-184`) from the JSON output. If the draft is a sub-issue of an existing epic, follow up with `linctl issue update <new-id> --parent <epic-id>`. If sortOrder positioning is required (epic-sized path step 7), follow the ordering recipe there.
 
 Do not assign the issue unless the user explicitly requested it.
 

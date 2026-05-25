@@ -96,7 +96,7 @@ The commit subjects are authored to be informative (atomic-commits discipline) �
 
 <mark>**Explain the drift in plain English.**</mark> Describe what the doc or feature actually does in concrete terms, what the criterion actually says, and why the connection lands. Avoid stride-internal vocabulary (`Distinction`, `operationalises`, `gate`, `judgement-worthy`, `trace` as a noun) in user-facing copy — the reader may know nothing about stride's meta-cognitive framework. If a 12-year-old wouldn't understand it, rewrite.
 
-A worked before/after, from the WB-297 dogfood that made this rule explicit:
+A worked before/after:
 
 > **Abstract first attempt:** *"The friction Distinction is the test maintainers reach for to decide whether friction is judgement-worthy. It operationalises criterion #3 — every 'is this gate firing on the right thing?' question runs through this Distinction."*
 >
