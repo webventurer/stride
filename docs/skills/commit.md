@@ -32,7 +32,7 @@ AI assistants frequently group files into commits based on the wrong criteria:
 
 | Pass | Action | Goal |
 |:-----|:-------|:-----|
-| 0 | **Pre-flight** | Fix formatting, identify atomic changes |
+| 0 | **Pre-flight** | Identify atomic changes |
 | 1 | **Content** | Stage selectively, verify one logical change |
 | 2 | **Standards** | Verify message format against checklists |
 | 3 | **Final review** | Sanity check before committing |
@@ -40,9 +40,9 @@ AI assistants frequently group files into commits based on the wrong criteria:
 
 ## Pass 0: Pre-flight
 
-Run the formatter first. Every time. If the pre-commit hook finds things to fix, it changes the working tree but not the staged copy — leaving an orphaned diff after every commit.
+`/commit` doesn't run a formatter — formatting is a separate concern from deciding what belongs in a commit, and a whole-repo format here would reformat unrelated files and pollute the atomic commit. Keep the tree formatted on its own axis (your editor, or a manual `pnpm fix` landed as its own `style:` commit).
 
-Then review what changed with `git status` and `git diff`.
+Review what changed with `git status` and `git diff`, then identify the atomic changes.
 
 **Per-file independence gate**: if 2+ files are changed, write one sentence per file describing what it does independently. If a sentence is incomplete without another file, they belong together. If every sentence stands alone, each is a separate commit.
 
@@ -161,7 +161,7 @@ Prefixes can include a scope: `feat(auth):`, `fix(api):`, `docs(git):`. Prefixes
 Apply the coherence test. If all changes serve the same logical purpose, it's one commit. If they solve different problems, split them.
 
 **One commit** — all changes enhance the same process:
-- Add "fix formatting first" step
+- Add "per-file independence" gate
 - Add "identify multiple changes" step
 - Update verification checklist
 
