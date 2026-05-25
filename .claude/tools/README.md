@@ -79,7 +79,7 @@ The current surface stops at the CRUD that our own in-repo skills needed. If you
 - User, team, and cycle queries beyond `resolve_by_name()`.
 - Pagination cursors exposed to the caller (list helpers paginate internally and return the full list).
 
-These aren't broken or hidden — they're just outside the line WB-62 drew around "things our skills call". The vendor contract is explicit: copy the file and add what you need in your own vendored copy. The `graphql()` helper gives you the full Linear GraphQL API directly; the typed helpers are just a convenience layer over the dozen or so operations we happened to need first.
+These aren't broken or hidden — they're just outside the line we drew around "things our skills call". The vendor contract is explicit: copy the file and add what you need in your own vendored copy. The `graphql()` helper gives you the full Linear GraphQL API directly; the typed helpers are just a convenience layer over the dozen or so operations we happened to need first.
 
 ### Usage
 
@@ -147,7 +147,7 @@ through `linctl graphql`, so it inherits linctl's auth (`LINCTL_API_KEY`) —
 no second auth path, no `requests`. It is the single home for every
 linctl-gap operation, so the skill markdown never inlines raw GraphQL.
 
-Built for the linctl migration (WB-393): linctl's `issue list` / `issue
+Built for the linctl migration: linctl's `issue list` / `issue
 search` filter by team and state but not by project or parent (and no
 Linear CLI in the ecosystem exposes a parent filter — it's graphql-only),
 linctl has no typed milestone command, and `issue update` has no
