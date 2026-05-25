@@ -18,7 +18,7 @@ Do **not** apply this rule for execution commands (`/linear:start`, `/linear:fix
 
 1. **Read `VISION.md`'s Success criteria.** That section names the outcomes the project is committed to.
 
-2. **For each candidate item, infer which Success criterion it advances.** Use the issue body's "Why this matters" section — WB-256 enforces that newly drafted issues name the outcome they serve. For an issue without an explicit reference, reason from title and description about which criterion the work most plausibly advances. If the connection is genuinely unclear, treat the item as serving no specific criterion.
+2. **For each candidate item, infer which Success criterion it advances.** Use the issue body's "Why this matters" section — `/linear:plan-work` enforces that newly drafted issues name the outcome they serve. For an issue without an explicit reference, reason from title and description about which criterion the work most plausibly advances. If the connection is genuinely unclear, treat the item as serving no specific criterion.
 
 3. **Order by least-progressed first.** Among candidates, surface those advancing the **least-progressed** Success criteria higher. "Least-progressed" is a judgment based on what's visible in the project state:
 
@@ -57,13 +57,13 @@ When recommending an item, name the Vision outcome it serves. The user should se
 Format inside command output:
 
 ```
-1. **WB-XX — Title** — reason. Serves Vision outcome: "<criterion line from VISION.md>".
+1. **PG-XX — Title** — reason. Serves Vision outcome: "<criterion line from VISION.md>".
 ```
 
 If a candidate doesn't cleanly serve any Success criterion, surface that honestly:
 
 ```
-2. **WB-YY — Title** — reason. Doesn't cleanly trace to a Vision outcome — flag as a candidate for /vision review.
+2. **PG-YY — Title** — reason. Doesn't cleanly trace to a Vision outcome — flag as a candidate for /vision review.
 ```
 
 An issue that can't trace to Vision is information: either the work is out of scope, or the Vision needs a new outcome.
