@@ -87,8 +87,8 @@ These aren't broken or hidden — they're just outside the line WB-62 drew aroun
 from linear_client import create_issue, resolve_by_name, require_env
 
 api_key = require_env("LINEAR_API_KEY")
-team_id = resolve_by_name(api_key, "teams", "Webventurer")
-project_id = resolve_by_name(api_key, "projects", "stride")
+team_id = resolve_by_name(api_key, "teams", "Engineering")
+project_id = resolve_by_name(api_key, "projects", "my-project")
 state_id = resolve_by_name(api_key, "workflowStates", "Backlog")
 
 issue_id = create_issue(

@@ -71,12 +71,12 @@ Surface this as a closing note; setup can't do it for them.
 
   | Team | Created | Archived | Reordered |
   |:-----|:--------|:---------|:----------|
-  | TES (Test Team) | — | In Progress | 8 states ordered |
+  | ENG (Engineering) | — | In Progress | 8 states ordered |
 
 - **advise**: state plainly that nothing was changed (the team has cards), then show the target order and what to fix:
 
   ```
-  WB (Webventurer) has issues — left untouched.
+  OPS (Operations) has issues — left untouched.
   Canonical order: Backburner, Backlog, Todo, Doing, In Review, Waiting, Done, Canceled, Duplicate
   Board order:     Backburner, Backlog, Todo, Doing, Done, Canceled, Duplicate, In Review, Waiting
   Fix: drag "In Review" and "Waiting" before "Done" in Linear's board settings.
