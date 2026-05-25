@@ -78,7 +78,7 @@ After grouping, scan for files that serve more than one commit. Common examples:
 | **Temporary edit** | Remove the lines for the later commit, stage, commit, then restore them for the next commit |
 | **`git add -p`** | When changes are in separate hunks that git can split cleanly |
 
-**Example**: `openrouter_cli.py` has both `send` (chat commit) and `send_async` (parallelisation commit). Temporarily remove `send_async`, commit the sync version, then add it back for the parallelisation commit.
+**Example**: a `notifier.py` has both `send` (sync commit) and `send_async` (parallelisation commit). Temporarily remove `send_async`, commit the sync version, then add it back for the parallelisation commit.
 
 **The test**: after staging, does `git diff --cached` show only changes for *this* commit's concern? If it shows changes for another commit's concern, you have bleed.
 
