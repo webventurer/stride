@@ -76,7 +76,10 @@ def linctl_graphql(query: str, variables: dict) -> dict:
 
 def raise_for_failure(result: subprocess.CompletedProcess):
     if result.returncode != 0:
-        raise LinctlError(f"linctl graphql failed: {result.stderr.strip()}")
+        raise LinctlError(
+            f"linctl graphql failed (rc={result.returncode}): "
+            f"stderr={result.stderr.strip()!r} stdout={result.stdout.strip()!r}"
+        )
 
 
 def graphql_data(stdout: str) -> dict:
