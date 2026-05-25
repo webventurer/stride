@@ -4,48 +4,11 @@
 # ///
 """Linear operations the /linear:* skills need that linctl can't express.
 
-Vendored module — no support, no versioning, no PyPI. Copy and adapt
-to your needs. See .claude/tools/README.md for the usage contract.
+Vendored, no versioning. Each helper builds a GraphQL query and runs it
+through `linctl graphql`, inheriting linctl's auth (LINCTL_API_KEY).
 
-linctl's typed commands cover most of Linear, but not project/parent-scoped
-issue queries, project milestones, or board `sortOrder`. Each helper below
-builds a GraphQL query and runs it through `linctl graphql`, inheriting
-linctl's auth (LINCTL_API_KEY). No second auth path, no `requests`.
-
-    Issue queries
-        search_by_project(project, text)              text search in a project
-        list_by_project_state(project, state, since)  project + state, opt.
-                                                      created since (e.g. -P1W)
-        list_by_project_state_type(project, type)     project + state TYPE
-                                                      (started/unstarted/...) —
-                                                      spans all states in a group
-        list_by_parent(parent_id)                     sub-issues of a parent
-    Milestones
-        list_milestones(project_id)                   {id, name} per milestone
-        milestone_open_issues(milestone_id)           non-Done issues in it
-        create_milestone(project_id, name, target)    -> {id, name}
-        update_milestone_description(id, description)  -> success bool
-    Project content
-        project_content(project_id)                   project `content` (Vision doc)
-        update_project_content(project_id, content)   -> success bool
-    Board order
-        min_backlog_sort_order(project_id)            lowest Backlog sortOrder
-        set_sort_order(issue_id, sort_order)          -> success bool
-    Workflow-state drift
-        state_drift(team_key)                         states stride declares
-                                                      (linear_statuses.json) that
-                                                      the board lacks — [] = in sync
-    Workflow-state provisioning
-        provision_states(team_key)                    create the canonical states
-                                                      the board lacks + reorder to
-                                                      JSON sequence; non-destructive,
-                                                      idempotent ({created, reordered})
-
-Usage (deps auto-installed by uv; LINCTL_API_KEY for the workspace):
     LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py \\
         search-by-project --project "<project>" --text "<terms>"
-
-Requires Python 3.10+ and `linctl` on PATH.
 """
 
 import json
@@ -76,7 +39,10 @@ def linctl_graphql(query: str, variables: dict) -> dict:
 
 def raise_for_failure(result: subprocess.CompletedProcess):
     if result.returncode != 0:
-        raise LinctlError(f"linctl graphql failed: {result.stderr.strip()}")
+        raise LinctlError(
+            f"linctl graphql failed (rc={result.returncode}): "
+            f"stderr={result.stderr.strip()!r} stdout={result.stdout.strip()!r}"
+        )
 
 
 def graphql_data(stdout: str) -> dict:
@@ -227,9 +193,7 @@ def set_sort_order(issue_id: str, sort_order: float) -> bool:
     ]
 
 
-# ---- Workflow-state drift (linctl team state list is per-team; this diffs it
-#      against linear_statuses.json — the names stride uses — to catch the
-#      silent no-op a name mismatch causes, e.g. WB-401's "In Progress") ----
+# ---- Workflow-state drift (board vs the names stride declares) ----
 
 
 def board_states(team_key: str) -> list:
@@ -262,11 +226,8 @@ def state_drift(team_key: str | None = None) -> list:
     return [{"name": n, "type": t} for n, t in sorted(missing)]
 
 
-# ---- Provision workflow states (linctl team state has no `create`, and its
-#      `update` can't set position — both go through GraphQL. /linear:setup
-#      creates the canonical states a workspace is missing and reorders them
-#      into the JSON sequence. Non-destructive: never deletes or renames a
-#      state, so no in-progress work is ever orphaned) ----
+# ---- Provision workflow states (linctl can't create a state or set its
+#      position; both go through GraphQL) ----
 
 TYPE_COLORS = {
     "backlog": "#bec2c8",
@@ -277,14 +238,25 @@ TYPE_COLORS = {
     "duplicate": "#95a2b3",
 }
 
+# Linear won't let the API create or reposition these state types.
+RESERVED_TYPES = {"duplicate", "triage"}
 
-def team_with_states(team_key: str) -> dict:
+
+def team_overview(team_key: str) -> dict:
     query = (
         "query($key: String!) { teams(filter: { key: { eq: $key } }, first: 1) "
-        "{ nodes { id states { nodes { id name type position } } } } }"
+        "{ nodes { id states { nodes { id name type position } } "
+        "issues(first: 1) { nodes { id } } } } }"
     )
     nodes = linctl_graphql(query, {"key": team_key})["teams"]["nodes"]
-    return {"id": nodes[0]["id"], "states": nodes[0]["states"]["nodes"]} if nodes else {}
+    if not nodes:
+        return {}
+    team = nodes[0]
+    return {
+        "id": team["id"],
+        "states": team["states"]["nodes"],
+        "has_issues": bool(team["issues"]["nodes"]),
+    }
 
 
 def create_workflow_state(
@@ -313,48 +285,115 @@ def set_state_position(state_id: str, position: float) -> bool:
     return data["workflowStateUpdate"]["success"]
 
 
-def create_missing_states(team_id: str, states: dict, position: dict) -> list:
-    created, prev = [], None
-    for state_type, names in states.items():
-        for name in names:
-            if name in position:
-                prev = position[name]
-                continue
-            at = prev + 1.0 if prev is not None else 0.0
-            create_workflow_state(team_id, name, state_type, TYPE_COLORS[state_type], at)
-            position[name] = prev = at
-            created.append({"name": name, "type": state_type})
-    return created
+def archive_workflow_state(state_id: str) -> bool:
+    query = "mutation($id: String!) { workflowStateArchive(id: $id) { success } }"
+    return linctl_graphql(query, {"id": state_id})["workflowStateArchive"]["success"]
 
 
-def apply_positions(present: list, position: dict, ids: dict) -> list:
-    base = min(position[n] for n in present)
-    changed = [n for i, n in enumerate(present) if position[n] != base + i]
-    for i, name in enumerate(present):
-        if name in changed:
-            set_state_position(ids[name], base + i)
-    return changed
+def canonical_sequence(states: dict) -> list:
+    return [name for names in states.values() for name in names]
 
 
-def reorder_canonical(states: dict, position: dict, ids: dict) -> list:
-    reordered = []
-    for names in states.values():
-        present = [n for n in names if n in ids]
-        if sorted(present, key=position.get) != present:
-            reordered += apply_positions(present, position, ids)
-    return reordered
+def orderable_sequence(states: dict) -> list:
+    return [
+        name
+        for state_type, names in states.items()
+        if state_type not in RESERVED_TYPES
+        for name in names
+    ]
+
+
+def board_order(board: list) -> list:
+    return [s["name"] for s in sorted(board, key=lambda s: s["position"])]
+
+
+def positioned_in_order(target: list, board: list) -> bool:
+    pos = {s["name"]: s["position"] for s in board}
+    return sorted(target, key=lambda n: pos.get(n, 0.0)) == target
+
+
+def in_canonical_order(states: dict, board: list) -> bool:
+    present = {s["name"] for s in board}
+    return positioned_in_order([n for n in orderable_sequence(states) if n in present], board)
+
+
+def missing_states(states: dict, board: list) -> list:
+    types = {n: t for t, names in states.items() for n in names}
+    present = {s["name"] for s in board}
+    return [{"name": n, "type": types[n]} for n in canonical_sequence(states) if n not in present]
+
+
+def extra_states(states: dict, board: list) -> list:
+    canon = set(canonical_sequence(states))
+    return [name for name in board_order(board) if name not in canon]
+
+
+def advise_report(states: dict, board: list) -> dict:
+    return {
+        "mode": "advise",
+        "canonical_order": canonical_sequence(states),
+        "board_order": board_order(board),
+        "missing": missing_states(states, board),
+        "extra": extra_states(states, board),
+        "ordered": in_canonical_order(states, board),
+    }
+
+
+def create_missing(team_id: str, states: dict, ids: dict) -> list:
+    todo = [
+        (state_type, name)
+        for state_type, names in states.items()
+        if state_type not in RESERVED_TYPES
+        for name in names
+        if name not in ids
+    ]
+    for state_type, name in todo:
+        color = TYPE_COLORS[state_type]
+        ids[name] = create_workflow_state(team_id, name, state_type, color, 0.0)["id"]
+    return [{"name": name, "type": state_type} for state_type, name in todo]
+
+
+def archive_extra(states: dict, board: list) -> list:
+    canon = set(canonical_sequence(states))
+    extra = [
+        s for s in board if s["name"] not in canon and s["type"] not in RESERVED_TYPES
+    ]
+    for s in extra:
+        archive_workflow_state(s["id"])
+    return [s["name"] for s in extra]
+
+
+def order_states(states: dict, board: list, ids: dict) -> list:
+    target = [n for n in orderable_sequence(states) if n in ids]
+    if positioned_in_order(target, board):
+        return []
+    for i, name in enumerate(target):
+        set_state_position(ids[name], float(i))
+    return target
+
+
+def setup_empty_team(team_id: str, states: dict, board: list) -> dict:
+    ids = {s["name"]: s["id"] for s in board}
+    created = create_missing(team_id, states, ids)
+    deleted = archive_extra(states, board)
+    reordered = order_states(states, board, ids)
+    return {
+        "mode": "provisioned",
+        "created": created,
+        "deleted": deleted,
+        "reordered": reordered,
+        "in_sync": not (created or deleted or reordered),
+    }
 
 
 def provision_states(team_key: str | None = None) -> dict:
-    team = team_with_states(team_key or first_team_key())
+    team = team_overview(team_key or first_team_key())
     if not team:
         raise LinctlError(f"no team found for key {team_key!r}")
     states = load_statuses()["states"]
-    position = {s["name"]: s["position"] for s in team["states"]}
-    ids = {s["name"]: s["id"] for s in team["states"]}
-    created = create_missing_states(team["id"], states, position)
-    reordered = reorder_canonical(states, position, ids)
-    return {"created": created, "reordered": reordered, "in_sync": not (created or reordered)}
+    if team["has_issues"]:
+        return advise_report(states, team["states"])
+    return setup_empty_team(team["id"], states, team["states"])
 
 
 @click.group()

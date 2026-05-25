@@ -74,7 +74,7 @@ The other Linear commands (`/linear:check`, `/linear:list-projects`, `/linear:fi
 
 ### /linear:setup
 
-**Provision Linear workflow states.** Reads `linear_statuses.json` and creates the workflow states a chosen team is missing, ordering them to match — so `/linear:start` / `/linear:finish` transitions land instead of silently no-opping on a missing column. Asks which team to target when the workspace has more than one (states are per-team, so it never assumes the first). Non-destructive (never deletes or renames a state) and idempotent (a team already in sync is left untouched).
+**Provision Linear workflow states.** Card-aware. An **empty team** is set up to match `linear_statuses.json` — create the missing states, archive non-canonical ones, order them, and seed a sample card so the board renders — so `/linear:start` / `/linear:finish` transitions land instead of no-opping on a missing column. A team that **already holds issues is never modified**: setup only reports the target column order and what to fix in Linear's UI, because a live board is the human's to change. Asks which team to target when the workspace has more than one. (Reserved states like `Duplicate` can't be repositioned via the API, so they're left where Linear pins them.)
 
 ### /linear:list-projects
 
