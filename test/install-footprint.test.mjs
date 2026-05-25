@@ -97,6 +97,14 @@ describe("install footprint", () => {
     strictEqual(existsSync(join(claudeDir, "tools/openrouter_cli.py")), true);
   });
 
+  it("does not ship stride's own test files", () => {
+    seedFixture();
+    runInstall();
+
+    const claudeDir = join(fixtureRoot, ".claude");
+    strictEqual(existsSync(join(claudeDir, "tools/tests")), false);
+  });
+
   it("writes the stride section to .gitignore when accepted", () => {
     seedFixture();
     runInstall({ gitignore: "y" });
