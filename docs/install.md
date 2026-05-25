@@ -36,7 +36,7 @@ stride's `/linear:*` skills reach Linear through **linctl**, authenticated by a 
 LINEAR_<TEAM>_API_KEY=lin_api_...
 ```
 
-Get a key at [linear.app/settings/api](https://linear.app/settings/api) (one per workspace). Every `/linear:*` call is implicitly prefixed `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl …` — see [the workflow reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/workflow.md). Verify the connection with `/linear:check`.
+Get a key at [linear.app/settings/api](https://linear.app/settings/api) (one per workspace). Every `/linear:*` call is implicitly prefixed `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl …` — see [the workflow reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/workflow.md). Verify the connection with `/linear:check` — it confirms each key authenticates now, and (once your board is provisioned in the next step) that every team's board carries the states stride needs.
 
 ### Provision your Linear board
 
@@ -47,6 +47,8 @@ stride drives work through Linear's workflow columns, so a team's board needs th
 ```
 
 It's **card-aware**. A team with **no issues** is set up automatically — it creates the missing columns, archives non-canonical ones, orders them to match, and seeds a sample card so the board renders. A team that **already holds issues** is never modified; it only reports the target order for you to fix in Linear's UI — a live board is yours to change, not a script's. Run it once per team before your first `/linear:start`.
+
+`/linear:setup` and `/linear:check` are companions — setup provisions the board, check confirms it. After provisioning, run `/linear:check` again: it verifies every team's board against `linear_statuses.json`, so you know the columns landed before your first `/linear:start`.
 
 Two board-view preferences can't be set through the API, so toggle them once in Linear's UI: default the team to **Board** view, and enable **"Show empty groups"** so every column shows even before it holds a card.
 
