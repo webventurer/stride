@@ -139,7 +139,7 @@ When you already know it's epic-sized, pass `--epic` to skip sensing and go stra
 
 ### /linear:quick
 
-**Ship a small change, then file the card after.** For work too small to plan up front — a copy tweak, a padding fix, a doc-link repair — the up-front card *is* the friction. `/linear:quick` inverts the order: review the diff, and when you say a ship phrase (`ship` / `ship it` / `quick` / `jfdi` / `go`) it merges with `--merge` and files the Linear card **born directly in Done** with the merged PR attached. The board shows a finished card pointing at the PR — no Backlog → Doing → In Review journey, because the work bypassed those states by design.
+**Ship a small change, then file the card after.** For work too small to plan up front — a copy tweak, a padding fix, a doc-link repair — the up-front card *is* the friction. `/linear:quick` inverts the order: it opens a PR for you to review (on GitHub, before anything merges), and when you say a ship phrase (`ship` / `ship it` / `quick` / `jfdi` / `go`) it merges with `--merge` and files the Linear card **born directly in Done** with the merged PR attached. The board shows a finished card pointing at the PR — no Backlog → Doing → In Review journey, because the work bypassed those states by design.
 
 Two ways in: **describe it** (`/linear:quick "..."` — branch, implement, ship) or **already did it** (make the change first, then run `/linear:quick` to file the card matching your existing diff).
 

@@ -7,7 +7,7 @@ Two ways in:
 - **Describe it** — `/linear:quick "tighten the hero heading spacing"`: branch, implement, review, ship.
 - **Already did it** — make the change first, then run `/linear:quick`: it picks up your existing diff and files the card to match what you just created.
 
-Either way: review → **you say a ship phrase** → Vision trace → merge → file the Done card (or hold it to bundle with later changes).
+Either way: review on the PR → **you say a ship phrase** → Vision trace → merge → file the Done card (or hold it to bundle with later changes). The PR opens at review time, so the change is viewable on GitHub before anything merges — only the merge waits for the ship phrase.
 
 <mark>**Not a replacement for `/linear:plan-work`.**</mark> This is for changes whose shape is obvious and whose diff fits in one terminal scroll — copy/wording, design tweaks, doc polish, single-file refactors, config tweaks, dead-code removal. Anything that crosses files non-trivially, touches a shared contract or public API, needs a migration, or carries scope/risk uncertainty still earns the card-first discipline of `/linear:plan-work`.
 
@@ -35,6 +35,7 @@ The merge fires **only** when you say an explicit ship phrase: **`ship`, `ship i
 
 - Never work directly on `main` — existing uncommitted changes on `main` move to a branch first
 - Never merge without one of the ship phrases above
+- The PR opens at **review** time (step 5); only the **merge** waits for the ship phrase
 - Use `--merge` (not `--squash`) to preserve atomic commits
 - Keep scope to one change — if the diff grows past a one-scroll review, stop and suggest `/linear:plan-work`
 - <mark>**Don't shortcut the Vision trace.** A drift is surfaced for your decision — exactly as `/linear:finish` does — *before* the merge, while the catch is still actionable.</mark>
@@ -75,18 +76,29 @@ If the change starts crossing files non-trivially or the diff outgrows one termi
 
 Run the project's build and tests. Fix failures and re-run until clean. Never ship with a failing build.
 
-### 5. Review in the terminal
+### 5. Review — open the PR, then gate
 
-Show the full diff and the commit log:
+Show the full diff and the commit log in the terminal:
 
 ```bash
 git diff main...HEAD
 git log main..HEAD --oneline
 ```
 
-Then ask: **"Ship it? (say `ship` / `ship it` / `quick` / `jfdi` / `go`, or tell me what to change.)"**
+Then push the branch and open the PR **without merging**, so the change is reviewable on GitHub or pulled into an editor — not terminal-only *(auth per [reference/workflow.md](reference/workflow.md))*:
 
-If the user requests changes, make them, re-validate (step 4), and show the updated diff. Repeat until they say a ship phrase. <mark>**Until then, do nothing irreversible.**</mark>
+```bash
+git push -u origin quick/<slug>
+gh pr create --title "<imperative summary>" --body "$(cat <<'EOF'
+## Summary
+<1–2 bullets: what changed and why>
+EOF
+)"
+```
+
+If a PR already exists for the branch (a resumed run), push to it instead of opening a second one. Then surface the URL with the gate prompt: **"PR: \<url\> — ship it? (say `ship` / `ship it` / `quick` / `jfdi` / `go`, or tell me what to change.)"**
+
+If the user requests changes, make them, re-validate (step 4), push to the same PR (`git push`, or `--force-with-lease` after a squash), and show the updated diff. Repeat until they say a ship phrase. <mark>**Opening the PR is reversible; the merge is not. Until a ship phrase, do nothing irreversible — above all, no merge.**</mark>
 
 ### 6. On the ship phrase — trace Vision, then merge
 
@@ -110,17 +122,11 @@ Only once the user says a ship phrase. **First run the Vision trace check — th
   ```
 
   - **ship / pick** → continue to the merge; the chosen criterion becomes the card's *Why this matters*.
-  - **add** → pause. Tell the user: *"Add the criterion to `VISION.md`, `/commit` it on this branch, then say a ship phrase again."* Don't merge. (The merge is still ahead, so the catch rides on the same branch — no follow-up PR needed.)
+  - **add** → pause. Tell the user: *"Add the criterion to `VISION.md`, `/commit` it on this branch (the push updates the open PR), then say a ship phrase again."* Don't merge. (The merge is still ahead, so the catch rides on the same branch and the same open PR — no follow-up PR needed.)
 
-The merge hasn't happened yet, so a drift is fully actionable here. Once the trace is settled, merge:
+The merge hasn't happened yet, so a drift is fully actionable here. The PR is already open from step 5 — once the trace is settled, merge it:
 
 ```bash
-git push -u origin quick/<slug>
-gh pr create --title "<imperative summary>" --body "$(cat <<'EOF'
-## Summary
-<1–2 bullets: what changed and why>
-EOF
-)"
 gh pr merge <number> --merge --subject "Merge branch 'quick/<slug>'" --body ""
 ```
 
@@ -175,7 +181,7 @@ Display:
 - `VISION.md` missing → stop, suggest `/vision`
 - Uncommitted changes on `main` → branch + `/commit` before shipping (never ship from `main`)
 - Build/tests fail → fix before shipping; never merge red
-- No ship phrase given → never merge; keep iterating
+- No ship phrase given → never merge; keep iterating. The PR opened at step 5 stays open (reversible) — if the user abandons the flow, the open PR and pushed branch are theirs to close or resume; quick doesn't auto-close them
 - Vision drift, user picks **add** → stop, don't merge; resume after the criterion is committed
 - Change outgrew a one-scroll diff → stop, suggest `/linear:plan-work`
 - `linctl issue create` / `attach` fails after merge → surface it; the PR is already merged, so re-running the file step (with the bundle intact) recovers the card
