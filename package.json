@@ -7,6 +7,7 @@
     "build:docs": "vitepress build docs",
     "preview:docs": "vitepress preview docs",
     "fix": "biome check --write .",
+    "fix:staged": "biome check --write --staged --no-errors-on-unmatched",
     "format": "biome format --write .",
     "lint": "biome lint .",
     "test": "node --test test/*.test.mjs"

@@ -32,7 +32,7 @@ AI assistants frequently group files into commits based on the wrong criteria:
 
 | Pass | Action | Goal |
 |:-----|:-------|:-----|
-| 0 | **Pre-flight** | Fix formatting, identify atomic changes |
+| 0 | **Pre-flight** | Identify atomic changes |
 | 1 | **Content** | Stage selectively, verify one logical change |
 | 2 | **Standards** | Verify message format against checklists |
 | 3 | **Final review** | Sanity check before committing |
@@ -40,9 +40,9 @@ AI assistants frequently group files into commits based on the wrong criteria:
 
 ## Pass 0: Pre-flight
 
-Run the formatter first. Every time. If the pre-commit hook finds things to fix, it changes the working tree but not the staged copy — leaving an orphaned diff after every commit.
+Don't format the whole repo here — `pnpm fix` reformats every file and drags unrelated drift into your commit. The commit wrapper (`do_commit.sh`) formats the staged files automatically when you commit, via a project's `fix:staged` script, so only the files in this commit are touched.
 
-Then review what changed with `git status` and `git diff`.
+Review what changed with `git status` and `git diff`, then identify the atomic changes.
 
 **Per-file independence gate**: if 2+ files are changed, write one sentence per file describing what it does independently. If a sentence is incomplete without another file, they belong together. If every sentence stands alone, each is a separate commit.
 

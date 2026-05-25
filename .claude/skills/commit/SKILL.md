@@ -241,7 +241,7 @@ Pre-commit hooks can accidentally cause you to commit multiple unrelated files t
 3. You run `git add -A` to include the fixes
 4. **Result**: your commit now includes unrelated files
 
-**Prevention**: Run the repo's hooks manually in Pass 0 (see [WORKFLOW.md](WORKFLOW.md)). This fixes all formatting upfront so hooks have nothing to fix during the actual commit.
+**Prevention**: `do_commit.sh` formats the staged files — and only those — before committing, via the project's `fix:staged` script (see [WORKFLOW.md](WORKFLOW.md) Pass 0 Step 1). Scoping the formatter to the staged set keeps unrelated drift out of the commit *and* leaves the hook nothing to fix.
 
 ---
 

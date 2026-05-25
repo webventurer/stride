@@ -24,18 +24,17 @@ Read [SKILL.md](SKILL.md) first — it contains the coherence test, AI atomicity
 
 ## Pass 0: Pre-flight
 
-**Goal**: Clean slate before staging.
+**Goal**: Understand the changes and plan the atomic commits before staging.
 
-### Step 1: Run formatting
+### Step 1: Don't format here — the commit wrapper does it
 
-<mark>**Run the formatter first. Every time. No exceptions.** If the pre-commit hook finds anything to fix, it changes the working tree but not the staged copy — leaving an orphaned diff after every commit.</mark>
+<mark>**Don't run a whole-repo formatter (`pnpm fix`, `biome check --write .`) in Pass 0.** It reformats *every* file, dragging unrelated standing drift into your working tree — files that have nothing to do with this commit, which you then have to revert by hand.</mark>
 
-| If this exists | Language | Formatter/linter | Run |
-|:---------------|:---------|:------------------|:----|
-| `.pre-commit-config.yaml` | Python | Ruff (via pre-commit) | `pre-commit run --all-files` |
-| `package.json` with `fix` script | JS/TS | Biome (via pnpm) | `pnpm fix` |
+`.claude/hooks/do_commit.sh` formats the **staged set** automatically when you commit (Pass 2), running the project's `fix:staged` script and re-staging the result — so the only files touched are the ones in this commit. You don't run a formatter by hand here; just make sure the change is staged before committing.
 
-<mark>**Use `pnpm fix`, not `npx lefthook run pre-commit`.**</mark> Lefthook only formats staged files — running it before staging is a no-op, and running it after staging defeats the purpose (the pre-commit hook does the same thing). `pnpm fix` formats all files regardless of staging state, so running it first ensures the hook has nothing left to change. A mixed repo (Python + JS) will have `pre-commit` *and* `pnpm fix` — run both. If none exist, skip — hooks will run during `git commit`.
+> **Opt in per project**: define a `fix:staged` script that formats *only staged files*, e.g. `"fix:staged": "biome check --write --staged --no-errors-on-unmatched"`. With no such script, the wrapper commits unchanged. Whole-repo `pnpm fix` stays available for deliberate periodic maintenance — just not on the per-commit path.
+
+> **Why not `biome check --changed` in the wrapper?** It compares against *committed* state only (and errors without `vcs.defaultBranch`/`--since`), so it can't see the uncommitted edits a commit is built from. `--staged` is the flag built for pre-commit formatting.
 
 ### Step 2: See what changed
 
