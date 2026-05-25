@@ -4,8 +4,8 @@ Most tests hit a real Linear API and are gated by LINEAR_E2E=1. The
 error-handling test is mocked and runs unconditionally.
 
 Run with:
-    python -m pytest tools/tests/
-    LINEAR_E2E=1 python -m pytest tools/tests/
+    python -m pytest archive/test_linear_client.py
+    LINEAR_E2E=1 python -m pytest archive/test_linear_client.py
 """
 
 import os
@@ -16,9 +16,9 @@ from unittest.mock import patch
 
 import pytest
 
-# Add the tools directory to the path so we can import linear_client
-TOOLS_DIR = Path(__file__).parent.parent
-sys.path.insert(0, str(TOOLS_DIR))
+# linear_client lives alongside this test in archive/
+ARCHIVE_DIR = Path(__file__).parent
+sys.path.insert(0, str(ARCHIVE_DIR))
 
 from linear_client import (  # noqa: E402
     LinearError,
@@ -63,18 +63,18 @@ def api_key():
 
 
 @pytest.fixture
-def team_id(api_key):
+def team_id(api_key: str):
     return resolve_by_name(api_key, "teams", TEAM_NAME)
 
 
 @pytest.fixture
-def state_id(api_key, team_id):
+def state_id(api_key: str, team_id: str):
     states = resolve_states(api_key, team_id)
     return states["Backlog"]["id"]
 
 
 @pytest.fixture
-def scratch_project(api_key, team_id):
+def scratch_project(api_key: str, team_id: str):
     name = f"sdk-test-project-{suffix()}"
     project_id = create_project(
         api_key,
@@ -91,7 +91,9 @@ def scratch_project(api_key, team_id):
 
 
 @live_only
-def test_create_and_delete_issue(api_key, team_id, scratch_project, state_id):
+def test_create_and_delete_issue(
+    api_key: str, team_id: str, scratch_project: str, state_id: str
+):
     title = f"sdk-test-issue-{suffix()}"
     issue_id = create_issue(
         api_key,
@@ -109,7 +111,7 @@ def test_create_and_delete_issue(api_key, team_id, scratch_project, state_id):
 
 
 @live_only
-def test_create_project_with_fields(api_key, team_id):
+def test_create_project_with_fields(api_key: str, team_id: str):
     name = f"sdk-test-project-fields-{suffix()}"
     project_id = create_project(
         api_key, team_id, name=name, description="short", content="## long"
@@ -121,7 +123,7 @@ def test_create_project_with_fields(api_key, team_id):
 
 
 @live_only
-def test_update_project(api_key, scratch_project):
+def test_update_project(api_key: str, scratch_project: str):
     new_id = update_project(
         api_key,
         scratch_project,
@@ -132,7 +134,7 @@ def test_update_project(api_key, scratch_project):
 
 
 @live_only
-def test_create_project_update(api_key, scratch_project):
+def test_create_project_update(api_key: str, scratch_project: str):
     update_id = create_project_update(
         api_key, scratch_project, body="status check", health="onTrack"
     )
@@ -140,7 +142,7 @@ def test_create_project_update(api_key, scratch_project):
 
 
 @live_only
-def test_create_project_link(api_key, scratch_project):
+def test_create_project_link(api_key: str, scratch_project: str):
     link_id = create_project_link(
         api_key, scratch_project, url="https://example.com", label="Docs"
     )
@@ -148,7 +150,7 @@ def test_create_project_link(api_key, scratch_project):
 
 
 @live_only
-def test_create_and_delete_label(api_key):
+def test_create_and_delete_label(api_key: str):
     name = f"sdk-test-label-{suffix()}"
     label_id = create_label(api_key, name=name, color="#ff00ff")
     try:
@@ -158,7 +160,9 @@ def test_create_and_delete_label(api_key):
 
 
 @live_only
-def test_update_issue(api_key, team_id, scratch_project, state_id):
+def test_update_issue(
+    api_key: str, team_id: str, scratch_project: str, state_id: str
+):
     title = f"sdk-test-update-{suffix()}"
     issue_id = create_issue(
         api_key,
@@ -183,7 +187,7 @@ def test_update_issue(api_key, team_id, scratch_project, state_id):
 
 @live_only
 def test_list_issues_filters_by_project(
-    api_key, team_id, scratch_project, state_id
+    api_key: str, team_id: str, scratch_project: str, state_id: str
 ):
     title = f"sdk-test-list-{suffix()}"
     issue_id = create_issue(
@@ -203,7 +207,7 @@ def test_list_issues_filters_by_project(
 
 
 @live_only
-def test_list_projects_returns_projects(api_key):
+def test_list_projects_returns_projects(api_key: str):
     projects = list_projects(api_key)
     assert isinstance(projects, list)
     assert projects, "expected at least one project in the test workspace"
@@ -211,7 +215,7 @@ def test_list_projects_returns_projects(api_key):
 
 
 @live_only
-def test_list_labels_returns_labels(api_key):
+def test_list_labels_returns_labels(api_key: str):
     name = f"sdk-test-label-{suffix()}"
     label_id = create_label(api_key, name=name, color="#00ff00")
     try:
@@ -222,7 +226,9 @@ def test_list_labels_returns_labels(api_key):
 
 
 @live_only
-def test_create_attachment(api_key, team_id, scratch_project, state_id):
+def test_create_attachment(
+    api_key: str, team_id: str, scratch_project: str, state_id: str
+):
     title = f"sdk-test-issue-att-{suffix()}"
     issue_id = create_issue(
         api_key,
@@ -245,7 +251,7 @@ def test_create_attachment(api_key, team_id, scratch_project, state_id):
 
 
 @live_only
-def test_graphql_raises_linear_error_on_bad_query(api_key):
+def test_graphql_raises_linear_error_on_bad_query(api_key: str):
     with pytest.raises(LinearError) as excinfo:
         graphql(api_key, "{ nonexistentField }")
     assert "nonexistentField" in str(excinfo.value) or "400" in str(
