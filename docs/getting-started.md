@@ -19,7 +19,7 @@ Functionally, Vision is stride's *upstream anchor* — planning, ranking, and im
 
 The `/linear` commands connect your development workflow directly to [Linear](https://linear.app). This is an opinionated choice — Linear is keyboard-driven, git-integrated, and built for the way modern software teams actually work. No drag-and-drop boards, no workflow bloat.
 
-Rather than context-switching between your editor and a browser, you can plan work, create issues, implement features, handle PR feedback, and close issues — all from within Claude Code. The five commands cover the **full development lifecycle**: from researching a problem and writing a well-structured issue, through to merging an approved pull request and marking it done.
+Rather than context-switching between your editor and a browser, you can plan work, create issues, implement features, handle PR feedback, and close issues — all from within Claude Code. These commands cover the **full development lifecycle**: from researching a problem and writing a well-structured issue, through to merging an approved pull request and marking it done.
 
 This keeps the agent *grounded in real project priorities* rather than working in isolation.
 

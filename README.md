@@ -12,7 +12,7 @@ Everything installs as plain markdown into your `.claude/` directory. No runtime
 
 **`/vision`** — The guiding light. One canonical `VISION.md` at the repo root: what the project delivers, why it exists, what success looks like. Every issue, every feature, every architectural decision traces back to it. `/linear:plan-work` enforces this — issues drafted in a vacuum get flagged for trace-back, not just warned. Vision evolves rarely and reads as stakeholder language; the rest of stride's loop runs against it. *(Planning, ranking, and implementation all read `VISION.md` before deciding anything — that's the upstream-anchor role.)* See [the `/vision` skill](https://webventurer.github.io/stride/skills/vision) for the seven-question walkthrough.
 
-**`/linear`** — Five commands covering the full development cycle. Plan work, create issues, implement on a branch, handle PR feedback, merge and close — all driven from Claude Code, all synced with [Linear](https://linear.app). Issues flow through your board automatically as you work.
+**`/linear`** — Commands covering the full development cycle. Plan work, create issues, implement on a branch, handle PR feedback, merge and close — all driven from Claude Code, all synced with [Linear](https://linear.app). Issues flow through your board automatically as you work.
 
 ![Kanban board](docs/public/kanban-board.svg)
 *Issues flow from Backlog through In Progress to Done — driven entirely by `/linear` commands.*
