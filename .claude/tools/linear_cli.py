@@ -277,14 +277,29 @@ TYPE_COLORS = {
     "duplicate": "#95a2b3",
 }
 
+# Linear treats these state types as reserved: the API refuses to create or
+# reposition them (workflowStateUpdate → "unable to update reserved state").
+# Setup leaves them to Linear — it can't and shouldn't manage their order.
+RESERVED_TYPES = {"duplicate", "triage"}
 
-def team_with_states(team_key: str) -> dict:
+
+def team_overview(team_key: str) -> dict:
+    # States plus a cheap "does this team hold any issues?" probe — the safety
+    # gate that decides whether setup may write to the board or must only advise.
     query = (
         "query($key: String!) { teams(filter: { key: { eq: $key } }, first: 1) "
-        "{ nodes { id states { nodes { id name type position } } } } }"
+        "{ nodes { id states { nodes { id name type position } } "
+        "issues(first: 1) { nodes { id } } } } }"
     )
     nodes = linctl_graphql(query, {"key": team_key})["teams"]["nodes"]
-    return {"id": nodes[0]["id"], "states": nodes[0]["states"]["nodes"]} if nodes else {}
+    if not nodes:
+        return {}
+    team = nodes[0]
+    return {
+        "id": team["id"],
+        "states": team["states"]["nodes"],
+        "has_issues": bool(team["issues"]["nodes"]),
+    }
 
 
 def create_workflow_state(
@@ -313,48 +328,101 @@ def set_state_position(state_id: str, position: float) -> bool:
     return data["workflowStateUpdate"]["success"]
 
 
-def create_missing_states(team_id: str, states: dict, position: dict) -> list:
-    created, prev = [], None
+def archive_workflow_state(state_id: str) -> bool:
+    query = (
+        "mutation($id: String!) { workflowStateArchive(id: $id) { success } }"
+    )
+    return linctl_graphql(query, {"id": state_id})["workflowStateArchive"]["success"]
+
+
+def canonical_sequence(states: dict) -> list:
+    return [name for names in states.values() for name in names]
+
+
+def orderable_sequence(states: dict) -> list:
+    # Canonical states whose position the API can actually set — excludes the
+    # reserved types Linear pins (duplicate, triage).
+    return [
+        name
+        for state_type, names in states.items()
+        if state_type not in RESERVED_TYPES
+        for name in names
+    ]
+
+
+def advise_report(states: dict, board: list) -> dict:
+    # Read-only: what the board *should* be vs what it is. Never writes — used
+    # when the team already holds issues, so the human adjusts the board.
+    seq = canonical_sequence(states)
+    canon = set(seq)
+    orderable = orderable_sequence(states)
+    types = {name: t for t, names in states.items() for name in names}
+    on_board = {s["name"] for s in board}
+    by_position = [s["name"] for s in sorted(board, key=lambda s: s["position"])]
+    return {
+        "mode": "advise",
+        "canonical_order": seq,
+        "board_order": by_position,
+        "missing": [{"name": n, "type": types[n]} for n in seq if n not in on_board],
+        "extra": [n for n in by_position if n not in canon],
+        # Reserved states (duplicate/triage) can't be ordered, so judge order on
+        # the orderable ones only — otherwise the report nags about the unfixable.
+        "ordered": [n for n in by_position if n in set(orderable)]
+        == [n for n in orderable if n in on_board],
+    }
+
+
+def setup_empty_team(team_id: str, states: dict, board: list) -> dict:
+    # The team has no issues, so setup is authoritative: create the canonical
+    # states, archive anything non-canonical, and order them to match the JSON.
+    # Safe because no in-progress work can be orphaned. Reserved-type states
+    # (duplicate/triage) are left to Linear — it won't let the API touch them.
+    canon = set(canonical_sequence(states))
+    ids = {s["name"]: s["id"] for s in board}
+    created, deleted = [], []
     for state_type, names in states.items():
+        if state_type in RESERVED_TYPES:
+            continue
         for name in names:
-            if name in position:
-                prev = position[name]
-                continue
-            at = prev + 1.0 if prev is not None else 0.0
-            create_workflow_state(team_id, name, state_type, TYPE_COLORS[state_type], at)
-            position[name] = prev = at
-            created.append({"name": name, "type": state_type})
-    return created
-
-
-def apply_positions(present: list, position: dict, ids: dict) -> list:
-    base = min(position[n] for n in present)
-    changed = [n for i, n in enumerate(present) if position[n] != base + i]
-    for i, name in enumerate(present):
-        if name in changed:
-            set_state_position(ids[name], base + i)
-    return changed
-
-
-def reorder_canonical(states: dict, position: dict, ids: dict) -> list:
+            if name not in ids:
+                state = create_workflow_state(
+                    team_id, name, state_type, TYPE_COLORS[state_type], 0.0
+                )
+                ids[name] = state["id"]
+                created.append({"name": name, "type": state_type})
+    for s in board:
+        if s["name"] not in canon:
+            archive_workflow_state(s["id"])
+            deleted.append(s["name"])
+    # Order by comparing the *order* of the orderable states (not absolute
+    # positions, which Linear renormalises) — if wrong, lay them down as 0..N
+    # in one pass.
+    pos = {s["name"]: s["position"] for s in board}
+    present = [n for n in orderable_sequence(states) if n in ids]
     reordered = []
-    for names in states.values():
-        present = [n for n in names if n in ids]
-        if sorted(present, key=position.get) != present:
-            reordered += apply_positions(present, position, ids)
-    return reordered
+    if sorted(present, key=lambda n: pos.get(n, 0.0)) != present:
+        for i, name in enumerate(present):
+            set_state_position(ids[name], float(i))
+        reordered = present
+    return {
+        "mode": "provisioned",
+        "created": created,
+        "deleted": deleted,
+        "reordered": reordered,
+        "in_sync": not (created or deleted or reordered),
+    }
 
 
 def provision_states(team_key: str | None = None) -> dict:
-    team = team_with_states(team_key or first_team_key())
+    # Card-aware: an empty team is set up to match the JSON exactly; a team that
+    # already holds issues is never touched — we return a report for the human.
+    team = team_overview(team_key or first_team_key())
     if not team:
         raise LinctlError(f"no team found for key {team_key!r}")
     states = load_statuses()["states"]
-    position = {s["name"]: s["position"] for s in team["states"]}
-    ids = {s["name"]: s["id"] for s in team["states"]}
-    created = create_missing_states(team["id"], states, position)
-    reordered = reorder_canonical(states, position, ids)
-    return {"created": created, "reordered": reordered, "in_sync": not (created or reordered)}
+    if team["has_issues"]:
+        return advise_report(states, team["states"])
+    return setup_empty_team(team["id"], states, team["states"])
 
 
 @click.group()
