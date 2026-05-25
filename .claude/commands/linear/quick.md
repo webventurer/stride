@@ -13,6 +13,20 @@ Either way: review → **you say a ship phrase** → Vision trace → merge → 
 
 > **Not `/loop`.** `/loop` is scheduled re-invocation of a command; `/linear:quick` is a one-shot ship-then-file flow. Same first four letters, unrelated.
 
+## Good candidates for the fast loop
+
+The fast-loop fits work where the shape is already obvious from the description and the diff fits comfortably in one terminal scroll. Examples:
+
+- **Design tweaks** — typography, spacing, colour swap, padding adjustment, icon switch
+- **Copy and wording** — typo fix, sentence rewrite, heading rename, button-label change
+- **Documentation polish** — broken link, formatting consistency, sentence break, list normalisation
+- **Single-file refactors** — extract a variable, rename a function within one file, inline a one-off helper
+- **Config tweaks** — adjust a threshold, update a default, change a constant
+- **Dead code removal** — orphaned imports, unused functions, dead branches the diff makes obvious
+- **Comment / docstring additions** — when the *what* is obvious from the code but the *why* isn't
+
+**When not to reach for `/linear:quick`:** the change crosses files in non-trivial ways, touches a public API or shared contract, requires migration, evolves the Vision, or carries any uncertainty about scope or risk. Those still earn the card-first discipline of `/linear:plan-work`.
+
 ## The ship gate
 
 The merge fires **only** when you say an explicit ship phrase: **`ship`, `ship it`, `quick`, `jfdi`, `go`**. <mark>**The agent never decides on its own that the change is ready to merge.**</mark> No phrase, no merge — "looks done to me" and silent timeouts are not triggers.
