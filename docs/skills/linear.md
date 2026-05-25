@@ -74,7 +74,7 @@ The other Linear commands (`/linear:check`, `/linear:list-projects`, `/linear:fi
 
 ### /linear:setup
 
-**Provision Linear workflow states.** Reads `linear_statuses.json` and creates the workflow states the workspace is missing, ordering them to match — so `/linear:start` / `/linear:finish` transitions land instead of silently no-opping on a missing column. Non-destructive (never deletes or renames a state) and idempotent (a workspace already in sync is left untouched).
+**Provision Linear workflow states.** Reads `linear_statuses.json` and creates the workflow states a chosen team is missing, ordering them to match — so `/linear:start` / `/linear:finish` transitions land instead of silently no-opping on a missing column. Asks which team to target when the workspace has more than one (states are per-team, so it never assumes the first). Non-destructive (never deletes or renames a state) and idempotent (a team already in sync is left untouched).
 
 ### /linear:list-projects
 
