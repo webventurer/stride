@@ -125,9 +125,13 @@ function contentsMatch(srcFile, destFile) {
   return hashFile(srcFile) === hashFile(destFile);
 }
 
+// Stride's own dev artifacts — never shipped into a consumer's .claude/.
+const INSTALL_EXCLUDE = new Set(["tests", "__pycache__"]);
+
 function walkFiles(root, base = root) {
   const paths = [];
   for (const entry of readdirSync(root)) {
+    if (INSTALL_EXCLUDE.has(entry)) continue;
     const full = join(root, entry);
     const stat = lstatSync(full);
     if (stat.isSymbolicLink()) continue;
