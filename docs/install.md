@@ -85,7 +85,7 @@ This removes all copied directories, the example file, and strips the stride hoo
 .claude/
 ├── skills/commit/       # skill + workflow + reference docs
 ├── skills/craft/        # CRAFT prompt skill
-├── commands/linear/     # 9 commands + reference docs
+├── commands/linear/     # 10 commands + reference docs
 ├── hooks/               # commit wrapper + bare-commit blocker
 ├── tools/               # cross-model feedback script
 └── stride/docs/         # supporting patterns and concepts
