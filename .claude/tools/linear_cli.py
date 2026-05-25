@@ -355,7 +355,9 @@ def create_missing(team_id: str, states: dict, ids: dict) -> list:
 
 def archive_extra(states: dict, board: list) -> list:
     canon = set(canonical_sequence(states))
-    extra = [s for s in board if s["name"] not in canon]
+    extra = [
+        s for s in board if s["name"] not in canon and s["type"] not in RESERVED_TYPES
+    ]
     for s in extra:
         archive_workflow_state(s["id"])
     return [s["name"] for s in extra]
