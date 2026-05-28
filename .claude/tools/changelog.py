@@ -81,29 +81,59 @@ def summarise_non_feature_types(types: dict[str, int]) -> str:
     return ", ".join(f"{v} {k}" for k, v in others) if others else "minor work"
 
 
+def commit_body(sha: str) -> str:
+    return subprocess.run(
+        ["git", "show", "-s", "--format=%b", sha],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+
+
+def first_paragraph(body: str) -> str:
+    paras = [p for p in body.split("\n\n") if p.strip()]
+    return " ".join(paras[0].split()) if paras else ""
+
+
+def feature_title(c: Commit) -> str:
+    return c.subject.removeprefix("feat:").strip().rstrip(".")
+
+
+def format_feature(c: Commit) -> str:
+    head = (f"### {feature_title(c)}\n"
+            f"*+{c.insertions}/-{c.deletions}, "
+            f"{c.insertions + c.deletions} lines changed*")
+    detail = first_paragraph(commit_body(c.sha))
+    return f"{head}\n\n{detail}" if detail else head
+
+
 def render_top(top: list[Commit]) -> str:
-    return "\n".join(
-        f"- **{c.subject.removeprefix('feat:').strip()}** "
-        f"(+{c.insertions}/-{c.deletions}, {c.insertions + c.deletions} lines changed)"
-        for c in top
-    )
+    return "\n\n".join(format_feature(c) for c in top)
 
 
-def render_overview(commits: list[Commit], days: int) -> str:
+def join_titles(titles: list[str]) -> str:
+    if len(titles) == 1:
+        return titles[0]
+    if len(titles) == 2:
+        return f"{titles[0]} and {titles[1]}"
+    return ", ".join(titles[:-1]) + f", and {titles[-1]}"
+
+
+def render_overview(commits: list[Commit], top: list[Commit], days: int) -> str:
     feat_count = len(features(commits))
     others = summarise_non_feature_types(group_by_type(commits))
+    headline_names = join_titles([f"*{feature_title(c)}*" for c in top])
     para1 = (
-        f"Over the past {days} days, {len(commits)} commits landed across the "
-        f"codebase. Of those, {feat_count} were new features, with the rest "
-        f"covering {others}. The largest changes by diff size — the ones most "
-        f"likely to be felt by a user or a downstream consumer — are highlighted above."
+        f"Over the past {days} days, {len(commits)} commits landed — "
+        f"{feat_count} of them new features. The {len(top)} headline items "
+        f"detailed above ({headline_names}) accounted for the biggest "
+        f"shifts in the diff, with each one introducing or reshaping a "
+        f"piece of stride's surface."
     )
     para2 = (
-        "The week's work concentrated on shipping useful additions while keeping "
-        "the existing surface stable. Feature commits brought new capability online, "
-        "and supporting commits filled in tests, docs, and refactors around them. "
-        "Read the headlines for the substance, then drill into `git log` for the "
-        "exact diffs and rationale."
+        f"Around those headlines, the remaining {len(commits) - feat_count} "
+        f"non-feature commits covered {others} — supporting the new capability "
+        f"with tests, docs, and refactors. Read the headlines above for what each "
+        f"change is and why it exists; drop into `git log` for the exact files "
+        f"and diffs."
     )
     return f"{para1}\n\n{para2}"
 
@@ -120,7 +150,7 @@ def render(days: int, top: int) -> str:
         f"## Top {len(feats)} feature changes\n\n"
         f"{render_top(feats)}\n\n"
         f"## Overview\n\n"
-        f"{render_overview(commits, days)}\n"
+        f"{render_overview(commits, feats, days)}\n"
     )
 
 
