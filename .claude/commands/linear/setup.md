@@ -19,14 +19,14 @@ List the configured workspaces (these come from `~/.env`):
 env | grep -oE '^LINEAR_[A-Z_]+_API_KEY' | sort -u
 ```
 
-If none are found, point the user at [reference/setup.md](reference/setup.md) to add a `LINEAR_<TEAM>_API_KEY`. If exactly one is set, use it. If several, ask which workspace to use.
+If none are found, point the user at [reference/setup.md](reference/setup.md) to add a `LINEAR_<WORKSPACE>_API_KEY`. If exactly one is set, use it. If several, ask which workspace to use.
 
 ### 2. Pick the team
 
 A workspace can hold several teams; provisioning writes to one team's board. List them:
 
 ```bash
-LINCTL_API_KEY="$LINEAR_<TEAM>_API_KEY" linctl team list
+LINCTL_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" linctl team list
 ```
 
 If exactly one team exists, use its key. If several, <mark>**ask which team to target — never assume the first.**</mark> Capture the chosen team **key** (e.g. `WB`) for the `--team` flag below.
@@ -36,7 +36,7 @@ If exactly one team exists, use its key. If several, <mark>**ask which team to t
 Run *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-LINCTL_API_KEY="$LINEAR_<TEAM>_API_KEY" uv run .claude/tools/linear_cli.py provision-states --team <TEAM-KEY>
+LINCTL_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py provision-states --team <TEAM-KEY>
 ```
 
 The tool checks whether the team holds any issues and branches:
@@ -49,7 +49,7 @@ The tool checks whether the team holds any issues and branches:
 A freshly provisioned board has no issues, so Linear renders a blank screen. **If `mode` was `provisioned`**, create one sample card so the columns are visible:
 
 ```bash
-LINCTL_API_KEY="$LINEAR_<TEAM>_API_KEY" linctl issue create -t <TEAM-KEY> --state Backlog \
+LINCTL_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" linctl issue create -t <TEAM-KEY> --state Backlog \
   --title "Sample card — so the board shows its columns" \
   --description "Placeholder so the board renders. Safe to delete."
 ```

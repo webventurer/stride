@@ -31,7 +31,7 @@ Measured on macOS Apple Silicon, 2026-05-23, with `linctl 0.1.8` against four st
 
 ### What works
 
-- **Multi-workspace via env-var prefix** — `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl whoami` cleanly switches between Webventurer (`WB`), Personal (`MIK`), and Wordtracker (`WD`) workspaces. Each returns its own team UUID and issue count. No `~/.linctl-auth.json` persistence needed; one-line prefix per invocation works.
+- **Multi-workspace via env-var prefix** — `LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl whoami` cleanly switches between Webventurer (`WB`), Personal (`MIK`), and Wordtracker (`WD`) workspaces. Each returns its own team UUID and issue count. No `~/.linctl-auth.json` persistence needed; one-line prefix per invocation works.
 - **`sortOrder` mutation via raw GraphQL** — `linctl graphql 'mutation { issueUpdate(id: ..., input: { sortOrder: ... }) { success issue { sortOrder } } }'` works. Confirmed by reading-then-rewriting WB-391's `sortOrder` at value 36 (idempotent no-op). This gives us the **WB-388 outcome for free** — no Python-client extension needed if we migrate.
 - **`--json` output** — issue read returns 12KB clean structured JSON; `issue list --newer-than 1_week_ago` returns 117KB. Same data MCP would surface, no schema preamble.
 - **Latency** — read operations 170–220ms, network-bound to `api.linear.app`. Comparable to MCP per call; the CLI binary itself adds <10ms.

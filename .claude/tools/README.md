@@ -59,23 +59,23 @@ linctl has no typed milestone command, and `issue update` has no
 
 ```bash
 # issue queries
-LINCTL_API_KEY=$LINEAR_WEBVENTURER_API_KEY \
+LINCTL_API_KEY=$LINEAR_ACME_API_KEY \
   uv run .claude/tools/linear_cli.py search-by-project --project "Stride >>>" --text "linctl"
-LINCTL_API_KEY=$LINEAR_WEBVENTURER_API_KEY \
+LINCTL_API_KEY=$LINEAR_ACME_API_KEY \
   uv run .claude/tools/linear_cli.py list-by-project-state --project "Stride >>>" --state Done --since -P1W
-LINCTL_API_KEY=$LINEAR_WEBVENTURER_API_KEY \
+LINCTL_API_KEY=$LINEAR_ACME_API_KEY \
   uv run .claude/tools/linear_cli.py list-by-parent <parent-uuid>
 
 # milestones
-LINCTL_API_KEY=$LINEAR_WEBVENTURER_API_KEY \
+LINCTL_API_KEY=$LINEAR_ACME_API_KEY \
   uv run .claude/tools/linear_cli.py list-milestones <project-uuid>
-LINCTL_API_KEY=$LINEAR_WEBVENTURER_API_KEY \
+LINCTL_API_KEY=$LINEAR_ACME_API_KEY \
   uv run .claude/tools/linear_cli.py create-milestone --project <project-uuid> --name "Phase 1" --target-date 2026-12-31
 
 # board order
-LINCTL_API_KEY=$LINEAR_WEBVENTURER_API_KEY \
+LINCTL_API_KEY=$LINEAR_ACME_API_KEY \
   uv run .claude/tools/linear_cli.py min-backlog-sort-order <project-uuid>
-LINCTL_API_KEY=$LINEAR_WEBVENTURER_API_KEY \
+LINCTL_API_KEY=$LINEAR_ACME_API_KEY \
   uv run .claude/tools/linear_cli.py set-sort-order <issue-uuid> --sort-order -120550
 ```
 

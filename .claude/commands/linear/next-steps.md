@@ -21,7 +21,7 @@ Review what's happening and recommend what to work on next.
 Check for a `.linear_project` file in the repository root.
 
 - If **found**: read the project name from it
-- If **not found**: list available projects (`LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project list --json` — auth per [reference/workflow.md](reference/workflow.md)), ask the user to choose, and save their selection to `.linear_project`. Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it.
+- If **not found**: list available projects (`LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project list --json` — auth per [reference/workflow.md](reference/workflow.md)), ask the user to choose, and save their selection to `.linear_project`. Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it.
 
 Use the resolved project name for all Linear API calls in this command.
 
@@ -49,7 +49,7 @@ Read `VISION.md` from the repo root.
 
 ### 2. Fetch data (all calls in parallel)
 
-All `linctl` and `linear_cli.py` calls below are implicitly prefixed with `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY` per [reference/workflow.md](reference/workflow.md).
+All `linctl` and `linear_cli.py` calls below are implicitly prefixed with `LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY` per [reference/workflow.md](reference/workflow.md).
 
 | Call | Purpose |
 |:-----|:--------|

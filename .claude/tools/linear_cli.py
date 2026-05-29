@@ -7,7 +7,7 @@
 Vendored, no versioning. Each helper builds a GraphQL query and runs it
 through `linctl graphql`, inheriting linctl's auth (LINCTL_API_KEY).
 
-    LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py \\
+    LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY uv run .claude/tools/linear_cli.py \\
         search-by-project --project "<project>" --text "<terms>"
 """
 

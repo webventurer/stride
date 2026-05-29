@@ -28,8 +28,8 @@ Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if Gi
 Fetch the issue and its comments via linctl *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue get $ARGUMENTS --json
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl comment list $ARGUMENTS --json
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue get $ARGUMENTS --json
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl comment list $ARGUMENTS --json
 ```
 
 Extract from the issue JSON: identifier, title, description, state, labels, `gitBranchName`, assignee, project, project milestone (if any), parent issue.
@@ -146,7 +146,7 @@ Continue to step 6.
 Only update if the current state is Todo, Backlog, or Backburner.
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue update $ARGUMENTS --state Doing
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue update $ARGUMENTS --state Doing
 ```
 
 If already Doing, leave unchanged. Never set any other state in this step.
@@ -299,7 +299,7 @@ EOF
 ### 14. Update Linear status → In Review
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue update $ARGUMENTS --state "In Review"
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue update $ARGUMENTS --state "In Review"
 ```
 
 Only after the PR is confirmed created or already exists. Skip if the issue is already In Review. Warn (but proceed) if the issue is Done.

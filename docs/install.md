@@ -33,10 +33,17 @@ brew install gh uv linctl jq
 stride's `/linear:*` skills reach Linear through **linctl**, authenticated by a per-workspace API key in `~/.env` — no `.mcp.json`, no OAuth. Add one key per workspace:
 
 ```
-LINEAR_<TEAM>_API_KEY=lin_api_...
+LINEAR_<WORKSPACE>_API_KEY=lin_api_...
 ```
 
-Get a key at [linear.app/settings/api](https://linear.app/settings/api) (one per workspace). Every `/linear:*` call is implicitly prefixed `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl …` — see [the workflow reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/workflow.md). Verify the connection with `/linear:check` — it confirms each key authenticates now, and (once your board is provisioned in the next step) that every team's board carries the states stride needs.
+Get a key at [linear.app/settings/api](https://linear.app/settings/api) (one per workspace). Every `/linear:*` call is implicitly prefixed `LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl …` — see [the workflow reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/workflow.md). Verify the connection with `/linear:check` — it confirms each key authenticates now, and (once your board is provisioned in the next step) that every team's board carries the states stride needs.
+
+**How Linear API keys are scoped:** Linear API keys are per workspace (per user, scoped to the workspace), not per team.
+
+- An API key is created by a user under Settings → API → Personal API keys, and inherits that user's permissions across the entire workspace — every team they have access to.
+- There is no concept of a team-scoped API key. To restrict scope to one team, you'd either use a dedicated service-account user that's only added to that team, or filter by `teamId` in your queries.
+
+One key per workspace is the model — substitute the workspace identifier for `<WORKSPACE>` (e.g. `LINEAR_ACME_API_KEY` for an Acme workspace).
 
 ### Provision your Linear board
 
