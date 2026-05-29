@@ -4,19 +4,19 @@ Small, vendored Python utilities that live alongside the repo. Each
 file stands on its own — no package, no install, no dependency graph
 beyond `requests` / `click`.
 
-## `linear_cli.py`
+## Linear: `linear.py` (library) + `linear_cli.py` (CLI)
 
-A Linear GraphQL client + the operations the `/linear:*` skills need:
-project/parent-scoped issue queries, project milestones, board
-`sortOrder`, workflow-state drift and provisioning. Talks Linear's
-GraphQL API directly via `requests` — no external CLI dependency.
+Stride's Linear client is split across two files:
+
+- **`linear.py`** — the library. Talks Linear's GraphQL API directly via `requests`. All typed helpers, custom queries, and resolvers live here. Import-only.
+- **`linear_cli.py`** — the CLI front-end. Click commands that wrap the library, used by every `/linear:*` slash command.
 
 ### Requirements
 
 - **Python 3.10+**, **`click`**, **`requests`** — auto-installed by `uv run` via the PEP 723 header; no `pip install`.
 - **`LINEAR_API_KEY`** in the environment (canonical), or **`LINCTL_API_KEY`** (legacy alias, still read for backward compat).
 
-### What it provides
+### What `linear.py` provides
 
 **Issue queries** (return a list of node dicts: `identifier`, `title`, `state`):
 
@@ -41,28 +41,56 @@ GraphQL API directly via `requests` — no external CLI dependency.
 - `state_drift(team_key=None)` — names declared in `linear_statuses.json` but missing from the team's board.
 - `provision_states(team_key=None)` — on an empty team, creates/orders/archives states to match the JSON; on a populated team, returns an advisory report.
 
-**CRUD helpers** (`create_issue`, `update_issue`, `list_issues`, `create_attachment`, `create_project`, `update_project`, `create_label`, `list_labels`, `resolve_by_name`, …) — vendored direct-GraphQL helpers, each taking an `api_key` argument. Not currently called by any slash command; available for future skills.
+**Read helpers**:
+
+- `get_issue(api_key, identifier)`, `get_project(api_key, identifier)`, `whoami(api_key)`.
+- `list_teams(api_key)`, `get_team(api_key, key)`, `list_team_states(api_key, team_key)`.
+- `list_comments(api_key, issue_id)`.
+
+**Write helpers**: `create_issue` (returns the full issue object, accepts `parent_id`, `priority`, `project_milestone_id`, etc.), `update_issue` (accepts `parent_id`), `create_comment`, `create_attachment`, `create_project`, `update_project`.
+
+**Resolvers** (name → UUID lookups used by the CLI):
+
+- `resolve_project_id(api_key, name_or_id)` — round-trips UUIDs unchanged; resolves names via one query.
+- `resolve_state_for_issue(api_key, identifier, state_name)` — returns `(issue_uuid, state_id)` in a single round-trip.
+- `resolve_labels_for_team(api_key, team_id, names)` — translates label names → UUIDs scoped to a team.
 
 `LinearError` is raised on HTTP, network, or GraphQL errors. `LinctlError` remains as a legacy alias.
+
+### `linear_cli.py` subcommands
+
+Every command outputs JSON. Slash commands parse JSON; ad-hoc terminal use pipes through `| jq`.
+
+| Subcommand | Maps to |
+|:-----------|:--------|
+| `whoami` | `linctl whoami` |
+| `issue get <id>` | `linctl issue get` |
+| `issue create -t <team> --title ... [--project <name>] [--state <name>] [--priority N] [--labels a,b] [--parent <id>]` | `linctl issue create` |
+| `issue update <id> [--state <name>] [--parent <id>] [--title] [--description] [--labels] [--priority]` | `linctl issue update` |
+| `issue attach <id> --url <url> [--title <t>]` | `linctl issue attach` |
+| `comment list <id>` | `linctl comment list` |
+| `comment create <id> --body <text>` | `linctl comment create` |
+| `team list` | `linctl team list` |
+| `team state -t <team>` | `linctl team state` |
+| `project list` | `linctl project list` |
+| `project create -t <team> --name <name> [--description <subtitle>] [--content <body>]` | `linctl project create` |
+| `project get <name-or-id>` | `linctl project get` (also accepts names; linctl is UUID-only here) |
+| `project update <id> --description "..."` | `linctl project update` |
+| `label list -t <team>` | `linctl label list` |
+
+Plus the stride-specific flat commands: `search-by-project`, `list-by-project-state`, `list-by-project-state-type`, `list-by-parent`, `list-milestones`, `milestone-open-issues`, `create-milestone`, `update-milestone-description`, `get-project-content`, `update-project-content`, `min-backlog-sort-order`, `set-sort-order`, `state-drift`, `provision-states`.
 
 ### Usage
 
 ```bash
-# issue queries
 LINEAR_API_KEY=$LINEAR_ACME_API_KEY \
   uv run .claude/tools/linear_cli.py search-by-project --project "Stride >>>" --text "linctl"
 LINEAR_API_KEY=$LINEAR_ACME_API_KEY \
-  uv run .claude/tools/linear_cli.py list-by-project-state --project "Stride >>>" --state Done --since -P1W
+  uv run .claude/tools/linear_cli.py issue get WB-453
 LINEAR_API_KEY=$LINEAR_ACME_API_KEY \
-  uv run .claude/tools/linear_cli.py list-by-parent <parent-uuid>
-
-# milestones
+  uv run .claude/tools/linear_cli.py project get "Stride >>>"
 LINEAR_API_KEY=$LINEAR_ACME_API_KEY \
   uv run .claude/tools/linear_cli.py list-milestones <project-uuid>
-LINEAR_API_KEY=$LINEAR_ACME_API_KEY \
-  uv run .claude/tools/linear_cli.py create-milestone --project <project-uuid> --name "Phase 1" --target-date 2026-12-31
-
-# board order
 LINEAR_API_KEY=$LINEAR_ACME_API_KEY \
   uv run .claude/tools/linear_cli.py min-backlog-sort-order <project-uuid>
 LINEAR_API_KEY=$LINEAR_ACME_API_KEY \
@@ -79,7 +107,7 @@ All tests are pure-function or `requests.post`-mocked — they run
 without network access:
 
 ```bash
-python -m pytest .claude/tools/tests/test_linear_cli.py
+python -m pytest .claude/tools/tests/test_linear.py
 ```
 
 ## `openrouter_cli.py`
