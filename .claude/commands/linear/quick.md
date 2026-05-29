@@ -144,15 +144,15 @@ File the card now, or delay to bundle with more changes? (file / delay)
 - **file** — create one card in **Done** covering this change *and every PR held in the pending bundle*, then attach each PR *(auth per [reference/workflow.md](reference/workflow.md))*:
 
   ```bash
-  LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue create \
+  uv run .claude/tools/linear_cli.py issue create \
     -t <TEAM> --project "<project>" --state Done \
     --title "<imperative summary of the change(s)>" \
-    --description "<what shipped (per PR), plus a Why this matters line citing the Vision criterion>" --json
-  LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue attach <new-id> --pr <merged-PR-URL>
+    --description "<what shipped (per PR), plus a Why this matters line citing the Vision criterion>"
+  uv run .claude/tools/linear_cli.py issue attach <new-id> --pr <merged-PR-URL>
   # ...repeat issue attach for each PR in the bundle
   ```
 
-  Resolve the project from `.linear_project` and the team key from `linctl team list --json`. The PR links make the Linear ↔ git ↔ PR trail whole even though the branch carried no issue ID. Clear the pending bundle once filed.
+  Resolve the project from `.linear_project` and the team key from `uv run .claude/tools/linear_cli.py team list`. The PR links make the Linear ↔ git ↔ PR trail whole even though the branch carried no issue ID. Clear the pending bundle once filed.
 
 ### 8. Clean up
 
@@ -184,4 +184,4 @@ Display:
 - No ship phrase given → never merge; keep iterating. The PR opened at step 5 stays open (reversible) — if the user abandons the flow, the open PR and pushed branch are theirs to close or resume; quick doesn't auto-close them
 - Vision drift, user picks **add** → stop, don't merge; resume after the criterion is committed
 - Change outgrew a one-scroll diff → stop, suggest `/linear:plan-work`
-- `linctl issue create` / `attach` fails after merge → surface it; the PR is already merged, so re-running the file step (with the bundle intact) recovers the card
+- `uv run .claude/tools/linear_cli.py issue create` / `attach` fails after merge → surface it; the PR is already merged, so re-running the file step (with the bundle intact) recovers the card

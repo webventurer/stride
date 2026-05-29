@@ -21,10 +21,10 @@ Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if Gi
 
 ### 1. Read the Linear issue
 
-Fetch the issue via linctl *(auth per [reference/workflow.md](reference/workflow.md))*:
+Fetch the issue via `linear_cli.py` *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue get $ARGUMENTS --json
+uv run .claude/tools/linear_cli.py issue get $ARGUMENTS
 ```
 
 Extract from the JSON: identifier, title, `gitBranchName`, current state, project milestone (if any), parent issue.
@@ -33,7 +33,7 @@ Stop if the issue cannot be found.
 
 ### 2. Find the PR
 
-Run `gh pr list --head <gitBranchName> --json number,url,title,reviewDecision,mergeable`.
+Run `gh pr list --head <gitBranchName> number,url,title,reviewDecision,mergeable`.
 
 If no PR exists, stop — nothing to merge.
 
@@ -105,12 +105,12 @@ A worked before/after:
 Same content, ten times the readability.
 
 - **stated**: the agent was overconfident; user override stands. Continue to step 6 (Merge).
-- **alternative**: post a one-line Linear comment via `linctl comment create <issue-id> --body "..."` naming the agent's drift catch and the user-picked criterion. Continue to step 6. The drift is named on the issue; the body isn't auto-rewritten.
+- **alternative**: post a one-line Linear comment via `uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."` naming the agent's drift catch and the user-picked criterion. Continue to step 6. The drift is named on the issue; the body isn't auto-rewritten.
 - **something else**: drop into the missing-criterion path below.
 
 #### Something else — missing criterion path
 
-Ask one follow-up — *"In one line, what shifted?"* — and post the user's answer as a Linear comment on the issue via `linctl comment create <issue-id> --body "..."`. Then ask:
+Ask one follow-up — *"In one line, what shifted?"* — and post the user's answer as a Linear comment on the issue via `uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."`. Then ask:
 
 ```
 Stop and add the criterion to VISION.md before merging? (y/n)
@@ -192,7 +192,7 @@ VS Code does not support programmatic window closing. The worktree directory is 
 Move the issue to **Done**:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue update $ARGUMENTS --state Done
+uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state Done
 ```
 
 Only set Done status. Skip if already Done. Never set any other status.
@@ -201,7 +201,7 @@ Only set Done status. Skip if already Done. Never set any other status.
 
 Skip this step if the issue had no milestone.
 
-Otherwise, fetch issues attached to the milestone in non-Done states (linctl has no typed milestone command, so `linear_cli.py` provides it):
+Otherwise, fetch issues attached to the milestone in non-Done states via `linear_cli.py`:
 
 ```bash
 uv run .claude/tools/linear_cli.py milestone-open-issues <milestone-UUID>
@@ -227,7 +227,7 @@ If the user declines, leave the milestone untouched.
 
 Skip this step if the issue had no `parentId`, or if the parent's title doesn't start with `Epic: ` (the parent is a regular sub-issue parent, not a stride epic).
 
-Otherwise, fetch the parent epic's open sub-issues (`<parent-id>` is the parent UUID, `parent.id` from the `linctl issue get` at step 1):
+Otherwise, fetch the parent epic's open sub-issues (`<parent-id>` is the parent UUID, `parent.id` from the `uv run .claude/tools/linear_cli.py issue get` at step 1):
 
 ```bash
 uv run .claude/tools/linear_cli.py list-by-parent <parent-id> | jq '[.[] | select(.state.type as $t | ["backlog","unstarted","started"] | index($t))]'
@@ -244,10 +244,10 @@ All sub-issues of *[Epic title]* are complete — mark the epic Done?
 If the user confirms, move the parent issue to Done:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue update <parent-id> --state Done
+uv run .claude/tools/linear_cli.py issue update <parent-id> --state Done
 ```
 
-linctl accepts state names directly — no separate ID lookup needed. Unlike milestones, parent-issue epics have a real status, so closing them is a normal status transition — no description note needed.
+`linear_cli.py` accepts state names directly — no separate ID lookup needed. Unlike milestones, parent-issue epics have a real status, so closing them is a normal status transition — no description note needed.
 
 If the user declines, leave the epic untouched.
 
@@ -271,8 +271,8 @@ This PR changed VISION.md — sync to Linear?
 Then:
 
 1. Read `VISION.md` from the repo root.
-2. Resolve the Linear project from `.linear_project`. Get its id, URL, and current subtitle (`description`) from the project list by name — `linctl project get` takes an ID, not a name: `linctl project list --json | jq -r --arg name "<project-name>" '.[] | select(.name == $name) | {id, url, description}'`.
-3. Fetch the current project `content` via `linear_cli.py` (the Vision lives in `content`, not the length-limited `description`; linctl can't read `content`). The subtitle is VISION.md's opening blockquote — the `>` line under the H1 (read it from the file loaded in sub-step 1):
+2. Resolve the Linear project from `.linear_project`. Get its id, URL, and current subtitle (`description`) from the project list by name — `uv run .claude/tools/linear_cli.py project get` takes an ID, not a name: `uv run .claude/tools/linear_cli.py project list | jq -r --arg name "<project-name>" '.[] | select(.name == $name) | {id, url, description}'`.
+3. Fetch the current project `content` via `linear_cli.py` (the Vision lives in `content`, not the length-limited `description`). The subtitle is VISION.md's opening blockquote — the `>` line under the H1 (read it from the file loaded in sub-step 1):
    ```bash
    uv run .claude/tools/linear_cli.py get-project-content <project-id>
    ```
@@ -287,7 +287,7 @@ Then:
 5. On `y`, write whichever differs:
    ```bash
    uv run .claude/tools/linear_cli.py update-project-content <project-id> --content "$(cat VISION.md)"
-   LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project update <project-id> --description "<tagline-from-step-3>"
+   uv run .claude/tools/linear_cli.py project update <project-id> --description "<tagline-from-step-3>"
    ```
    On `n`: skip the writes and continue to step 9.
 

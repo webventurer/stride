@@ -23,11 +23,11 @@ Workflow: `/plan-work` → `/start` (includes terminal review) → **`/fix`** (i
 
 ### 1. Read the Linear issue
 
-Fetch the issue via linctl *(auth per [reference/workflow.md](reference/workflow.md))*:
+Fetch the issue via `linear_cli.py` *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue get $ARGUMENTS --json
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl comment list $ARGUMENTS --json
+uv run .claude/tools/linear_cli.py issue get $ARGUMENTS
+uv run .claude/tools/linear_cli.py comment list $ARGUMENTS
 ```
 
 Extract from the issue JSON: identifier, title, `gitBranchName`.
@@ -73,7 +73,7 @@ without a named outcome.
 
 ### 3. Find the PR
 
-Run `gh pr list --head <gitBranchName> --json number,url,title`.
+Run `gh pr list --head <gitBranchName> number,url,title`.
 
 If no PR exists, stop — suggest `/start` first.
 
@@ -82,7 +82,7 @@ If no PR exists, stop — suggest `/start` first.
 Fetch the PR reviews and comments:
 
 ```bash
-gh pr view <number> --json reviews,comments
+gh pr view <number> reviews,comments
 gh api repos/{owner}/{repo}/pulls/<number>/comments
 ```
 

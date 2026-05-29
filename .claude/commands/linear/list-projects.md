@@ -6,10 +6,10 @@ Show all projects in the connected Linear workspace.
 
 ### 1. Fetch projects
 
-Fetch all active projects via linctl *(auth per [reference/workflow.md](reference/workflow.md))*:
+Fetch all active projects via `linear_cli.py`. Workspace-iterating, so the per-workspace `LINEAR_API_KEY=` wrap is explicit:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project list --json
+LINEAR_API_KEY=$LINEAR_<WORKSPACE>_API_KEY uv run .claude/tools/linear_cli.py project list
 ```
 
 ### 2. Display

@@ -70,7 +70,7 @@ The other Linear commands (`/linear:check`, `/linear:list-projects`, `/linear:fi
 
 ### /linear:check
 
-**Verify Linear access.** Runs `linctl whoami` for each `LINEAR_<WORKSPACE>_API_KEY` in `~/.env` to confirm it authenticates, then checks that every team's board carries the workflow states in `linear_statuses.json` and flags any drift. Because boards are per-team, it reports one row per team — a multi-team workspace gets each team checked, not just the first. If a team's board drifts, it points you at [`/linear:setup`](/skills/linear) for that team (it never reconciles the board itself).
+**Verify Linear access.** Runs `linear_cli.py whoami` for each `LINEAR_<WORKSPACE>_API_KEY` in `~/.env` to confirm it authenticates, then checks that every team's board carries the workflow states in `linear_statuses.json` and flags any drift. Because boards are per-team, it reports one row per team — a multi-team workspace gets each team checked, not just the first. If a team's board drifts, it points you at [`/linear:setup`](/skills/linear) for that team (it never reconciles the board itself).
 
 ### /linear:setup
 
@@ -78,13 +78,13 @@ The other Linear commands (`/linear:check`, `/linear:list-projects`, `/linear:fi
 
 ### /linear:list-projects
 
-**List all projects across connected Linear workspaces.** Runs `linctl project list` for each configured `LINEAR_<WORKSPACE>_API_KEY` and displays results grouped by workspace.
+**List all projects across connected Linear workspaces.** Runs `linear_cli.py project list` for each configured `LINEAR_<WORKSPACE>_API_KEY` and displays results grouped by workspace.
 
 **Usage**: `/linear:list-projects`
 
 ### /linear:update-vision
 
-**Mirror `VISION.md` to the Linear project.** Reads `VISION.md`, resolves the Linear project from `.linear_project`, shows the diff against the current Linear content, and — once you confirm — pushes the file's contents into the project's `content` field via linctl.
+**Mirror `VISION.md` to the Linear project.** Reads `VISION.md`, resolves the Linear project from `.linear_project`, shows the diff against the current Linear content, and — once you confirm — pushes the file's contents into the project's `content` field via `linear_cli.py update-project-content`.
 
 Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). One-way only: repo → Linear, never the reverse. Idempotent — re-running with no `VISION.md` changes is a no-op.
 
