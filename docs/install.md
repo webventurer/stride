@@ -10,33 +10,30 @@ That command installs stride itself, not the CLIs the workflow relies on — see
 
 ## What you need to install first
 
-stride needs [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plus four CLIs on your PATH — `gh`, `uv`, `linctl`, `jq` (used across the `/linear:*` skills, the commit hook, and the Python tools). On macOS:
+stride needs [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plus three CLIs on your PATH — `gh`, `uv`, `jq` (used across the `/linear:*` skills, the commit hook, and the Python tools). On macOS:
 
 ```bash
 npm install -g @anthropic-ai/claude-code
-brew tap dorkitude/linctl
-brew install gh uv linctl jq
+brew install gh uv jq
 ```
 
 ### Linux
 
-`gh`, `uv`, and `jq` install from your package manager; `linctl` uses the same brew tap as above, or `nix profile install github:dorkitude/linctl`.
+`gh`, `uv`, and `jq` install from your package manager. No source-build dependencies — stride talks to Linear via a vendored Python client (`linear_cli.py`), not an external CLI.
 
 ### Windows
 
-**WSL is the supported Windows path.** stride's commit hooks need a bash/zsh shell — the [Vision](https://github.com/webventurer/stride/blob/main/VISION.md) states plainly that *"Bash/zsh required for hooks (Windows requires WSL)."* Install [WSL](https://learn.microsoft.com/windows/wsl/install), then follow the macOS steps above inside it (`brew tap dorkitude/linctl && brew install gh uv linctl jq`).
-
-`gh`, `uv`, and `jq` do have native Windows installers (winget / scoop / MSI) if you only need those — but `linctl` has none, so a native install still leaves you building it from source with Go (`go install`), and the hooks won't run without WSL anyway. Pick WSL up front.
+**WSL is the supported Windows path.** stride's commit hooks need a bash/zsh shell — the [Vision](https://github.com/webventurer/stride/blob/main/VISION.md) states plainly that *"Bash/zsh required for hooks (Windows requires WSL)."* Install [WSL](https://learn.microsoft.com/windows/wsl/install), then follow the macOS steps above inside it (`brew install gh uv jq`).
 
 ### Connect Linear
 
-stride's `/linear:*` skills reach Linear through **linctl**, authenticated by a per-workspace API key in `~/.env` — no `.mcp.json`, no OAuth. Add one key per workspace:
+stride's `/linear:*` skills reach Linear via the vendored `linear_cli.py` (in `.claude/tools/`), authenticated by a per-workspace API key in `~/.env` — no `.mcp.json`, no OAuth, no external CLI install. Add one key per workspace:
 
 ```
 LINEAR_<WORKSPACE>_API_KEY=lin_api_...
 ```
 
-Get a key at [linear.app/settings/api](https://linear.app/settings/api) (one per workspace). Every `/linear:*` call is implicitly prefixed `LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl …` — see [the workflow reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/workflow.md). Verify the connection with `/linear:check` — it confirms each key authenticates now, and (once your board is provisioned in the next step) that every team's board carries the states stride needs.
+Get a key at [linear.app/settings/api](https://linear.app/settings/api) (one per workspace). Per-project calls read the bearer token automatically from `.linear_project`'s `api_key_env` field (set on first run); workspace-iterating commands (`/linear:check`, `/linear:setup`, `/linear:list-projects`) wrap each call with `LINEAR_API_KEY=$LINEAR_<WORKSPACE>_API_KEY`. See [the workflow reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/workflow.md). Verify the connection with `/linear:check` — it confirms each key authenticates now, and (once your board is provisioned in the next step) that every team's board carries the states stride needs.
 
 **How Linear API keys are scoped:** Linear API keys are per workspace (per user, scoped to the workspace), not per team.
 

@@ -329,7 +329,7 @@ function logAvailableSkills() {
   );
   console.log("  /commit              — 4-pass atomic git commits");
   console.log("  /craft               — CRAFT prompt framework");
-  console.log("  /linear:check        — verify Linear access (linctl)");
+  console.log("  /linear:check        — verify Linear access");
   console.log("  /linear:setup        — provision Linear workflow states");
   console.log("  /linear:start        — implement a Linear issue");
   console.log("  /linear:plan-work    — create a Linear issue");

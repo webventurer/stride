@@ -14,7 +14,7 @@ Stride's Linear client is split across two files:
 ### Requirements
 
 - **Python 3.10+**, **`click`**, **`requests`** — auto-installed by `uv run` via the PEP 723 header; no `pip install`.
-- **`LINEAR_API_KEY`** in the environment (canonical), or **`LINCTL_API_KEY`** (legacy alias, still read for backward compat).
+- **`LINEAR_API_KEY`** in the environment, or `api_key_env` named in `.linear_project`.
 
 ### What `linear.py` provides
 
@@ -61,22 +61,17 @@ Stride's Linear client is split across two files:
 
 Every command outputs JSON. Slash commands parse JSON; ad-hoc terminal use pipes through `| jq`.
 
-| Subcommand | Maps to |
-|:-----------|:--------|
-| `whoami` | `linctl whoami` |
-| `issue get <id>` | `linctl issue get` |
-| `issue create -t <team> --title ... [--project <name>] [--state <name>] [--priority N] [--labels a,b] [--parent <id>]` | `linctl issue create` |
-| `issue update <id> [--state <name>] [--parent <id>] [--title] [--description] [--labels] [--priority]` | `linctl issue update` |
-| `issue attach <id> --url <url> [--title <t>]` | `linctl issue attach` |
-| `comment list <id>` | `linctl comment list` |
-| `comment create <id> --body <text>` | `linctl comment create` |
-| `team list` | `linctl team list` |
-| `team state -t <team>` | `linctl team state` |
-| `project list` | `linctl project list` |
-| `project create -t <team> --name <name> [--description <subtitle>] [--content <body>]` | `linctl project create` |
-| `project get <name-or-id>` | `linctl project get` (also accepts names; linctl is UUID-only here) |
-| `project update <id> --description "..."` | `linctl project update` |
-| `label list -t <team>` | `linctl label list` |
+**Issues**: `issue get <id>` · `issue create -t <team> --title ... [--project <name>] [--state <name>] [--priority N] [--labels a,b] [--parent <id>]` · `issue update <id> [--state <name>] [--parent <id>] [--title] [--description] [--labels] [--priority]` · `issue attach <id> --url <url> [--title <t>]`
+
+**Comments**: `comment list <id>` · `comment create <id> --body <text>`
+
+**Teams**: `team list` · `team state -t <team>`
+
+**Projects**: `project list` · `project create -t <team> --name <name> [--description <subtitle>] [--content <body>]` · `project get <name-or-id>` (accepts either) · `project update <id> --description "..."`
+
+**Labels**: `label list -t <team>`
+
+**Viewer**: `whoami`
 
 Plus the stride-specific flat commands: `search-by-project`, `list-by-project-state`, `list-by-project-state-type`, `list-by-parent`, `list-milestones`, `milestone-open-issues`, `create-milestone`, `update-milestone-description`, `get-project-content`, `update-project-content`, `min-backlog-sort-order`, `set-sort-order`, `state-drift`, `provision-states`.
 
@@ -84,7 +79,7 @@ Plus the stride-specific flat commands: `search-by-project`, `list-by-project-st
 
 ```bash
 LINEAR_API_KEY=$LINEAR_ACME_API_KEY \
-  uv run .claude/tools/linear_cli.py search-by-project --project "Stride >>>" --text "linctl"
+  uv run .claude/tools/linear_cli.py search-by-project --project "Stride >>>" --text "epic"
 LINEAR_API_KEY=$LINEAR_ACME_API_KEY \
   uv run .claude/tools/linear_cli.py issue get WB-453
 LINEAR_API_KEY=$LINEAR_ACME_API_KEY \
@@ -97,9 +92,10 @@ LINEAR_API_KEY=$LINEAR_ACME_API_KEY \
   uv run .claude/tools/linear_cli.py set-sort-order <issue-uuid> --sort-order -120550
 ```
 
-The `LINCTL_API_KEY=` wrap (still used by some slash commands while
-they call `linctl` for the fat-CLI surface) keeps working — it falls
-through to the same bearer-token resolver.
+Workspace-iterating commands (`/linear:check`, `/linear:setup`,
+`/linear:list-projects`) wrap each call with
+`LINEAR_API_KEY=$LINEAR_<WORKSPACE>_API_KEY` to target a specific
+workspace.
 
 ### Tests
 

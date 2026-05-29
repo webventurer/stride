@@ -7,7 +7,7 @@
 **Utility:**
 
 ```
-/linear:check               → verify linctl auth + board matches statuses JSON
+/linear:check               → verify Linear auth + board matches statuses JSON
 /linear:setup               → provision workflow states (non-destructive)
 /linear:list-projects       → list all projects across workspaces
 /linear:next-steps          → see what needs doing
@@ -42,25 +42,25 @@ It's like how every email is called a "message" whether it's a question, an anno
 
 ## How skills talk to Linear
 
-Stride's `/linear:*` skills call [linctl](https://github.com/dorkitude/linctl) — a brew-installable Go CLI — to drive Linear. Every invocation in a skill file is implicitly prefixed with the per-workspace API key from `~/.env`:
+Stride's `/linear:*` skills call `linear_cli.py` (in `.claude/tools/`) — a vendored Python client that talks Linear's GraphQL API directly via `requests`. No external CLI install.
+
+Project-scoped commands read the bearer token from `.linear_project`'s `api_key_env` field automatically — no per-call wrap. Workspace-iterating commands (`/linear:check`, `/linear:setup`, `/linear:list-projects`) wrap each call explicitly with the workspace's env var:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl <verb> ...
+LINEAR_API_KEY=$LINEAR_<WORKSPACE>_API_KEY uv run .claude/tools/linear_cli.py <verb> ...
 ```
 
-Substitute `<WORKSPACE>` with the workspace name you're driving against (e.g. `LINEAR_ORG1_API_KEY`, `LINEAR_ORG2_API_KEY`). The per-workspace variables live in `~/.env` per [setup.md](setup.md). One stride install can drive multiple Linear workspaces — the env-var-per-workspace pattern is how you switch between them per invocation.
+Substitute `<WORKSPACE>` with the workspace name you're driving against (e.g. `LINEAR_ORG1_API_KEY`). The per-workspace variables live in `~/.env` per [setup.md](setup.md). One stride install can drive multiple Linear workspaces — the env-var-per-workspace pattern is how you switch between them per invocation.
 
-**Reading skill files:** call sites in `/linear:*` workflows are written without the prefix to keep them scannable. The first `linctl` line in each skill carries an inline reminder; subsequent calls follow the same pattern.
+**JSON for agents:** `linear_cli.py` always outputs JSON, so the agent can parse with `jq` without a flag.
 
-**JSON for agents:** all linctl calls used by skills add `--json` so the agent gets structured output to parse with `jq`. Without `--json`, linctl prints human-readable text.
-
-**Why linctl, not the Linear MCP:** see [docs/research/linear-mcp-vs-cli.md](../../../../docs/research/linear-mcp-vs-cli.md). Short version: MCP loads ~60k tokens of schema before the agent reasons; linctl loads zero.
+**Why a vendored client, not MCP:** MCP loads ~60k tokens of schema before the agent reasons; the vendored client loads zero. Plus stride owns the auth path end-to-end — no second protocol to configure.
 
 ## Workflow states
 
 The state names the `/linear:*` commands move issues through — `Backlog` on create, `Doing` on start, `In Review` after the PR, `Done` on finish — are defined once in [`linear_statuses.json`](../linear_statuses.json), grouped by Linear's state type and mapped to each workflow transition. That file is the source of truth for the names stride uses and for the type groups `/linear:next-steps` filters on.
 
-The call sites keep readable literals (`linctl issue update <id> --state Doing`) for scannability — but the canonical list is the JSON. `/linear:check` diffs it against the live board (via `linear_cli.py state-drift`) and flags any state stride expects that the board doesn't have, catching the silent-no-op trap a name mismatch causes (e.g. `In Progress` matching nothing). Adapting stride to a workspace whose states are named differently starts here: edit the JSON, then run `/linear:check` to confirm the board matches.
+The call sites keep readable literals (`linear_cli.py issue update <id> --state Doing`) for scannability — but the canonical list is the JSON. `/linear:check` diffs it against the live board (via `linear_cli.py state-drift`) and flags any state stride expects that the board doesn't have, catching the silent-no-op trap a name mismatch causes (e.g. `In Progress` matching nothing). Adapting stride to a workspace whose states are named differently starts here: edit the JSON, then run `/linear:check` to confirm the board matches.
 
 ## Reviewing PRs in VS Code
 
