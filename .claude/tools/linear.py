@@ -96,12 +96,48 @@ def require_env(name: str) -> str:
     return val
 
 
+LINEAR_PROJECT_PATH = Path(".linear_project")
+
+
+def parse_project_config(text: str) -> dict:
+    config: dict = {}
+    for line in config_lines(text):
+        absorb_config_line(config, line)
+    return config
+
+
+def config_lines(text: str) -> list:
+    return [s for s in (raw.strip() for raw in text.splitlines()) if s and not s.startswith("#")]
+
+
+def absorb_config_line(config: dict, line: str):
+    if "=" in line:
+        k, v = line.split("=", 1)
+        config[k.strip()] = v.strip()
+    elif "project" not in config:
+        # Backward compat: bare project name on first non-comment line.
+        config["project"] = line
+
+
+def project_config() -> dict:
+    return parse_project_config(LINEAR_PROJECT_PATH.read_text()) if LINEAR_PROJECT_PATH.exists() else {}
+
+
+def token_from_project_config() -> str | None:
+    env_name = project_config().get("api_key_env")
+    return os.environ.get(env_name) if env_name else None
+
+
 def bearer_token() -> str:
-    token = os.environ.get("LINEAR_API_KEY") or os.environ.get("LINCTL_API_KEY")
+    token = (
+        os.environ.get("LINEAR_API_KEY")
+        or os.environ.get("LINCTL_API_KEY")
+        or token_from_project_config()
+    )
     if not token:
         raise LinearError(
-            "No Linear credentials. Set LINEAR_API_KEY in ~/.env "
-            "(or LINCTL_API_KEY for legacy compat)."
+            "No Linear credentials. Set LINEAR_API_KEY in ~/.env, name an "
+            "api_key_env in .linear_project, or set LINCTL_API_KEY (legacy)."
         )
     return token
 
