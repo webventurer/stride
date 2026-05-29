@@ -214,7 +214,7 @@ The squash commit message reads as if the work was done right the first time —
 
 ## Setup
 
-See the [install guide](/install#connect-linear) for connecting Linear via linctl. The commands also require the [GitHub CLI](https://cli.github.com/) for PR operations.
+See the [install guide](/install#connect-linear) for connecting Linear via a per-workspace API key. The commands also require the [GitHub CLI](https://cli.github.com/) for PR operations.
 
 ### Reviewing PRs in VS Code
 

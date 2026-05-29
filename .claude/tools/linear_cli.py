@@ -174,7 +174,7 @@ def provision_states_cmd(team_key: str):
     echo_json(provision_states(team_key))
 
 
-# ---- linctl-matching subgroups ----
+# ---- Issue / comment / team / project / label / whoami subgroups ----
 
 
 @cli.command("whoami")

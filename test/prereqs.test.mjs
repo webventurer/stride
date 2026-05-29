@@ -9,12 +9,12 @@ import {
 
 describe("missingPrereqs", () => {
   it("returns only the tools absent from PATH", () => {
-    const present = (cmd) => cmd !== "linctl"; // linctl missing, rest present
+    const present = (cmd) => cmd !== "jq"; // jq missing, rest present
     const missing = missingPrereqs(present);
 
     deepStrictEqual(
       missing.map((p) => p.cmd),
-      ["linctl"],
+      ["jq"],
     );
   });
 
@@ -25,10 +25,10 @@ describe("missingPrereqs", () => {
     );
   });
 
-  it("returns all four when none are present", () => {
+  it("returns all three when none are present", () => {
     deepStrictEqual(
       missingPrereqs(() => false).map((p) => p.cmd),
-      ["gh", "uv", "linctl", "jq"],
+      ["gh", "uv", "jq"],
     );
   });
 });
@@ -36,7 +36,7 @@ describe("missingPrereqs", () => {
 describe("prereqReport", () => {
   it("reports all-found when nothing is missing", () => {
     deepStrictEqual(prereqReport([]), [
-      "Prerequisites: gh, uv, linctl, jq all found.",
+      "Prerequisites: gh, uv, jq all found.",
     ]);
   });
 
@@ -61,7 +61,7 @@ describe("requirePrerequisites", () => {
     );
 
     ok(out.some((l) => l.startsWith("Missing prerequisites")));
-    ok(out.some((l) => l.includes("linctl — brew tap dorkitude/linctl")));
+    ok(out.some((l) => l.includes("jq — brew install jq")));
     strictEqual(exitCode, 1);
   });
 

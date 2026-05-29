@@ -5,10 +5,6 @@ import { execSync } from "node:child_process";
 export const PREREQS = [
   { cmd: "gh", install: "brew install gh" },
   { cmd: "uv", install: "brew install uv" },
-  {
-    cmd: "linctl",
-    install: "brew tap dorkitude/linctl && brew install linctl",
-  },
   { cmd: "jq", install: "brew install jq" },
 ];
 
@@ -19,8 +15,7 @@ export function missingPrereqs(isPresent = onPath) {
 
 // The lines the doctor prints — pure, so tests assert on the array.
 export function prereqReport(missing) {
-  if (missing.length === 0)
-    return ["Prerequisites: gh, uv, linctl, jq all found."];
+  if (missing.length === 0) return ["Prerequisites: gh, uv, jq all found."];
   return [
     "Missing prerequisites — stride needs these on your PATH. Install them, then re-run:",
     ...missing.map((p) => `  ${p.cmd} — ${p.install}`),
@@ -29,13 +24,13 @@ export function prereqReport(missing) {
 }
 
 // What native Windows sees instead of the (POSIX-only) tool probes. WSL is
-// stride's supported Windows path — the hooks and linctl both need a POSIX
-// shell — so say that plainly rather than report every tool "missing".
+// stride's supported Windows path — the hooks need a POSIX shell — so say
+// that plainly rather than report every tool "missing".
 export function windowsReport() {
   return [
-    "stride requires WSL on Windows — its commit hooks and the linctl CLI",
-    "both need a bash/zsh shell. Install WSL, then run the install from",
-    "inside it. See the Windows section of docs/install.md.",
+    "stride requires WSL on Windows — its commit hooks need a bash/zsh",
+    "shell. Install WSL, then run the install from inside it. See the",
+    "Windows section of docs/install.md.",
   ];
 }
 

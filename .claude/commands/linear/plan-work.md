@@ -61,7 +61,7 @@ First, check `$ARGUMENTS` for the `--project <name>` flag.
     api_key_env = LINEAR_<WORKSPACE>_API_KEY
     ```
 
-    Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it. The `api_key_env` field lets `linear_cli.py` read the bearer token without a per-call `LINCTL_API_KEY=` wrap.
+    Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it. The `api_key_env` field lets `linear_cli.py` read the bearer token without a per-call `LINEAR_API_KEY=` wrap.
 
     ```bash
     uv run .claude/tools/linear_cli.py project list

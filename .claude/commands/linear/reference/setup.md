@@ -2,17 +2,17 @@
 
 > **AI Assistant Note**: Reference this document when setting up Linear integration for a new project.
 
-This guide covers how to connect Claude Code to Linear via linctl, using a per-workspace API key in `~/.env`.
+This guide covers how to connect Claude Code to Linear using a per-workspace API key in `~/.env`. The `/linear:*` commands talk to Linear's GraphQL API via stride's vendored `linear_cli.py` — no external CLI to install.
 
 ## Quick reference
 
-**Prerequisites**: A Linear workspace, `linctl` installed, and a `LINEAR_<WORKSPACE>_API_KEY` in `~/.env` (see the [install guide](/install)).
+**Prerequisites**: A Linear workspace and a `LINEAR_<WORKSPACE>_API_KEY` in `~/.env` (see the [install guide](/install)).
 
 **Utility commands:**
 
 | Command | What it does |
 |:--------|:-------------|
-| `/linear:check` | Verify linctl auth — confirm each `LINEAR_<WORKSPACE>_API_KEY` resolves, and the board matches `linear_statuses.json` |
+| `/linear:check` | Verify auth — confirm each `LINEAR_<WORKSPACE>_API_KEY` resolves, and the board matches `linear_statuses.json` |
 | `/linear:setup` | Provision the workspace's workflow states from `linear_statuses.json` — creates missing columns, reorders to sequence, never deletes |
 | `/linear:list-projects` | List all projects across connected Linear workspaces |
 | `/linear:next-steps` | Review priorities, surface PRs needing fix, recommend what to work on next |
@@ -33,7 +33,7 @@ See [workflow.md](workflow.md) for detailed command docs and typical flow.
 
 ### 1. Add your API key
 
-stride's `/linear:*` skills reach Linear through [linctl](https://github.com/dorkitude/linctl) using a per-workspace API key — no `.mcp.json`, no OAuth. Add one key per workspace to `~/.env`:
+stride's `/linear:*` skills reach Linear via the vendored `linear_cli.py` (in `.claude/tools/`) using a per-workspace API key — no `.mcp.json`, no OAuth, no external CLI install. Add one key per workspace to `~/.env`:
 
 ```
 LINEAR_<WORKSPACE>_API_KEY=lin_api_...
@@ -51,7 +51,7 @@ One key per workspace is the model — substitute the workspace identifier for `
 
 ### 2. Verify the connection
 
-Run `/linear:check` to confirm linctl can authenticate against each `LINEAR_<WORKSPACE>_API_KEY` set in `~/.env`. It runs `linctl whoami` per key and reports which workspace each one resolves to.
+Run `/linear:check` to confirm stride can authenticate against each `LINEAR_<WORKSPACE>_API_KEY` set in `~/.env`. It runs `linear_cli.py whoami` per key and reports which workspace each one resolves to.
 
 ### 3. Install the Linear GitHub integration
 
@@ -89,7 +89,7 @@ api_key_env = LINEAR_WEBVENTURER_API_KEY
 ```
 
 - `project` — the Linear project name. A bare value on the first non-comment line is read as `project` for backward compatibility.
-- `api_key_env` — names the env var in `~/.env` that holds the workspace API key. When set, `linear_cli.py` reads the bearer token from that env var automatically, so per-call `LINCTL_API_KEY=$LINEAR_<X>_API_KEY` wraps aren't needed on `linear_cli.py` invocations. Workspace-iterating commands (`/linear:check`, `/linear:setup`) still use the explicit wrap since they target multiple workspaces.
+- `api_key_env` — names the env var in `~/.env` that holds the workspace API key. When set, `linear_cli.py` reads the bearer token from that env var automatically, so per-call `LINEAR_API_KEY=$LINEAR_<X>_API_KEY` wraps aren't needed. Workspace-iterating commands (`/linear:check`, `/linear:setup`, `/linear:list-projects`) still use the explicit wrap since they target multiple workspaces.
 
 Override the resolved token per-call with `LINEAR_API_KEY=<token>`.
 

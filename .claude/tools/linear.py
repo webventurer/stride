@@ -5,8 +5,8 @@
 """Linear GraphQL client — the library the /linear:* skills' CLI sits on.
 
 Talks Linear's GraphQL API directly via `requests`. Reads the bearer
-token from `LINEAR_API_KEY` (canonical) or `LINCTL_API_KEY` (legacy
-compat).
+token from `LINEAR_API_KEY` or from the env var named by
+`.linear_project`'s `api_key_env` field.
 
 This module is import-only — for the CLI front-end, see `linear_cli.py`.
 """
@@ -31,10 +31,6 @@ STATUSES_PATH = (
 
 class LinearError(Exception):
     """Raised when a Linear API call fails — HTTP, network, or GraphQL errors."""
-
-
-# Legacy alias — older callers/tests reference this name.
-LinctlError = LinearError
 
 
 def graphql(
@@ -129,25 +125,16 @@ def token_from_project_config() -> str | None:
 
 
 def bearer_token() -> str:
-    token = (
-        os.environ.get("LINEAR_API_KEY")
-        or os.environ.get("LINCTL_API_KEY")
-        or token_from_project_config()
-    )
+    token = os.environ.get("LINEAR_API_KEY") or token_from_project_config()
     if not token:
         raise LinearError(
-            "No Linear credentials. Set LINEAR_API_KEY in ~/.env, name an "
-            "api_key_env in .linear_project, or set LINCTL_API_KEY (legacy)."
+            "No Linear credentials. Set LINEAR_API_KEY in ~/.env or name "
+            "an api_key_env in .linear_project."
         )
     return token
 
 
-def linctl_graphql(query: str, variables: dict) -> dict:
-    """Run a GraphQL query, return the `data` payload.
-
-    Name kept for backward compat — was a subprocess wrapper around
-    `linctl graphql`, now hits Linear directly via requests.
-    """
+def graphql_data(query: str, variables: dict) -> dict:
     return graphql(bearer_token(), query, variables)["data"]
 
 
@@ -506,7 +493,7 @@ def search_by_project(project: str, text: str) -> list:
         "$project: String!, $text: String!",
         "project: { name: { eq: $project } } searchableContent: { contains: $text }",
     )
-    return linctl_graphql(query, {"project": project, "text": text})["issues"]["nodes"]
+    return graphql_data(query, {"project": project, "text": text})["issues"]["nodes"]
 
 
 def list_by_project_state(project: str, state: str, since: str | None = None) -> list:
@@ -517,7 +504,7 @@ def list_by_project_state(project: str, state: str, since: str | None = None) ->
         params += ", $since: DateTimeOrDuration!"
         filters += " createdAt: { gt: $since }"
         variables["since"] = since
-    return linctl_graphql(issues_query(params, filters), variables)["issues"]["nodes"]
+    return graphql_data(issues_query(params, filters), variables)["issues"]["nodes"]
 
 
 def list_by_project_state_type(project: str, state_type: str) -> list:
@@ -525,14 +512,14 @@ def list_by_project_state_type(project: str, state_type: str) -> list:
         "$project: String!, $type: String!",
         "project: { name: { eq: $project } } state: { type: { eq: $type } }",
     )
-    return linctl_graphql(query, {"project": project, "type": state_type})["issues"][
+    return graphql_data(query, {"project": project, "type": state_type})["issues"][
         "nodes"
     ]
 
 
 def list_by_parent(parent_id: str) -> list:
     query = issues_query("$parent: ID!", "parent: { id: { eq: $parent } }")
-    return linctl_graphql(query, {"parent": parent_id})["issues"]["nodes"]
+    return graphql_data(query, {"parent": parent_id})["issues"]["nodes"]
 
 
 # ---- Milestones ----
@@ -545,7 +532,7 @@ def list_milestones(project_id: str) -> list:
         "query($project: String!) { project(id: $project) { "
         "projectMilestones { nodes { id name } } } }"
     )
-    data = linctl_graphql(query, {"project": project_id})
+    data = graphql_data(query, {"project": project_id})
     return data["project"]["projectMilestones"]["nodes"]
 
 
@@ -555,7 +542,7 @@ def milestone_open_issues(milestone_id: str) -> list:
         f"issues(filter: {{ state: {{ type: {{ in: {OPEN_STATE_TYPES} }} }} }}) "
         "{ nodes { identifier } } } }"
     )
-    data = linctl_graphql(query, {"milestone": milestone_id})
+    data = graphql_data(query, {"milestone": milestone_id})
     return data["projectMilestone"]["issues"]["nodes"]
 
 
@@ -573,7 +560,7 @@ def create_milestone(
         f"mutation({params}) {{ projectMilestoneCreate(input: {{ {fields} }}) "
         "{ projectMilestone { id name } } }"
     )
-    return linctl_graphql(query, variables)["projectMilestoneCreate"][
+    return graphql_data(query, variables)["projectMilestoneCreate"][
         "projectMilestone"
     ]
 
@@ -584,7 +571,7 @@ def update_milestone_description(milestone_id: str, description: str) -> bool:
         "projectMilestoneUpdate(id: $id, input: { description: $description }) "
         "{ success } }"
     )
-    data = linctl_graphql(query, {"id": milestone_id, "description": description})
+    data = graphql_data(query, {"id": milestone_id, "description": description})
     return data["projectMilestoneUpdate"]["success"]
 
 
@@ -593,7 +580,7 @@ def update_milestone_description(milestone_id: str, description: str) -> bool:
 
 def project_content(project_id: str) -> str | None:
     query = "query($id: String!) { project(id: $id) { content } }"
-    return linctl_graphql(query, {"id": project_id})["project"]["content"]
+    return graphql_data(query, {"id": project_id})["project"]["content"]
 
 
 def update_project_content(project_id: str, content: str) -> bool:
@@ -601,7 +588,7 @@ def update_project_content(project_id: str, content: str) -> bool:
         "mutation($id: String!, $content: String!) { "
         "projectUpdate(id: $id, input: { content: $content }) { success } }"
     )
-    data = linctl_graphql(query, {"id": project_id, "content": content})
+    data = graphql_data(query, {"id": project_id, "content": content})
     return data["projectUpdate"]["success"]
 
 
@@ -614,7 +601,7 @@ def min_backlog_sort_order(project_id: str) -> float | None:
         'issues(first: 1, filter: { state: { type: { eq: "backlog" } } }) '
         "{ nodes { sortOrder } } } }"
     )
-    nodes = linctl_graphql(query, {"project": project_id})["project"]["issues"]["nodes"]
+    nodes = graphql_data(query, {"project": project_id})["project"]["issues"]["nodes"]
     return nodes[0]["sortOrder"] if nodes else None
 
 
@@ -623,7 +610,7 @@ def set_sort_order(issue_id: str, sort_order: float) -> bool:
         "mutation($id: String!, $order: Float!) { "
         "issueUpdate(id: $id, input: { sortOrder: $order }) { success } }"
     )
-    return linctl_graphql(query, {"id": issue_id, "order": sort_order})["issueUpdate"][
+    return graphql_data(query, {"id": issue_id, "order": sort_order})["issueUpdate"][
         "success"
     ]
 
@@ -636,12 +623,12 @@ def board_states(team_key: str) -> list:
         "query($key: String!) { teams(filter: { key: { eq: $key } }, first: 1) "
         "{ nodes { states { nodes { name type } } } } }"
     )
-    nodes = linctl_graphql(query, {"key": team_key})["teams"]["nodes"]
+    nodes = graphql_data(query, {"key": team_key})["teams"]["nodes"]
     return nodes[0]["states"]["nodes"] if nodes else []
 
 
 def first_team_key() -> str | None:
-    nodes = linctl_graphql("query { teams(first: 1) { nodes { key } } }", {})["teams"][
+    nodes = graphql_data("query { teams(first: 1) { nodes { key } } }", {})["teams"][
         "nodes"
     ]
     return nodes[0]["key"] if nodes else None
@@ -682,7 +669,7 @@ def team_overview(team_key: str) -> dict:
         "{ nodes { id states { nodes { id name type position } } "
         "issues(first: 1) { nodes { id } } } } }"
     )
-    nodes = linctl_graphql(query, {"key": team_key})["teams"]["nodes"]
+    nodes = graphql_data(query, {"key": team_key})["teams"]["nodes"]
     if not nodes:
         return {}
     team = nodes[0]
@@ -707,7 +694,7 @@ def create_workflow_state(
         "color": color,
         "position": position,
     }
-    return linctl_graphql(query, {"input": state})["workflowStateCreate"][
+    return graphql_data(query, {"input": state})["workflowStateCreate"][
         "workflowState"
     ]
 
@@ -717,13 +704,13 @@ def set_state_position(state_id: str, position: float) -> bool:
         "mutation($id: String!, $pos: Float!) { "
         "workflowStateUpdate(id: $id, input: { position: $pos }) { success } }"
     )
-    data = linctl_graphql(query, {"id": state_id, "pos": position})
+    data = graphql_data(query, {"id": state_id, "pos": position})
     return data["workflowStateUpdate"]["success"]
 
 
 def archive_workflow_state(state_id: str) -> bool:
     query = "mutation($id: String!) { workflowStateArchive(id: $id) { success } }"
-    return linctl_graphql(query, {"id": state_id})["workflowStateArchive"]["success"]
+    return graphql_data(query, {"id": state_id})["workflowStateArchive"]["success"]
 
 
 def canonical_sequence(states: dict) -> list:

@@ -22,7 +22,6 @@ sys.path.insert(0, str(TOOLS_DIR))
 
 from linear import (  # noqa: E402
     LinearError,
-    LinctlError,
     looks_like_uuid,
     bearer_token,
     board_states,
@@ -39,7 +38,7 @@ from linear import (  # noqa: E402
     get_team,
     graphql,
     issues_query,
-    linctl_graphql,
+    graphql_data,
     list_by_parent,
     list_by_project_state,
     list_by_project_state_type,
@@ -109,10 +108,6 @@ def sent_variables(mock: MagicMock) -> dict:
 # ---- plumbing ----
 
 
-def test_legacy_linctl_error_alias_resolves_to_linear_error():
-    assert LinctlError is LinearError
-
-
 def test_issues_query_embeds_params_filters_and_node_fields():
     query = issues_query("$x: String!", "project: { name: { eq: $x } }")
 
@@ -157,17 +152,6 @@ def test_operation_name_falls_back_to_first_field():
     assert operation_name("{ viewer { id } }") == "viewer"
 
 
-def test_bearer_token_prefers_linear_api_key_over_legacy():
-    with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_canonical", "LINCTL_API_KEY": "lin_legacy"}, clear=False):
-        assert bearer_token() == "lin_canonical"
-
-
-def test_bearer_token_falls_back_to_legacy_linctl_env():
-    env = {"LINCTL_API_KEY": "lin_legacy"}
-    with patch.dict("os.environ", env, clear=True):
-        assert bearer_token() == "lin_legacy"
-
-
 def test_bearer_token_raises_when_no_credentials():
     with patch.dict("os.environ", {}, clear=True):
         with pytest.raises(LinearError) as excinfo:
@@ -188,17 +172,17 @@ def test_graphql_sends_query_and_variables_to_linear_endpoint():
     assert kwargs["headers"]["Authorization"] == "lin_test"
 
 
-def test_linctl_graphql_returns_data_payload_not_full_body():
+def test_graphql_data_returns_data_payload_not_full_body():
     with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
         with patch("linear.requests.post", return_value=ok_response({"viewer": {"id": "u1"}})):
-            assert linctl_graphql("query { viewer { id } }", {}) == {"viewer": {"id": "u1"}}
+            assert graphql_data("query { viewer { id } }", {}) == {"viewer": {"id": "u1"}}
 
 
-def test_linctl_graphql_raises_on_graphql_errors():
+def test_graphql_data_raises_on_graphql_errors():
     with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
         with patch("linear.requests.post", return_value=graphql_errors_response([{"message": "bad filter"}])):
             with pytest.raises(LinearError) as excinfo:
-                linctl_graphql("query { x }", {})
+                graphql_data("query { x }", {})
 
     assert "bad filter" in str(excinfo.value)
 
@@ -224,10 +208,10 @@ def with_env_and_mock(data: dict):
 def test_search_by_project_passes_variables_and_returns_nodes():
     env, post = with_env_and_mock(issues([{"identifier": "WB-1"}]))
     with env, post as mock:
-        result = search_by_project("Stride", "linctl")
+        result = search_by_project("Stride", "epic")
 
     assert result == [{"identifier": "WB-1"}]
-    assert sent_variables(mock) == {"project": "Stride", "text": "linctl"}
+    assert sent_variables(mock) == {"project": "Stride", "text": "epic"}
     assert "searchableContent: { contains: $text }" in sent_query(mock)
 
 
