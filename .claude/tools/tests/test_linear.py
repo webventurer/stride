@@ -31,6 +31,8 @@ from linear import (  # noqa: E402
     create_milestone,
     create_project,
     create_workflow_state,
+    parse_project_config,
+    token_from_project_config,
     declared_states,
     get_issue,
     get_project,
@@ -726,6 +728,62 @@ def test_update_issue_omits_fields_not_passed():
         update_issue("lin_test", "i1", state_id="s-doing")
 
     assert sent_variables(mock)["input"] == {"stateId": "s-doing"}
+
+
+# ---- WB-461: .linear_project parser + bearer-token fallback ----
+
+
+def test_parse_project_config_reads_key_value_lines():
+    text = "project = Stride >>>\napi_key_env = LINEAR_WEBVENTURER_API_KEY\n"
+    assert parse_project_config(text) == {
+        "project": "Stride >>>",
+        "api_key_env": "LINEAR_WEBVENTURER_API_KEY",
+    }
+
+
+def test_parse_project_config_treats_bare_first_line_as_project_name():
+    assert parse_project_config("Stride >>>\n") == {"project": "Stride >>>"}
+
+
+def test_parse_project_config_ignores_blank_and_comment_lines():
+    text = "# top comment\n\nproject = Stride\n  # indented comment\n"
+    assert parse_project_config(text) == {"project": "Stride"}
+
+
+def test_parse_project_config_returns_empty_for_empty_text():
+    assert parse_project_config("") == {}
+
+
+def test_token_from_project_config_reads_named_env_var():
+    text = "project = Stride\napi_key_env = LINEAR_TEST_API_KEY\n"
+    env = {"LINEAR_TEST_API_KEY": "lin_from_named"}
+    with patch("linear.LINEAR_PROJECT_PATH") as path, patch.dict("os.environ", env, clear=True):
+        path.exists.return_value = True
+        path.read_text.return_value = text
+        assert token_from_project_config() == "lin_from_named"
+
+
+def test_token_from_project_config_returns_none_when_api_key_env_absent():
+    text = "project = Stride\n"
+    with patch("linear.LINEAR_PROJECT_PATH") as path, patch.dict("os.environ", {}, clear=True):
+        path.exists.return_value = True
+        path.read_text.return_value = text
+        assert token_from_project_config() is None
+
+
+def test_token_from_project_config_returns_none_when_file_missing():
+    with patch("linear.LINEAR_PROJECT_PATH") as path:
+        path.exists.return_value = False
+        assert token_from_project_config() is None
+
+
+def test_bearer_token_falls_through_to_project_config_when_no_env():
+    text = "project = Stride\napi_key_env = LINEAR_TEST_API_KEY\n"
+    env = {"LINEAR_TEST_API_KEY": "lin_from_config"}
+    with patch("linear.LINEAR_PROJECT_PATH") as path, patch.dict("os.environ", env, clear=True):
+        path.exists.return_value = True
+        path.read_text.return_value = text
+        assert bearer_token() == "lin_from_config"
 
 
 def test_create_project_returns_id_and_sends_team_input():

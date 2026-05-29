@@ -81,6 +81,18 @@ The commands resolve the Linear project from a `.linear_project` file in the rep
 - **Team**: resolved from `.linear_project` (or ask the user on first run)
 - **Project**: read from `.linear_project`
 
+### `.linear_project` format
+
+```
+project = Stride >>>
+api_key_env = LINEAR_WEBVENTURER_API_KEY
+```
+
+- `project` — the Linear project name. A bare value on the first non-comment line is read as `project` for backward compatibility.
+- `api_key_env` — names the env var in `~/.env` that holds the workspace API key. When set, `linear_cli.py` reads the bearer token from that env var automatically, so per-call `LINCTL_API_KEY=$LINEAR_<X>_API_KEY` wraps aren't needed on `linear_cli.py` invocations. Workspace-iterating commands (`/linear:check`, `/linear:setup`) still use the explicit wrap since they target multiple workspaces.
+
+Override the resolved token per-call with `LINEAR_API_KEY=<token>`.
+
 ---
 
 *Setup once, then let the commands handle the Linear ceremony.*
