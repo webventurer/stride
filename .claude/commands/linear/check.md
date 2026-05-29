@@ -19,7 +19,7 @@ If none are found, tell the user to add at least one `LINEAR_<WORKSPACE>_API_KEY
 For each env var found, run linctl's identity check to confirm the key works *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-LINCTL_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" linctl whoami --json
+LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py whoami
 ```
 
 Report the result as a table:
@@ -42,7 +42,7 @@ The state names stride uses (`Doing`, `In Review`, `Done`, `Backlog`, …) live 
 **Boards are per-team, not per-workspace** — a workspace can hold several teams, each with its own board, so check every team rather than assuming the first. For each connected workspace, list its teams *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-LINCTL_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" linctl team list --json
+LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py team list
 ```
 
 Then run the drift check **once per team**, passing the team key. Without `--team` the tool checks only the workspace's first team, so a multi-team workspace would silently skip the rest:

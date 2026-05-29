@@ -21,7 +21,7 @@ Review what's happening and recommend what to work on next.
 Check for a `.linear_project` file in the repository root.
 
 - If **found**: read the project name from it (parsed as `project = <name>`; bare-name format also accepted for backward compatibility)
-- If **not found**: list available projects (`LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project list --json` — auth per [reference/workflow.md](reference/workflow.md)), ask the user to choose, then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save both as `.linear_project`:
+- If **not found**: list available projects (`uv run .claude/tools/linear_cli.py project list` — auth per [reference/workflow.md](reference/workflow.md)), ask the user to choose, then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save both as `.linear_project`:
 
   ```
   project = <chosen-project-name>
@@ -56,18 +56,18 @@ Read `VISION.md` from the repo root.
 
 ### 2. Fetch data (all calls in parallel)
 
-All `linctl` and `linear_cli.py` calls below are implicitly prefixed with `LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY` per [reference/workflow.md](reference/workflow.md).
+All `linear_cli.py` calls below read the bearer token from `.linear_project`'s `api_key_env` field automatically — no per-call wrap needed.
 
 | Call | Purpose |
 |:-----|:--------|
-| `linctl whoami --json` | Authenticated user |
+| `uv run .claude/tools/linear_cli.py whoami` | Authenticated user |
 | `uv run .claude/tools/linear_cli.py list-by-project-state-type --project "<project>" --type started` | Started issues (spans all started-type states, e.g. Doing / In Review / Waiting) |
 | `uv run .claude/tools/linear_cli.py list-by-project-state --project "<project>" --state Todo` | Unstarted issues |
 | `uv run .claude/tools/linear_cli.py list-by-project-state --project "<project>" --state Backlog` | Backlog issues |
 | `uv run .claude/tools/linear_cli.py list-by-project-state --project "<project>" --state Done --since -P1W` | Recently completed |
-| `uv run .claude/tools/linear_cli.py list-milestones <project-UUID>` | Milestones (no typed linctl command) |
+| `uv run .claude/tools/linear_cli.py list-milestones <project-UUID>` | Milestones |
 | `uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "` | Parent-issue epics (matched by title prefix) |
-| `gh pr list --state open --json number,title,headRefName,author,reviewDecision,reviews,url` | Open PRs |
+| `gh pr list --state open number,title,headRefName,author,reviewDecision,reviews,url` | Open PRs |
 
 ### 3. Show current work
 

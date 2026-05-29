@@ -4,14 +4,14 @@ Push `VISION.md` into the Linear project so the project page reflects the canoni
 
 Workflow: edit `VISION.md` → `/linear:update-vision` → confirm the diff → Linear updated.
 
-> **The two fields, and why `linear_cli.py`:** a project's `description` is a short, length-limited summary (the subtitle); its `content` is the long-form document body (the Vision). Writing a full Vision to `description` fails with a GraphQL `Argument Validation Error`, so the Vision goes in `content`. `linctl` has no typed command for `content` (its `project get`/`project update` only touch `description`), so this command reads and writes `content` through `.claude/tools/linear_cli.py` (which uses `linctl graphql`), and writes the short subtitle directly via `linctl project update --description`.
+> **The two fields:** a project's `description` is a short, length-limited summary (the subtitle); its `content` is the long-form document body (the Vision). Writing a full Vision to `description` fails with a GraphQL `Argument Validation Error`, so the Vision goes in `content`. This command writes `content` via `linear_cli.py update-project-content` and the short subtitle via `linear_cli.py project update --description`.
 
 ## Rules
 
 - `VISION.md` at the repo root is the source of truth — this command is one-way (repo → Linear)
 - Two fields are mirrored: `content` (the full document) and `description` (the subtitle, from VISION.md's opening blockquote tagline). Touch no other metadata
 - For existing projects: show what will change, require explicit confirmation before writing
-- For new projects (no `.linear_project`): the user supplies the name, `VISION.md` becomes the initial `content` and its tagline the subtitle, the team is resolved from `linctl team list` — no diff exists to confirm
+- For new projects (no `.linear_project`): the user supplies the name, `VISION.md` becomes the initial `content` and its tagline the subtitle, the team is resolved from `uv run .claude/tools/linear_cli.py team list` — no diff exists to confirm
 - If both `content` and subtitle already match `VISION.md`, skip the write — report and stop
 - If `VISION.md` has no opening blockquote, leave the subtitle untouched — never blank an existing one
 - The user's `.linear_project` selection drives which project is updated (or is written on first create)
@@ -45,7 +45,7 @@ Check for a `.linear_project` file in the repository root.
 - If **not found**: list available projects *(auth per [reference/workflow.md](reference/workflow.md))*:
 
   ```bash
-  LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project list --json
+  uv run .claude/tools/linear_cli.py project list
   ```
 
   Offer two choices:
@@ -62,7 +62,7 @@ When the user picks *Create new project*:
 1. Ask for the project name.
 2. Resolve the Linear team:
    ```bash
-   LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl team list --json
+   uv run .claude/tools/linear_cli.py team list
    ```
    - If exactly one team is returned, use its `key` (e.g. `WB`)
    - Otherwise, ask the user to choose
@@ -70,11 +70,11 @@ When the user picks *Create new project*:
 3. Create the project with the subtitle set from VISION.md's tagline — its opening blockquote, the `>` line under the H1 (the short `description` field; the full Vision goes into `content` next). Omit `--description` if VISION.md has no opening blockquote:
 
    ```bash
-   LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project create \
+   uv run .claude/tools/linear_cli.py project create \
      -t <TEAM-KEY> \
      --name "<project-name>" \
      --description "<tagline>" \
-     --json
+    
    ```
 
    Capture the project `id` and URL from the JSON response. If the create fails (for example the user lacks permission to create projects on the team), surface the error and stop — do not retry silently.
@@ -92,10 +92,10 @@ When the user picks *Create new project*:
 
 ### 3. Get the current project state
 
-`linctl project get` takes a project **ID**, not a name — so resolve the id, URL, and current subtitle (`description`) from the project list by name, then fetch the current `content` via `linear_cli.py` (linctl can't read `content`):
+`uv run .claude/tools/linear_cli.py project get` accepts either a name or UUID — fetch the id, URL, and current subtitle (`description`) from the project list by name, then fetch the long-form `content` via `get-project-content`:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project list --json \
+uv run .claude/tools/linear_cli.py project list \
   | jq -r --arg name "<project-name-from-.linear_project>" '.[] | select(.name == $name) | {id, url, description}'
 uv run .claude/tools/linear_cli.py get-project-content <project-id>
 ```
@@ -138,17 +138,17 @@ Then:
 
 Only after explicit yes — write whichever field differs:
 
-- **Content** (if it differs) — via `linear_cli.py` (the Vision is long; `linctl project update --description` can't carry it):
+- **Content** (if it differs) — via `linear_cli.py` (the Vision is long; `uv run .claude/tools/linear_cli.py project update --description` can't carry it):
 
   ```bash
   uv run .claude/tools/linear_cli.py \
     update-project-content <project-id-from-step-3> --content "$(cat VISION.md)"
   ```
 
-- **Subtitle** (if it differs and the tagline is non-empty) — directly via linctl, since `description` is the short field `--description` is meant for:
+- **Subtitle** (if it differs and the tagline is non-empty) — directly via `linear_cli.py`, since `description` is the short field `--description` is meant for:
 
   ```bash
-  LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project update <project-id-from-step-3> \
+  uv run .claude/tools/linear_cli.py project update <project-id-from-step-3> \
     --description "<tagline-from-step-3>"
   ```
 
@@ -171,6 +171,6 @@ End the command — no further status changes, no follow-up commits.
 - `VISION.md` missing → stop, suggest `/vision`
 - `.linear_project` missing → resolve interactively per step 2 (pick existing or create new)
 - Project not found in Linear → stop, ask the user to verify `.linear_project`
-- `linctl team list` returns no teams (create-new path) → stop, ask the user to verify Linear access
+- `uv run .claude/tools/linear_cli.py team list` returns no teams (create-new path) → stop, ask the user to verify Linear access
 - User declines the diff → stop without writing
-- `update-project-content` / `linctl project create` fails → show the error and stop; do not retry silently
+- `update-project-content` / `uv run .claude/tools/linear_cli.py project create` fails → show the error and stop; do not retry silently

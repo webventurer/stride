@@ -64,13 +64,13 @@ First, check `$ARGUMENTS` for the `--project <name>` flag.
     Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it. The `api_key_env` field lets `linear_cli.py` read the bearer token without a per-call `LINCTL_API_KEY=` wrap.
 
     ```bash
-    LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project list --json
+    uv run .claude/tools/linear_cli.py project list
     ```
 
-**Resolve the project name** (both modes). linctl accepts the project's name directly on `linctl issue create --project "<name>"` — no UUID lookup needed. Run `linctl project get "<name>" --json` once to confirm the name resolves and capture the project UUID for any later `linear_cli.py` calls (`list-milestones`, `min-backlog-sort-order`, `create-milestone` all take it).
+**Resolve the project name** (both modes). `linear_cli.py issue create --project "<name>"` resolves the name internally on `uv run .claude/tools/linear_cli.py issue create --project "<name>"` — no UUID lookup needed. Run `uv run .claude/tools/linear_cli.py project get "<name>"` once to confirm the name resolves and capture the project UUID for any later `linear_cli.py` calls (`list-milestones`, `min-backlog-sort-order`, `create-milestone` all take it).
 
 - **Zero matches**: stop and tell the user the name doesn't resolve. Ask them to verify the spelling. Do not proceed to drafting on a typo.
-- **One match**: store the name. Use it as the `--project "<name>"` argument on every `linctl issue create` call (step 12 and any nested calls in step 5's epic-sized path).
+- **One match**: store the name. Use it as the `--project "<name>"` argument on every `uv run .claude/tools/linear_cli.py issue create` call (step 12 and any nested calls in step 5's epic-sized path).
 - **Multiple matches**: show the candidates and ask the user to disambiguate.
 
 ### 1. Vision check
@@ -156,19 +156,19 @@ If no signals fire, skip silently and continue to step 7 as story-sized. The com
 
 <mark>**Size-sensing offers, doesn't force.**</mark> When signals are detected, the agent asks; the user always has final say. Auto-flipping silently would be a worse failure mode than the old forced ask.
 
-**Story-sized path** (default / "no, it's one story" / "narrow to story") — continue to step 7 as normal. At step 12 (create issue), also search for parent-issue epics in the project (`uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "`): if any exist, ask "Link this story to an existing epic?" and if yes, set the parent after creation via `linctl issue update <new-id> --parent <epic-id>`. Legacy milestones — boards may still have them from before stride moved to parent-issue epics; if `uv run .claude/tools/linear_cli.py list-milestones <project-UUID>` returns any, offer them as a secondary option and use the `--project-milestone "<name>"` flag on `linctl issue create` instead.
+**Story-sized path** (default / "no, it's one story" / "narrow to story") — continue to step 7 as normal. At step 12 (create issue), also search for parent-issue epics in the project (`uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "`): if any exist, ask "Link this story to an existing epic?" and if yes, set the parent after creation via `uv run .claude/tools/linear_cli.py issue update <new-id> --parent <epic-id>`. Legacy milestones — boards may still have them from before stride moved to parent-issue epics; if `uv run .claude/tools/linear_cli.py list-milestones <project-UUID>` returns any, offer them as a secondary option and use the `--project-milestone "<name>"` flag on `uv run .claude/tools/linear_cli.py issue create` instead.
 
 **Epic-sized path** (`--epic` / "break into epic") — follow the parent-issue path:
 
 1. Search for existing parent-issue epics in the project (`uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "`) and show any matches.
 2. Ask: "Create a new epic, or link these stories to an existing one?"
-3. If creating: run duplicate check (step 3), CRAFT if requested (step 4), then steps 7 onwards (research, test consideration, draft, approval, create) for the **parent issue** — skip step 5 on the recursion since size has already been decided. Use [reference/EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead of ISSUE-TEMPLATE.md and prefix the title with `Epic: `. Create the parent issue first via `linctl issue create -t <TEAM> --title "Epic: ..." --project "<project>" --state Backlog --json` and capture the returned identifier (e.g. `PG-NNN`).
+3. If creating: run duplicate check (step 3), CRAFT if requested (step 4), then steps 7 onwards (research, test consideration, draft, approval, create) for the **parent issue** — skip step 5 on the recursion since size has already been decided. Use [reference/EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead of ISSUE-TEMPLATE.md and prefix the title with `Epic: `. Create the parent issue first via `uv run .claude/tools/linear_cli.py issue create -t <TEAM> --title "Epic: ..." --project "<project>" --state Backlog` and capture the returned identifier (e.g. `PG-NNN`).
 4. Confirm the parent issue with the user before drafting sub-issues.
 5. Ask: "What are the first 1–3 stories for this epic?" — each answer becomes a separate issue draft.
-6. For each story: run duplicate check (step 3), CRAFT if requested (step 4), then steps 7 onwards. Create via `linctl issue create --project "<project>" --state Backlog ...` and then immediately set the parent via `linctl issue update <new-id> --parent <epic-id>`. linctl's create command doesn't have a `--parent` flag — the two-step pattern is canonical. Story drafts use ISSUE-TEMPLATE.md as normal — they're stories that happen to have a parent.
+6. For each story: run duplicate check (step 3), CRAFT if requested (step 4), then steps 7 onwards. Create via `uv run .claude/tools/linear_cli.py issue create --project "<project>" --state Backlog ...` and then immediately set the parent via `uv run .claude/tools/linear_cli.py issue update <new-id> --parent <epic-id>`. `linear_cli.py issue create` doesn't take a `--parent` flag — the two-step pattern is canonical. Story drafts use ISSUE-TEMPLATE.md as normal — they're stories that happen to have a parent.
 7. **Position the epic at the top of the project's Backlog, order the sub-issues beneath it in drafting order, then summarise.**
 
-   linctl's `issue update` doesn't have a `--sort-order` flag, so positions are set via `linear_cli.py` (`min-backlog-sort-order` to read, `set-sort-order` to write). Lower `sortOrder` = higher on the board; leave a gap of ~100 below the epic so future epics have room. The drafting-order rule respects the sequence the user chose by deciding which sub-issue to file first.
+   `linear_cli.py issue update` doesn't take a `--sort-order` flag, so positions are set via `linear_cli.py` (`min-backlog-sort-order` to read, `set-sort-order` to write). Lower `sortOrder` = higher on the board; leave a gap of ~100 below the epic so future epics have room. The drafting-order rule respects the sequence the user chose by deciding which sub-issue to file first.
 
    Recipe: fetch the project's current minimum Backlog `sortOrder`, then call `issueUpdate` on the epic with `min − 100` and on each sub-issue with `epic + 1`, `+ 2`, … in drafting order:
 
@@ -183,7 +183,7 @@ If no signals fire, skip silently and continue to step 7 as story-sized. The com
 
 <mark>**Do not bundle all stories into one issue.** Each story is its own sub-issue with `parentId` set.</mark>
 
-**Legacy milestone path**: if the user explicitly wants a date-bound milestone instead of a parent-issue epic (e.g. "ship by Q2", "before launch"), create it via `uv run .claude/tools/linear_cli.py create-milestone --project "<project-UUID>" --name "..." --target-date "..."` and link stories with `linctl issue create ... --project-milestone "<name>"`. This stays available for date/scope-bound tracking but is no longer the default — parent-issue epics carry the narrative; milestones are time markers.
+**Legacy milestone path**: if the user explicitly wants a date-bound milestone instead of a parent-issue epic (e.g. "ship by Q2", "before launch"), create it via `uv run .claude/tools/linear_cli.py create-milestone --project "<project-UUID>" --name "..." --target-date "..."` and link stories with `uv run .claude/tools/linear_cli.py issue create ... --project-milestone "<name>"`. This stays available for date/scope-bound tracking but is no longer the default — parent-issue epics carry the narrative; milestones are time markers.
 
 ### 6. Shape — feature by default, bug when warranted
 
@@ -217,7 +217,7 @@ If no signals fire, skip silently and continue to step 7 — feature-shaped is t
 - Search the codebase for 2–5 relevant files using Grep/Glob — summarise patterns or constraints, avoid exhaustive repository analysis
 - Check Linear for similar issues via `uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "<keywords>"` (broader search than step 3)
 - Read relevant project documentation if necessary (see [reference/project-docs.md](reference/project-docs.md) for standard paths)
-- Fetch available labels via `LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl label list --team <TEAM> --json` for the resolved team
+- Fetch available labels via `uv run .claude/tools/linear_cli.py label list --team <TEAM>` for the resolved team
 - Summarise findings for use in the draft
 
 ### 8. Test consideration
@@ -301,10 +301,10 @@ Show the full draft to the user. Ask for explicit approval before creating.
 
 ### 12. Create the issue
 
-Only after explicit approval. linctl accepts state names directly — no separate ID lookup — and accepts the project's name on `--project`:
+Only after explicit approval. `linear_cli.py` accepts state names directly — no separate ID lookup — and accepts the project's name on `--project`:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue create \
+uv run .claude/tools/linear_cli.py issue create \
   -t <TEAM-KEY> \
   --project "<project-name from .linear_project>" \
   --state Backlog \
@@ -312,10 +312,10 @@ LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue create \
   --description "<from draft>" \
   --priority <0–4> \
   --labels "<comma,separated>" \
-  --json
+ 
 ```
 
-Capture the issue identifier (e.g. `PG-184`) from the JSON output. If the draft is a sub-issue of an existing epic, follow up with `linctl issue update <new-id> --parent <epic-id>`. If sortOrder positioning is required (epic-sized path step 7), follow the ordering recipe there.
+Capture the issue identifier (e.g. `PG-184`) from the JSON output. If the draft is a sub-issue of an existing epic, follow up with `uv run .claude/tools/linear_cli.py issue update <new-id> --parent <epic-id>`. If sortOrder positioning is required (epic-sized path step 7), follow the ordering recipe there.
 
 Do not assign the issue unless the user explicitly requested it.
 

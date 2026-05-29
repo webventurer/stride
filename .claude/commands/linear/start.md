@@ -25,11 +25,11 @@ Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if Gi
 
 ### 1. Read the Linear issue
 
-Fetch the issue and its comments via linctl *(auth per [reference/workflow.md](reference/workflow.md))*:
+Fetch the issue and its comments via `linear_cli.py` *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue get $ARGUMENTS --json
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl comment list $ARGUMENTS --json
+uv run .claude/tools/linear_cli.py issue get $ARGUMENTS
+uv run .claude/tools/linear_cli.py comment list $ARGUMENTS
 ```
 
 Extract from the issue JSON: identifier, title, description, state, labels, `gitBranchName`, assignee, project, project milestone (if any), parent issue.
@@ -38,7 +38,7 @@ Extract from comments: decisions and context added after the description was wri
 
 If the issue is attached to a project milestone, surface it before continuing: `This story is part of *[Milestone name]*`. One line — just enough context that the user knows which milestone the work is feeding.
 
-If the issue has a parent, fetch the parent via `linctl issue get <parent-id> --json` and check its title. If the title starts with `Epic: `, surface the parent-issue epic before continuing: `This story is a sub-issue of *[Epic title]* (status: [Parent status])`. Same shape as the milestone surface — one line of umbrella context. If the parent's title doesn't start with `Epic: `, the story is just a sub-issue of another issue (not a stride epic) — skip the surface silently.
+If the issue has a parent, fetch the parent via `uv run .claude/tools/linear_cli.py issue get <parent-id>` and check its title. If the title starts with `Epic: `, surface the parent-issue epic before continuing: `This story is a sub-issue of *[Epic title]* (status: [Parent status])`. Same shape as the milestone surface — one line of umbrella context. If the parent's title doesn't start with `Epic: `, the story is just a sub-issue of another issue (not a stride epic) — skip the surface silently.
 
 Stop if the issue cannot be found.
 
@@ -146,7 +146,7 @@ Continue to step 6.
 Only update if the current state is Todo, Backlog, or Backburner.
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue update $ARGUMENTS --state Doing
+uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state Doing
 ```
 
 If already Doing, leave unchanged. Never set any other state in this step.
@@ -269,7 +269,7 @@ If this is a resume run and the branch was already pushed before the squash, use
 
 ### 12. Check for existing PR
 
-Run `gh pr list --head <branch> --json url,number`.
+Run `gh pr list --head <branch> url,number`.
 
 If a PR already exists, show the URL and skip to step 14.
 
@@ -299,7 +299,7 @@ EOF
 ### 14. Update Linear status → In Review
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue update $ARGUMENTS --state "In Review"
+uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state "In Review"
 ```
 
 Only after the PR is confirmed created or already exists. Skip if the issue is already In Review. Warn (but proceed) if the issue is Done.

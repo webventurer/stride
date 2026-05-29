@@ -26,7 +26,7 @@ If none are found, point the user at [reference/setup.md](reference/setup.md) to
 A workspace can hold several teams; provisioning writes to one team's board. List them:
 
 ```bash
-LINCTL_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" linctl team list
+LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py team list
 ```
 
 If exactly one team exists, use its key. If several, <mark>**ask which team to target — never assume the first.**</mark> Capture the chosen team **key** (e.g. `WB`) for the `--team` flag below.
@@ -49,7 +49,7 @@ The tool checks whether the team holds any issues and branches:
 A freshly provisioned board has no issues, so Linear renders a blank screen. **If `mode` was `provisioned`**, create one sample card so the columns are visible:
 
 ```bash
-LINCTL_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" linctl issue create -t <TEAM-KEY> --state Backlog \
+LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py issue create -t <TEAM-KEY> --state Backlog \
   --title "Sample card — so the board shows its columns" \
   --description "Placeholder so the board renders. Safe to delete."
 ```
