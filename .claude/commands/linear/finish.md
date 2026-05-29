@@ -24,7 +24,7 @@ Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if Gi
 Fetch the issue via linctl *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue get $ARGUMENTS --json
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue get $ARGUMENTS --json
 ```
 
 Extract from the JSON: identifier, title, `gitBranchName`, current state, project milestone (if any), parent issue.
@@ -192,7 +192,7 @@ VS Code does not support programmatic window closing. The worktree directory is 
 Move the issue to **Done**:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue update $ARGUMENTS --state Done
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue update $ARGUMENTS --state Done
 ```
 
 Only set Done status. Skip if already Done. Never set any other status.
@@ -204,7 +204,7 @@ Skip this step if the issue had no milestone.
 Otherwise, fetch issues attached to the milestone in non-Done states (linctl has no typed milestone command, so `linear_cli.py` provides it):
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py milestone-open-issues <milestone-UUID>
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY uv run .claude/tools/linear_cli.py milestone-open-issues <milestone-UUID>
 ```
 
 If any nodes come back, the milestone has remaining work — skip silently.
@@ -215,7 +215,7 @@ If the nodes list is empty, all stories in the milestone are now Done. Prompt:
 All stories in *[Milestone name]* are complete — mark the milestone done?
 ```
 
-If the user confirms, append a completion note to the milestone description via `LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py update-milestone-description <milestone-UUID> --description "..."` (Linear has no milestone "completed" state, so a description note is the durable signal). Format:
+If the user confirms, append a completion note to the milestone description via `LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY uv run .claude/tools/linear_cli.py update-milestone-description <milestone-UUID> --description "..."` (Linear has no milestone "completed" state, so a description note is the durable signal). Format:
 
 ```
 Completed: <YYYY-MM-DD> — all stories Done.
@@ -230,7 +230,7 @@ Skip this step if the issue had no `parentId`, or if the parent's title doesn't 
 Otherwise, fetch the parent epic's open sub-issues (`<parent-id>` is the parent UUID, `parent.id` from the `linctl issue get` at step 1):
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py list-by-parent <parent-id> | jq '[.[] | select(.state.type as $t | ["backlog","unstarted","started"] | index($t))]'
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY uv run .claude/tools/linear_cli.py list-by-parent <parent-id> | jq '[.[] | select(.state.type as $t | ["backlog","unstarted","started"] | index($t))]'
 ```
 
 If any items come back, the epic has remaining sub-issues — skip silently.
@@ -244,7 +244,7 @@ All sub-issues of *[Epic title]* are complete — mark the epic Done?
 If the user confirms, move the parent issue to Done:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue update <parent-id> --state Done
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue update <parent-id> --state Done
 ```
 
 linctl accepts state names directly — no separate ID lookup needed. Unlike milestones, parent-issue epics have a real status, so closing them is a normal status transition — no description note needed.
@@ -274,7 +274,7 @@ Then:
 2. Resolve the Linear project from `.linear_project`. Get its id, URL, and current subtitle (`description`) from the project list by name — `linctl project get` takes an ID, not a name: `linctl project list --json | jq -r --arg name "<project-name>" '.[] | select(.name == $name) | {id, url, description}'`.
 3. Fetch the current project `content` via `linear_cli.py` (the Vision lives in `content`, not the length-limited `description`; linctl can't read `content`). The subtitle is VISION.md's opening blockquote — the `>` line under the H1 (read it from the file loaded in sub-step 1):
    ```bash
-   LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py get-project-content <project-id>
+   LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY uv run .claude/tools/linear_cli.py get-project-content <project-id>
    ```
 4. Compare both fields against `VISION.md` (after trimming surrounding whitespace). Linear normalises markdown on save (e.g. `-` list markers become `*`), so treat normalisation-only differences as in sync. The subtitle is the tagline vs the current `description`; skip the subtitle if VISION.md has no opening blockquote (never blank an existing one).
    - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 9.
@@ -286,8 +286,8 @@ Then:
 
 5. On `y`, write whichever differs:
    ```bash
-   LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py update-project-content <project-id> --content "$(cat VISION.md)"
-   LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project update <project-id> --description "<tagline-from-step-3>"
+   LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY uv run .claude/tools/linear_cli.py update-project-content <project-id> --content "$(cat VISION.md)"
+   LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project update <project-id> --description "<tagline-from-step-3>"
    ```
    On `n`: skip the writes and continue to step 9.
 

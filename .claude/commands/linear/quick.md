@@ -144,11 +144,11 @@ File the card now, or delay to bundle with more changes? (file / delay)
 - **file** — create one card in **Done** covering this change *and every PR held in the pending bundle*, then attach each PR *(auth per [reference/workflow.md](reference/workflow.md))*:
 
   ```bash
-  LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue create \
+  LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue create \
     -t <TEAM> --project "<project>" --state Done \
     --title "<imperative summary of the change(s)>" \
     --description "<what shipped (per PR), plus a Why this matters line citing the Vision criterion>" --json
-  LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue attach <new-id> --pr <merged-PR-URL>
+  LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue attach <new-id> --pr <merged-PR-URL>
   # ...repeat issue attach for each PR in the bundle
   ```
 

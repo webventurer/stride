@@ -45,10 +45,10 @@ It's like how every email is called a "message" whether it's a question, an anno
 Stride's `/linear:*` skills call [linctl](https://github.com/dorkitude/linctl) — a brew-installable Go CLI — to drive Linear. Every invocation in a skill file is implicitly prefixed with the per-workspace API key from `~/.env`:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl <verb> ...
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl <verb> ...
 ```
 
-Substitute `<TEAM>` with the workspace name you're driving against (e.g. `LINEAR_ORG1_API_KEY`, `LINEAR_ORG2_API_KEY`). The per-workspace variables live in `~/.env` per [setup.md](setup.md). One stride install can drive multiple Linear workspaces — the env-var-per-team pattern is how you switch between them per invocation.
+Substitute `<WORKSPACE>` with the workspace name you're driving against (e.g. `LINEAR_ORG1_API_KEY`, `LINEAR_ORG2_API_KEY`). The per-workspace variables live in `~/.env` per [setup.md](setup.md). One stride install can drive multiple Linear workspaces — the env-var-per-workspace pattern is how you switch between them per invocation.
 
 **Reading skill files:** call sites in `/linear:*` workflows are written without the prefix to keep them scannable. The first `linctl` line in each skill carries an inline reminder; subsequent calls follow the same pattern.
 

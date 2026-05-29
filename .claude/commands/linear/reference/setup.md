@@ -6,13 +6,13 @@ This guide covers how to connect Claude Code to Linear via linctl, using a per-w
 
 ## Quick reference
 
-**Prerequisites**: A Linear workspace, `linctl` installed, and a `LINEAR_<TEAM>_API_KEY` in `~/.env` (see the [install guide](/install)).
+**Prerequisites**: A Linear workspace, `linctl` installed, and a `LINEAR_<WORKSPACE>_API_KEY` in `~/.env` (see the [install guide](/install)).
 
 **Utility commands:**
 
 | Command | What it does |
 |:--------|:-------------|
-| `/linear:check` | Verify linctl auth — confirm each `LINEAR_<TEAM>_API_KEY` resolves, and the board matches `linear_statuses.json` |
+| `/linear:check` | Verify linctl auth — confirm each `LINEAR_<WORKSPACE>_API_KEY` resolves, and the board matches `linear_statuses.json` |
 | `/linear:setup` | Provision the workspace's workflow states from `linear_statuses.json` — creates missing columns, reorders to sequence, never deletes |
 | `/linear:list-projects` | List all projects across connected Linear workspaces |
 | `/linear:next-steps` | Review priorities, surface PRs needing fix, recommend what to work on next |
@@ -36,14 +36,22 @@ See [workflow.md](workflow.md) for detailed command docs and typical flow.
 stride's `/linear:*` skills reach Linear through [linctl](https://github.com/dorkitude/linctl) using a per-workspace API key — no `.mcp.json`, no OAuth. Add one key per workspace to `~/.env`:
 
 ```
-LINEAR_<TEAM>_API_KEY=lin_api_...
+LINEAR_<WORKSPACE>_API_KEY=lin_api_...
 ```
 
 Get a key at [linear.app/settings/api](https://linear.app/settings/api). See the [install guide](/install) for the full prerequisite list.
 
+**How Linear API keys are scoped:** Linear API keys are per workspace (per user, scoped to the workspace), not per team.
+
+- An API key is created by a user under Settings → API → Personal API keys, and inherits that user's permissions across the entire workspace — every team they have access to.
+- There is no concept of a team-scoped API key. To restrict scope to one team, you'd either use a dedicated service-account user that's only added to that team, or filter by `teamId` in your queries.
+- OAuth apps work the same way at the workspace level; scopes are workspace-wide, not team-wide.
+
+One key per workspace is the model — substitute the workspace identifier for `<WORKSPACE>` (e.g. `LINEAR_ACME_API_KEY` for an Acme workspace).
+
 ### 2. Verify the connection
 
-Run `/linear:check` to confirm linctl can authenticate against each `LINEAR_<TEAM>_API_KEY` set in `~/.env`. It runs `linctl whoami` per key and reports which workspace each one resolves to.
+Run `/linear:check` to confirm linctl can authenticate against each `LINEAR_<WORKSPACE>_API_KEY` set in `~/.env`. It runs `linctl whoami` per key and reports which workspace each one resolves to.
 
 ### 3. Install the Linear GitHub integration
 

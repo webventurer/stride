@@ -12,14 +12,14 @@ Look for `LINEAR_*_API_KEY` env vars currently set in the shell (these come from
 env | grep -oE '^LINEAR_[A-Z_]+_API_KEY' | sort -u
 ```
 
-If none are found, tell the user to add at least one `LINEAR_<TEAM>_API_KEY` to `~/.env` — see [reference/setup.md](reference/setup.md).
+If none are found, tell the user to add at least one `LINEAR_<WORKSPACE>_API_KEY` to `~/.env` — see [reference/setup.md](reference/setup.md).
 
 ### 2. Test each workspace
 
 For each env var found, run linctl's identity check to confirm the key works *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-LINCTL_API_KEY="$LINEAR_<TEAM>_API_KEY" linctl whoami --json
+LINCTL_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" linctl whoami --json
 ```
 
 Report the result as a table:
@@ -42,13 +42,13 @@ The state names stride uses (`Doing`, `In Review`, `Done`, `Backlog`, …) live 
 **Boards are per-team, not per-workspace** — a workspace can hold several teams, each with its own board, so check every team rather than assuming the first. For each connected workspace, list its teams *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-LINCTL_API_KEY="$LINEAR_<TEAM>_API_KEY" linctl team list --json
+LINCTL_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" linctl team list --json
 ```
 
 Then run the drift check **once per team**, passing the team key. Without `--team` the tool checks only the workspace's first team, so a multi-team workspace would silently skip the rest:
 
 ```bash
-LINCTL_API_KEY="$LINEAR_<TEAM>_API_KEY" uv run .claude/tools/linear_cli.py state-drift --team <TEAM-KEY>
+LINCTL_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py state-drift --team <TEAM-KEY>
 ```
 
 It returns a JSON list of `{name, type}` pairs stride declares but the board lacks — drift that will cause silent no-ops. An empty list (`[]`) means that team's board carries every state stride uses (extra board states are fine — the JSON records what stride *uses*, not everything that exists). `state-drift` is read-only — it never writes to the board.

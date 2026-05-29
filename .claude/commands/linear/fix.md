@@ -26,8 +26,8 @@ Workflow: `/plan-work` → `/start` (includes terminal review) → **`/fix`** (i
 Fetch the issue via linctl *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl issue get $ARGUMENTS --json
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl comment list $ARGUMENTS --json
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl issue get $ARGUMENTS --json
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl comment list $ARGUMENTS --json
 ```
 
 Extract from the issue JSON: identifier, title, `gitBranchName`.

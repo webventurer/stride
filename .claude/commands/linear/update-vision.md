@@ -45,7 +45,7 @@ Check for a `.linear_project` file in the repository root.
 - If **not found**: list available projects *(auth per [reference/workflow.md](reference/workflow.md))*:
 
   ```bash
-  LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project list --json
+  LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project list --json
   ```
 
   Offer two choices:
@@ -62,7 +62,7 @@ When the user picks *Create new project*:
 1. Ask for the project name.
 2. Resolve the Linear team:
    ```bash
-   LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl team list --json
+   LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl team list --json
    ```
    - If exactly one team is returned, use its `key` (e.g. `WB`)
    - Otherwise, ask the user to choose
@@ -70,7 +70,7 @@ When the user picks *Create new project*:
 3. Create the project with the subtitle set from VISION.md's tagline — its opening blockquote, the `>` line under the H1 (the short `description` field; the full Vision goes into `content` next). Omit `--description` if VISION.md has no opening blockquote:
 
    ```bash
-   LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project create \
+   LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project create \
      -t <TEAM-KEY> \
      --name "<project-name>" \
      --description "<tagline>" \
@@ -82,7 +82,7 @@ When the user picks *Create new project*:
 4. Write `VISION.md` into the new project's `content`:
 
    ```bash
-   LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py \
+   LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY uv run .claude/tools/linear_cli.py \
      update-project-content <project-id> --content "$(cat VISION.md)"
    ```
 
@@ -95,9 +95,9 @@ When the user picks *Create new project*:
 `linctl project get` takes a project **ID**, not a name — so resolve the id, URL, and current subtitle (`description`) from the project list by name, then fetch the current `content` via `linear_cli.py` (linctl can't read `content`):
 
 ```bash
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project list --json \
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project list --json \
   | jq -r --arg name "<project-name-from-.linear_project>" '.[] | select(.name == $name) | {id, url, description}'
-LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py get-project-content <project-id>
+LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY uv run .claude/tools/linear_cli.py get-project-content <project-id>
 ```
 
 The **subtitle** is VISION.md's opening blockquote — the `>` tagline directly under the H1 (already in front of you from step 1's read; take the line without its `> ` marker). If VISION.md has no opening blockquote, there's no subtitle to sync this run.
@@ -141,14 +141,14 @@ Only after explicit yes — write whichever field differs:
 - **Content** (if it differs) — via `linear_cli.py` (the Vision is long; `linctl project update --description` can't carry it):
 
   ```bash
-  LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY uv run .claude/tools/linear_cli.py \
+  LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY uv run .claude/tools/linear_cli.py \
     update-project-content <project-id-from-step-3> --content "$(cat VISION.md)"
   ```
 
 - **Subtitle** (if it differs and the tagline is non-empty) — directly via linctl, since `description` is the short field `--description` is meant for:
 
   ```bash
-  LINCTL_API_KEY=$LINEAR_<TEAM>_API_KEY linctl project update <project-id-from-step-3> \
+  LINCTL_API_KEY=$LINEAR_<WORKSPACE>_API_KEY linctl project update <project-id-from-step-3> \
     --description "<tagline-from-step-3>"
   ```
 
