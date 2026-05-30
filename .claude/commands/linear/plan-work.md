@@ -29,7 +29,7 @@ Accepts a description and optional flags: `/plan-work --research --craft --workt
 
 - **Story is the default; epic when warranted**: most descriptions are story-sized (one deliverable, ships as one PR), and stride defaults to that without asking. Epic-sized work (a named initiative with multiple stories) is reached two ways — the `--epic` flag, or size-sensing surfacing a soft prompt when epic-shape signals fire (see step 5). Epic-sized work becomes a parent issue with sub-issues for each story; story-sized work becomes an issue, optionally linked to an existing epic via `parentId`.
 - **Epic title prefix**: epic-sized parent issues use `Epic: <stakeholder outcome>` as their title — the prefix makes the scope visible at a glance on the kanban board, and the post-colon part still follows the stakeholder-outcome rule. Example: `Epic: Bulk/Batch Blog Processing (parallel article pipeline)`.
-- **Feature is the default; bug when warranted**: most descriptions are feature-shaped (*"add / build / ship X"*) and use the story template — that's the default without asking. Bug-shaped work (*"X is broken / fails / silently no-ops"*) is reached two ways — the `--bug` flag, or shape-sensing surfacing a soft prompt when bug-shape signals fire (see step 6). Bug-shaped work uses [BUG-TEMPLATE.md](reference/BUG-TEMPLATE.md) — symptoms / repro / expected vs actual / suspected causes as first-class sections, instead of burying diagnosis under *"Where things stand"*. Shape and size are independent: a feature can be story- or epic-sized, and so can a bug.
+- **Feature is the default; bug when warranted**: most descriptions are feature-shaped (*"add / build / ship X"*) and use the story template — that's the default without asking. Bug-shaped work (*"X is broken / fails / silently no-ops"*) is reached two ways — the `--bug` flag, or shape-sensing surfacing a soft prompt when bug-shape signals fire (see step 6). Bug-shaped work uses [bug.md](reference/templates/bug.md) — symptoms / repro / expected vs actual / suspected causes as first-class sections, instead of burying diagnosis under *"Where things stand"*. Shape and size are independent: a feature can be story- or epic-sized, and so can a bug.
 
 ### Drafting style
 
@@ -126,7 +126,7 @@ Handle results in two tiers:
 
 If `--craft` flag is present, run CRAFT automatically. Otherwise, ask the user: "Would you like me to run `/craft` on your description first to sharpen the issue before drafting?"
 
-- If **yes** (or `--craft`): read [reference/ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md) for story-sized work, or [reference/EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) when drafting the parent issue on the epic-sized path. Substitute `[user's description]` with what the user provided **and** `[VISION]` with the full contents of the `VISION.md` loaded in step 1, run `/craft` with the populated prompt, then use the refined output as the description for all subsequent steps. Substituting the entire Vision into the prompt is what lets the agent — or any model the prompt is sent to — anchor the draft on real criteria, real constraints, and real non-goals rather than guessing.
+- If **yes** (or `--craft`): read [reference/templates/issue.md](reference/templates/issue.md) for story-sized work, or [reference/templates/epic.md](reference/templates/epic.md) when drafting the parent issue on the epic-sized path. Substitute `[user's description]` with what the user provided **and** `[VISION]` with the full contents of the `VISION.md` loaded in step 1, run `/craft` with the populated prompt, then use the refined output as the description for all subsequent steps. Substituting the entire Vision into the prompt is what lets the agent — or any model the prompt is sent to — anchor the draft on real criteria, real constraints, and real non-goals rather than guessing.
 - If **no**: continue with the original description
 
 ### 5. Size — story by default, epic when warranted
@@ -164,7 +164,7 @@ If no signals fire, skip silently and continue to step 7 as story-sized. The com
 
 Feature is the default. Most descriptions are feature-shaped — *"add / build / ship / replace X"* — and asking every invocation imposes bug-shaped overhead on the common case. Skip this step and continue to step 7 unless one of the following triggers fires.
 
-**Trigger 1 — `--bug` flag.** If `--bug` was parsed in step 2, skip shape-sensing entirely and mark the draft as bug-shaped — step 9 will route to [BUG-TEMPLATE.md](reference/BUG-TEMPLATE.md).
+**Trigger 1 — `--bug` flag.** If `--bug` was parsed in step 2, skip shape-sensing entirely and mark the draft as bug-shaped — step 9 will route to [bug.md](reference/templates/bug.md).
 
 **Trigger 2 — shape-sensing detects bug shape.** Read the description (the `--craft`-refined version from step 4 if `--craft` was used; otherwise the raw input). Look for **bug-shape signals**:
 
@@ -178,14 +178,14 @@ If any signals fire, surface a **soft prompt** — not a forced gate:
 
 Two paths:
 
-- **Use bug template** → mark the draft as bug-shaped; step 9 routes to BUG-TEMPLATE.md.
+- **Use bug template** → mark the draft as bug-shaped; step 9 routes to bug.md.
 - **Treat as feature** → continue to step 7 with the description treated as feature-shaped.
 
 If no signals fire, skip silently and continue to step 7 — feature-shaped is the default.
 
 <mark>**Shape-sensing offers, doesn't force.**</mark> Same pattern as size-sensing — the agent asks when signals fire; the user always has final say. Auto-flipping silently would be a worse failure mode than the old forced ask.
 
-**Shape and size are independent.** A feature can be story- or epic-sized, and so can a bug. When both the epic-sized path (step 5) and bug-shaped marker are active, the parent issue uses EPIC-TEMPLATE.md and sub-issues use BUG-TEMPLATE.md. No `EPIC-BUG-TEMPLATE` exists — bug at epic scale is rare enough that the two-template composition handles it.
+**Shape and size are independent.** A feature can be story- or epic-sized, and so can a bug. When both the epic-sized path (step 5) and bug-shaped marker are active, the parent issue uses epic.md and sub-issues use bug.md. No `epic-bug` template exists — bug at epic scale is rare enough that the two-template composition handles it.
 
 ### 7. Research (only with `--research`)
 
@@ -215,11 +215,11 @@ Omit the section entirely when tests don't apply.
 
 <mark>**Read the linked template before drafting** — its sections are the source of truth, not this step's summary. Don't draft from memory or from the prose around the link; open the file and follow it.</mark>
 
-**Story drafts** (feature-shaped, story-sized — the default path) — use the full issue structure from [ISSUE-TEMPLATE.md](reference/ISSUE-TEMPLATE.md). With `--research`, also append the research-mode additions described in that template.
+**Story drafts** (feature-shaped, story-sized — the default path) — use the full issue structure from [issue.md](reference/templates/issue.md). With `--research`, also append the research-mode additions described in that template.
 
-**Bug drafts** (bug-shaped, story-sized — `--bug` flag or the bug-shape branch of step 6) — use [BUG-TEMPLATE.md](reference/BUG-TEMPLATE.md) instead. Symptoms / repro / expected vs actual / suspected causes are first-class sections, in place of *"Where things stand"* and *"What we'll do"*. With `--research`, append the research-mode additions described in that template.
+**Bug drafts** (bug-shaped, story-sized — `--bug` flag or the bug-shape branch of step 6) — use [bug.md](reference/templates/bug.md) instead. Symptoms / repro / expected vs actual / suspected causes are first-class sections, in place of *"Where things stand"* and *"What we'll do"*. With `--research`, append the research-mode additions described in that template.
 
-**Epic parent-issue drafts** — use [EPIC-TEMPLATE.md](reference/EPIC-TEMPLATE.md) instead. Sub-issues under the parent default to ISSUE-TEMPLATE.md — they're stories that happen to have a parent. When the epic is also bug-shaped (`--epic --bug`), sub-issues use BUG-TEMPLATE.md instead. Research mode never applies to the epic itself; that detail belongs on each sub-issue.
+**Epic parent-issue drafts** — use [epic.md](reference/templates/epic.md) instead. Sub-issues under the parent default to issue.md — they're stories that happen to have a parent. When the epic is also bug-shaped (`--epic --bug`), sub-issues use bug.md instead. Research mode never applies to the epic itself; that detail belongs on each sub-issue.
 
 **Ground the draft in the Vision** loaded at step 1 — *within-project mode only*. The "Why this matters" section must explicitly reference which Vision outcome the issue serves — quote the relevant Success criteria line or constraint, and explain how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
 

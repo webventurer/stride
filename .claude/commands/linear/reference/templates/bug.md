@@ -4,7 +4,7 @@
 >
 > **Why it exists**: Bugs answer a different shape of question than features — symptoms, repro, expected vs actual, suspected causes. Running bug-shaped work through the story template buries the rigour under *"Where things stand"* and invites premature commitment to a specific fix before diagnosis is done. This template surfaces the bug-shaped sections as first-class, so the draft reads as a diagnosis brief rather than a feature spec wearing a bug label.
 >
-> **Where it comes from**: The [CRAFT framework](../../../skills/craft/SKILL.md) (Context, Role, Action, Format, Target audience) — the same meta-prompting technique [ISSUE-TEMPLATE.md](ISSUE-TEMPLATE.md) uses for features. Parallel structure, different sections.
+> **Where it comes from**: The [CRAFT framework](../../../../skills/craft/SKILL.md) (Context, Role, Action, Format, Target audience) — the same meta-prompting technique [issue.md](issue.md) uses for features. Parallel structure, different sections.
 
 ---
 
