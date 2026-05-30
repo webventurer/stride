@@ -55,7 +55,7 @@ Stride's Linear client is split across two files:
 - `resolve_state_for_issue(api_key, identifier, state_name)` — returns `(issue_uuid, state_id)` in a single round-trip.
 - `resolve_labels_for_team(api_key, team_id, names)` — translates label names → UUIDs scoped to a team.
 
-`LinearError` is raised on HTTP, network, or GraphQL errors. `LinctlError` remains as a legacy alias.
+`LinearError` is raised on HTTP, network, or GraphQL errors.
 
 ### `linear_cli.py` subcommands
 
