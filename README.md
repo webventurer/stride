@@ -6,7 +6,7 @@ AI agents write code fast. But without structure, that speed turns into entropy 
 
 stride gives you **atomic commits** — every change is one idea, independently revertible, with a reason attached. You get AI speed *and* a git history you can trust. That's the trade: you don't have to choose between fast and clean.
 
-Everything installs as plain markdown into your `.claude/` directory. No runtime dependencies, no lock-in — read it, change it, make it yours.
+Everything installs as plain text into your `.claude/` directory — markdown skills and commands plus a small Python helper for Linear. No compiled binaries, no build step, no lock-in — read it, change it, make it yours.
 
 ## What you get
 
@@ -38,7 +38,7 @@ npx github:webventurer/stride
 
 This copies skills, commands, hooks, and docs into your project. It merges hook config into `.claude/settings.local.json` (gitignored, machine-local — your committed `settings.json` is never modified). Nothing is installed globally.
 
-Before your first `/linear:*` command, install the prerequisites — `gh`, `uv`, `jq` — and add your Linear API key to `~/.env`. On Windows that means working inside WSL (the hooks need a bash/zsh shell). See [Install](https://webventurer.github.io/stride/install) for the one-time setup.
+Before your first `/linear:*` command, install the prerequisites — `gh`, `uv`, `jq` — and add a Linear API key to `~/.env` — one key per workspace (`LINEAR_<WORKSPACE>_API_KEY`), selected per repo via `.linear_project`. On Windows that means working inside WSL (the hooks need a bash/zsh shell). See [Install](https://webventurer.github.io/stride/install) for the one-time setup.
 
 ## Quick start
 

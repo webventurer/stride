@@ -295,7 +295,7 @@ function logCopiedFiles(totals) {
   console.log("  commands/linear/ (Linear workflow commands)");
   console.log("  hooks/           (commit hook scripts)");
   console.log("  stride/docs/     (principles, patterns, concepts)");
-  console.log("  tools/           (cross-model feedback script)");
+  console.log("  tools/           (Linear API client + cross-model feedback script)");
 }
 
 async function confirmSettingsMerge() {
