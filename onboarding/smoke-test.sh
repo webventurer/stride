@@ -3,23 +3,17 @@
 #
 # Two modes:
 #   STRIDE_SMOKE_MODE=docker (default) — runs container.sh inside a clean
-#       ubuntu:24.04 container. Tests Linux (and Windows-via-WSL2 by extension —
-#       WSL2 *is* a Linux environment, so the Ubuntu container path covers it).
+#       ubuntu:24.04 container. Exercises the Linux/WSL2 install path (WSL2
+#       *is* a Linux environment, so the Ubuntu container covers it).
 #   STRIDE_SMOKE_MODE=host — runs the timed portion on whatever OS invoked the
-#       script. Use this on macOS, where Docker can't run macOS containers.
+#       script. Use this for macOS coverage (Docker can't run macOS containers),
+#       or when Docker isn't available.
 #
-# Run locally:
+# Docker mode (default — exercises the Linux/WSL2 install path):
 #   LINEAR_API_KEY=lin_api_... ./onboarding/smoke-test.sh
 #
-# Run on macOS (host mode):
+# Host mode (skips Docker — for macOS coverage, or when Docker isn't available):
 #   STRIDE_SMOKE_MODE=host LINEAR_API_KEY=lin_api_... ./onboarding/smoke-test.sh
-#
-# Tighten the budget (e.g. CI regression hunting):
-#   STRIDE_SMOKE_BUDGET_SECONDS=75 LINEAR_API_KEY=... ./onboarding/smoke-test.sh
-#
-# Test a specific branch instead of `main`:
-#   STRIDE_SMOKE_REF=github:webventurer/stride#wb-457-foo LINEAR_API_KEY=... \
-#       ./onboarding/smoke-test.sh
 #
 # Use a different base image (docker mode only, default ubuntu:24.04):
 #   STRIDE_SMOKE_IMAGE=ubuntu:22.04 LINEAR_API_KEY=... ./onboarding/smoke-test.sh
@@ -84,6 +78,8 @@ run_host() {
         local start end
         start=$(date +%s)
         printf 'y\n%.0s' $(seq 1 10) | npx --yes "$REF" >/dev/null 2>&1
+        [[ -f .claude/commands/linear/start.md && -x .claude/hooks/do_commit.sh ]] \
+            || { echo "install incomplete: missing skill or hook" >&2; exit 1; }
         uv run --with click --with requests .claude/tools/linear_cli.py whoami \
             | jq -e '.authenticated == true' >/dev/null
         end=$(date +%s)

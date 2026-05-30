@@ -9,6 +9,7 @@
 
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
+export DEBCONF_NOWARNINGS=yes
 
 REF="${STRIDE_SMOKE_REF:-github:webventurer/stride}"
 
@@ -17,15 +18,12 @@ REF="${STRIDE_SMOKE_REF:-github:webventurer/stride}"
 apt-get update -qq
 apt-get install -qq -y --no-install-recommends curl ca-certificates gnupg jq >/dev/null
 
-# Node (for npx) — NodeSource current LTS
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash - >/dev/null 2>&1
 apt-get install -qq -y nodejs >/dev/null
 
-# uv (for the Python tools)
 curl -LsSf https://astral.sh/uv/install.sh 2>/dev/null | sh >/dev/null
 export PATH="$HOME/.local/bin:$PATH"
 
-# gh (official apt repo)
 mkdir -p -m 755 /etc/apt/keyrings
 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
     | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null
@@ -40,9 +38,9 @@ apt-get install -qq -y gh >/dev/null
 mkdir -p /tmp/test-project && cd /tmp/test-project
 
 START=$(date +%s)
-# install.mjs prompts for gitignore + hook config. printf exits cleanly so
-# pipefail doesn't trip the way `yes` does on SIGPIPE.
 printf 'y\n%.0s' $(seq 1 10) | npx --yes "$REF" >/dev/null 2>&1
+[[ -f .claude/commands/linear/start.md && -x .claude/hooks/do_commit.sh ]] \
+    || { echo "install incomplete: missing skill or hook" >&2; exit 1; }
 uv run --with click --with requests .claude/tools/linear_cli.py whoami \
     | jq -e '.authenticated == true' >/dev/null
 END=$(date +%s)
