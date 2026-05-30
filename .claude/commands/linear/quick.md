@@ -87,13 +87,18 @@ git log main..HEAD --oneline
 
 Then push the branch and open the PR **without merging**, so the change is reviewable on GitHub or pulled into an editor — not terminal-only *(auth per [reference/workflow.md](reference/workflow.md))*:
 
-```bash
-git push -u origin quick/<slug>
-gh pr create --title "<imperative summary>" --body "$(cat <<'EOF'
+Write the PR body to a file with the editor — never an inline heredoc, since bodies often carry backticks, `$`, or `<placeholders>` that trip shell quoting ([why](reference/workflow.md#how-skills-talk-to-linear)):
+
+```markdown
 ## Summary
 <1–2 bullets: what changed and why>
-EOF
-)"
+```
+
+Then push and open the PR with `--body-file`:
+
+```bash
+git push -u origin quick/<slug>
+gh pr create --title "<imperative summary>" --body-file <body-file>
 ```
 
 If a PR already exists for the branch (a resumed run), push to it instead of opening a second one. Then surface the URL with the gate prompt: **"PR: \<url\> — ship it? (say `ship` / `ship it` / `quick` / `jfdi` / `go`, or tell me what to change.)"**
@@ -141,13 +146,13 @@ File the card now, or delay to bundle with more changes? (file / delay)
 ```
 
 - **delay** — hold this PR's URL, summary, and confirmed Vision criterion in the session's **pending bundle**, and skip filing. Tell the user it'll fold into the next `file`. The change is already shipped; only the card is deferred. (The bundle lives in this working session — a later `/linear:quick` that files picks it up.)
-- **file** — create one card in **Done** covering this change *and every PR held in the pending bundle*, then attach each PR *(auth per [reference/workflow.md](reference/workflow.md))*:
+- **file** — create one card in **Done** covering this change *and every PR held in the pending bundle*, then attach each PR *(auth per [reference/workflow.md](reference/workflow.md))*. Write the card description to a file first and pass it with `--description @<file>` — multi-line bodies go through a file, never an inline string ([why](reference/workflow.md#how-skills-talk-to-linear)):
 
   ```bash
   uv run .claude/tools/linear_cli.py issue create \
     -t <TEAM> --project "<project>" --state Done \
     --title "<imperative summary of the change(s)>" \
-    --description "<what shipped (per PR), plus a Why this matters line citing the Vision criterion>"
+    --description @<card-file>
   uv run .claude/tools/linear_cli.py issue attach <new-id> --pr <merged-PR-URL>
   # ...repeat issue attach for each PR in the bundle
   ```

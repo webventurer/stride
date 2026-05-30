@@ -279,10 +279,9 @@ Run `gh pr create`:
 
 - **Title**: use the Linear issue title (keep under 70 chars)
 - **Base branch**: `main`
-- **Body**: use a HEREDOC for formatting:
+- **Body**: write it to a file with the editor — never an inline heredoc, since bodies carry backticks, `$`, and `<placeholders>` that trip shell quoting ([why](reference/workflow.md#how-skills-talk-to-linear)):
 
-```
-gh pr create --title "<title>" --body "$(cat <<'EOF'
+```markdown
 ## Summary
 <1-3 bullet points describing what changed and why>
 
@@ -292,8 +291,12 @@ gh pr create --title "<title>" --body "$(cat <<'EOF'
 
 ## Test plan
 - [ ] <checklist of things to verify>
-EOF
-)"
+```
+
+Then create the PR with `--body-file`:
+
+```bash
+gh pr create --title "<title>" --body-file <body-file>
 ```
 
 ### 14. Update Linear status → In Review

@@ -148,13 +148,16 @@ Run `git push`.
 
 ### 10. Comment on PR
 
-Post a concise comment explaining what was fixed:
+Post a concise comment explaining what was fixed. Write the comment body to a file with the editor — never an inline heredoc, since it can carry backticks, `$`, or `<placeholders>` that trip shell quoting ([why](reference/workflow.md#how-skills-talk-to-linear)):
+
+```markdown
+<brief paragraph explaining what changed in response to the review>
+```
+
+Then post it with `--body-file`:
 
 ```bash
-gh pr comment <number> --body "$(cat <<'EOF'
-<brief paragraph explaining what changed in response to the review>
-EOF
-)"
+gh pr comment <number> --body-file <body-file>
 ```
 
 ### 11. Summary
