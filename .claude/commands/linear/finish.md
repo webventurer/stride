@@ -49,6 +49,56 @@ Run the project's build command (e.g. `pnpm build`). If the project has tests, r
 
 If anything fails, stop — do not merge. Show what failed.
 
+### 4b. Check for pending fixup commits
+
+Before the merge, scan the branch for `fixup!` commits. These are journey-shaped commits meant to fold into an earlier target via `git rebase --autosquash` — if they land on `main` verbatim, the log fills with `fixup! feat: ...` subjects whose bodies don't explain why each change exists. That breaks the Vision criterion: *"Every commit on a stride-managed branch passes four-pass atomicity — no monolithic commits, every message explains why."*
+
+Count them:
+
+```bash
+pending=$(git log main..HEAD --format=%s | grep -c '^fixup!')
+```
+
+If `pending` is zero, skip silently and continue to step 5.
+
+Otherwise, surface the fixups and offer three paths:
+
+```
+N fixup commit(s) pending on this branch:
+  - <fixup subject 1>
+  - <fixup subject 2>
+  - ...
+
+Autosquash them now before merging? (y / n / abort)
+```
+
+- **y** → run the autosquash and force-push:
+
+  ```bash
+  base=$(git merge-base main HEAD)
+  GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash "$base"
+  git push --force-with-lease
+  ```
+
+  `--force-with-lease` refuses if the remote tip has moved since the last fetch, so it can't silently overwrite someone else's push. Continue to step 5 with the rewritten history.
+
+- **n** → continue to step 5 as-is. The user has explicitly chosen to merge the fixups verbatim. The drift is named on the issue (via the prompt the user just saw), not silently shipped.
+
+- **abort** → exit cleanly. Tell the user:
+
+  > *"Autosquash the fixups manually (`GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash main && git push --force-with-lease`), then re-run `/linear:finish`."*
+
+  Do not merge.
+
+<mark>**Why a prompt, not automatic.**</mark> Rewriting published history is the kind of action that needs explicit user authorisation (per stride's *executing actions with care* stance). Asking is the safer default.
+
+<mark>**Why fixup-specific, not all journey commits.**</mark> `fixup!` commits have an unambiguous target encoded in their subject (per `--fixup=<sha>`), so autosquash collapses them deterministically. Other journey-shaped commits ("WIP", "address feedback") are a `/linear:start` step 10 concern — caught at push time, not merge time.
+
+**Failure modes**:
+
+- Rebase conflicts → abort the rebase (`git rebase --abort`), surface the conflict, tell the user to resolve manually and re-run.
+- `--force-with-lease` refused → the remote moved between fetch and push. Fetch, re-run.
+
 ### 5. Confirm Vision outcome (before merge)
 
 <mark>**This step fires *before* the merge.**</mark> When trace drift is caught here, the catch is still actionable — the criterion can ride alongside its originating feature on the same branch, instead of needing a follow-up `VISION.md` PR.
@@ -327,6 +377,8 @@ Display:
 - No PR found → stop, nothing to merge
 - Uncommitted changes → stop, suggest `/commit`
 - Tests fail → stop, do not merge
+- Fixup commits present + user picks "abort" → exit cleanly, do not merge (autosquash + force-push manually, then re-run)
+- Fixup rebase conflicts → abort rebase, surface conflict, do not merge
 - Vision-confirm answered "no" + user picks "stop and add criterion" → exit cleanly, do not merge (re-run after adding the criterion commit)
 - Branch not fully merged → stop, warn (never force-delete)
 - Local branch already deleted → skip silently
