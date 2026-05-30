@@ -43,7 +43,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
 - [ ] After `/linear:update-vision` runs, the Linear project description matches `VISION.md`
 - [ ] `npx github:webventurer/stride` installs in under 30 seconds, no global side effects
-- [ ] Setup gets a fresh user from `npx` to their first successful `/linear:start` in under 90 seconds on any supported OS. Authentication accepts either a Personal API Key in `~/.env` or an OAuth token obtained via `stride auth` — both feed the same single code path through every command. No external CLI dependencies that require building from source.
+- [ ] Setup gets a fresh user from `npx` to their first successful `/linear:start` in under 90 seconds on any supported OS. Authentication uses a Personal API Key in `~/.env`, feeding a single code path through every command. No external CLI dependencies that require building from source.
 - [ ] Onboarding wall-clock time is measured by a smoke-test that runs end-to-end against a clean container on each release. A run that exceeds 90 seconds blocks the release until the regression is identified.
 - [ ] Install is verified on macOS (Apple Silicon), Ubuntu LTS, and Windows-via-WSL2. Each supported OS has a tested install path that runs without compiling dependencies from source.
 - [ ] The prereq-doctor names every missing prerequisite — tools to install **and** permissions to request — with the exact remediation step (a command, a Linear docs link, or a message template for the user to send their admin).
