@@ -13,6 +13,7 @@ export DEBCONF_NOWARNINGS=yes
 
 REF="${STRIDE_SMOKE_REF:-github:webventurer/stride}"
 
+
 # ---- prereq install (outside the budget — represents the user's one-time setup) ----
 
 apt-get update -qq
@@ -33,6 +34,7 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubc
 apt-get update -qq
 apt-get install -qq -y gh >/dev/null
 
+
 # ---- stride install + auth (timed) ----
 
 mkdir -p /tmp/test-project && cd /tmp/test-project
@@ -46,3 +48,13 @@ uv run --with click --with requests .claude/tools/linear_cli.py whoami \
 END=$(date +%s)
 
 echo "STRIDE_ELAPSED=$((END - START))"
+
+
+# ---- config-file auth probe (untimed — correctness, not the 90s budget) ----
+
+printf 'project = Smoke\napi_key_env = STRIDE_SMOKE_CONFIG_KEY\n' > .linear_project
+env -u LINEAR_API_KEY STRIDE_SMOKE_CONFIG_KEY="$LINEAR_API_KEY" \
+    uv run --with click --with requests .claude/tools/linear_cli.py whoami \
+    | jq -e '.authenticated == true' >/dev/null \
+    || { echo "config-file auth path failed: .linear_project -> api_key_env" >&2; exit 1; }
+rm -f .linear_project

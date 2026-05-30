@@ -73,18 +73,28 @@ run_host() {
     require_host_tools
     echo "Smoke-test on host (ref=$REF) against budget=${BUDGET}s..."
     WORKDIR="$(mktemp -d)"
-    (
-        cd "$WORKDIR"
-        local start end
-        start=$(date +%s)
-        printf 'y\n%.0s' $(seq 1 10) | npx --yes "$REF" >/dev/null 2>&1
-        [[ -f .claude/commands/linear/start.md && -x .claude/hooks/do_commit.sh ]] \
-            || { echo "install incomplete: missing skill or hook" >&2; exit 1; }
+    ( cd "$WORKDIR" && time_onboarding && assert_config_file_auth )
+}
+
+time_onboarding() {
+    local start end
+    start=$(date +%s)
+    printf 'y\n%.0s' $(seq 1 10) | npx --yes "$REF" >/dev/null 2>&1
+    [[ -f .claude/commands/linear/start.md && -x .claude/hooks/do_commit.sh ]] \
+        || { echo "install incomplete: missing skill or hook" >&2; exit 1; }
+    uv run --with click --with requests .claude/tools/linear_cli.py whoami \
+        | jq -e '.authenticated == true' >/dev/null
+    end=$(date +%s)
+    echo "STRIDE_ELAPSED=$((end - start))"
+}
+
+# Untimed: unset LINEAR_API_KEY so auth must resolve via .linear_project.
+assert_config_file_auth() {
+    printf 'project = Smoke\napi_key_env = STRIDE_SMOKE_CONFIG_KEY\n' > .linear_project
+    env -u LINEAR_API_KEY STRIDE_SMOKE_CONFIG_KEY="$LINEAR_API_KEY" \
         uv run --with click --with requests .claude/tools/linear_cli.py whoami \
-            | jq -e '.authenticated == true' >/dev/null
-        end=$(date +%s)
-        echo "STRIDE_ELAPSED=$((end - start))"
-    )
+        | jq -e '.authenticated == true' >/dev/null \
+        || { echo "config-file auth path failed: .linear_project -> api_key_env" >&2; exit 1; }
 }
 
 extract_elapsed() {
