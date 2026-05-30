@@ -46,6 +46,7 @@ from linear import (  # noqa: E402
     list_by_project_state_type,
     list_comments,
     list_milestones,
+    list_projects,
     list_team_states,
     list_teams,
     milestone_open_issues,
@@ -196,6 +197,15 @@ def issues(nodes: list) -> dict:
     return {"issues": {"nodes": nodes}}
 
 
+def projects_page(nodes: list) -> dict:
+    return {
+        "projects": {
+            "nodes": nodes,
+            "pageInfo": {"hasNextPage": False, "endCursor": None},
+        },
+    }
+
+
 def with_env_and_mock(data: dict):
     """Context-manager helper: patch env + requests.post returning the given data."""
 
@@ -242,6 +252,29 @@ def test_list_by_project_state_type_filters_by_type():
 
     assert sent_variables(mock) == {"project": "Stride", "type": "started"}
     assert "state: { type: { eq: $type } }" in sent_query(mock)
+
+
+def test_list_projects_requests_lead_summary_and_recency_fields():
+    env, post = with_env_and_mock(projects_page([]))
+    with env, post as mock:
+        list_projects("lin_test")
+
+    query = sent_query(mock)
+    assert "description" in query
+    assert "updatedAt" in query
+    assert "lead { name }" in query
+
+
+def test_list_projects_sorts_most_recently_updated_first():
+    nodes = [
+        {"name": "older", "updatedAt": "2026-01-01T00:00:00.000Z"},
+        {"name": "newer", "updatedAt": "2026-05-01T00:00:00.000Z"},
+    ]
+    env, post = with_env_and_mock(projects_page(nodes))
+    with env, post:
+        result = list_projects("lin_test")
+
+    assert [p["name"] for p in result] == ["newer", "older"]
 
 
 def test_list_by_parent_filters_by_parent_id():
