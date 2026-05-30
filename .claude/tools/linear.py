@@ -321,7 +321,8 @@ def update_project(
 LIST_PROJECTS_QUERY = """{{
     projects(first: 50 {after}) {{
         nodes {{
-            id name
+            id name description updatedAt
+            lead {{ name }}
             teams {{ nodes {{ id name }} }}
         }}
         pageInfo {{ hasNextPage endCursor }}
@@ -339,7 +340,8 @@ def list_projects(api_key: str, team_id: str | None = None) -> list:
         if not page["pageInfo"]["hasNextPage"]:
             break
         cursor = page["pageInfo"]["endCursor"]
-    return filter_by_team(projects, team_id) if team_id else projects
+    scoped = filter_by_team(projects, team_id) if team_id else projects
+    return sorted(scoped, key=lambda p: p.get("updatedAt") or "", reverse=True)
 
 
 def filter_by_team(projects: list, team_id: str) -> list:
