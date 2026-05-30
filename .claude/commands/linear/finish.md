@@ -4,7 +4,7 @@ Merge an approved PR, clean up branches, and mark the issue Done.
 
 Accepts a Linear issue ID as argument: `/finish PG-205`
 
-If no argument is given, infer the issue ID from the current branch name (extract the `[A-Z]+-\d+` pattern, e.g. `PG-205`). If neither works, ask the user.
+If no argument is given, infer the issue ID from the current branch name (extract the `[A-Z]+-\d+` pattern, e.g. `PG-205`). If neither works, ask the user. The resolved value is `<issue-id>` — every Linear call below uses it, not the raw `$ARGUMENTS` token (which is empty on the no-argument path).
 
 Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if GitHub review feedback) → **`/finish`**
 
@@ -24,7 +24,7 @@ Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if Gi
 Fetch the issue via `linear_cli.py` *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-uv run .claude/tools/linear_cli.py issue get $ARGUMENTS
+uv run .claude/tools/linear_cli.py issue get <issue-id>
 ```
 
 Extract from the JSON: identifier, title, `gitBranchName`, current state, project milestone (if any), parent issue.
@@ -242,7 +242,7 @@ VS Code does not support programmatic window closing. The worktree directory is 
 Move the issue to **Done**:
 
 ```bash
-uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state Done
+uv run .claude/tools/linear_cli.py issue update <issue-id> --state Done
 ```
 
 Only set Done status. Skip if already Done. Never set any other status.
