@@ -35,7 +35,7 @@ That's stride's epic. A milestone is a date-bound chunking marker inside a proje
 
 When `/linear:plan-work` recognises an epic-sized description, it does three things in order:
 
-1. **Drafts the parent issue** using [EPIC-TEMPLATE.md](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/EPIC-TEMPLATE.md). The body has four sections — *Why this matters / What success looks like / What we agreed / What we won't touch* — strategic only, no implementation detail. The title is prefixed `Epic: ` so the umbrella is visible at a glance on the board.
+1. **Drafts the parent issue** using [epic.md](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/templates/epic.md). The body has four sections — *Why this matters / What success looks like / What we agreed / What we won't touch* — strategic only, no implementation detail. The title is prefixed `Epic: ` so the umbrella is visible at a glance on the board.
 2. **Saves the parent first** so its ID is available for the sub-issues that follow.
 3. **Drafts each story as a sub-issue** with `parentId` set to the parent. Stories use the regular [issue template](/reference/issue-template) — they're stories that happen to have a parent.
 
