@@ -44,6 +44,7 @@ from linear import (  # noqa: E402
     min_backlog_sort_order,
     project_content,
     provision_states,
+    read_text_arg,
     resolve_labels_for_team,
     resolve_project_id,
     resolve_state_for_issue,
@@ -134,9 +135,13 @@ def get_project_content_cmd(project_id: str):
 
 @cli.command("update-project-content")
 @click.argument("project_id")
-@click.option("--content", required=True)
+@click.option(
+    "--content",
+    required=True,
+    help="Inline text, @path to read a file, or - to read stdin",
+)
 def update_project_content_cmd(project_id: str, content: str):
-    echo_json(update_project_content(project_id, content))
+    echo_json(update_project_content(project_id, read_text_arg(content)))
 
 
 @cli.command("min-backlog-sort-order")
@@ -212,7 +217,11 @@ def issue_get_cmd(identifier: str):
     help="State name (defaults to team default)",
 )
 @click.option("--title", required=True)
-@click.option("--description", default="")
+@click.option(
+    "--description",
+    default="",
+    help="Inline text, @path to read a file, or - to read stdin",
+)
 @click.option("--priority", type=int, default=None, help="0-4 (3=Medium default)")
 @click.option("--labels", default=None, help="Comma-separated label names")
 @click.option(
@@ -236,7 +245,7 @@ def issue_create_cmd(
         api,
         team_id=team_obj["id"],
         title=title,
-        description=description,
+        description=read_text_arg(description),
         project_id=project_id,
         priority=priority,
         state_id=state_id_for_create(api, team, state_name),
@@ -313,11 +322,15 @@ def comment_list_cmd(issue_identifier: str):
 
 @comment_group.command("create")
 @click.argument("issue_identifier")
-@click.option("--body", required=True)
+@click.option(
+    "--body",
+    required=True,
+    help="Inline text, @path to read a file, or - to read stdin",
+)
 def comment_create_cmd(issue_identifier: str, body: str):
     api = bearer_token()
     issue_uuid = get_issue(api, issue_identifier)["id"]
-    echo_json(create_comment(api, issue_uuid, body))
+    echo_json(create_comment(api, issue_uuid, read_text_arg(body)))
 
 
 @cli.group("team")

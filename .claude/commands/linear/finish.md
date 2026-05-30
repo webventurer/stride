@@ -334,9 +334,9 @@ Then:
      Replace the Linear content and/or subtitle with VISION.md? (y/n)
      ```
 
-5. On `y`, write whichever differs:
+5. On `y`, write whichever differs (`--content @VISION.md` reads the file directly — no shell quoting in the path ([why](reference/workflow.md#how-skills-talk-to-linear)); the subtitle is a short single-line field, so it stays inline):
    ```bash
-   uv run .claude/tools/linear_cli.py update-project-content <project-id> --content "$(cat VISION.md)"
+   uv run .claude/tools/linear_cli.py update-project-content <project-id> --content @VISION.md
    uv run .claude/tools/linear_cli.py project update <project-id> --description "<tagline-from-step-3>"
    ```
    On `n`: skip the writes and continue to step 13.

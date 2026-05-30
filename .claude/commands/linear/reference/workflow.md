@@ -54,6 +54,13 @@ Substitute `<WORKSPACE>` with the workspace name you're driving against (e.g. `L
 
 **JSON for agents:** `linear_cli.py` always outputs JSON, so the agent can parse with `jq` without a flag.
 
+**Building bodies — multi-line goes through a file, never an inline heredoc.** PR and issue bodies routinely contain backticks, `$`, apostrophes, and `<placeholder>` brackets — exactly the characters that break an inline `--body "$(cat <<'EOF' … EOF)"`. The rule: **any multi-line or free-form body is written to a file and passed by path; only short single-line fields (a PR title, a project subtitle) stay inline.**
+
+- **`gh`** — `gh pr create --body-file <path>` / `gh pr comment --body-file <path>`
+- **`linear_cli.py`** — the body-bearing options accept `@<path>` to read a file or `-` to read stdin, alongside plain inline text: `issue create --description`, `comment create --body`, and `update-project-content --content`. Where the source is already a file, point straight at it: `update-project-content --content @VISION.md`.
+
+The file content is never tokenised by the shell, so quoting can't trip the call.
+
 **Why a vendored client, not MCP:** MCP loads ~60k tokens of schema before the agent reasons; the vendored client loads zero. Plus stride owns the auth path end-to-end — no second protocol to configure.
 
 ## Workflow states

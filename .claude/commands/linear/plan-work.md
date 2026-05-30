@@ -276,7 +276,7 @@ Show the full draft to the user. Ask for explicit approval before creating.
 
 ### 12. Create the issue
 
-Only after explicit approval. `linear_cli.py` accepts state names directly — no separate ID lookup — and accepts the project's name on `--project`:
+Only after explicit approval. Write the drafted description to a file first and pass it with `--description @<file>` — the body is multi-line markdown, so it goes through a file, never an inline string ([why](reference/workflow.md#how-skills-talk-to-linear)). `linear_cli.py` accepts state names directly — no separate ID lookup — and accepts the project's name on `--project`:
 
 ```bash
 uv run .claude/tools/linear_cli.py issue create \
@@ -284,7 +284,7 @@ uv run .claude/tools/linear_cli.py issue create \
   --project "<project-name from .linear_project>" \
   --state Backlog \
   --title "<from draft>" \
-  --description "<from draft>" \
+  --description @<draft-file> \
   --priority <0–4> \
   --labels "<comma,separated>" \
  

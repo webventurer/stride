@@ -83,10 +83,10 @@ When the user picks *Create new project*:
 
    ```bash
    uv run .claude/tools/linear_cli.py \
-     update-project-content <project-id> --content "$(cat VISION.md)"
+     update-project-content <project-id> --content @VISION.md
    ```
 
-   The `$(cat VISION.md)` substitution preserves markdown newlines and special characters.
+   `--content @VISION.md` reads the file directly — markdown newlines and special characters never touch the shell ([why](reference/workflow.md#how-skills-talk-to-linear)).
 
 5. Save the new project name to `.linear_project`. Step 6 will display the URL.
 
@@ -142,7 +142,7 @@ Only after explicit yes — write whichever field differs:
 
   ```bash
   uv run .claude/tools/linear_cli.py \
-    update-project-content <project-id-from-step-3> --content "$(cat VISION.md)"
+    update-project-content <project-id-from-step-3> --content @VISION.md
   ```
 
 - **Subtitle** (if it differs and the tagline is non-empty) — directly via `linear_cli.py`, since `description` is the short field `--description` is meant for:
@@ -152,7 +152,7 @@ Only after explicit yes — write whichever field differs:
     --description "<tagline-from-step-3>"
   ```
 
-The `$(cat VISION.md)` substitution preserves markdown newlines and special characters.
+`--content @VISION.md` reads the file directly, so markdown newlines and special characters never touch the shell ([why](reference/workflow.md#how-skills-talk-to-linear)). The subtitle is a short single-line field, so it stays inline.
 
 ### 6. Confirm
 

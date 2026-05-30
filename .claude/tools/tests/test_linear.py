@@ -9,6 +9,7 @@ Run with:
     python -m pytest .claude/tools/tests/test_linear_cli.py
 """
 
+import io
 import json
 import sys
 from pathlib import Path
@@ -23,6 +24,7 @@ sys.path.insert(0, str(TOOLS_DIR))
 from linear import (  # noqa: E402
     LinearError,
     looks_like_uuid,
+    read_text_arg,
     bearer_token,
     board_states,
     create_comment,
@@ -785,3 +787,43 @@ def test_create_project_returns_id_and_sends_team_input():
         "description": "tagline",
         "content": "# Vision",
     }
+
+
+# ---- read_text_arg: resolve inline / @file / - stdin body arguments ----
+
+def test_read_text_arg_returns_none_unchanged():
+    assert read_text_arg(None) is None
+
+
+def test_read_text_arg_returns_empty_string_unchanged():
+    assert read_text_arg("") == ""
+
+
+def test_read_text_arg_returns_inline_text_unchanged():
+    assert read_text_arg("just inline text") == "just inline text"
+
+
+def test_read_text_arg_reads_file_contents_for_at_prefix(tmp_path: Path):
+    body = tmp_path / "body.md"
+    body.write_text("## Summary\nfrom a file")
+
+    assert read_text_arg(f"@{body}") == "## Summary\nfrom a file"
+
+
+def test_read_text_arg_preserves_shell_special_chars_from_file(tmp_path: Path):
+    raw = "Body with `backticks`, $vars, an apostrophe's, and <angle> brackets"
+    body = tmp_path / "tricky.md"
+    body.write_text(raw)
+
+    assert read_text_arg(f"@{body}") == raw
+
+
+def test_read_text_arg_reads_stdin_for_dash(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr("sys.stdin", io.StringIO("piped body text"))
+
+    assert read_text_arg("-") == "piped body text"
+
+
+def test_read_text_arg_raises_when_at_file_missing(tmp_path: Path):
+    with pytest.raises(LinearError, match="Text-arg file not found"):
+        read_text_arg(f"@{tmp_path / 'nope.md'}")
