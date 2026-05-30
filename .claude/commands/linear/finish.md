@@ -2,11 +2,11 @@
 
 Merge an approved PR, clean up branches, and mark the issue Done.
 
-Accepts a Linear issue ID as argument: `/finish PG-205`
+Accepts a Linear issue ID as argument: `/linear:finish PG-205`
 
 If no argument is given, infer the issue ID from the current branch name (extract the `[A-Z]+-\d+` pattern, e.g. `PG-205`). If neither works, ask the user. The resolved value is `<issue-id>` — every Linear call below uses it, not the raw `$ARGUMENTS` token (which is empty on the no-argument path).
 
-Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if GitHub review feedback) → **`/finish`**
+Workflow: `/linear:plan-work` → `/linear:start` (includes terminal review) → `/linear:fix` (if GitHub review feedback) → **`/linear:finish`**
 
 ## Rules
 
