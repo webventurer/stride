@@ -14,6 +14,7 @@ This module is import-only — for the CLI front-end, see `linear_cli.py`.
 import json
 import os
 import re
+import sys
 import time
 from pathlib import Path
 
@@ -132,6 +133,21 @@ def bearer_token() -> str:
             "an api_key_env in .linear_project."
         )
     return token
+
+
+def read_text_arg(value: str | None) -> str | None:
+    if not value:
+        return value
+    if value == "-":
+        return sys.stdin.read()
+    return text_from_file(value[1:]) if value.startswith("@") else value
+
+
+def text_from_file(path: str) -> str:
+    file = Path(path)
+    if not file.exists():
+        raise LinearError(f"Text-arg file not found: {path}")
+    return file.read_text()
 
 
 def graphql_data(query: str, variables: dict) -> dict:
