@@ -16,7 +16,7 @@ If none are found, tell the user to add at least one `LINEAR_<WORKSPACE>_API_KEY
 
 ### 2. Test each workspace
 
-For each env var found, run the identity check to confirm the key works:
+For each env var found, run the identity check to confirm the key works — workspace-iterating, so the per-workspace `LINEAR_API_KEY=` wrap is explicit (it overrides `.linear_project`'s single key):
 
 ```bash
 LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py whoami

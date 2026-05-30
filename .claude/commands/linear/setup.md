@@ -23,7 +23,7 @@ If none are found, point the user at [reference/setup.md](reference/setup.md) to
 
 ### 2. Pick the team
 
-A workspace can hold several teams; provisioning writes to one team's board. List them:
+A workspace can hold several teams; provisioning writes to one team's board. List them — workspace-targeted, so the per-workspace `LINEAR_API_KEY=` wrap is explicit (it overrides `.linear_project`'s single key):
 
 ```bash
 LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py team list
