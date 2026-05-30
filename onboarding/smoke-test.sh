@@ -29,17 +29,11 @@ BUDGET="${STRIDE_SMOKE_BUDGET_SECONDS:-90}"
 IMAGE="${STRIDE_SMOKE_IMAGE:-ubuntu:24.04}"
 REF="${STRIDE_SMOKE_REF:-github:webventurer/stride}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
-WORKDIR=""
 
 die() {
     echo "error: $*" >&2
     exit 2
 }
-
-cleanup() {
-    [[ -n "$WORKDIR" && -d "$WORKDIR" ]] && rm -rf "$WORKDIR"
-}
-trap cleanup EXIT
 
 require_env() {
     [[ -n "${LINEAR_API_KEY:-}" ]] || die "LINEAR_API_KEY must be set"
@@ -72,8 +66,11 @@ run_docker() {
 run_host() {
     require_host_tools
     echo "Smoke-test on host (ref=$REF) against budget=${BUDGET}s..."
-    WORKDIR="$(mktemp -d)"
-    ( cd "$WORKDIR" && time_onboarding && assert_config_file_auth )
+    local workdir status=0
+    workdir="$(mktemp -d)"
+    ( cd "$workdir" && time_onboarding && assert_config_file_auth ) || status=$?
+    rm -rf "$workdir"
+    return "$status"
 }
 
 time_onboarding() {
