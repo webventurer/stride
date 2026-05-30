@@ -46,3 +46,14 @@ uv run --with click --with requests .claude/tools/linear_cli.py whoami \
 END=$(date +%s)
 
 echo "STRIDE_ELAPSED=$((END - START))"
+
+# ---- config-file auth probe (untimed — correctness, not the 90s budget) ----
+# The env-var path above bypasses .linear_project resolution. Most real users
+# instead name a per-workspace key in .linear_project and let bearer_token()
+# resolve it from the environment. Exercise that path with LINEAR_API_KEY unset.
+printf 'project = Smoke\napi_key_env = STRIDE_SMOKE_CONFIG_KEY\n' > .linear_project
+env -u LINEAR_API_KEY STRIDE_SMOKE_CONFIG_KEY="$LINEAR_API_KEY" \
+    uv run --with click --with requests .claude/tools/linear_cli.py whoami \
+    | jq -e '.authenticated == true' >/dev/null \
+    || { echo "config-file auth path failed: .linear_project -> api_key_env" >&2; exit 1; }
+rm -f .linear_project

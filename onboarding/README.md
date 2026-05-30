@@ -48,13 +48,13 @@ The end-to-end install → first-real-command path:
 - **Skill markdown landed** — checks `.claude/commands/linear/start.md` exists. Catches partial installs where the install crashed midway.
 - **Hook landed and is executable** — checks `.claude/hooks/do_commit.sh` is in place. Without it `/commit` is broken.
 - **Python tool chain works end-to-end** — `uv run` resolves the PEP 723 deps (`click`, `requests`), `linear.py` imports cleanly, `bearer_token()` resolves an API key, the GraphQL endpoint responds, auth succeeds.
+- **Both auth entry points** — the timed probe authenticates via `LINEAR_API_KEY` in the environment; a second untimed probe writes a `.linear_project` naming an `api_key_env`, unsets `LINEAR_API_KEY`, and confirms `token_from_project_config()` resolves the key from the named var. That's the config-file path most real users hit, now exercised on the install path rather than only in unit tests.
 - **90-second wall-clock budget** — the criterion this whole script exists to measure. `STRIDE_SMOKE_BUDGET_SECONDS=-1` forces a FAIL for testing the failure path itself.
 
 ## What this smoke test does not test
 
 Honest gaps. Some are out of scope, some are follow-ups, all are worth knowing:
 
-- **The `.linear_project` config-file auth path** — the smoke test passes `LINEAR_API_KEY` as an env var, which bypasses the `.linear_project` → `api_key_env` → `bearer_token()` chain. That chain *is* exercised by the Python tool tests under `.claude/tools/tests/`, but not on the install path itself.
 - **Silent prompt drift in `install.mjs`** — we pipe `printf 'y\n' x 10` blindly to accept defaults. If a new interactive prompt is added to `install.mjs` and the printf count isn't updated, the install still completes but skips the new prompt's intended choice. No alarm fires here.
 - **Re-install / orphan prune** — runs against a fresh tempdir every time. The on-re-install file pruning behaviour (introduced in WB-447) is not on the smoke path. A regression that broke prune-on-re-install would pass here.
 - **Claude Code itself doesn't run** — we prove the bytes for `/linear:start` are on disk; we don't prove Claude Code finds and invokes them. Closing that gap needs a Claude Code integration harness, not a shell smoke test.

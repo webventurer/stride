@@ -84,6 +84,14 @@ run_host() {
             | jq -e '.authenticated == true' >/dev/null
         end=$(date +%s)
         echo "STRIDE_ELAPSED=$((end - start))"
+
+        # Config-file auth probe (untimed) — exercise the .linear_project ->
+        # api_key_env path real users hit, with LINEAR_API_KEY unset.
+        printf 'project = Smoke\napi_key_env = STRIDE_SMOKE_CONFIG_KEY\n' > .linear_project
+        env -u LINEAR_API_KEY STRIDE_SMOKE_CONFIG_KEY="$LINEAR_API_KEY" \
+            uv run --with click --with requests .claude/tools/linear_cli.py whoami \
+            | jq -e '.authenticated == true' >/dev/null \
+            || { echo "config-file auth path failed: .linear_project -> api_key_env" >&2; exit 1; }
     )
 }
 
