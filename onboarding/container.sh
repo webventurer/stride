@@ -13,6 +13,7 @@ export DEBCONF_NOWARNINGS=yes
 
 REF="${STRIDE_SMOKE_REF:-github:webventurer/stride}"
 
+
 # ---- prereq install (outside the budget — represents the user's one-time setup) ----
 
 apt-get update -qq
@@ -33,6 +34,7 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubc
 apt-get update -qq
 apt-get install -qq -y gh >/dev/null
 
+
 # ---- stride install + auth (timed) ----
 
 mkdir -p /tmp/test-project && cd /tmp/test-project
@@ -47,10 +49,9 @@ END=$(date +%s)
 
 echo "STRIDE_ELAPSED=$((END - START))"
 
+
 # ---- config-file auth probe (untimed — correctness, not the 90s budget) ----
-# The env-var path above bypasses .linear_project resolution. Most real users
-# instead name a per-workspace key in .linear_project and let bearer_token()
-# resolve it from the environment. Exercise that path with LINEAR_API_KEY unset.
+
 printf 'project = Smoke\napi_key_env = STRIDE_SMOKE_CONFIG_KEY\n' > .linear_project
 env -u LINEAR_API_KEY STRIDE_SMOKE_CONFIG_KEY="$LINEAR_API_KEY" \
     uv run --with click --with requests .claude/tools/linear_cli.py whoami \
