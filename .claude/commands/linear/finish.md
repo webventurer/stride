@@ -49,7 +49,7 @@ Run the project's build command (e.g. `pnpm build`). If the project has tests, r
 
 If anything fails, stop — do not merge. Show what failed.
 
-### 4b. Check for pending fixup commits
+### 5. Check for pending fixup commits
 
 Before the merge, scan the branch for `fixup!` commits. These are journey-shaped commits meant to fold into an earlier target via `git rebase --autosquash` — if they land on `main` verbatim, the log fills with `fixup! feat: ...` subjects whose bodies don't explain why each change exists. That breaks the Vision criterion: *"Every commit on a stride-managed branch passes four-pass atomicity — no monolithic commits, every message explains why."*
 
@@ -59,7 +59,7 @@ Count them:
 pending=$(git log main..HEAD --format=%s | grep -c '^fixup!')
 ```
 
-If `pending` is zero, skip silently and continue to step 5.
+If `pending` is zero, skip silently and continue to step 6.
 
 Otherwise, surface the fixups and offer three paths:
 
@@ -80,9 +80,9 @@ Autosquash them now before merging? (y / n / abort)
   git push --force-with-lease
   ```
 
-  `--force-with-lease` refuses if the remote tip has moved since the last fetch, so it can't silently overwrite someone else's push. Continue to step 5 with the rewritten history.
+  `--force-with-lease` refuses if the remote tip has moved since the last fetch, so it can't silently overwrite someone else's push. Continue to step 6 with the rewritten history.
 
-- **n** → continue to step 5 as-is. The user has explicitly chosen to merge the fixups verbatim. The drift is named on the issue (via the prompt the user just saw), not silently shipped.
+- **n** → continue to step 6 as-is. The user has explicitly chosen to merge the fixups verbatim. The drift is named on the issue (via the prompt the user just saw), not silently shipped.
 
 - **abort** → exit cleanly. Tell the user:
 
@@ -99,11 +99,11 @@ Autosquash them now before merging? (y / n / abort)
 - Rebase conflicts → abort the rebase (`git rebase --abort`), surface the conflict, tell the user to resolve manually and re-run.
 - `--force-with-lease` refused → the remote moved between fetch and push. Fetch, re-run.
 
-### 5. Confirm Vision outcome (before merge)
+### 6. Confirm Vision outcome (before merge)
 
 <mark>**This step fires *before* the merge.**</mark> When trace drift is caught here, the catch is still actionable — the criterion can ride alongside its originating feature on the same branch, instead of needing a follow-up `VISION.md` PR.
 
-If the issue has no "Why this matters" section (legacy soft path from `/linear:start`), skip silently and continue to step 6.
+If the issue has no "Why this matters" section (legacy soft path from `/linear:start`), skip silently and continue to step 7.
 
 Otherwise, run a **silent trace check** *before* deciding whether to prompt the user. Inputs (already in context from step 1 and the steps above):
 
@@ -115,7 +115,7 @@ Read the commit subjects against the Success criteria and apply the [*revise, do
 
 #### Match — silent confirmation
 
-The issue's stated trace matches the agent's best-fit criterion *and* the fit is unambiguous. Surface a single line and continue to step 6:
+The issue's stated trace matches the agent's best-fit criterion *and* the fit is unambiguous. Surface a single line and continue to step 7:
 
 ```
 Trace verified against "<criterion>" — proceeding to merge.
@@ -154,8 +154,8 @@ A worked before/after:
 
 Same content, ten times the readability.
 
-- **stated**: the agent was overconfident; user override stands. Continue to step 6 (Merge).
-- **alternative**: post a one-line Linear comment via `uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."` naming the agent's drift catch and the user-picked criterion. Continue to step 6. The drift is named on the issue; the body isn't auto-rewritten.
+- **stated**: the agent was overconfident; user override stands. Continue to step 7 (Merge).
+- **alternative**: post a one-line Linear comment via `uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."` naming the agent's drift catch and the user-picked criterion. Continue to step 7. The drift is named on the issue; the body isn't auto-rewritten.
 - **something else**: drop into the missing-criterion path below.
 
 #### Something else — missing criterion path
@@ -172,7 +172,7 @@ Stop and add the criterion to VISION.md before merging? (y/n)
 
   Exit cleanly. Do not merge. Re-running `/linear:finish` re-runs validation (step 4) and re-runs the trace check — which should now match against the just-added criterion.
 
-- **No**: continue to step 6 (Merge). The drift is named in the comment but not amended; the user can file a follow-up `VISION.md` PR if they want.
+- **No**: continue to step 7 (Merge). The drift is named in the comment but not amended; the user can file a follow-up `VISION.md` PR if they want.
 
 #### When in doubt, ask
 
@@ -180,7 +180,7 @@ If the agent is genuinely uncertain whether the trace matches — neither obviou
 
 This step turns the "Why this matters" line from a write-once token into a verified reference — and (with the *Yes, stop* branch) makes the catch *amendable*: a missing criterion rides alongside its originating feature instead of needing a separate PR.
 
-### 6. Merge (preserve commits)
+### 7. Merge (preserve commits)
 
 Merge with `--merge` to preserve the atomic commits from the branch. The merge commit gets the default subject only — no body. The individual commits on the branch already explain what was built and why; duplicating that in the merge commit just creates drift between the two messages.
 
@@ -190,7 +190,7 @@ gh pr merge <number> --merge --subject "Merge branch '<gitBranchName>'" --body "
 
 Pass `--body ""` explicitly so `gh` does not fall back to the PR description.
 
-### 7. Clean up branches, remove worktree, close VS Code
+### 8. Clean up branches, remove worktree, close VS Code
 
 Detect the main repo path. Run `git worktree list` — the first entry is the main repo:
 
@@ -206,13 +206,13 @@ Derive the worktree path from the repo name and issue ID:
 ../<repo-dirname>-<issue-id-lowercase>
 ```
 
-**Step 7a — Switch to main and pull:**
+**Step 8a — Switch to main and pull:**
 
 ```bash
 git -C <main-repo-path> checkout main && git -C <main-repo-path> pull
 ```
 
-**Step 7b — Remove worktree:**
+**Step 8b — Remove worktree:**
 
 Remove the worktree first — git refuses to delete a branch that a worktree is checked out on.
 
@@ -222,14 +222,14 @@ git -C <main-repo-path> worktree remove <worktree-path>
 
 If the worktree directory does not exist, skip silently. If `git worktree remove` fails due to untracked files, use `--force`.
 
-**Step 7c — Delete branches:**
+**Step 8c — Delete branches:**
 
 Now that the worktree is gone, the branch can be deleted:
 
 - **Local**: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently
 - **Remote**: `git -C <main-repo-path> push origin --delete <gitBranchName>` — if already deleted (GitHub may auto-delete), skip silently
 
-**Step 7d — Ask user to close VS Code:**
+**Step 8d — Ask user to close VS Code:**
 
 ```
 Please close the VS Code window for <worktree-dirname>.
@@ -237,7 +237,7 @@ Please close the VS Code window for <worktree-dirname>.
 
 VS Code does not support programmatic window closing. The worktree directory is already gone, so VS Code will show an error state — the user just needs to close the window.
 
-### 8. Update Linear → done
+### 9. Update Linear → done
 
 Move the issue to **Done**:
 
@@ -247,7 +247,7 @@ uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state Done
 
 Only set Done status. Skip if already Done. Never set any other status.
 
-### 8b. Check milestone completion
+### 10. Check milestone completion
 
 Skip this step if the issue had no milestone.
 
@@ -273,7 +273,7 @@ Completed: <YYYY-MM-DD> — all stories Done.
 
 If the user declines, leave the milestone untouched.
 
-### 8c. Check parent-issue epic completion
+### 11. Check parent-issue epic completion
 
 Skip this step if the issue had no `parentId`, or if the parent's title doesn't start with `Epic: ` (the parent is a regular sub-issue parent, not a stride epic).
 
@@ -301,7 +301,7 @@ uv run .claude/tools/linear_cli.py issue update <parent-id> --state Done
 
 If the user declines, leave the epic untouched.
 
-### 8d. Sync Vision if it changed
+### 12. Sync Vision if it changed
 
 Detect whether the merged PR's diff included `VISION.md`:
 
@@ -327,7 +327,7 @@ Then:
    uv run .claude/tools/linear_cli.py get-project-content <project-id>
    ```
 4. Compare both fields against `VISION.md` (after trimming surrounding whitespace). Linear normalises markdown on save (e.g. `-` list markers become `*`), so treat normalisation-only differences as in sync. The subtitle is the tagline vs the current `description`; skip the subtitle if VISION.md has no opening blockquote (never blank an existing one).
-   - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 9.
+   - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 13.
    - **Either differs**: show what will change (content diff and/or old→new subtitle) and ask:
 
      ```
@@ -339,11 +339,11 @@ Then:
    uv run .claude/tools/linear_cli.py update-project-content <project-id> --content "$(cat VISION.md)"
    uv run .claude/tools/linear_cli.py project update <project-id> --description "<tagline-from-step-3>"
    ```
-   On `n`: skip the writes and continue to step 9.
+   On `n`: skip the writes and continue to step 13.
 
-If any step in the sync flow fails (`.linear_project` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 9. The issue is already Done from step 8 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
+If any step in the sync flow fails (`.linear_project` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 13. The issue is already Done from step 9 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
 
-Track the outcome for the summary in step 9:
+Track the outcome for the summary in step 13:
 
 | State | When |
 |:------|:-----|
@@ -353,7 +353,7 @@ Track the outcome for the summary in step 9:
 | `failed: <reason>` | Sync attempted but errored |
 | *(omitted)* | `VISION.md` was not in the merged diff |
 
-### 9. Summary
+### 13. Summary
 
 Display:
 
@@ -364,9 +364,9 @@ Display:
 - Remote branch: deleted / already gone
 - Worktree: removed / not found
 - Linear status: Done
-- Milestone (if applicable): name + completion status (`complete` if 8b marked it complete, `<n> stories remaining` otherwise)
-- Epic (if applicable): name + completion status (`Done` if 8c moved the parent to Done, `<n> sub-issues remaining` otherwise)
-- Vision sync (if `VISION.md` was in the merged diff): `applied` / `declined` / `already in sync` / `failed: <reason>` (per step 8d). Omit the row if VISION.md wasn't touched.
+- Milestone (if applicable): name + completion status (`complete` if step 10 marked it complete, `<n> stories remaining` otherwise)
+- Epic (if applicable): name + completion status (`Done` if step 11 moved the parent to Done, `<n> sub-issues remaining` otherwise)
+- Vision sync (if `VISION.md` was in the merged diff): `applied` / `declined` / `already in sync` / `failed: <reason>` (per step 12). Omit the row if VISION.md wasn't touched.
 
 ---
 
