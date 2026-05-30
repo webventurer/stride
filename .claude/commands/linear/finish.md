@@ -33,7 +33,7 @@ Stop if the issue cannot be found.
 
 ### 2. Find the PR
 
-Run `gh pr list --head <gitBranchName> number,url,title,reviewDecision,mergeable`.
+Run `gh pr list --head <gitBranchName> --json number,url,title,reviewDecision,mergeable`.
 
 If no PR exists, stop — nothing to merge.
 
