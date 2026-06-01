@@ -117,7 +117,7 @@ def test_issues_query_embeds_params_filters_and_node_fields():
 
     assert query.startswith("query($x: String!)")
     assert "project: { name: { eq: $x } }" in query
-    assert "identifier title state { name type }" in query
+    assert "identifier title sortOrder state { name type }" in query
 
 
 def test_raise_for_http_raises_on_4xx_with_body_snippet():
@@ -285,6 +285,7 @@ def test_list_by_parent_filters_by_parent_id():
 
     assert sent_variables(mock) == {"parent": "uuid-123"}
     assert "parent: { id: { eq: $parent } }" in sent_query(mock)
+    assert "sortOrder" in sent_query(mock)
 
 
 # ---- milestones ----
