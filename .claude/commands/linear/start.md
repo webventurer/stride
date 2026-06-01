@@ -2,7 +2,7 @@
 
 Implement, validate, and open a PR in one headless flow.
 
-Accepts a Linear issue ID as argument: `/start PG-205`
+Accepts a story ID or an epic ID: `/start PG-205`. An epic argument triggers **[Epic mode](#epic-mode)** — its sub-issues are worked one at a time, pausing at each PR.
 
 If no argument is given, infer the issue ID from the current branch name (extract the `[A-Z]+-\d+` pattern, e.g. `PG-205`). If neither works, ask the user.
 
@@ -43,6 +43,8 @@ If the issue has a parent, fetch the parent via `uv run .claude/tools/linear_cli
 Stop if the issue cannot be found.
 
 If the issue is assigned to someone other than the current user, warn and ask whether to proceed.
+
+**If the argument is itself an epic** — its title starts `Epic: `, or `uv run .claude/tools/linear_cli.py list-by-parent <issue-UUID>` returns sub-issues — don't treat it as a single story. Switch to [Epic mode](#epic-mode) and stop here; the numbered steps below run per sub-issue, driven from there.
 
 ### 2. Vision check
 
@@ -340,6 +342,54 @@ The PR is the record. The terminal is where the real review happens first.
 
 ---
 
+## Epic mode
+
+> When the argument is an epic, `/linear:start` works its sub-issues one at a time, pausing at every PR. An epic has no code of its own — its work lives in its stories.
+
+### E1. Enumerate and disclose upfront
+
+List the sub-issues before doing anything:
+
+```bash
+uv run .claude/tools/linear_cli.py list-by-parent <epic-UUID>
+```
+
+Order by `sortOrder` ascending (board order). When `sortOrder` is unset, fall back to identifier order. Then surface the plan — scope visible upfront, with an escape hatch:
+
+```
+Epic <ID>: <title>
+N sub-issues, worked one at a time — you review and /finish each PR before the next starts:
+  1. <SUB-1> — <title> [state]
+  2. <SUB-2> — <title> [state]
+  ...
+Starting with the first unfinished one: <SUB-X>. Say stop to bail out.
+```
+
+### E2. Work the next unfinished sub-issue
+
+Pick the first sub-issue that isn't already `In Review` or `Done`. Run the full per-story flow — steps 1–15 above — for that sub-issue: branch, implement, validate, PR, status → In Review, terminal review. Sub-issues already In Review or Done are skipped (named in the disclosure, not re-worked).
+
+### E3. Stop at the PR — every time
+
+After the sub-issue reaches its PR and terminal review (step 15), **stop**. Do not merge, do not start the next sub-issue. Surface:
+
+```
+<SUB-X> is in review: <PR URL>
+Review it, run /linear:finish when ready, then re-run /linear:start <epic-ID> to pick up the next sub-issue (<SUB-Y>).
+```
+
+<mark>**The epic advances across invocations, each gated by your /finish + re-run — never an open-ended in-run loop, never an auto-advance.**</mark> This is the same per-PR approval the [Rules](#rules) demand; epic mode just sequences it.
+
+### E4. Epic complete
+
+When every sub-issue is `Done`, report it and suggest moving the epic itself to Done:
+
+```
+All N sub-issues of <epic-ID> are Done. Move the epic to Done? (it carries no code of its own)
+```
+
+---
+
 ## Error handling
 
 - Issue ID unresolvable → stop, ask the user
@@ -351,3 +401,5 @@ The PR is the record. The terminal is where the real review happens first.
 - Build fails → fix, re-validate, continue
 - PR already exists → not an error, show URL and continue
 - Squash leaves the diff stat changed (file content drift) → abort the squash, restore via reflog, leave commits as-is
+- Epic argument with no sub-issues → tell the user the epic has no stories to iterate; nothing to do
+- Every sub-issue already Done → report the epic is complete, suggest closing it (Epic mode E4)
