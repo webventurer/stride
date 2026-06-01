@@ -27,6 +27,12 @@
 
    On success, the summary names the parent epic and the sub-issues in their new board order.
 
+   **Then prompt about Manual ordering — required, once per run.** Linear only honours a manual `sortOrder` when the board view is set to **Manual** ordering; otherwise the pin is ignored even though `set-sort-order` returns success. After pinning, surface once:
+
+   > *"Linear only honours manual position when the board view is set to Manual ordering — `sortOrder` is ignored otherwise. Switch the board view to Manual so the epic actually sits on top?"*
+
+   This is a reminder, not an auto-flip — flipping the view is WB-496's concern, and only if GraphQL allows. Pinning itself is required, not optional: skip it only on the missing-API-key fallback above.
+
 <mark>**Do not bundle all stories into one issue.** Each story is its own sub-issue with `parentId` set.</mark>
 
 **Legacy milestone path**: if the user explicitly wants a date-bound milestone instead of a parent-issue epic (e.g. "ship by Q2", "before launch"), create it via `uv run .claude/tools/linear_cli.py create-milestone --project "<project-UUID>" --name "..." --target-date "..."` and link stories with `uv run .claude/tools/linear_cli.py issue create ... --project-milestone "<name>"`. This stays available for date/scope-bound tracking but is no longer the default — parent-issue epics carry the narrative; milestones are time markers.
