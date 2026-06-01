@@ -25,6 +25,10 @@ N sub-issues, worked one at a time — you review and /finish each PR before the
 Starting with the first unfinished one: <SUB-X>. Say stop to bail out.
 ```
 
+**Manual-ordering reminder — once, here.** The disclosed order reflects `sortOrder`, but Linear only shows that order on the board when the view is set to **Manual**. If the board order doesn't match the disclosure, surface once:
+
+> *"Linear only honours manual position when the board view is set to Manual ordering — `sortOrder` is ignored otherwise. Switch the view to Manual so the epic's position shows?"*
+
 ## E2. Work the next unfinished sub-issue
 
 Pick the first sub-issue that isn't already `In Review` or `Done`. Run the full per-story flow — `/linear:start` steps 1–15 — for that sub-issue: branch, implement, validate, PR, status → In Review, terminal review. Sub-issues already In Review or Done are skipped (named in the disclosure, not re-worked).

@@ -616,11 +616,12 @@ def update_project_content(project_id: str, content: str) -> bool:
 def min_backlog_sort_order(project_id: str) -> float | None:
     query = (
         "query($project: String!) { project(id: $project) { "
-        'issues(first: 1, filter: { state: { type: { eq: "backlog" } } }) '
+        'issues(first: 250, filter: { state: { type: { eq: "backlog" } } }) '
         "{ nodes { sortOrder } } } }"
     )
     nodes = graphql_data(query, {"project": project_id})["project"]["issues"]["nodes"]
-    return nodes[0]["sortOrder"] if nodes else None
+    orders = [n["sortOrder"] for n in nodes if n["sortOrder"] is not None]
+    return min(orders) if orders else None
 
 
 def set_sort_order(issue_id: str, sort_order: float) -> bool:
