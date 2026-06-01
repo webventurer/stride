@@ -27,11 +27,13 @@
 
    On success, the summary names the parent epic and the sub-issues in their new board order.
 
-   **Then prompt about Manual ordering — required, once per run.** Linear only honours a manual `sortOrder` when the board view is set to **Manual** ordering; otherwise the pin is ignored even though `set-sort-order` returns success. After pinning, surface once:
+   **Then set the project's board view to Manual ordering — required.** Linear only honours a manual `sortOrder` when the project's board view is on **Manual** ordering; otherwise the pin is ignored even though `set-sort-order` returns success. Set it directly:
 
-   > *"Linear only honours manual position when the board view is set to Manual ordering — `sortOrder` is ignored otherwise. Switch the board view to Manual so the epic actually sits on top?"*
+   ```bash
+   uv run .claude/tools/linear_cli.py set-project-view-manual <project-UUID>
+   ```
 
-   This is a reminder, not an auto-flip — switching the view automatically is out of scope here, and only feasible if Linear's GraphQL allows it. Pinning itself is required, not optional: skip it only on the missing-API-key fallback above.
+   If that call fails (older API, missing key), fall back to a one-line reminder: *"Switch the project's board view to Manual ordering — `sortOrder` is ignored otherwise, so the epic won't visibly sit on top until you do."* Pinning itself is required, not optional: skip it only on the missing-API-key fallback above.
 
 <mark>**Do not bundle all stories into one issue.** Each story is its own sub-issue with `parentId` set.</mark>
 

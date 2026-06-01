@@ -61,6 +61,7 @@ from linear import (  # noqa: E402
     resolve_project_id,
     resolve_state_for_issue,
     search_by_project,
+    set_project_view_manual,
     set_sort_order,
     state_drift,
     update_issue,
@@ -389,6 +390,24 @@ def test_set_sort_order_passes_float_and_returns_success():
     assert result is True
     assert sent_variables(mock) == {"id": "issue-1", "order": -120550.0}
     assert "$order: Float!" in sent_query(mock)
+
+
+def test_set_project_view_manual_sends_org_project_ordering():
+    data = {"viewPreferencesCreate": {"success": True}}
+    env, post = with_env_and_mock(data)
+    with env, post as mock:
+        result = set_project_view_manual("proj-1")
+
+    assert result is True
+    assert sent_variables(mock) == {
+        "input": {
+            "type": "organization",
+            "viewType": "project",
+            "projectId": "proj-1",
+            "preferences": {"viewOrdering": "manual"},
+        }
+    }
+    assert "viewPreferencesCreate" in sent_query(mock)
 
 
 # ---- workflow-state drift ----
