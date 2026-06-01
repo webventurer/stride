@@ -2,7 +2,7 @@
 
 Implement, validate, and open a PR in one headless flow.
 
-Accepts a Linear issue ID as argument: `/start PG-205`
+Accepts a story ID or an epic ID: `/start PG-205`. An epic argument triggers **[epic iteration](reference/epic-iteration.md)** — its sub-issues are worked one at a time, pausing at each PR.
 
 If no argument is given, infer the issue ID from the current branch name (extract the `[A-Z]+-\d+` pattern, e.g. `PG-205`). If neither works, ask the user.
 
@@ -43,6 +43,8 @@ If the issue has a parent, fetch the parent via `uv run .claude/tools/linear_cli
 Stop if the issue cannot be found.
 
 If the issue is assigned to someone other than the current user, warn and ask whether to proceed.
+
+**If the argument is itself an epic** — its title starts `Epic: `, or `uv run .claude/tools/linear_cli.py list-by-parent <issue-UUID>` returns sub-issues — don't treat it as a single story. Follow [reference/epic-iteration.md](reference/epic-iteration.md) instead; it drives the numbered steps below once per sub-issue, pausing at each PR.
 
 ### 2. Vision check
 
@@ -351,3 +353,5 @@ The PR is the record. The terminal is where the real review happens first.
 - Build fails → fix, re-validate, continue
 - PR already exists → not an error, show URL and continue
 - Squash leaves the diff stat changed (file content drift) → abort the squash, restore via reflog, leave commits as-is
+- Epic argument with no sub-issues → tell the user the epic has no stories to iterate; nothing to do
+- Every sub-issue already Done → report the epic is complete, suggest closing it (see [epic-iteration](reference/epic-iteration.md))
