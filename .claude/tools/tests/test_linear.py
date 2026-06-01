@@ -357,11 +357,23 @@ def test_update_project_content_passes_content_and_returns_success():
 # ---- board order ----
 
 
-def test_min_backlog_sort_order_returns_first_value():
-    data = {"project": {"issues": {"nodes": [{"sortOrder": -120450}]}}}
+def test_min_backlog_sort_order_returns_minimum_not_first_node():
+    # The API returns nodes in updatedAt order, so the first node is the
+    # most-recently-updated issue, not the floor. The function must return
+    # the true minimum across all backlog issues.
+    nodes = [{"sortOrder": -204750}, {"sortOrder": -205050}, {"sortOrder": -204850}]
+    data = {"project": {"issues": {"nodes": nodes}}}
     env, post = with_env_and_mock(data)
     with env, post:
-        assert min_backlog_sort_order("proj-1") == -120450
+        assert min_backlog_sort_order("proj-1") == -205050
+
+
+def test_min_backlog_sort_order_ignores_null_orders():
+    nodes = [{"sortOrder": None}, {"sortOrder": -204950}]
+    data = {"project": {"issues": {"nodes": nodes}}}
+    env, post = with_env_and_mock(data)
+    with env, post:
+        assert min_backlog_sort_order("proj-1") == -204950
 
 
 def test_min_backlog_sort_order_returns_none_when_empty():
