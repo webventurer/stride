@@ -62,6 +62,16 @@ Report one row per team:
 
 If a team drifts, point the user at [`/linear:setup`](setup.md) for that team — on an empty board it provisions the states to match; on a populated board it reports the target order for the human to apply (rename the board state to match `linear_statuses.json`, or edit the JSON to match the board). stride never auto-reconciles — the board is the source of truth for what *exists*, the JSON for what stride *uses*. Only ever suggest `/linear:setup`; never run it automatically from `/linear:check`.
 
-### 4. Summary
+### 4. Remind about board ordering
+
+Linear only honours a manually pinned `sortOrder` — like an epic placed at the top of its project — when the board view is set to **Manual** ordering. Under Created / Priority / etc. ordering the pin is ignored and the epic won't visibly move, even though the API write succeeded.
+
+A project board's ordering mode isn't exposed by Linear's API, so `check` can't auto-detect it. Surface a one-line reminder rather than asserting a state it can't see:
+
+> *"Can't auto-detect board ordering — if you rely on epic pinning, confirm each project's board view is set to Manual. `sortOrder` is ignored under Created/Priority/etc. ordering."*
+
+This is a health-check reminder, not a failure — it always prints, since the state is unreadable.
+
+### 5. Summary
 
 End with a one-line summary: "N of M Linear workspaces connected; K of L team boards in sync, N drifted." If any board drifted, name `/linear:setup` as the next step.
