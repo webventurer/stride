@@ -58,12 +58,14 @@ Skip this when `mode` was `advise` — that team already has cards.
 
 ### 5. Tell the user the board-view toggles (UI only)
 
-Applies to either path. Linear's board-view preferences aren't on the team API — `TeamUpdateInput` has no field for them, and the `viewPreferences` mutations are per-user, per-view — so the user sets these **once in Linear's UI**:
+Applies to either path. These *team* board-view toggles aren't on the team API (`TeamUpdateInput` has no field for them), so the user sets them **once in Linear's UI**:
 
 - **Default the team to the Board view** — otherwise it opens as a list.
 - **Enable "Show empty groups"** in the board's display settings — otherwise columns with no cards stay hidden, so a freshly provisioned board still looks half-empty until each column has an issue.
 
 Surface this as a closing note; setup can't do it for them.
+
+*Project* board ordering is a separate, settable concern: Manual ordering on a project's board (so a pinned epic shows on top) is set automatically on the epic path via `set-project-view-manual` — see [reference/epic-flow.md](reference/epic-flow.md). That's project-scoped, not a team toggle.
 
 ### 6. Summary
 

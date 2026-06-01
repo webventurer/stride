@@ -634,6 +634,20 @@ def set_sort_order(issue_id: str, sort_order: float) -> bool:
     ]
 
 
+def set_project_view_manual(project_id: str) -> bool:
+    query = (
+        "mutation($input: ViewPreferencesCreateInput!) { "
+        "viewPreferencesCreate(input: $input) { success } }"
+    )
+    view = {
+        "type": "organization",
+        "viewType": "project",
+        "projectId": project_id,
+        "preferences": {"viewOrdering": "manual"},
+    }
+    return graphql_data(query, {"input": view})["viewPreferencesCreate"]["success"]
+
+
 # ---- Workflow-state drift ----
 
 

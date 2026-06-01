@@ -49,6 +49,7 @@ from linear import (  # noqa: E402
     resolve_project_id,
     resolve_state_for_issue,
     search_by_project,
+    set_project_view_manual,
     set_sort_order,
     state_drift,
     update_issue,
@@ -155,6 +156,12 @@ def min_backlog_sort_order_cmd(project_id: str):
 @click.option("--sort-order", type=float, required=True)
 def set_sort_order_cmd(issue_id: str, sort_order: float):
     echo_json(set_sort_order(issue_id, sort_order))
+
+
+@cli.command("set-project-view-manual")
+@click.argument("project_id")
+def set_project_view_manual_cmd(project_id: str):
+    echo_json(set_project_view_manual(project_id))
 
 
 @cli.command("state-drift")
