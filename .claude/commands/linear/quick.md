@@ -153,7 +153,7 @@ File the card now, or delay to bundle with more changes? (file / delay)
     -t <TEAM> --project "<project>" --state Done \
     --title "<imperative summary of the change(s)>" \
     --description @<card-file>
-  uv run .claude/tools/linear_cli.py issue attach <new-id> --pr <merged-PR-URL>
+  uv run .claude/tools/linear_cli.py issue attach <new-id> --url <merged-PR-URL>
   # ...repeat issue attach for each PR in the bundle
   ```
 
