@@ -157,7 +157,7 @@ def graphql_data(query: str, variables: dict) -> dict:
 # ---- Mutations: issues ----
 
 ISSUE_FULL_FIELDS = """
-    id identifier title description priority url branchName createdAt updatedAt
+    id identifier title description priority url branchName sortOrder createdAt updatedAt
     state { id name type color description position }
     assignee { id name email }
     team { id key name }
@@ -495,7 +495,7 @@ def looks_like_uuid(value: str) -> bool:
 
 # ---- Issue queries (existing /linear:* operations) ----
 
-NODE_FIELDS = "identifier title state { name type }"
+NODE_FIELDS = "identifier title sortOrder state { name type }"
 
 
 def issues_query(params: str, filters: str) -> str:
