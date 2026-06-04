@@ -311,7 +311,33 @@ Only after the PR is confirmed created or already exists. Skip if the issue is a
 
 ### 15. Review in terminal
 
-Show the full diff against main for the user to review:
+**First, open the PR in diffity if it's available.** diffity is a localhost diff viewer, independent of the VS Code PR panel, so the visual diff always renders. It is **not** a dependency — if it's missing, skip straight to the terminal diff below with no install, no prompt, no error.
+
+```bash
+which diffity || echo "diffity not installed — skipping visual diff"
+```
+
+If diffity is present, open the PR's diff, reusing its launch pattern (check → background-launch → print URL):
+
+1. Launch with the PR URL (from step 13, or the existing PR from step 12), forcing a fresh instance with `--new`. Run it via the Bash tool with `run_in_background: true` — let the tool handle backgrounding, no `&` and no `--quiet`:
+
+   ```bash
+   diffity --new <pr-url>
+   ```
+
+   `--new` matters: diffity reuses any instance already running for the repo and **ignores a new ref**, so without it a stale viewer masks the just-created PR. `--new` is repo-scoped — instances for other repos are left alone.
+
+2. Wait 2 seconds, then read the port and print only the short URL — no session IDs or hashes:
+
+   ```bash
+   diffity list --json
+   ```
+
+   > Diffity is showing the PR diff at http://localhost:5391
+
+If diffity errors at any point, note it in one line and carry on — a broken viewer never blocks the review.
+
+Then show the full diff against main for the user to review:
 
 ```bash
 git diff main...HEAD
@@ -352,6 +378,7 @@ The PR is the record. The terminal is where the real review happens first.
 - No commits ahead of `main` → stop
 - Build fails → fix, re-validate, continue
 - PR already exists → not an error, show URL and continue
+- diffity missing or errors → skip the visual diff silently, continue the review
 - Squash leaves the diff stat changed (file content drift) → abort the squash, restore via reflog, leave commits as-is
 - Epic argument with no sub-issues → tell the user the epic has no stories to iterate; nothing to do
 - Every sub-issue already Done → report the epic is complete, suggest closing it (see [epic-iteration](reference/epic-iteration.md))
