@@ -35,6 +35,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] Stride's command files (`.claude/commands/*.md`) stay scannable as they grow — a reader can locate a step, rule, or flag in seconds, not minutes
 - [ ] Every `/linear:*` command produces the output its own spec documents — a documented column, sort, or field shows real data, never a silent blank or arbitrary order
 - [ ] The common path through every `/linear:*` command runs without prompts; interruptions appear only when stride detects friction worth the user's judgement
+- [ ] You can review your working changes at any point without leaving the flow — `/linear:start` surfaces the diff at its review step, and (with diffity installed) `/diffity-diff` opens a visual diff on demand
 - [ ] Every multi-step stride interaction discloses its scope upfront — number of steps, time estimate, escape hatch — so the user is never trapped in an open-ended sequence
 - [ ] When you list the commits this branch is adding, the story reads naturally to a non-engineer scanning top-to-bottom (`git log main..HEAD --oneline` to check)
 - [ ] Issue titles read as stakeholder outcomes, not implementation steps

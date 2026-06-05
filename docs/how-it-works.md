@@ -92,6 +92,26 @@ Each command knows about Linear statuses, GitHub PRs, and git branches. The agen
 
 Issues come in two sizes: **stories** (one PR) or **epics** (a parent issue with sub-issues, when several stories serve a common purpose smaller than the Vision). `/linear:plan-work` asks the sizing question and routes accordingly. See [Epics and stories](/reference/epics-and-user-stories) for the full mapping.
 
+## Review on the fly
+
+`/linear:start` has a built-in review checkpoint — it opens the new PR's diff (in diffity, when installed) before you approve. But you don't have to wait for it: **`/diffity-diff` opens a visual diff of your working tree at any point**, so you can review your changes whenever you want, not only when stride prompts you.
+
+The full diffity command family — all run against your local repo; most open a view in the browser, while the resolve commands read comments and edit your code:
+
+| Command | What it does |
+|:--------|:-------------|
+| **`/diffity-diff`** | Open the diff viewer on your working-tree changes (or any ref / PR URL). |
+| **`/diffity-review`** | Get an AI code review of the current diff, left as inline comments in the viewer. |
+| **`/diffity-resolve`** | Read the open comments on the diff (yours or the review's) and make the code fixes. |
+| **`/diffity-tree`** | Browse the whole repo as a file tree and comment on any file — not just what changed. |
+| **`/diffity-resolve-tree`** | Read the comments left in the tree browser and make the code fixes. |
+| **`/diffity-tour`** | Create a guided, step-by-step walkthrough of the codebase to answer a question or explain a feature, with highlighted code. |
+| **`/diffity-learn`** | Start a project-driven learning journey for a technical topic — taught through real projects and tours, at your pace. |
+
+The first five stay within review — view a diff, browse the whole repo, leave comments (by hand or via the AI review), and resolve them. The last two go beyond review into code tours and guided learning.
+
+The `/diffity-diff` path and the checkpoint are complementary — `/diffity-diff` for on-demand review of uncommitted work mid-implementation, the `/linear:start` checkpoint as the gate before a PR ships. (Jumping straight to `/linear:finish` skips that checkpoint's auto-open, so `/diffity-diff` is how you review on your own terms regardless.) It's for reviewing your own working changes in-flow — not a replacement for formal PR review. diffity is optional; see the [install guide](/install) for setup.
+
 ## The cross-model feedback loop
 
 `/linear:plan-work` optionally sends issue drafts to ChatGPT via OpenRouter for a second opinion before creating the issue. Three voices — Claude proposes, ChatGPT challenges, you steer — sharpen the issue through cross-model perspectives.
