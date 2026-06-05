@@ -25,6 +25,30 @@ brew install gh uv jq
 
 **WSL is the supported Windows path.** stride's commit hooks need a bash/zsh shell — the [Vision](https://github.com/webventurer/stride/blob/main/VISION.md) states plainly that *"Bash/zsh required for hooks (Windows requires WSL)."* Install [WSL](https://learn.microsoft.com/windows/wsl/install), then follow the macOS steps above inside it (`brew install gh uv jq`).
 
+### Optional: diffity for visual PR review
+
+[diffity](https://github.com/nilbuild/diffity) is an agent-agnostic, GitHub-style diff and code-review viewer. It runs as a local server and opens the diff in your browser at `http://localhost:5391` (the next free port if one's already running) — it reads your local git state, so nothing leaves your machine.
+
+diffity is **optional** — stride works fully without it. When it's installed, `/linear:start` opens the new PR's diff in diffity at the review step, independent of the VS Code PR panel; when it's absent, that step is skipped silently and nothing else changes.
+
+Install the CLI globally in one step — no source build, same command on macOS, Linux, and WSL:
+
+```bash
+pnpm add -g diffity   # or: npm install -g diffity
+```
+
+That's all `/linear:start` needs. To drive diffity from Claude Code directly — `/diffity-diff` to open the viewer on your current changes any time (handy for a look before you commit), plus `/diffity-review` and `/diffity-resolve` — add its skills too:
+
+```bash
+npx skills add nilbuild/diffity
+```
+
+These land in `~/.agents/skills` (the cross-tool skills directory). Claude Code loads skills from `~/.claude/skills`, so link them in once:
+
+```bash
+mkdir -p ~/.claude/skills && for d in ~/.agents/skills/diffity-*; do ln -sfn "$d" ~/.claude/skills/; done
+```
+
 ### Connect Linear
 
 stride's `/linear:*` skills reach Linear via the vendored `linear_cli.py` (in `.claude/tools/`), authenticated by a per-workspace API key in `~/.env` — no `.mcp.json`, no OAuth, no external CLI install. Add one key per workspace:
