@@ -52,16 +52,31 @@ Report one row per team:
 
 If a team drifts, point the user at [`/linear:setup`](setup.md) for that team — on an empty board it provisions the states to match; on a populated board it reports the target order for the human to apply (rename the board state to match `linear_statuses.json`, or edit the JSON to match the board). stride never auto-reconciles — the board is the source of truth for what *exists*, the JSON for what stride *uses*. Only ever suggest `/linear:setup`; never run it automatically from `/linear:check`.
 
-### 4. Remind about board ordering
+### 4. Verify the repo is pinned to a project
 
-Linear only honours a manually pinned `sortOrder` — like an epic placed at the top of its project — when the board view is set to **Manual** ordering. Under Created / Priority / etc. ordering the pin is ignored and the epic won't visibly move, even though the API write succeeded.
+`/linear:setup` pins a repo to a Linear project by writing `.linear_project` (its [create-project step](reference/create-project.md)). This confirms that pin still resolves — the read-only mirror of what setup writes.
 
-A project board's ordering mode isn't exposed by Linear's API, so `check` can't auto-detect it. Surface a one-line reminder rather than asserting a state it can't see:
+Read `.linear_project` at the repo root:
 
-> *"Can't auto-detect board ordering — if you rely on epic pinning, confirm each project's board view is set to Manual. `sortOrder` is ignored under Created/Priority/etc. ordering."*
+- **Absent** → the repo isn't pinned. Not a failure — a repo that only runs workspace-level commands doesn't need one, and `/linear:setup` or `/linear:plan-work` writes it on first use. Report "not pinned" and move on.
+- **Present** → read its `project = <name>` and confirm the project resolves (auth comes from the file's `api_key_env`, no wrap needed):
 
-This is a health-check reminder, not a failure — it always prints, since the state is unreadable.
+  ```bash
+  uv run .claude/tools/linear_cli.py project get "<name>"
+  ```
 
-### 5. Summary
+  A match confirms the binding is live. No match → the name in `.linear_project` doesn't resolve — the project was renamed or deleted, or `api_key_env` points at the wrong workspace. Point the user at `/linear:setup` to re-pin, or at `.linear_project` to fix the name.
 
-End with a one-line summary: "N of M Linear workspaces connected; K of L team boards in sync, N drifted." If any board drifted, name `/linear:setup` as the next step.
+### 5. Remind about board ordering
+
+Linear only honours a manually pinned `sortOrder` — like an epic placed at the top of its project — when the board view is sorted by **Manual**. Under Created / Priority / Updated ordering the pin is ignored and the epic won't visibly move, even though the API write succeeded.
+
+stride already sets Manual ordering on a *project's* board when it pins an epic there — automatically, via `set-project-view-manual` on the epic path (see [reference/epic-flow.md](reference/epic-flow.md)). What stays a manual UI step is the **team / work board view** you sequence day-to-day work in: Linear's API neither sets nor reports that view's sort mode, so `check` can't verify it and reminds instead:
+
+> *"Can't read board sort order — if you sequence work by hand on a board view, confirm it's set to Manual, or stride's ordering looks scrambled. (Project boards pinned via the epic path are already Manual.)"*
+
+A health-check reminder, not a failure — it always prints, since the mode is unreadable.
+
+### 6. Summary
+
+End with a one-line summary: "N of M Linear workspaces connected; K of L team boards in sync, N drifted; project binding ok / unresolved / not pinned." If any board drifted or the project binding didn't resolve, name `/linear:setup` as the next step.
