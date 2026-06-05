@@ -51,44 +51,9 @@ Check for a `.linear_project` file in the repository root.
   Offer two choices:
 
   1. **Pick an existing project** — choose from the list. Save the selection to `.linear_project`.
-  2. **Create a new project** — follow [Create new project](#create-new-project) below.
+  2. **Create a new project** — follow [Create a Linear project](reference/create-project.md).
 
   Once `.linear_project` exists, check the repo's `.gitignore` — if `.linear_project` isn't listed, append it. Then route: path 1 continues to step 3 (fetch the existing project's `content`), path 2 continues to step 6 (confirm — the create-new flow already wrote `content`, so the fetch / diff / write steps are no-ops).
-
-#### Create new project
-
-When the user picks *Create new project*:
-
-1. Ask for the project name.
-2. Resolve the Linear team:
-   ```bash
-   uv run .claude/tools/linear_cli.py team list
-   ```
-   - If exactly one team is returned, use its `key` (e.g. `WB`)
-   - Otherwise, ask the user to choose
-   - If no teams are returned, stop — the user has no team to create projects on
-3. Create the project with the subtitle set from VISION.md's tagline — its opening blockquote, the `>` line under the H1 (the short `description` field; the full Vision goes into `content` next). Omit `--description` if VISION.md has no opening blockquote:
-
-   ```bash
-   uv run .claude/tools/linear_cli.py project create \
-     -t <TEAM-KEY> \
-     --name "<project-name>" \
-     --description "<tagline>" \
-    
-   ```
-
-   Capture the project `id` and URL from the JSON response. If the create fails (for example the user lacks permission to create projects on the team), surface the error and stop — do not retry silently.
-
-4. Write `VISION.md` into the new project's `content`:
-
-   ```bash
-   uv run .claude/tools/linear_cli.py \
-     update-project-content <project-id> --content @VISION.md
-   ```
-
-   `--content @VISION.md` reads the file directly — markdown newlines and special characters never touch the shell ([why](reference/workflow.md#how-skills-talk-to-linear)).
-
-5. Save the new project name to `.linear_project`. Step 6 will display the URL.
 
 ### 3. Get the current project state
 
