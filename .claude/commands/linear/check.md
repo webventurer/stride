@@ -6,13 +6,7 @@ Verify stride can authenticate against every configured Linear workspace, then c
 
 ### 1. Find configured workspaces
 
-Look for `LINEAR_*_API_KEY` env vars currently set in the shell (these come from `~/.env`):
-
-```bash
-env | grep -oE '^LINEAR_[A-Z_]+_API_KEY' | sort -u
-```
-
-If none are found, tell the user to add at least one `LINEAR_<WORKSPACE>_API_KEY` to `~/.env` — see [reference/setup.md](reference/setup.md).
+Discover the configured workspaces — see [Workspaces and teams → Find configured workspaces](reference/workspaces-and-teams.md#find-configured-workspaces). `check` tests **every** workspace found (where `/linear:setup` targets one).
 
 ### 2. Test each workspace
 
@@ -39,11 +33,7 @@ If a workspace fails, show the error and suggest checking:
 
 The state names stride uses (`Doing`, `In Review`, `Done`, `Backlog`, …) live in one place: [`linear_statuses.json`](linear_statuses.json). A name that doesn't exist on the board silently no-ops — e.g. a board state named `In Progress` when stride uses `Doing`. This step confirms every state stride declares actually exists on the live board.
 
-**Boards are per-team, not per-workspace** — a workspace can hold several teams, each with its own board, so check every team rather than assuming the first. For each connected workspace, list its teams *(auth per [reference/workflow.md](reference/workflow.md))*:
-
-```bash
-LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py team list
-```
+For each connected workspace, list its teams — see [Workspaces and teams → List a workspace's teams](reference/workspaces-and-teams.md#list-a-workspaces-teams). Check **every** team, not just the first.
 
 Then run the drift check **once per team**, passing the team key. Without `--team` the tool checks only the workspace's first team, so a multi-team workspace would silently skip the rest:
 

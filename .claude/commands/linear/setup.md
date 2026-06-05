@@ -13,23 +13,11 @@ Two Linear constraints worth knowing:
 
 ### 1. Pick the workspace
 
-List the configured workspaces (these come from `~/.env`):
-
-```bash
-env | grep -oE '^LINEAR_[A-Z_]+_API_KEY' | sort -u
-```
-
-If none are found, point the user at [reference/setup.md](reference/setup.md) to add a `LINEAR_<WORKSPACE>_API_KEY`. If exactly one is set, use it. If several, ask which workspace to use.
+Discover the configured workspaces — see [Workspaces and teams → Find configured workspaces](reference/workspaces-and-teams.md#find-configured-workspaces). Provisioning targets **one**: if exactly one is set, use it; if several, ask which workspace to use.
 
 ### 2. Pick the team
 
-A workspace can hold several teams; provisioning writes to one team's board. List them — workspace-targeted, so the per-workspace `LINEAR_API_KEY=` wrap is explicit (it overrides `.linear_project`'s single key):
-
-```bash
-LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py team list
-```
-
-If exactly one team exists, use its key. If several, <mark>**ask which team to target — never assume the first.**</mark> Capture the chosen team **key** (e.g. `WB`) for the `--team` flag below.
+Provisioning writes to **one** team's board. List the workspace's teams — see [Workspaces and teams → List a workspace's teams](reference/workspaces-and-teams.md#list-a-workspaces-teams). If exactly one team exists, use its key. If several, <mark>**ask which team to target — never assume the first.**</mark> Capture the chosen team **key** (e.g. `WB`) for the `--team` flag below.
 
 ### 3. Provision (card-aware)
 
