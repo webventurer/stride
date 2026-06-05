@@ -74,16 +74,7 @@ Provisioning readies a *team's* board; a repo also needs to know *which project*
 Check for `.linear_project` at the repo root.
 
 - **Present** → the repo is already pinned; skip silently. Re-running setup never re-creates a project.
-- **Missing** → ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, run [`/linear:update-vision`'s *Create new project* flow](update-vision.md#create-new-project) on the team from step 2 — it asks for a name, creates the project, seeds `VISION.md` into the project `content` (when the file exists), writes `.linear_project`, and adds it to `.gitignore`. Reuse that path rather than restating it.
-
-  **One addition specific to setup:** because step 1 already resolved the workspace, write `.linear_project` with *both* fields, not just the project name —
-
-  ```
-  project = <project-name>
-  api_key_env = LINEAR_<WORKSPACE>_API_KEY
-  ```
-
-  If project creation fails (e.g. no permission to create projects on the team), surface the error and stop — don't pin `.linear_project` to a project that wasn't created.
+- **Missing** → ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.linear_project` (both `project` and `api_key_env`), and updates `.gitignore`.
 
 ### 7. Summary
 
