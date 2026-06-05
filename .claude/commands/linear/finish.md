@@ -31,11 +31,31 @@ Extract from the JSON: identifier, title, `gitBranchName`, current state, projec
 
 Stop if the issue cannot be found.
 
-### 2. Find the PR
+### 2. Precondition: the branch has commits and an open PR
 
-Run `gh pr list --head <gitBranchName> --json number,url,title,reviewDecision,mergeable`.
+`/linear:finish` only merges an existing PR — it never commits, pushes, or opens one (that's `/linear:start`'s job). Confirm both preconditions up front, so an early invocation refuses clearly instead of appearing to start the finish flow.
 
-If no PR exists, stop — nothing to merge.
+**No commits ahead of `main`?** Nothing has been committed yet, so there's nothing a PR could contain:
+
+```bash
+git log main..<gitBranchName> --oneline
+```
+
+If empty, stop:
+
+> *"Nothing committed on this branch yet — `/linear:finish` only merges an existing PR. Run `/linear:start <issue-id>` to implement, commit, push, and open the PR first."*
+
+**No open PR?** The work is committed but not yet up for merge:
+
+```bash
+gh pr list --head <gitBranchName> --json number,url,title,reviewDecision,mergeable
+```
+
+If the list is empty, stop:
+
+> *"No open PR for this branch — `/linear:finish` has nothing to merge. Run `/linear:start <issue-id>` to push and open the PR first."*
+
+Capture the PR `number`, `url`, and `mergeable` for the merge in step 7. This gate is the single PR precondition — later steps assume the PR exists and never re-stop on it.
 
 ### 3. Check repo state
 
@@ -374,7 +394,8 @@ Display:
 
 - Issue ID unresolvable → stop, ask the user
 - Issue not found in Linear → stop
-- No PR found → stop, nothing to merge
+- No commits ahead of `main` → stop; nothing committed yet, run `/linear:start` to implement and open the PR
+- No open PR for the branch → stop; run `/linear:start` to push and open the PR
 - Uncommitted changes → stop, suggest `/commit`
 - Tests fail → stop, do not merge
 - Fixup commits present + user picks "abort" → exit cleanly, do not merge (autosquash + force-push manually, then re-run)
