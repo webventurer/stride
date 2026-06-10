@@ -11,11 +11,13 @@ token from `LINEAR_API_KEY` or from the env var named by
 This module is import-only — for the CLI front-end, see `linear_cli.py`.
 """
 
+import hashlib
 import json
 import os
 import re
 import sys
 import time
+import uuid
 from pathlib import Path
 
 import requests
@@ -640,12 +642,21 @@ def set_project_view_manual(project_id: str) -> bool:
         "viewPreferencesCreate(input: $input) { success } }"
     )
     view = {
+        "id": view_pref_id_for(project_id),
         "type": "organization",
         "viewType": "project",
         "projectId": project_id,
         "preferences": {"viewOrdering": "manual"},
     }
     return graphql_data(query, {"input": view})["viewPreferencesCreate"]["success"]
+
+
+def view_pref_id_for(project_id: str) -> str:
+    seed = f"stride:project-view-manual:{project_id}".encode()
+    bits = bytearray(hashlib.sha256(seed).digest()[:16])
+    bits[6] = (bits[6] & 0x0F) | 0x40  # RFC-4122 v4 shape; Linear validates id format
+    bits[8] = (bits[8] & 0x3F) | 0x80
+    return str(uuid.UUID(bytes=bytes(bits)))
 
 
 # ---- Workflow-state drift ----
