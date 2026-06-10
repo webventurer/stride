@@ -695,6 +695,19 @@ TYPE_COLORS = {
 # Linear won't let the API create or reposition these state types.
 RESERVED_TYPES = {"duplicate", "triage"}
 
+# Linear renders a board grouped by state type in this fixed sequence;
+# `position` only orders states within a group, so cross-group position
+# comparisons are meaningless.
+TYPE_SEQUENCE = [
+    "triage",
+    "backlog",
+    "unstarted",
+    "started",
+    "completed",
+    "canceled",
+    "duplicate",
+]
+
 
 def team_overview(team_key: str) -> dict:
     query = (
@@ -759,13 +772,17 @@ def orderable_sequence(states: dict) -> list:
     ]
 
 
+def rank_of(state: dict) -> tuple:
+    return (TYPE_SEQUENCE.index(state["type"]), state["position"])
+
+
 def board_order(board: list) -> list:
-    return [s["name"] for s in sorted(board, key=lambda s: s["position"])]
+    return [s["name"] for s in sorted(board, key=rank_of)]
 
 
 def positioned_in_order(target: list, board: list) -> bool:
-    pos = {s["name"]: s["position"] for s in board}
-    return sorted(target, key=lambda n: pos.get(n, 0.0)) == target
+    ranks = {s["name"]: rank_of(s) for s in board}
+    return sorted(target, key=lambda n: ranks.get(n, (0, 0.0))) == target
 
 
 def in_canonical_order(states: dict, board: list) -> bool:
@@ -838,7 +855,8 @@ def setup_empty_team(team_id: str, states: dict, board: list) -> dict:
     ids = {s["name"]: s["id"] for s in board}
     created = create_missing(team_id, states, ids)
     deleted = archive_extra(states, board)
-    reordered = order_states(states, board, ids)
+    full_board = board + [{**c, "position": 0.0} for c in created]
+    reordered = order_states(states, full_board, ids)
     return {
         "mode": "provisioned",
         "created": created,
