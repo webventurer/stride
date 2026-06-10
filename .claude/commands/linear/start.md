@@ -309,9 +309,9 @@ uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state "In Review"
 
 Only after the PR is confirmed created or already exists. Skip if the issue is already In Review. Warn (but proceed) if the issue is Done.
 
-### 15. Review in terminal
+### 15. Review
 
-**First, open the PR in diffity if it's available.** diffity is a localhost diff viewer, independent of the VS Code PR panel, so the visual diff always renders. It is **not** a dependency — if it's missing, skip straight to the terminal diff below with no install, no prompt, no error.
+**Open the PR in diffity — it is the review surface.** diffity is a localhost diff viewer, independent of the VS Code PR panel, so the visual diff always renders. It is **not** a dependency — if it's missing, skip the visual diff and let the PR on GitHub stand as the diff surface. Never fall back to a terminal `git diff` — no install, no prompt, no error.
 
 ```bash
 which diffity || echo "diffity not installed — skipping visual diff"
@@ -337,10 +337,9 @@ If diffity is present, open the PR's diff, reusing its launch pattern (check →
 
 If diffity errors at any point, note it in one line and carry on — a broken viewer never blocks the review.
 
-Then show the full diff against main for the user to review:
+Then show the commit list for the user to review:
 
 ```bash
-git diff main...HEAD
 git log main..HEAD --oneline
 ```
 
@@ -356,7 +355,7 @@ Then display:
 
 Ask: **"Does this look right, or do you want changes?"**
 
-If the user requests changes, make them, re-validate (step 8), commit, push, and show the updated diff. Repeat until the user is satisfied.
+If the user requests changes, make them, re-validate (step 8), commit, push, and refresh diffity on the updated PR (re-launch with `--new`). Repeat until the user is satisfied.
 
 If the user objects to a squash from step 10 ("don't squash these"), recover via `git reflog` to find the pre-squash SHA, then `git reset --hard <sha>`, then re-push with `--force-with-lease`.
 
@@ -364,7 +363,7 @@ If the user objects to a squash from step 10 ("don't squash these"), recover via
 
 <mark>**This rule holds in epic / loop mode too.**</mark> When `/linear:start` is being run repeatedly to chain through several sub-issues of one epic — *"work through the list"*, *"do all of PG-X through PG-Y"*, *"run the epic"* — the temptation is to auto-invoke `/linear:finish` between stories so the loop keeps moving. Don't. Each PR is a discrete review checkpoint that the user needs to see before it lands on `main`. *"Work through the list"* is an instruction to plan and implement — it never authorises merging without explicit per-story approval. Pause, surface the PR URL and a short diff summary, wait. The user invokes `/linear:finish` when they're ready. Then — and only then — start the next story.
 
-The PR is the record. The terminal is where the real review happens first.
+The PR is the record. diffity is where the real review happens first.
 
 ---
 
@@ -378,7 +377,7 @@ The PR is the record. The terminal is where the real review happens first.
 - No commits ahead of `main` → stop
 - Build fails → fix, re-validate, continue
 - PR already exists → not an error, show URL and continue
-- diffity missing or errors → skip the visual diff silently, continue the review
+- diffity missing or errors → skip the visual diff silently; the PR on GitHub is the diff surface, never a terminal `git diff`
 - Squash leaves the diff stat changed (file content drift) → abort the squash, restore via reflog, leave commits as-is
 - Epic argument with no sub-issues → tell the user the epic has no stories to iterate; nothing to do
 - Every sub-issue already Done → report the epic is complete, suggest closing it (see [epic-iteration](reference/epic-iteration.md))
