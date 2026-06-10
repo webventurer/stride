@@ -269,7 +269,11 @@ def issue_create_cmd(
     "--parent", "parent_identifier", default=None, help="Parent issue identifier"
 )
 @click.option("--title", default=None)
-@click.option("--description", default=None)
+@click.option(
+    "--description",
+    default=None,
+    help="Inline text, @path to read a file, or - to read stdin",
+)
 @click.option("--labels", default=None, help="Comma-separated label names (replaces)")
 @click.option("--priority", type=int, default=None)
 def issue_update_cmd(
@@ -287,7 +291,7 @@ def issue_update_cmd(
         api,
         issue_uuid,
         title=title,
-        description=description,
+        description=read_text_arg(description),
         priority=priority,
         state_id=state_id_for_update(api, identifier, state_name),
         parent_id=parent_id_or_none(api, parent_identifier),
@@ -370,7 +374,11 @@ def project_list_cmd():
 @click.option("-t", "--team", required=True, help="Team key (e.g. WB)")
 @click.option("--name", required=True)
 @click.option("--description", default=None, help="Project subtitle")
-@click.option("--content", default=None, help="Long-form project body (Vision)")
+@click.option(
+    "--content",
+    default=None,
+    help="Long-form project body (Vision): inline text, @path, or - for stdin",
+)
 def project_create_cmd(
     team: str,
     name: str,
@@ -380,7 +388,8 @@ def project_create_cmd(
     api = bearer_token()
     team_obj = team_or_fail(api, team)
     project_id = create_project(
-        api, team_obj["id"], name, description=description, content=content,
+        api, team_obj["id"], name, description=description,
+        content=read_text_arg(content),
     )
     echo_json(get_project(api, project_id))
 

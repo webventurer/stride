@@ -17,11 +17,13 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from click.testing import CliRunner
 
 # Add the tools directory to the path so we can import linear_cli
 TOOLS_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(TOOLS_DIR))
 
+import linear_cli  # noqa: E402
 from linear import (  # noqa: E402
     LinearError,
     looks_like_uuid,
@@ -944,3 +946,40 @@ def test_read_text_arg_reads_stdin_for_dash(monkeypatch: pytest.MonkeyPatch):
 def test_read_text_arg_raises_when_at_file_missing(tmp_path: Path):
     with pytest.raises(LinearError, match="Text-arg file not found"):
         read_text_arg(f"@{tmp_path / 'nope.md'}")
+
+
+# ---- WB-538: long-text CLI options expand @path, never write it literally ----
+
+
+def test_issue_update_expands_at_file_description(tmp_path: Path):
+    body = tmp_path / "desc.md"
+    body.write_text("### Real content\nfrom a file")
+
+    with patch("linear_cli.bearer_token", return_value="lin_test"), patch(
+        "linear_cli.get_issue", return_value={"id": "issue-uuid"}
+    ), patch("linear_cli.update_issue", return_value={"id": "issue-uuid"}) as mock:
+        result = CliRunner().invoke(
+            linear_cli.cli,
+            ["issue", "update", "WB-1", "--description", f"@{body}"],
+        )
+
+    assert result.exit_code == 0, result.output
+    assert mock.call_args.kwargs["description"] == "### Real content\nfrom a file"
+
+
+def test_project_create_expands_at_file_content(tmp_path: Path):
+    vision = tmp_path / "VISION.md"
+    vision.write_text("# Vision: stride")
+
+    with patch("linear_cli.bearer_token", return_value="lin_test"), patch(
+        "linear_cli.get_team", return_value={"id": "t1"}
+    ), patch("linear_cli.create_project", return_value="p1") as mock, patch(
+        "linear_cli.get_project", return_value={"id": "p1"}
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli,
+            ["project", "create", "-t", "WB", "--name", "X", "--content", f"@{vision}"],
+        )
+
+    assert result.exit_code == 0, result.output
+    assert mock.call_args.kwargs["content"] == "# Vision: stride"
