@@ -26,6 +26,7 @@ from linear import (  # noqa: E402
     looks_like_uuid,
     read_text_arg,
     bearer_token,
+    board_order,
     board_states,
     create_comment,
     create_issue,
@@ -41,6 +42,7 @@ from linear import (  # noqa: E402
     graphql,
     issues_query,
     graphql_data,
+    in_canonical_order,
     list_by_parent,
     list_by_project_state,
     list_by_project_state_type,
@@ -501,8 +503,8 @@ def test_create_workflow_state_passes_typed_input_and_color():
 def test_order_states_skips_when_already_in_json_order():
     # Doing before In Review by position — matches ONE_TYPE order, so no writes.
     board = [
-        {"name": "Doing", "position": 2.0},
-        {"name": "In Review", "position": 1069.0},
+        {"name": "Doing", "type": "started", "position": 2.0},
+        {"name": "In Review", "type": "started", "position": 1069.0},
     ]
     ids = {"Doing": "d", "In Review": "r"}
     with patch("linear.set_state_position") as set_pos:
@@ -513,8 +515,8 @@ def test_order_states_skips_when_already_in_json_order():
 def test_order_states_fixes_out_of_order_states():
     # In Review sits before Doing by position — must be reordered to JSON order.
     board = [
-        {"name": "Doing", "position": 5.0},
-        {"name": "In Review", "position": 2.0},
+        {"name": "Doing", "type": "started", "position": 5.0},
+        {"name": "In Review", "type": "started", "position": 2.0},
     ]
     ids = {"Doing": "d", "In Review": "r"}
     with patch("linear.set_state_position") as set_pos:
@@ -522,6 +524,48 @@ def test_order_states_fixes_out_of_order_states():
 
     assert result == ["Doing", "In Review"]
     assert set_pos.call_count == 2
+
+
+# WB-534: Linear renders a board grouped by state type; position only orders
+# states within a group, so cross-group position comparisons are meaningless.
+CROSS_GROUP_BOARD = [
+    {"name": "Backburner", "type": "backlog", "position": -974.71},
+    {"name": "Backlog", "type": "backlog", "position": 0.0},
+    {"name": "Todo", "type": "unstarted", "position": 1.0},
+    {"name": "Doing", "type": "started", "position": 2.0},
+    {"name": "In Review", "type": "started", "position": 1069.76},
+    {"name": "Waiting", "type": "started", "position": 2120.79},
+    {"name": "Done", "type": "completed", "position": 3.0},
+    {"name": "Canceled", "type": "canceled", "position": 4.0},
+    {"name": "Duplicate", "type": "duplicate", "position": 5.0},
+]
+
+CANONICAL_STATES = {
+    "backlog": ["Backburner", "Backlog"],
+    "unstarted": ["Todo"],
+    "started": ["Doing", "In Review", "Waiting"],
+    "completed": ["Done"],
+    "canceled": ["Canceled"],
+    "duplicate": ["Duplicate"],
+}
+
+
+def test_board_order_groups_by_type_before_position():
+    assert board_order(CROSS_GROUP_BOARD) == [
+        "Backburner",
+        "Backlog",
+        "Todo",
+        "Doing",
+        "In Review",
+        "Waiting",
+        "Done",
+        "Canceled",
+        "Duplicate",
+    ]
+
+
+def test_in_canonical_order_ignores_cross_group_positions():
+    assert in_canonical_order(CANONICAL_STATES, CROSS_GROUP_BOARD) is True
 
 
 def test_provision_states_creates_missing_and_reports_them():
