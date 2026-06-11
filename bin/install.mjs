@@ -105,6 +105,7 @@ const DIRS = [
 ];
 
 const HOOKS = [
+  ".claude/hooks/check_commit_widths.py",
   ".claude/hooks/do_commit.sh",
   ".claude/hooks/pretooluse/block_bare_git_commit.sh",
   ".claude/hooks/userpromptsubmit/inject_design_principles.sh",
