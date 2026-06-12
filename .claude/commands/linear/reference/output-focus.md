@@ -78,18 +78,18 @@ Outcome: <one plain-English sentence — what the product/feature does different
 User-visible change: <yes — [what a user sees] | no — internal change supporting [X]>
 Needs your call? <none | specific decision or risk — one sentence>
 
+WB-XXX — <title>
+Branch: <name>
+Build: passed
 PR: <url>
+Linear: In Review
+[Squashed N commits into M — if step 10 grouped commits]
+[kept N helpers / dropped X / inlined Y — if footprint audit ran]
+
 Does this look right?
 ```
 
-**Technical mode** — display all of:
-- Issue ID and title
-- Branch name
-- Build: passed
-- PR URL
-- Linear status: In Review / pushed for re-review
-- Squash summary (if commits were grouped): "Squashed N commits into M"
-- Footprint audit: "kept N helpers and M tests / dropped X / inlined Y"
+**Technical mode** — same metadata, plus the full implementation narrative (What ships, Decisions worth flagging, The torch).
 
 ---
 
@@ -102,21 +102,13 @@ Does this look right?
 Outcome: <one sentence — what the product/feature does differently>
 User-visible change: <yes — [what] | no — internal change supporting [X]>
 PR: <url>
+Build: passed
+[Milestone: <name> — complete / <n> remaining — if applicable]
+[Epic: <name> — Done / <n> sub-issues remaining — if applicable]
+[Vision sync: applied / declined / already in sync — if VISION.md touched]
 ```
 
-Milestone and epic completion still appear in outcome mode — they are status facts, not implementation detail.
-
-**Technical mode** — display the full table:
-- Issue ID and title
-- PR: merged
-- Build: passed
-- Local branch: deleted / already gone
-- Remote branch: deleted / already gone
-- Worktree: removed / not found
-- Linear status: Done
-- Milestone (if applicable): name + completion status
-- Epic (if applicable): name + completion status
-- Vision sync (if `VISION.md` was in the merged diff): applied / declined / already in sync / failed: \<reason\>
+**Technical mode** — same, plus: local branch, remote branch, and worktree cleanup status.
 
 ---
 
