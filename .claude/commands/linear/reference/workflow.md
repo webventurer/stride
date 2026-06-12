@@ -63,6 +63,8 @@ The file content is never tokenised by the shell, so quoting can't trip the call
 
 **Why a vendored client, not MCP:** MCP loads ~60k tokens of schema before the agent reasons; the vendored client loads zero. Plus stride owns the auth path end-to-end — no second protocol to configure.
 
+**The Linear MCP is denied, not just unused.** A user's global [claude.ai](https://claude.ai) connection can put the Linear MCP (`mcp__claude_ai_Linear__*`) in the session even though stride's `.mcp.json` never declares it — and an agent can then silently reach for it instead of `linear_cli.py`. So `.claude/settings.json` lists `mcp__claude_ai_Linear__*` in `permissions.deny`: the harness blocks every Linear MCP call before it runs, leaving the vendored CLI as the only path. The deny is Linear-scoped — other MCP servers (Gmail, Calendar, Drive, `context7`, `pencil`) stay usable — and as a bonus it drops the MCP's schema from context entirely. The guard travels with the install: `bin/install.mjs` merges the same `mcp__claude_ai_Linear__*` deny into a consumer's `.claude/settings.local.json` alongside the hooks, so every repo that adopts stride blocks the MCP the same way — not just stride's own dev tree.
+
 ## Workflow states
 
 The state names the `/linear:*` commands move issues through — `Backlog` on create, `Doing` on start, `In Review` after the PR, `Done` on finish — are defined once in [`linear_statuses.json`](../linear_statuses.json), grouped by Linear's state type and mapped to each workflow transition. That file is the source of truth for the names stride uses and for the type groups `/linear:next-steps` filters on.

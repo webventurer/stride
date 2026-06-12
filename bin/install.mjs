@@ -26,7 +26,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, "..");
 const destRoot = process.cwd();
 
-const HOOK_CONFIG = {
+const STRIDE_SETTINGS = {
   hooks: {
     UserPromptSubmit: [
       {
@@ -51,6 +51,9 @@ const HOOK_CONFIG = {
         ],
       },
     ],
+  },
+  permissions: {
+    deny: ["mcp__claude_ai_Linear__*"],
   },
 };
 
@@ -275,7 +278,7 @@ function mergeSettings() {
     settings = JSON.parse(readFileSync(settingsPath, "utf8"));
   }
 
-  deepMerge(settings, HOOK_CONFIG);
+  deepMerge(settings, STRIDE_SETTINGS);
   writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 }
 
