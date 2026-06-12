@@ -345,7 +345,41 @@ Then show the commit list for the user to review:
 git log main..HEAD --oneline
 ```
 
-Then display:
+Read the output focus (defaults to `outcome` when the field is absent or the file is missing):
+
+```bash
+jq -r '.focus // "outcome"' .stride.json 2>/dev/null || echo outcome
+```
+
+**In `outcome` mode** — lead with what moved forward, not how:
+
+```
+Outcome: <one plain-English sentence — what the product/feature does differently>
+User-visible change: <yes — [what a user sees] | no — internal change supporting [X]>
+Needs your call? <none | specific decision or risk — one sentence>
+
+PR: <url>
+Does this look right?
+```
+
+Technical detail appears in outcome mode only under these five conditions:
+
+1. A human must choose between options
+2. There is user-facing risk
+3. There is migration or deployment risk
+4. The implementation creates a constraint future work depends on
+5. The agent is blocked or genuinely uncertain
+
+When a condition applies, format it clearly:
+
+```
+Needs your call: <one sentence>
+Why: <one sentence>
+```
+
+<mark>**Anti-hallucination:** Do not invent product impact. If the work is internal with no UI change, say so plainly — "No direct user-visible change" or "Internal change supporting X." Never inflate implementation work into fake product impact.</mark>
+
+**In `technical` mode** — current behaviour; display all of:
 
 - Issue ID and title
 - Branch name

@@ -162,7 +162,22 @@ gh pr comment <number> --body-file <body-file>
 
 ### 11. Summary
 
-Display:
+Read the output focus:
+
+```bash
+jq -r '.focus // "outcome"' .stride.json 2>/dev/null || echo outcome
+```
+
+**In `outcome` mode:**
+
+```
+✓ WB-XXX — <title> — pushed for re-review
+What changed: <one plain-English sentence — what the fix addressed>
+User-visible change: <yes — [what] | no — internal fix>
+PR: <url>
+```
+
+**In `technical` mode** — current behaviour:
 
 - Issue ID and title
 - PR URL

@@ -375,7 +375,24 @@ Track the outcome for the summary in step 13:
 
 ### 13. Summary
 
-Display:
+Read the output focus first:
+
+```bash
+jq -r '.focus // "outcome"' .stride.json 2>/dev/null || echo outcome
+```
+
+**In `outcome` mode:**
+
+```
+✓ WB-XXX — <title> — Done
+Outcome: <one sentence — what the product/feature does differently>
+User-visible change: <yes — [what] | no — internal change supporting [X]>
+PR: <url>
+```
+
+Milestone and epic completion still appear in outcome mode — they are status facts, not implementation detail.
+
+**In `technical` mode** — display the full table:
 
 - Issue ID and title
 - PR: merged
