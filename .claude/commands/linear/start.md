@@ -345,28 +345,7 @@ Then show the commit list for the user to review:
 git log main..HEAD --oneline
 ```
 
-Read the output focus and apply the rules in [reference/output-focus.md](reference/output-focus.md).
-
-**In `outcome` mode** — lead with what moved forward, not how:
-
-```
-Outcome: <one plain-English sentence — what the product/feature does differently>
-User-visible change: <yes — [what a user sees] | no — internal change supporting [X]>
-Needs your call? <none | specific decision or risk — one sentence>
-
-PR: <url>
-Does this look right?
-```
-
-**In `technical` mode** — current behaviour; display all of:
-
-- Issue ID and title
-- Branch name
-- Build: passed
-- PR URL
-- Linear status: In Review
-- Squash summary (if step 10 grouped any commits): "Squashed N commits into M"
-- Footprint audit (from step 7): "kept N helpers and M tests / dropped X / inlined Y"
+Read the output focus and apply this command's format from [reference/output-focus.md](reference/output-focus.md).
 
 Ask: **"Does this look right, or do you want changes?"**
 

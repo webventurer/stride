@@ -162,24 +162,7 @@ gh pr comment <number> --body-file <body-file>
 
 ### 11. Summary
 
-Read the output focus and apply the rules in [reference/output-focus.md](reference/output-focus.md).
-
-**In `outcome` mode:**
-
-```
-✓ WB-XXX — <title> — pushed for re-review
-What changed: <one plain-English sentence — what the fix addressed>
-User-visible change: <yes — [what] | no — internal fix>
-PR: <url>
-```
-
-**In `technical` mode** — current behaviour:
-
-- Issue ID and title
-- PR URL
-- What was fixed (one-line summary per change)
-- Build: passed
-- "Pushed — ready for re-review"
+Read the output focus and apply this command's format from [reference/output-focus.md](reference/output-focus.md).
 
 ---
 

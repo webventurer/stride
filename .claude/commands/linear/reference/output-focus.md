@@ -64,3 +64,74 @@ Never inflate implementation work into fake product impact to fill the Outcome o
 | **Cleanup table** | Omitted | Shown |
 | **Vision alignment prose** | Omitted | Shown |
 | **Set via** | `.stride.json` `"focus": "outcome"` or absent | `.stride.json` `"focus": "technical"` |
+
+---
+
+## Command output shapes
+
+### `/linear:start` step 15 and `/linear:fix` step 11 (review gate)
+
+**Outcome mode:**
+
+```
+Outcome: <one plain-English sentence — what the product/feature does differently>
+User-visible change: <yes — [what a user sees] | no — internal change supporting [X]>
+Needs your call? <none | specific decision or risk — one sentence>
+
+PR: <url>
+Does this look right?
+```
+
+**Technical mode** — display all of:
+- Issue ID and title
+- Branch name
+- Build: passed
+- PR URL
+- Linear status: In Review / pushed for re-review
+- Squash summary (if commits were grouped): "Squashed N commits into M"
+- Footprint audit: "kept N helpers and M tests / dropped X / inlined Y"
+
+---
+
+### `/linear:finish` step 13 (summary)
+
+**Outcome mode:**
+
+```
+✓ WB-XXX — <title> — Done
+Outcome: <one sentence — what the product/feature does differently>
+User-visible change: <yes — [what] | no — internal change supporting [X]>
+PR: <url>
+```
+
+Milestone and epic completion still appear in outcome mode — they are status facts, not implementation detail.
+
+**Technical mode** — display the full table:
+- Issue ID and title
+- PR: merged
+- Build: passed
+- Local branch: deleted / already gone
+- Remote branch: deleted / already gone
+- Worktree: removed / not found
+- Linear status: Done
+- Milestone (if applicable): name + completion status
+- Epic (if applicable): name + completion status
+- Vision sync (if `VISION.md` was in the merged diff): applied / declined / already in sync / failed: \<reason\>
+
+---
+
+### `/linear:next-steps` step 7 (recommendations)
+
+**Outcome mode** — action and one-line reason only:
+
+> **Recommended next**
+>
+> 1. **WB-XX — Title** — \<one-line reason tied to product/user outcome\>
+> 2. **WB-YY — Title** — \<one-line reason\>
+
+**Technical mode** — current format, naming the Vision outcome per recommendation:
+
+> **Recommended next**
+>
+> 1. **PG-XX — Title** — reason. Serves Vision outcome: "\<criterion line from VISION.md\>".
+> 2. **PG-YY — Title** — reason. Serves Vision outcome: "\<criterion line from VISION.md\>".

@@ -375,31 +375,7 @@ Track the outcome for the summary in step 13:
 
 ### 13. Summary
 
-Read the output focus and apply the rules in [reference/output-focus.md](reference/output-focus.md).
-
-**In `outcome` mode:**
-
-```
-✓ WB-XXX — <title> — Done
-Outcome: <one sentence — what the product/feature does differently>
-User-visible change: <yes — [what] | no — internal change supporting [X]>
-PR: <url>
-```
-
-Milestone and epic completion still appear in outcome mode — they are status facts, not implementation detail.
-
-**In `technical` mode** — display the full table:
-
-- Issue ID and title
-- PR: merged
-- Build: passed
-- Local branch: deleted / already gone
-- Remote branch: deleted / already gone
-- Worktree: removed / not found
-- Linear status: Done
-- Milestone (if applicable): name + completion status (`complete` if step 10 marked it complete, `<n> stories remaining` otherwise)
-- Epic (if applicable): name + completion status (`Done` if step 11 moved the parent to Done, `<n> sub-issues remaining` otherwise)
-- Vision sync (if `VISION.md` was in the merged diff): `applied` / `declined` / `already in sync` / `failed: <reason>` (per step 12). Omit the row if VISION.md wasn't touched.
+Read the output focus and apply this command's format from [reference/output-focus.md](reference/output-focus.md).
 
 ---
 
