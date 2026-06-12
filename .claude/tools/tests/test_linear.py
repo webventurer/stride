@@ -839,7 +839,7 @@ def test_update_issue_omits_fields_not_passed():
 
 
 def test_project_config_reads_json_fields():
-    data = {"project": "Stride >>>", "api_key_env": "LINEAR_WEBVENTURER_API_KEY"}
+    data = {"project": "Test Project", "api_key_env": "LINEAR_TEST_API_KEY"}
     with patch("linear.STRIDE_CONFIG_PATH") as path:
         path.exists.return_value = True
         path.read_text.return_value = json.dumps(data)
@@ -855,8 +855,8 @@ def test_project_config_returns_empty_when_file_missing():
 
 
 def test_project_config_migrates_from_legacy_on_first_run():
-    data = {"project": "Stride >>>", "api_key_env": "LINEAR_WEBVENTURER_API_KEY"}
-    legacy_text = "project = Stride >>>\napi_key_env = LINEAR_WEBVENTURER_API_KEY\n"
+    data = {"project": "Test Project", "api_key_env": "LINEAR_TEST_API_KEY"}
+    legacy_text = "project = Test Project\napi_key_env = LINEAR_TEST_API_KEY\n"
     written = {}
     with patch("linear.STRIDE_CONFIG_PATH") as stride_path, \
          patch("linear.LEGACY_CONFIG_PATH") as legacy_path:
