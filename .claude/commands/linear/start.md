@@ -311,6 +311,8 @@ Only after the PR is confirmed created or already exists. Skip if the issue is a
 
 ### 15. Review
 
+<mark>**Run `which diffity` before doing anything else in this step.** Do not show the commit list, do not surface the summary, do not ask "does this look right?" — nothing until the diffity check is done.</mark>
+
 **Open the PR in diffity — it is the review surface.** diffity is a localhost diff viewer, independent of the VS Code PR panel, so the visual diff always renders. It is **not** a dependency — if it's missing, skip the visual diff and let the PR on GitHub stand as the diff surface. Never fall back to a terminal `git diff` — no install, no prompt, no error.
 
 ```bash
