@@ -162,13 +162,7 @@ gh pr comment <number> --body-file <body-file>
 
 ### 11. Summary
 
-Display:
-
-- Issue ID and title
-- PR URL
-- What was fixed (one-line summary per change)
-- Build: passed
-- "Pushed — ready for re-review"
+Read the output focus and apply this command's format from [reference/output-focus.md](reference/output-focus.md).
 
 ---
 

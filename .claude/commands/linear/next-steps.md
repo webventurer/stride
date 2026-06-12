@@ -134,12 +134,7 @@ Apply the priority ordering: build failure > PRs needing fix > in-progress > PRs
 
 Pick 1–3 items. For each recommendation, explain briefly why it's the right next move using factors such as: priority, quick win potential, follow-up to recently completed work, unblocking other work, PR needing review, alignment with current work in progress. **Name the Vision outcome the item serves** so the user sees why the agent picked it.
 
-Format:
-
-> **Recommended next**
->
-> 1. **PG-XX — Title** — reason. Serves Vision outcome: "<criterion line from VISION.md>".
-> 2. **PG-YY — Title** — reason. Serves Vision outcome: "<criterion line from VISION.md>".
+Read the output focus and apply this command's format from [reference/output-focus.md](reference/output-focus.md).
 
 If a candidate doesn't cleanly trace to any Success criterion, surface that honestly rather than inventing a tie-in (see [reference/align-to-vision.md](reference/align-to-vision.md) for the surfacing format).
 
