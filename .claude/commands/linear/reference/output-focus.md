@@ -38,6 +38,8 @@ Why: <one sentence>
 
 If none of the five conditions apply, omit technical detail entirely — the diffity diff and PR comments are the surfaces for implementation review.
 
+**"Needs your call?" is where the torch lives.** The torch — things the user didn't know to ask about — still belongs in the output, but only when it meets one of the five conditions above. The five conditions are the filter. An observation that doesn't meet any of them goes to diffity, not to the outcome summary. The torch as a free-form section is gone; its function survives.
+
 ---
 
 ## Anti-hallucination rule
