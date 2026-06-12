@@ -62,7 +62,14 @@ Provisioning readies a *team's* board; a repo also needs to know *which project*
 Check for `.stride.json` at the repo root.
 
 - **Present** → the repo is already pinned; skip silently. Re-running setup never re-creates a project.
-- **Missing** → ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.stride.json` (both `project` and `api_key_env`), and updates `.gitignore`.
+- **Missing** → the repo may still be pinned under the **legacy** `.linear_project` (INI-style) from before stride moved to `.stride.json`. Migrate it before ever offering to create a project — otherwise setup duplicates a project the repo already had:
+
+  ```bash
+  uv run .claude/tools/linear_cli.py migrate-legacy-config
+  ```
+
+  - **Returns a non-empty object** (e.g. `{"project": "...", "api_key_env": "..."}`) → the legacy `.linear_project` was migrated: `.stride.json` is now written from it and `.linear_project` deleted. The repo is pinned to its **existing** project — **do not create a new one**. Append `.stride.json` to `.gitignore` if it isn't already listed, and skip to step 7.
+  - **Returns `{}`** → no legacy config either; the repo is genuinely unpinned. Ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.stride.json` (`project`, `api_key_env`, and `focus`), and updates `.gitignore`.
 
 ### 7. Summary
 
@@ -81,6 +88,6 @@ Check for `.stride.json` at the repo root.
   Fix: drag "In Review" and "Waiting" before "Done" in Linear's board settings.
   ```
 
-- **project**: if a project was created, report its name and URL, and that `.stride.json` was pinned (and added to `.gitignore` when it wasn't already listed). If `.stride.json` was already present, say nothing — the repo was already pinned.
+- **project**: if a project was created, report its name and URL, and that `.stride.json` was pinned (and added to `.gitignore` when it wasn't already listed). If a legacy `.linear_project` was **migrated**, report the existing project it reused and that `.linear_project` was replaced by `.stride.json` — no new project created. If `.stride.json` was already present, say nothing — the repo was already pinned.
 
-Re-running is always safe: an empty team converges to in-sync; a populated team is only ever reported on; an already-pinned repo skips project creation.
+Re-running is always safe: an empty team converges to in-sync; a populated team is only ever reported on; an already-pinned (or legacy-pinned) repo skips project creation.
