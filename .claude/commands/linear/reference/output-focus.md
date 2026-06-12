@@ -2,7 +2,7 @@
 
 > **What this is**: the shared rules for how commands read the `focus` field from `.stride.json` and adjust their natural-language output accordingly. Linked from `/linear:start`, `/linear:finish`, `/linear:fix`, and `/linear:next-steps` — the commands that produce narrative summaries.
 >
-> **Why it exists**: command output previously operated at the implementation layer by default. The `focus` field lets teams choose the abstraction level that fits their workflow: `"outcome"` answers "what moved forward for the user?"; `"technical"` answers "what decisions were made and how?"
+> **Why it exists**: command output previously operated at the implementation layer by default. The `focus` field lets teams choose the abstraction level that fits their workflow: `"outcome"` answers "what moved forward for the user, and why?"; `"technical"` answers "what decisions were made and how?"
 
 ---
 
@@ -53,14 +53,18 @@ Acceptable forms:
 
 Never inflate implementation work into fake product impact to fill the Outcome or User-visible change fields.
 
+**The same rule governs `Why it matters`.** Ground it in the issue's own `Why this matters` section and the Vision outcome the work serves — report the forward motion the work was committed to, not a manufactured significance. If the only honest why is "enables X later," say exactly that. The output's `Why it matters` closes the loop on the issue's opening `Why this matters`: the issue states why the work was taken on; the summary reports that why, delivered.
+
 ---
 
 ## The two modes at a glance
 
 | | `outcome` (default) | `technical` |
 |:--|:--|:--|
-| **Answers** | What moved forward for the user? | What decisions were made and how? |
+| **Answers** | What moved forward for the user, and why? | What decisions were made and how? |
+| **`Why it matters` line** | Shown — grounded in the issue | Shown — folded into the narrative |
 | **Technical detail** | Only under the five conditions above | Always |
+| **Footprint-audit line** | Omitted | Shown |
 | **Cleanup table** | Omitted | Shown |
 | **Vision alignment prose** | Omitted | Shown |
 | **Set via** | `.stride.json` `"focus": "outcome"` or absent | `.stride.json` `"focus": "technical"` |
@@ -75,6 +79,7 @@ Never inflate implementation work into fake product impact to fill the Outcome o
 
 ```
 Outcome: <one plain-English sentence — what the product/feature does differently>
+Why it matters: <one sentence — what this unlocks or how it moves the project forward>
 User-visible change: <yes — [what a user sees] | no — internal change supporting [X]>
 Needs your call? <none | specific decision or risk — one sentence>
 
@@ -84,12 +89,11 @@ Build: passed
 PR: <url>
 Linear: In Review
 [Squashed N commits into M — if step 10 grouped commits]
-[kept N helpers / dropped X / inlined Y — if footprint audit ran]
 
 Does this look right?
 ```
 
-**Technical mode** — same metadata, plus the full implementation narrative (What ships, Decisions worth flagging, The torch).
+**Technical mode** — same metadata, plus the footprint-audit line (`kept N helpers / dropped X / inlined Y`) and the full implementation narrative (What ships, Decisions worth flagging, The torch).
 
 ---
 
@@ -100,6 +104,7 @@ Does this look right?
 ```
 ✓ WB-XXX — <title> — Done
 Outcome: <one sentence — what the product/feature does differently>
+Why it matters: <one sentence — what this unlocks or how it moves the project forward>
 User-visible change: <yes — [what] | no — internal change supporting [X]>
 PR: <url>
 Build: passed
