@@ -375,11 +375,7 @@ Track the outcome for the summary in step 13:
 
 ### 13. Summary
 
-Read the output focus first:
-
-```bash
-jq -r '.focus // "outcome"' .stride.json 2>/dev/null || echo outcome
-```
+Read the output focus and apply the rules in [reference/output-focus.md](reference/output-focus.md).
 
 **In `outcome` mode:**
 
