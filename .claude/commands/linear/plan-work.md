@@ -271,6 +271,8 @@ Each round has three voices: Claude proposes and synthesises, ChatGPT challenges
 
 Show the full draft to the user. Ask for explicit approval before creating.
 
+<mark>**Present the draft as the final text output of the turn, and ask for approval in plain prose.**</mark> Never pair the draft with a tool-based approval dialog in the same turn — the dialog can suppress the text above it, and the user ends up approving a card they never saw. End the turn on the draft + prose question; the user's reply is the gate.
+
 - If the user requests changes, revise and re-present
 - If the user declines, stop — do not create the issue
 
