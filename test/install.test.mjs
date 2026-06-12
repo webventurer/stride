@@ -29,7 +29,7 @@ function dedupeHooks(existing, incoming) {
   return existing;
 }
 
-const STRIDE_HOOKS = {
+const STRIDE_SETTINGS = {
   hooks: {
     UserPromptSubmit: [
       {
@@ -55,10 +55,13 @@ const STRIDE_HOOKS = {
       },
     ],
   },
+  permissions: {
+    deny: ["mcp__claude_ai_Linear__*"],
+  },
 };
 
 function cloneConfig() {
-  return JSON.parse(JSON.stringify(STRIDE_HOOKS));
+  return JSON.parse(JSON.stringify(STRIDE_SETTINGS));
 }
 
 describe("deepMerge", () => {
@@ -66,7 +69,7 @@ describe("deepMerge", () => {
     const settings = {};
     deepMerge(settings, cloneConfig());
 
-    deepStrictEqual(Object.keys(settings), ["hooks"]);
+    deepStrictEqual(Object.keys(settings), ["hooks", "permissions"]);
     strictEqual(settings.hooks.UserPromptSubmit.length, 1);
     strictEqual(settings.hooks.PreToolUse.length, 1);
   });
@@ -96,8 +99,34 @@ describe("deepMerge", () => {
     deepMerge(settings, cloneConfig());
 
     strictEqual(settings.includeCoAuthoredBy, false);
-    deepStrictEqual(settings.permissions.deny, ["Bash(rm -rf :*)"]);
     strictEqual(settings.hooks.PreToolUse.length, 1);
+  });
+});
+
+describe("Linear MCP deny propagation", () => {
+  it("adds the Linear deny to settings with no permissions", () => {
+    const settings = {};
+    deepMerge(settings, cloneConfig());
+
+    deepStrictEqual(settings.permissions.deny, ["mcp__claude_ai_Linear__*"]);
+  });
+
+  it("appends the Linear deny without clobbering existing entries", () => {
+    const settings = { permissions: { deny: ["Bash(rm -rf :*)"] } };
+    deepMerge(settings, cloneConfig());
+
+    deepStrictEqual(settings.permissions.deny, [
+      "Bash(rm -rf :*)",
+      "mcp__claude_ai_Linear__*",
+    ]);
+  });
+
+  it("does not duplicate the Linear deny on re-install", () => {
+    const settings = {};
+    deepMerge(settings, cloneConfig());
+    deepMerge(settings, cloneConfig());
+
+    deepStrictEqual(settings.permissions.deny, ["mcp__claude_ai_Linear__*"]);
   });
 });
 
