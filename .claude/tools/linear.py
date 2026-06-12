@@ -96,10 +96,30 @@ def require_env(name: str) -> str:
 
 
 STRIDE_CONFIG_PATH = Path(".stride.json")
+LEGACY_CONFIG_PATH = Path(".linear_project")
+
+
+def parse_legacy_config(text: str) -> dict:
+    lines = [s for s in (r.strip() for r in text.splitlines()) if s and not s.startswith("#")]
+    config = {k.strip(): v.strip() for l in lines if "=" in l for k, v in [l.split("=", 1)]}
+    if lines and "=" not in lines[0]:
+        config.setdefault("project", lines[0])
+    return config
+
+
+def migrate_from_legacy() -> dict:
+    if not LEGACY_CONFIG_PATH.exists():
+        return {}
+    config = parse_legacy_config(LEGACY_CONFIG_PATH.read_text())
+    STRIDE_CONFIG_PATH.write_text(json.dumps(config, indent=2) + "\n")
+    LEGACY_CONFIG_PATH.unlink()
+    return config
 
 
 def project_config() -> dict:
-    return json.loads(STRIDE_CONFIG_PATH.read_text()) if STRIDE_CONFIG_PATH.exists() else {}
+    if STRIDE_CONFIG_PATH.exists():
+        return json.loads(STRIDE_CONFIG_PATH.read_text())
+    return migrate_from_legacy()
 
 
 def token_from_project_config() -> str | None:
