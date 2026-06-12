@@ -57,7 +57,7 @@ stride's `/linear:*` skills reach Linear via the vendored `linear_cli.py` (in `.
 LINEAR_<WORKSPACE>_API_KEY=lin_api_...
 ```
 
-Get a key at [linear.app/settings/api](https://linear.app/settings/api) (one per workspace). Per-project calls read the bearer token automatically from `.linear_project`'s `api_key_env` field (set on first run); workspace-iterating commands (`/linear:check`, `/linear:setup`, `/linear:list-projects`) wrap each call with `LINEAR_API_KEY=$LINEAR_<WORKSPACE>_API_KEY`. See [the workflow reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/workflow.md). Verify the connection with `/linear:check` — it confirms each key authenticates now, and (once your board is provisioned in the next step) that every team's board carries the states stride needs.
+Get a key at [linear.app/settings/api](https://linear.app/settings/api) (one per workspace). Per-project calls read the bearer token automatically from `.stride.json`'s `api_key_env` field (set on first run); workspace-iterating commands (`/linear:check`, `/linear:setup`, `/linear:list-projects`) wrap each call with `LINEAR_API_KEY=$LINEAR_<WORKSPACE>_API_KEY`. See [the workflow reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/workflow.md). Verify the connection with `/linear:check` — it confirms each key authenticates now, and (once your board is provisioned in the next step) that every team's board carries the states stride needs.
 
 **How Linear API keys are scoped:** Linear API keys are per workspace (per user, scoped to the workspace), not per team.
 

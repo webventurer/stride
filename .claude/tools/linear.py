@@ -6,7 +6,7 @@
 
 Talks Linear's GraphQL API directly via `requests`. Reads the bearer
 token from `LINEAR_API_KEY` or from the env var named by
-`.linear_project`'s `api_key_env` field.
+`.stride.json`'s `api_key_env` field.
 
 This module is import-only — for the CLI front-end, see `linear_cli.py`.
 """
@@ -95,31 +95,41 @@ def require_env(name: str) -> str:
     return val
 
 
-LINEAR_PROJECT_PATH = Path(".linear_project")
+STRIDE_CONFIG_PATH = Path(".stride.json")
+LEGACY_CONFIG_PATH = Path(".linear_project")
 
 
-def parse_project_config(text: str) -> dict:
-    config: dict = {}
-    for line in config_lines(text):
-        absorb_config_line(config, line)
+def parse_legacy_config(text: str) -> dict:
+    lines = [s for s in (r.strip() for r in text.splitlines()) if s and not s.startswith("#")]
+    config = {k.strip(): v.strip() for l in lines if "=" in l for k, v in [l.split("=", 1)]}
+    if lines and "=" not in lines[0]:
+        config.setdefault("project", lines[0])
     return config
 
 
-def config_lines(text: str) -> list:
-    return [s for s in (raw.strip() for raw in text.splitlines()) if s and not s.startswith("#")]
+def migrate_from_legacy() -> dict:
+    if not LEGACY_CONFIG_PATH.exists():
+        return {}
+    config = parse_legacy_config(LEGACY_CONFIG_PATH.read_text())
+    STRIDE_CONFIG_PATH.write_text(json.dumps(config, indent=2) + "\n")
+    LEGACY_CONFIG_PATH.unlink()
+    return config
 
 
-def absorb_config_line(config: dict, line: str):
-    if "=" in line:
-        k, v = line.split("=", 1)
-        config[k.strip()] = v.strip()
-    elif "project" not in config:
-        # Backward compat: bare project name on first non-comment line.
-        config["project"] = line
+def read_config_json() -> dict:
+    try:
+        return json.loads(STRIDE_CONFIG_PATH.read_text())
+    except json.JSONDecodeError:
+        raise LinearError(
+            f"{STRIDE_CONFIG_PATH} contains invalid JSON — "
+            "fix it or delete it and re-run /linear:setup."
+        )
 
 
 def project_config() -> dict:
-    return parse_project_config(LINEAR_PROJECT_PATH.read_text()) if LINEAR_PROJECT_PATH.exists() else {}
+    if STRIDE_CONFIG_PATH.exists():
+        return read_config_json()
+    return migrate_from_legacy()
 
 
 def token_from_project_config() -> str | None:
@@ -132,7 +142,7 @@ def bearer_token() -> str:
     if not token:
         raise LinearError(
             "No Linear credentials. Set LINEAR_API_KEY in ~/.env or name "
-            "an api_key_env in .linear_project."
+            "an api_key_env in .stride.json."
         )
     return token
 

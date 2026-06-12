@@ -84,7 +84,7 @@ The other Linear commands (`/linear:check`, `/linear:list-projects`, `/linear:fi
 
 ### /linear:update-vision
 
-**Mirror `VISION.md` to the Linear project.** Reads `VISION.md`, resolves the Linear project from `.linear_project`, shows the diff against the current Linear content, and — once you confirm — pushes the file's contents into the project's `content` field via `linear_cli.py update-project-content`.
+**Mirror `VISION.md` to the Linear project.** Reads `VISION.md`, resolves the Linear project from `.stride.json`, shows the diff against the current Linear content, and — once you confirm — pushes the file's contents into the project's `content` field via `linear_cli.py update-project-content`.
 
 Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). One-way only: repo → Linear, never the reverse. Idempotent — re-running with no `VISION.md` changes is a no-op.
 

@@ -14,7 +14,7 @@ Stride's Linear client is split across two files:
 ### Requirements
 
 - **Python 3.10+**, **`click`**, **`requests`** — auto-installed by `uv run` via the PEP 723 header; no `pip install`.
-- **`LINEAR_API_KEY`** in the environment, or `api_key_env` named in `.linear_project`.
+- **`LINEAR_API_KEY`** in the environment, or `api_key_env` named in `.stride.json`.
 
 ### What `linear.py` provides
 

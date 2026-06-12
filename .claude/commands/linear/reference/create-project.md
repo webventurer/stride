@@ -1,6 +1,6 @@
 # Create a Linear project
 
-> **What this is**: the shared flow for creating a new Linear project and pinning the repo to it. Linked from [`/linear:setup`](../setup.md) (when a fresh repo has no `.linear_project`) and [`/linear:update-vision`](../update-vision.md) (when the repo isn't pinned yet). Keeping it in one place means both commands reference the same procedure instead of one reaching into the other.
+> **What this is**: the shared flow for creating a new Linear project and pinning the repo to it. Linked from [`/linear:setup`](../setup.md) (when a fresh repo has no `.stride.json`) and [`/linear:update-vision`](../update-vision.md) (when the repo isn't pinned yet). Keeping it in one place means both commands reference the same procedure instead of one reaching into the other.
 
 When creating a new Linear project for a repo:
 
@@ -23,7 +23,7 @@ When creating a new Linear project for a repo:
      --description "<tagline>"
    ```
 
-   Capture the project `id` and URL from the JSON response. If the create fails (for example the user lacks permission to create projects on the team), surface the error and stop — don't retry silently, and don't write `.linear_project` for a project that wasn't created.
+   Capture the project `id` and URL from the JSON response. If the create fails (for example the user lacks permission to create projects on the team), surface the error and stop — don't retry silently, and don't write `.stride.json` for a project that wasn't created.
 4. If `VISION.md` exists at the repo root, seed it into the project `content`:
 
    ```bash
@@ -31,10 +31,12 @@ When creating a new Linear project for a repo:
    ```
 
    `--content @VISION.md` reads the file directly — markdown newlines and special characters never touch the shell ([why](workflow.md#how-skills-talk-to-linear)).
-5. Write `.linear_project` at the repo root — **both fields**, so `linear_cli.py` reads the bearer token from it without a per-call `LINEAR_API_KEY=` wrap:
+5. Write `.stride.json` at the repo root — **both fields**, so `linear_cli.py` reads the bearer token from it without a per-call `LINEAR_API_KEY=` wrap:
 
+   ```json
+   {
+     "project": "<project-name>",
+     "api_key_env": "LINEAR_<WORKSPACE>_API_KEY"
+   }
    ```
-   project = <project-name>
-   api_key_env = LINEAR_<WORKSPACE>_API_KEY
-   ```
-6. If `.gitignore` doesn't already list `.linear_project`, append it.
+6. If `.gitignore` doesn't already list `.stride.json`, append it.

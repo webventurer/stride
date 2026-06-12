@@ -157,7 +157,7 @@ File the card now, or delay to bundle with more changes? (file / delay)
   # ...repeat issue attach for each PR in the bundle
   ```
 
-  Resolve the project from `.linear_project` and the team key from `uv run .claude/tools/linear_cli.py team list`. The PR links make the Linear ↔ git ↔ PR trail whole even though the branch carried no issue ID. Clear the pending bundle once filed.
+  Resolve the project from `.stride.json` and the team key from `uv run .claude/tools/linear_cli.py team list`. The PR links make the Linear ↔ git ↔ PR trail whole even though the branch carried no issue ID. Clear the pending bundle once filed.
 
 ### 8. Clean up
 

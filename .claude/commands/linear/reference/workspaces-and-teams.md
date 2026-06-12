@@ -14,7 +14,7 @@ If none are found, add at least one `LINEAR_<WORKSPACE>_API_KEY` — see [refere
 
 ## List a workspace's teams
 
-Boards are **per-team, not per-workspace** — a workspace can hold several teams, each with its own board. List them, wrapping the call in the workspace's key (the explicit per-workspace wrap, since these commands iterate workspaces rather than reading the single `.linear_project` key — see [How skills talk to Linear](workflow.md#how-skills-talk-to-linear)):
+Boards are **per-team, not per-workspace** — a workspace can hold several teams, each with its own board. List them, wrapping the call in the workspace's key (the explicit per-workspace wrap, since these commands iterate workspaces rather than reading the single `.stride.json` key — see [How skills talk to Linear](workflow.md#how-skills-talk-to-linear)):
 
 ```bash
 LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py team list

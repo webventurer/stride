@@ -10,7 +10,7 @@ Discover the configured workspaces — see [Workspaces and teams → Find config
 
 ### 2. Test each workspace
 
-For each env var found, run the identity check to confirm the key works — workspace-iterating, so the per-workspace `LINEAR_API_KEY=` wrap is explicit (it overrides `.linear_project`'s single key):
+For each env var found, run the identity check to confirm the key works — workspace-iterating, so the per-workspace `LINEAR_API_KEY=` wrap is explicit (it overrides `.stride.json`'s single key):
 
 ```bash
 LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py whoami
@@ -54,9 +54,9 @@ If a team drifts, point the user at [`/linear:setup`](setup.md) for that team �
 
 ### 4. Verify the repo is pinned to a project
 
-`/linear:setup` pins a repo to a Linear project by writing `.linear_project` (its [create-project step](reference/create-project.md)). This confirms that pin still resolves — the read-only mirror of what setup writes.
+`/linear:setup` pins a repo to a Linear project by writing `.stride.json` (its [create-project step](reference/create-project.md)). This confirms that pin still resolves — the read-only mirror of what setup writes.
 
-Read `.linear_project` at the repo root:
+Read `.stride.json` at the repo root:
 
 - **Absent** → the repo isn't pinned. Not a failure — a repo that only runs workspace-level commands doesn't need one, and `/linear:setup` or `/linear:plan-work` writes it on first use. Report "not pinned" and move on.
 - **Present** → read its `project = <name>` and confirm the project resolves (auth comes from the file's `api_key_env`, no wrap needed):
@@ -65,7 +65,7 @@ Read `.linear_project` at the repo root:
   uv run .claude/tools/linear_cli.py project get "<name>"
   ```
 
-  A match confirms the binding is live. No match → the name in `.linear_project` doesn't resolve — the project was renamed or deleted, or `api_key_env` points at the wrong workspace. Point the user at `/linear:setup` to re-pin, or at `.linear_project` to fix the name.
+  A match confirms the binding is live. No match → the name in `.stride.json` doesn't resolve — the project was renamed or deleted, or `api_key_env` points at the wrong workspace. Point the user at `/linear:setup` to re-pin, or at `.stride.json` to fix the name.
 
 ### 5. Remind about board ordering
 

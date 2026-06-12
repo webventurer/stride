@@ -1,6 +1,6 @@
 # Provision Linear workflow states
 
-Make a Linear team's board match the workflow states stride needs ([`linear_statuses.json`](linear_statuses.json)) — so `/linear:start` / `/linear:finish` transitions land instead of silently no-opping on a missing or misnamed column. When the repo isn't yet pinned to a Linear project, setup also offers to create one and write `.linear_project` (step 6) — so a fresh repo reaches a working board in a single command.
+Make a Linear team's board match the workflow states stride needs ([`linear_statuses.json`](linear_statuses.json)) — so `/linear:start` / `/linear:finish` transitions land instead of silently no-opping on a missing or misnamed column. When the repo isn't yet pinned to a Linear project, setup also offers to create one and write `.stride.json` (step 6) — so a fresh repo reaches a working board in a single command.
 
 <mark>**Card-aware, and that's the safety model.** An *empty* team (no issues) is set up authoritatively — create the canonical states, archive non-canonical ones, order them to match. A team that *already holds issues* is **never touched**; setup only reports what the board should be and asks the human to adjust it.</mark> A live board is the human's to change, not a script's.
 
@@ -57,12 +57,12 @@ Surface this as a closing note; setup can't do it for them.
 
 ### 6. Pin the repo to a Linear project
 
-Provisioning readies a *team's* board; a repo also needs to know *which project* its `/linear:*` issues belong to — that binding is `.linear_project` at the repo root. Setup offers to create it when missing, so a fresh repo reaches a working board in one command.
+Provisioning readies a *team's* board; a repo also needs to know *which project* its `/linear:*` issues belong to — that binding is `.stride.json` at the repo root. Setup offers to create it when missing, so a fresh repo reaches a working board in one command.
 
-Check for `.linear_project` at the repo root.
+Check for `.stride.json` at the repo root.
 
 - **Present** → the repo is already pinned; skip silently. Re-running setup never re-creates a project.
-- **Missing** → ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.linear_project` (both `project` and `api_key_env`), and updates `.gitignore`.
+- **Missing** → ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.stride.json` (both `project` and `api_key_env`), and updates `.gitignore`.
 
 ### 7. Summary
 
@@ -81,6 +81,6 @@ Check for `.linear_project` at the repo root.
   Fix: drag "In Review" and "Waiting" before "Done" in Linear's board settings.
   ```
 
-- **project**: if a project was created, report its name and URL, and that `.linear_project` was pinned (and added to `.gitignore` when it wasn't already listed). If `.linear_project` was already present, say nothing — the repo was already pinned.
+- **project**: if a project was created, report its name and URL, and that `.stride.json` was pinned (and added to `.gitignore` when it wasn't already listed). If `.stride.json` was already present, say nothing — the repo was already pinned.
 
 Re-running is always safe: an empty team converges to in-sync; a populated team is only ever reported on; an already-pinned repo skips project creation.

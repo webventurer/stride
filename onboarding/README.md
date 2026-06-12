@@ -48,7 +48,7 @@ The end-to-end install → first-real-command path:
 - **Skill markdown landed** — checks `.claude/commands/linear/start.md` exists. Catches partial installs where the install crashed midway.
 - **Hook landed and is executable** — checks `.claude/hooks/do_commit.sh` is in place. Without it `/commit` is broken.
 - **Python tool chain works end-to-end** — `uv run` resolves the PEP 723 deps (`click`, `requests`), `linear.py` imports cleanly, `bearer_token()` resolves an API key, the GraphQL endpoint responds, auth succeeds.
-- **Both auth entry points** — the timed probe authenticates via `LINEAR_API_KEY` in the environment; a second untimed probe writes a `.linear_project` naming an `api_key_env`, unsets `LINEAR_API_KEY`, and confirms `token_from_project_config()` resolves the key from the named var. That's the config-file path most real users hit, now exercised on the install path rather than only in unit tests.
+- **Both auth entry points** — the timed probe authenticates via `LINEAR_API_KEY` in the environment; a second untimed probe writes a `.stride.json` naming an `api_key_env`, unsets `LINEAR_API_KEY`, and confirms `token_from_project_config()` resolves the key from the named var. That's the config-file path most real users hit, now exercised on the install path rather than only in unit tests.
 - **90-second wall-clock budget** — the criterion this whole script exists to measure. `STRIDE_SMOKE_BUDGET_SECONDS=-1` forces a FAIL for testing the failure path itself.
 
 ## What this smoke test does not test

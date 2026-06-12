@@ -11,10 +11,10 @@ Workflow: edit `VISION.md` → `/linear:update-vision` → confirm the diff → 
 - `VISION.md` at the repo root is the source of truth — this command is one-way (repo → Linear)
 - Two fields are mirrored: `content` (the full document) and `description` (the subtitle, from VISION.md's opening blockquote tagline). Touch no other metadata
 - For existing projects: show what will change, require explicit confirmation before writing
-- For new projects (no `.linear_project`): the user supplies the name, `VISION.md` becomes the initial `content` and its tagline the subtitle, the team is resolved from `uv run .claude/tools/linear_cli.py team list` — no diff exists to confirm
+- For new projects (no `.stride.json`): the user supplies the name, `VISION.md` becomes the initial `content` and its tagline the subtitle, the team is resolved from `uv run .claude/tools/linear_cli.py team list` — no diff exists to confirm
 - If both `content` and subtitle already match `VISION.md`, skip the write — report and stop
 - If `VISION.md` has no opening blockquote, leave the subtitle untouched — never blank an existing one
-- The user's `.linear_project` selection drives which project is updated (or is written on first create)
+- The user's `.stride.json` selection drives which project is updated (or is written on first create)
 
 ---
 
@@ -39,7 +39,7 @@ Read `VISION.md` from the repo root.
 
 ### 2. Resolve project
 
-Check for a `.linear_project` file in the repository root.
+Check for a `.stride.json` file in the repository root.
 
 - If **found**: read the project name from it and continue to step 3.
 - If **not found**: list available projects *(auth per [reference/workflow.md](reference/workflow.md))*:
@@ -50,10 +50,10 @@ Check for a `.linear_project` file in the repository root.
 
   Offer two choices:
 
-  1. **Pick an existing project** — choose from the list. Save the selection to `.linear_project`.
+  1. **Pick an existing project** — choose from the list. Save the selection to `.stride.json`.
   2. **Create a new project** — follow [Create a Linear project](reference/create-project.md).
 
-  Once `.linear_project` exists, check the repo's `.gitignore` — if `.linear_project` isn't listed, append it. Then route: path 1 continues to step 3 (fetch the existing project's `content`), path 2 continues to step 6 (confirm — the create-new flow already wrote `content`, so the fetch / diff / write steps are no-ops).
+  Once `.stride.json` exists, check the repo's `.gitignore` — if `.stride.json` isn't listed, append it. Then route: path 1 continues to step 3 (fetch the existing project's `content`), path 2 continues to step 6 (confirm — the create-new flow already wrote `content`, so the fetch / diff / write steps are no-ops).
 
 ### 3. Get the current project state
 
@@ -61,7 +61,7 @@ Check for a `.linear_project` file in the repository root.
 
 ```bash
 uv run .claude/tools/linear_cli.py project list \
-  | jq -r --arg name "<project-name-from-.linear_project>" '.[] | select(.name == $name) | {id, url, description}'
+  | jq -r --arg name "<project-name-from-.stride.json>" '.[] | select(.name == $name) | {id, url, description}'
 uv run .claude/tools/linear_cli.py get-project-content <project-id>
 ```
 
@@ -74,7 +74,7 @@ Capture:
 - Current subtitle — the `description` from the `project list` filter
 - VISION.md tagline — the extracted blockquote (empty if VISION.md has none)
 
-If no project matches the name, stop and tell the user the name in `.linear_project` doesn't match any project they have access to.
+If no project matches the name, stop and tell the user the name in `.stride.json` doesn't match any project they have access to.
 
 ### 4. Compare and decide
 
@@ -134,8 +134,8 @@ End the command — no further status changes, no follow-up commits.
 ## Error handling
 
 - `VISION.md` missing → stop, suggest `/vision`
-- `.linear_project` missing → resolve interactively per step 2 (pick existing or create new)
-- Project not found in Linear → stop, ask the user to verify `.linear_project`
+- `.stride.json` missing → resolve interactively per step 2 (pick existing or create new)
+- Project not found in Linear → stop, ask the user to verify `.stride.json`
 - `uv run .claude/tools/linear_cli.py team list` returns no teams (create-new path) → stop, ask the user to verify Linear access
 - User declines the diff → stop without writing
 - `update-project-content` / `uv run .claude/tools/linear_cli.py project create` fails → show the error and stop; do not retry silently
