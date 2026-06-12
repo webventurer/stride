@@ -872,7 +872,7 @@ def test_project_config_raises_on_invalid_json():
     with patch("linear.STRIDE_CONFIG_PATH") as path:
         path.exists.return_value = True
         path.read_text.return_value = "project = Stride\napi_key_env = LINEAR_KEY\n"
-        with pytest.raises(Exception):
+        with pytest.raises(LinearError, match="invalid JSON"):
             project_config()
 
 

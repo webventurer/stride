@@ -116,9 +116,19 @@ def migrate_from_legacy() -> dict:
     return config
 
 
+def read_config_json() -> dict:
+    try:
+        return json.loads(STRIDE_CONFIG_PATH.read_text())
+    except json.JSONDecodeError:
+        raise LinearError(
+            f"{STRIDE_CONFIG_PATH} contains invalid JSON — "
+            "fix it or delete it and re-run /linear:setup."
+        )
+
+
 def project_config() -> dict:
     if STRIDE_CONFIG_PATH.exists():
-        return json.loads(STRIDE_CONFIG_PATH.read_text())
+        return read_config_json()
     return migrate_from_legacy()
 
 
