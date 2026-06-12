@@ -249,7 +249,7 @@ Once `VISION.md` is on disk, ask:
 
   > *"Run `/linear:update-vision` whenever you're ready to push."*
 
-**Failure handling.** If `/linear:update-vision` errors out (`.linear_project` missing, project not found, `save_project` fails), do not abort `/vision`. The file *was* written successfully — that's the primary deliverable. Surface the failure clearly, name the retry path, and continue to step 8:
+**Failure handling.** If `/linear:update-vision` errors out (`.stride.json` missing, project not found, `save_project` fails), do not abort `/vision`. The file *was* written successfully — that's the primary deliverable. Surface the failure clearly, name the retry path, and continue to step 8:
 
 > *"Vision was written to `VISION.md`. Linear sync failed: `<error>`. Run `/linear:update-vision` after fixing to retry."*
 

@@ -6,7 +6,7 @@
 
 Talks Linear's GraphQL API directly via `requests`. Reads the bearer
 token from `LINEAR_API_KEY` or from the env var named by
-`.linear_project`'s `api_key_env` field.
+`.stride.json`'s `api_key_env` field.
 
 This module is import-only — for the CLI front-end, see `linear_cli.py`.
 """
@@ -95,31 +95,11 @@ def require_env(name: str) -> str:
     return val
 
 
-LINEAR_PROJECT_PATH = Path(".linear_project")
-
-
-def parse_project_config(text: str) -> dict:
-    config: dict = {}
-    for line in config_lines(text):
-        absorb_config_line(config, line)
-    return config
-
-
-def config_lines(text: str) -> list:
-    return [s for s in (raw.strip() for raw in text.splitlines()) if s and not s.startswith("#")]
-
-
-def absorb_config_line(config: dict, line: str):
-    if "=" in line:
-        k, v = line.split("=", 1)
-        config[k.strip()] = v.strip()
-    elif "project" not in config:
-        # Backward compat: bare project name on first non-comment line.
-        config["project"] = line
+STRIDE_CONFIG_PATH = Path(".stride.json")
 
 
 def project_config() -> dict:
-    return parse_project_config(LINEAR_PROJECT_PATH.read_text()) if LINEAR_PROJECT_PATH.exists() else {}
+    return json.loads(STRIDE_CONFIG_PATH.read_text()) if STRIDE_CONFIG_PATH.exists() else {}
 
 
 def token_from_project_config() -> str | None:
@@ -132,7 +112,7 @@ def bearer_token() -> str:
     if not token:
         raise LinearError(
             "No Linear credentials. Set LINEAR_API_KEY in ~/.env or name "
-            "an api_key_env in .linear_project."
+            "an api_key_env in .stride.json."
         )
     return token
 

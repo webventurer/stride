@@ -76,19 +76,21 @@ The `/linear:start` command already names branches in the format Linear expects 
 
 ## Adapting for your project
 
-The commands resolve the Linear project from a `.linear_project` file in the repo root. If this file does not exist, `/next-steps` and `/plan-work` will ask which project to use and save the selection.
+The commands resolve the Linear project from a `.stride.json` file in the repo root. If this file does not exist, `/next-steps` and `/plan-work` will ask which project to use and save the selection.
 
-- **Team**: resolved from `.linear_project` (or ask the user on first run)
-- **Project**: read from `.linear_project`
+- **Team**: resolved from `.stride.json` (or ask the user on first run)
+- **Project**: read from `.stride.json`
 
-### `.linear_project` format
+### `.stride.json` format
 
+```json
+{
+  "project": "Stride >>>",
+  "api_key_env": "LINEAR_WEBVENTURER_API_KEY"
+}
 ```
-project = Stride >>>
-api_key_env = LINEAR_WEBVENTURER_API_KEY
-```
 
-- `project` — the Linear project name. A bare value on the first non-comment line is read as `project` for backward compatibility.
+- `project` — the Linear project name.
 - `api_key_env` — names the env var in `~/.env` that holds the workspace API key. When set, `linear_cli.py` reads the bearer token from that env var automatically, so per-call `LINEAR_API_KEY=$LINEAR_<X>_API_KEY` wraps aren't needed. Workspace-iterating commands (`/linear:check`, `/linear:setup`, `/linear:list-projects`) still use the explicit wrap since they target multiple workspaces.
 
 Override the resolved token per-call with `LINEAR_API_KEY=<token>`.

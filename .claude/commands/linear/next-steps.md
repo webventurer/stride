@@ -18,17 +18,19 @@ Review what's happening and recommend what to work on next.
 
 ### 0. Resolve project
 
-Check for a `.linear_project` file in the repository root.
+Check for a `.stride.json` file in the repository root.
 
-- If **found**: read the project name from it (parsed as `project = <name>`; bare-name format also accepted for backward compatibility)
-- If **not found**: list available projects (`uv run .claude/tools/linear_cli.py project list` — auth per [reference/workflow.md](reference/workflow.md)), ask the user to choose, then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save both as `.linear_project`:
+- If **found**: read the project name from it (`project` field in JSON)
+- If **not found**: list available projects (`uv run .claude/tools/linear_cli.py project list` — auth per [reference/workflow.md](reference/workflow.md)), ask the user to choose, then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save both as `.stride.json`:
 
+  ```json
+  {
+    "project": "<chosen-project-name>",
+    "api_key_env": "LINEAR_<WORKSPACE>_API_KEY"
+  }
   ```
-  project = <chosen-project-name>
-  api_key_env = LINEAR_<WORKSPACE>_API_KEY
-  ```
 
-  Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it.
+  Then check the repo's `.gitignore` — if `.stride.json` isn't listed, append it.
 
 Use the resolved project name for all Linear API calls in this command.
 
@@ -56,7 +58,7 @@ Read `VISION.md` from the repo root.
 
 ### 2. Fetch data (all calls in parallel)
 
-All `linear_cli.py` calls below read the bearer token from `.linear_project`'s `api_key_env` field automatically — no per-call wrap needed.
+All `linear_cli.py` calls below read the bearer token from `.stride.json`'s `api_key_env` field automatically — no per-call wrap needed.
 
 | Call | Purpose |
 |:-----|:--------|

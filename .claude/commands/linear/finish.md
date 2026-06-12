@@ -341,7 +341,7 @@ This PR changed VISION.md — sync to Linear?
 Then:
 
 1. Read `VISION.md` from the repo root.
-2. Resolve the Linear project from `.linear_project`. Get its id, URL, and current subtitle (`description`) from the project list by name — `uv run .claude/tools/linear_cli.py project get` takes an ID, not a name: `uv run .claude/tools/linear_cli.py project list | jq -r --arg name "<project-name>" '.[] | select(.name == $name) | {id, url, description}'`.
+2. Resolve the Linear project from `.stride.json`. Get its id, URL, and current subtitle (`description`) from the project list by name — `uv run .claude/tools/linear_cli.py project get` takes an ID, not a name: `uv run .claude/tools/linear_cli.py project list | jq -r --arg name "<project-name>" '.[] | select(.name == $name) | {id, url, description}'`.
 3. Fetch the current project `content` via `linear_cli.py` (the Vision lives in `content`, not the length-limited `description`). The subtitle is VISION.md's opening blockquote — the `>` line under the H1 (read it from the file loaded in sub-step 1):
    ```bash
    uv run .claude/tools/linear_cli.py get-project-content <project-id>
@@ -361,7 +361,7 @@ Then:
    ```
    On `n`: skip the writes and continue to step 13.
 
-If any step in the sync flow fails (`.linear_project` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 13. The issue is already Done from step 9 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
+If any step in the sync flow fails (`.stride.json` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 13. The issue is already Done from step 9 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
 
 Track the outcome for the summary in step 13:
 

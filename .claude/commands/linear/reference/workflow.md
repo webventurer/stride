@@ -44,7 +44,7 @@ It's like how every email is called a "message" whether it's a question, an anno
 
 Stride's `/linear:*` skills call `linear_cli.py` (in `.claude/tools/`) — a vendored Python client that talks Linear's GraphQL API directly via `requests`. No external CLI install.
 
-Project-scoped commands read the bearer token from `.linear_project`'s `api_key_env` field automatically — no per-call wrap. Workspace-iterating commands (`/linear:check`, `/linear:setup`, `/linear:list-projects`) wrap each call explicitly with the workspace's env var:
+Project-scoped commands read the bearer token from `.stride.json`'s `api_key_env` field automatically — no per-call wrap. Workspace-iterating commands (`/linear:check`, `/linear:setup`, `/linear:list-projects`) wrap each call explicitly with the workspace's env var:
 
 ```bash
 LINEAR_API_KEY=$LINEAR_<WORKSPACE>_API_KEY uv run .claude/tools/linear_cli.py <verb> ...

@@ -14,7 +14,7 @@ Accepts a description and optional flags: `/plan-work --research --craft --workt
 - `--worktree` — after issue creation, set up an isolated git worktree at `../<repo-dirname>-<issue-id-lowercase>` and hand off to a new Claude Code session (see step 14). `/linear:start` runs inline by default; pass this flag at planning time if the work needs an isolated workspace.
 - `--epic` — skip size-sensing and go straight to the epic-sized parent-issue flow (see step 5). Pass this when you already know the description is a named initiative with multiple stories.
 - `--bug` — skip shape-sensing and draft straight to the bug template (see step 6). Pass this when you already know the description is a bug report (symptoms + repro + gap), not a feature request.
-- `--project <name>` — file the issue against the named Linear project instead of the current repo's `.linear_project`. Skips the Vision check entirely (the current repo's Vision doesn't apply to another project's work). Use this for quick cross-project adds when the target project's repo isn't cloned locally. The target project must exist in Linear; mistyped names fail fast at step 0.
+- `--project <name>` — file the issue against the named Linear project instead of the current repo's `.stride.json`. Skips the Vision check entirely (the current repo's Vision doesn't apply to another project's work). Use this for quick cross-project adds when the target project's repo isn't cloned locally. The target project must exist in Linear; mistyped names fail fast at step 0.
 
 ## Decision rules
 
@@ -52,16 +52,18 @@ Accepts a description and optional flags: `/plan-work --research --craft --workt
 First, check `$ARGUMENTS` for the `--project <name>` flag.
 
 - **If `--project <name>` is present** (cross-project mode): use the flag's value as the project name. **Mark the run as cross-project mode** — step 1 (Vision check) is skipped and step 9 swaps the Vision-grounding requirement for a cross-project note.
-- **Otherwise** (within-project mode), check for a `.linear_project` file in the repository root.
-  - If **found**: read the project name from it (parsed as `project = <name>`; bare-name format also accepted for backward compatibility).
-  - If **not found**: list available projects *(auth per [reference/workflow.md](reference/workflow.md))* and ask the user to choose. Then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save both as `.linear_project`:
+- **Otherwise** (within-project mode), check for a `.stride.json` file in the repository root.
+  - If **found**: read the project name from it (`project` field in JSON).
+  - If **not found**: list available projects *(auth per [reference/workflow.md](reference/workflow.md))* and ask the user to choose. Then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save both as `.stride.json`:
 
-    ```
-    project = <chosen-project-name>
-    api_key_env = LINEAR_<WORKSPACE>_API_KEY
+    ```json
+    {
+      "project": "<chosen-project-name>",
+      "api_key_env": "LINEAR_<WORKSPACE>_API_KEY"
+    }
     ```
 
-    Then check the repo's `.gitignore` — if `.linear_project` isn't listed, append it. The `api_key_env` field lets `linear_cli.py` read the bearer token without a per-call `LINEAR_API_KEY=` wrap.
+    Then check the repo's `.gitignore` — if `.stride.json` isn't listed, append it. The `api_key_env` field lets `linear_cli.py` read the bearer token without a per-call `LINEAR_API_KEY=` wrap.
 
     ```bash
     uv run .claude/tools/linear_cli.py project list
@@ -283,7 +285,7 @@ Only after explicit approval. Write the drafted description to a file first and 
 ```bash
 uv run .claude/tools/linear_cli.py issue create \
   -t <TEAM-KEY> \
-  --project "<project-name from .linear_project>" \
+  --project "<project-name from .stride.json>" \
   --state Backlog \
   --title "<from draft>" \
   --description @<draft-file> \

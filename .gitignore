@@ -1,7 +1,7 @@
 node_modules
 .DS_Store
 *.tgz
-.linear_project
+.stride.json
 .mcp.json
 
 # direnv

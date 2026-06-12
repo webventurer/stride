@@ -85,13 +85,13 @@ time_onboarding() {
     echo "STRIDE_ELAPSED=$((end - start))"
 }
 
-# Untimed: unset LINEAR_API_KEY so auth must resolve via .linear_project.
+# Untimed: unset LINEAR_API_KEY so auth must resolve via .stride.json.
 assert_config_file_auth() {
-    printf 'project = Smoke\napi_key_env = STRIDE_SMOKE_CONFIG_KEY\n' > .linear_project
+    printf '{"project":"Smoke","api_key_env":"STRIDE_SMOKE_CONFIG_KEY"}\n' > .stride.json
     env -u LINEAR_API_KEY STRIDE_SMOKE_CONFIG_KEY="$LINEAR_API_KEY" \
         uv run --with click --with requests .claude/tools/linear_cli.py whoami \
         | jq -e '.authenticated == true' >/dev/null \
-        || { echo "config-file auth path failed: .linear_project -> api_key_env" >&2; exit 1; }
+        || { echo "config-file auth path failed: .stride.json -> api_key_env" >&2; exit 1; }
 }
 
 extract_elapsed() {
