@@ -313,31 +313,7 @@ Only after the PR is confirmed created or already exists. Skip if the issue is a
 
 <mark>**Run `which diffity` before doing anything else in this step.** Do not show the commit list, do not surface the summary, do not ask "does this look right?" — nothing until the diffity check is done.</mark>
 
-**Open the PR in diffity — it is the review surface.** diffity is a localhost diff viewer, independent of the VS Code PR panel, so the visual diff always renders. It is **not** a dependency — if it's missing, skip the visual diff and let the PR on GitHub stand as the diff surface. Never fall back to a terminal `git diff` — no install, no prompt, no error.
-
-```bash
-which diffity || echo "diffity not installed — skipping visual diff"
-```
-
-If diffity is present, open the PR's diff, reusing its launch pattern (check → background-launch → print URL):
-
-1. Launch with the PR URL (from step 13, or the existing PR from step 12), forcing a fresh instance with `--new`. Run it via the Bash tool with `run_in_background: true` — let the tool handle backgrounding, no `&` and no `--quiet`:
-
-   ```bash
-   diffity --new <pr-url>
-   ```
-
-   `--new` matters: diffity reuses any instance already running for the repo and **ignores a new ref**, so without it a stale viewer masks the just-created PR. `--new` is repo-scoped — instances for other repos are left alone.
-
-2. Wait 2 seconds, then read the port and print only the short URL — no session IDs or hashes:
-
-   ```bash
-   diffity list --json
-   ```
-
-   > Diffity is showing the PR diff at http://localhost:5391
-
-If diffity errors at any point, note it in one line and carry on — a broken viewer never blocks the review.
+**Open the PR in diffity — it is the review surface.** Follow the launch procedure in [reference/diffity-review.md](reference/diffity-review.md); the PR URL is from step 13 (or the existing PR from step 12).
 
 Then show the commit list for the user to review:
 
