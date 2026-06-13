@@ -101,7 +101,33 @@ git push -u origin quick/<slug>
 gh pr create --title "<imperative summary>" --body-file <body-file>
 ```
 
-If a PR already exists for the branch (a resumed run), push to it instead of opening a second one. Then surface the URL with the gate prompt: **"PR: \<url\> — ship it? (say `ship` / `ship it` / `quick` / `jfdi` / `go`, or tell me what to change.)"**
+If a PR already exists for the branch (a resumed run), push to it instead of opening a second one.
+
+**Then open the PR in diffity — the visual diff is the review surface, same as [`/linear:start` step 15](start.md).** diffity is a localhost diff viewer independent of the editor's PR panel, so the diff always renders. It is **not** a dependency — if it's missing, skip it and let the PR on GitHub stand as the diff surface. Never fall back to a terminal `git diff`.
+
+```bash
+which diffity || echo "diffity not installed — skipping visual diff"
+```
+
+If diffity is present, open the PR's diff (check → background-launch → print URL):
+
+1. Launch with the PR URL, forcing a fresh instance with `--new` — diffity reuses any instance already running for the repo and **ignores a new ref** without it, so a stale viewer would mask the just-created PR. Run it via the Bash tool with `run_in_background: true` — no `&`, no `--quiet`:
+
+   ```bash
+   diffity --new <pr-url>
+   ```
+
+2. Wait 2 seconds, then read the port and print only the short URL:
+
+   ```bash
+   diffity list --json
+   ```
+
+   > Diffity is showing the PR diff at http://localhost:5391
+
+If diffity errors at any point, note it in one line and carry on — a broken viewer never blocks the review.
+
+Then surface the URL with the gate prompt: **"PR: \<url\> — ship it? (say `ship` / `ship it` / `quick` / `jfdi` / `go`, or tell me what to change.)"**
 
 If the user requests changes, make them, re-validate (step 4), push to the same PR (`git push`, or `--force-with-lease` after a squash), and show the updated diff. Repeat until they say a ship phrase. <mark>**Opening the PR is reversible; the merge is not. Until a ship phrase, do nothing irreversible — above all, no merge.**</mark>
 
