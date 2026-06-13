@@ -79,8 +79,11 @@ Never inflate implementation work into fake product impact to fill the Outcome o
 
 ```
 Outcome: <one plain-English sentence — what the product/feature does differently>
+
 Why it matters: <one sentence — what this unlocks or how it moves the project forward>
+
 User-visible change: <yes — [what a user sees] | no — internal change supporting [X]>
+
 Needs your call? <none | specific decision or risk — one sentence>
 
 WB-XXX — <title>
@@ -103,9 +106,13 @@ Does this look right?
 
 ```
 ✓ WB-XXX — <title> — Done
+
 Outcome: <one sentence — what the product/feature does differently>
+
 Why it matters: <one sentence — what this unlocks or how it moves the project forward>
+
 User-visible change: <yes — [what] | no — internal change supporting [X]>
+
 PR: <url>
 Build: passed
 [Milestone: <name> — complete / <n> remaining — if applicable]
