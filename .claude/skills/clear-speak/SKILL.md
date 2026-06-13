@@ -13,7 +13,7 @@ Rewrite academic and abstract language into words that land immediately.
 
 <mark>**Scope: stride's own writing, not a general prose rewriter.**</mark> Command files, issue/commit/README text, and the things stride produces. Pointed at arbitrary prose it drifts toward "not stride's job" — stride's purpose is the Linear/commit workflow, not a general writing utility.
 
-> **The on-demand companion to the always-on rule.** stride's plain-language rule keeps *new* command output plain by default; `/clear-speak` is the tool you reach for to *fix* text that has already drifted into jargon, anywhere in the repo.
+> **The canonical home of stride's plain-language rule — and the on-demand tool.** stride's commands point here for the always-on standard that keeps *new* output plain (`output-focus.md`, `/linear:finish`, `/linear:plan-work` all link to this skill); `/clear-speak` applies that same standard as a tool you invoke to *fix* text that has already drifted into jargon, anywhere in the repo.
 
 ## When to use
 
