@@ -111,9 +111,18 @@ def migrate_from_legacy() -> dict:
     if not LEGACY_CONFIG_PATH.exists():
         return {}
     config = parse_legacy_config(LEGACY_CONFIG_PATH.read_text())
+    require_project(config)
     STRIDE_CONFIG_PATH.write_text(json.dumps(config, indent=2) + "\n")
     LEGACY_CONFIG_PATH.unlink()
     return config
+
+
+def require_project(config: dict):
+    if not config.get("project"):
+        raise LinearError(
+            f"{LEGACY_CONFIG_PATH} is malformed (no project found) — left in "
+            "place. Fix it or delete it and re-run /linear:setup."
+        )
 
 
 def read_config_json() -> dict:
