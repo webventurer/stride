@@ -127,9 +127,7 @@ def read_config_json() -> dict:
 
 
 def project_config() -> dict:
-    if STRIDE_CONFIG_PATH.exists():
-        return read_config_json()
-    return migrate_from_legacy()
+    return read_config_json() if STRIDE_CONFIG_PATH.exists() else {}
 
 
 def token_from_project_config() -> str | None:
@@ -141,8 +139,9 @@ def bearer_token() -> str:
     token = os.environ.get("LINEAR_API_KEY") or token_from_project_config()
     if not token:
         raise LinearError(
-            "No Linear credentials. Set LINEAR_API_KEY in ~/.env or name "
-            "an api_key_env in .stride.json."
+            "No Linear credentials. Run /linear:setup to create .stride.json "
+            "(it also upgrades a legacy .linear_project), or set LINEAR_API_KEY "
+            "in ~/.env."
         )
     return token
 
