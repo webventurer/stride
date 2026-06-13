@@ -22,6 +22,7 @@ import click
 sys.path.insert(0, str(Path(__file__).parent))
 
 from linear import (  # noqa: E402
+    backfill_focus,
     bearer_token,
     create_attachment,
     create_comment,
@@ -190,6 +191,11 @@ def provision_states_cmd(team_key: str):
 @cli.command("migrate-legacy-config")
 def migrate_legacy_config_cmd():
     echo_json(migrate_from_legacy())
+
+
+@cli.command("backfill-focus")
+def backfill_focus_cmd():
+    echo_json(backfill_focus())
 
 
 # ---- Issue / comment / team / project / label / whoami subgroups ----

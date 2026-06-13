@@ -67,9 +67,17 @@ uv run .claude/tools/linear_cli.py migrate-legacy-config
 
 A legacy file is rewritten as `.stride.json` and deleted, so a previously legacy-pinned repo now reads as **already pinned** in the check below — that's what stops setup from creating a duplicate project. If the migration wrote `.stride.json`, append it to `.gitignore` when it isn't already listed.
 
+Then materialise the `focus` default into an existing config that predates the field. This writes `"focus": "outcome"` into a `.stride.json` that lacks it, and is a no-op when the file is missing or already has `focus` (an explicit `"technical"` is never clobbered):
+
+```bash
+uv run .claude/tools/linear_cli.py backfill-focus
+```
+
+Setup is the single place `focus` is materialised — the output-generating commands only ever *read* it (falling back to `outcome` when absent), so running them never rewrites the config as a side effect.
+
 Then check for `.stride.json` at the repo root:
 
-- **Present** → the repo is pinned (already, or just migrated); skip silently. Re-running setup never re-creates a project.
+- **Present** → the repo is pinned (already, or just migrated), and `focus` is now materialised; skip silently. Re-running setup never re-creates a project.
 - **Missing** → the repo is genuinely unpinned. Ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.stride.json` (`project`, `api_key_env`, and `focus`), and updates `.gitignore`.
 
 ### 7. Summary

@@ -97,6 +97,7 @@ def require_env(name: str) -> str:
 
 STRIDE_CONFIG_PATH = Path(".stride.json")
 LEGACY_CONFIG_PATH = Path(".linear_project")
+DEFAULT_FOCUS = "outcome"
 
 
 def parse_legacy_config(text: str) -> dict:
@@ -107,12 +108,16 @@ def parse_legacy_config(text: str) -> dict:
     return config
 
 
+def write_config(config: dict) -> None:
+    STRIDE_CONFIG_PATH.write_text(json.dumps(config, indent=2) + "\n")
+
+
 def migrate_from_legacy() -> dict:
     if not LEGACY_CONFIG_PATH.exists():
         return {}
     config = parse_legacy_config(LEGACY_CONFIG_PATH.read_text())
     require_project(config)
-    STRIDE_CONFIG_PATH.write_text(json.dumps(config, indent=2) + "\n")
+    write_config(config)
     LEGACY_CONFIG_PATH.unlink()
     return config
 
@@ -137,6 +142,14 @@ def read_config_json() -> dict:
 
 def project_config() -> dict:
     return read_config_json() if STRIDE_CONFIG_PATH.exists() else {}
+
+
+def backfill_focus() -> dict:
+    config = project_config()
+    if config and "focus" not in config:
+        config["focus"] = DEFAULT_FOCUS
+        write_config(config)
+    return config
 
 
 def token_from_project_config() -> str | None:
