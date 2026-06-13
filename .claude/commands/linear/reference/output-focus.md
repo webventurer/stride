@@ -73,6 +73,8 @@ Never inflate implementation work into fake product impact to fill the Outcome o
 
 ## Command output shapes
 
+> **Plain language throughout.** Every "plain-English sentence" in the templates below follows the [`/clear-speak` skill](../../../skills/clear-speak/SKILL.md) — stride's canonical standard for what counts as jargon and how to replace it. Write each summary so a non-engineer can scan it top-to-bottom.
+
 ### `/linear:start` step 15 and `/linear:fix` step 11 (review gate)
 
 **Outcome mode:**
