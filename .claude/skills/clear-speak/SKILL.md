@@ -49,9 +49,9 @@ Drawn from stride's own writing:
 
 Academic language creates distance. Clear speak creates connection.
 
-## Required reading
+## Background reading
 
-Before applying this skill, read these foundational documents:
+The test, the quick transformations, and the principle above are enough for most rewrites. These docs flesh out the reasoning — open the relevant one on demand when you need the deeper detail, not on every rewrite:
 
 1. `writing/george-orwell-rules-for-writing.md` — the six rules
 2. `writing/write-clearly-simply-with-action.md` — clarity, simplicity, action

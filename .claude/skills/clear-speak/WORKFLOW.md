@@ -6,9 +6,9 @@ Replace fancy words with ones that land immediately. Academic language creates b
 
 ---
 
-## Required reading
+## Background reading
 
-Before applying this skill, read these foundational documents:
+The essentials are inlined below. Open a full document only when you need its deeper detail or examples — don't load all three on every rewrite:
 
 1. **George Orwell's six rules** — `writing/george-orwell-rules-for-writing.md`
    - Never use a long word where a short one will do
