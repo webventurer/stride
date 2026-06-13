@@ -54,6 +54,7 @@ from linear import (  # noqa: E402
     list_projects,
     list_team_states,
     list_teams,
+    migrate_from_legacy,
     milestone_open_issues,
     min_backlog_sort_order,
     operation_name,
@@ -859,6 +860,30 @@ def test_project_config_does_not_migrate_legacy_when_file_missing():
         legacy_path.exists.return_value = True
         assert project_config() == {}
         assert not legacy_path.unlink.called
+
+
+def test_migrate_from_legacy_round_trip(tmp_path: Path):
+    stride = tmp_path / ".stride.json"
+    legacy = tmp_path / ".linear_project"
+    legacy.write_text("project = Round Trip\napi_key_env = LINEAR_RT_API_KEY\n")
+    expected = {"project": "Round Trip", "api_key_env": "LINEAR_RT_API_KEY"}
+    with patch("linear.STRIDE_CONFIG_PATH", stride), \
+         patch("linear.LEGACY_CONFIG_PATH", legacy):
+        assert migrate_from_legacy() == expected
+    assert json.loads(stride.read_text()) == expected
+    assert not legacy.exists()
+
+
+def test_migrate_from_legacy_keeps_original_when_malformed(tmp_path: Path):
+    stride = tmp_path / ".stride.json"
+    legacy = tmp_path / ".linear_project"
+    legacy.write_text("# only a comment, no project\n")
+    with patch("linear.STRIDE_CONFIG_PATH", stride), \
+         patch("linear.LEGACY_CONFIG_PATH", legacy):
+        with pytest.raises(LinearError, match="malformed"):
+            migrate_from_legacy()
+    assert legacy.read_text() == "# only a comment, no project\n"
+    assert not stride.exists()
 
 
 def test_project_config_raises_on_invalid_json():
