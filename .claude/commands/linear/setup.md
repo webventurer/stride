@@ -59,17 +59,18 @@ Surface this as a closing note; setup can't do it for them.
 
 Provisioning readies a *team's* board; a repo also needs to know *which project* its `/linear:*` issues belong to — that binding is `.stride.json` at the repo root. Setup offers to create it when missing, so a fresh repo reaches a working board in one command.
 
-Check for `.stride.json` at the repo root.
+First, migrate any legacy `.linear_project` pin (INI-style, from before stride moved to `.stride.json`). This is a no-op when there's no legacy file, so it's always safe to run before the check:
 
-- **Present** → the repo is already pinned; skip silently. Re-running setup never re-creates a project.
-- **Missing** → the repo may still be pinned under the **legacy** `.linear_project` (INI-style) from before stride moved to `.stride.json`. Migrate it before ever offering to create a project — otherwise setup duplicates a project the repo already had:
+```bash
+uv run .claude/tools/linear_cli.py migrate-legacy-config
+```
 
-  ```bash
-  uv run .claude/tools/linear_cli.py migrate-legacy-config
-  ```
+A legacy file is rewritten as `.stride.json` and deleted, so a previously legacy-pinned repo now reads as **already pinned** in the check below — that's what stops setup from creating a duplicate project. If the migration wrote `.stride.json`, append it to `.gitignore` when it isn't already listed.
 
-  - **Returns a non-empty object** (e.g. `{"project": "...", "api_key_env": "..."}`) → the legacy `.linear_project` was migrated: `.stride.json` is now written from it and `.linear_project` deleted. The repo is pinned to its **existing** project — **do not create a new one**. Append `.stride.json` to `.gitignore` if it isn't already listed, and skip to step 7.
-  - **Returns `{}`** → no legacy config either; the repo is genuinely unpinned. Ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.stride.json` (`project`, `api_key_env`, and `focus`), and updates `.gitignore`.
+Then check for `.stride.json` at the repo root:
+
+- **Present** → the repo is pinned (already, or just migrated); skip silently. Re-running setup never re-creates a project.
+- **Missing** → the repo is genuinely unpinned. Ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.stride.json` (`project`, `api_key_env`, and `focus`), and updates `.gitignore`.
 
 ### 7. Summary
 
