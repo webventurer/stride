@@ -847,25 +847,18 @@ def test_project_config_reads_json_fields():
 
 
 def test_project_config_returns_empty_when_file_missing():
-    with patch("linear.STRIDE_CONFIG_PATH") as stride_path, \
-         patch("linear.LEGACY_CONFIG_PATH") as legacy_path:
+    with patch("linear.STRIDE_CONFIG_PATH") as stride_path:
         stride_path.exists.return_value = False
-        legacy_path.exists.return_value = False
         assert project_config() == {}
 
 
-def test_project_config_migrates_from_legacy_on_first_run():
-    data = {"project": "Test Project", "api_key_env": "LINEAR_TEST_API_KEY"}
-    legacy_text = "project = Test Project\napi_key_env = LINEAR_TEST_API_KEY\n"
-    written = {}
+def test_project_config_does_not_migrate_legacy_when_file_missing():
     with patch("linear.STRIDE_CONFIG_PATH") as stride_path, \
          patch("linear.LEGACY_CONFIG_PATH") as legacy_path:
         stride_path.exists.return_value = False
         legacy_path.exists.return_value = True
-        legacy_path.read_text.return_value = legacy_text
-        stride_path.write_text.side_effect = lambda t: written.update({"text": t})
-        assert project_config() == data
-        assert legacy_path.unlink.called
+        assert project_config() == {}
+        assert not legacy_path.unlink.called
 
 
 def test_project_config_raises_on_invalid_json():
