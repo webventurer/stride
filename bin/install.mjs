@@ -99,6 +99,7 @@ const DIRS = [
   ".claude/skills/commit",
   ".claude/skills/craft",
   ".claude/skills/vision",
+  ".claude/skills/clear-speak",
   ".claude/commands/linear",
   ".claude/hooks",
   ".claude/stride/docs/patterns/git",

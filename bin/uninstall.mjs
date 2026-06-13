@@ -26,6 +26,7 @@ const DIRS = [
   ".claude/skills/commit",
   ".claude/skills/craft",
   ".claude/skills/vision",
+  ".claude/skills/clear-speak",
   ".claude/commands/linear",
   ".claude/hooks",
   ".claude/stride/docs/patterns/git",
@@ -125,6 +126,7 @@ function main() {
   console.log("  skills/vision/   (project Vision authoring skill)");
   console.log("  skills/commit/   (4-pass atomic commit skill)");
   console.log("  skills/craft/    (CRAFT prompt skill)");
+  console.log("  skills/clear-speak/ (plain-language rewrite skill)");
   console.log("  commands/linear/ (Linear workflow commands)");
   console.log("  hooks/           (commit hook scripts)");
   console.log("  stride/docs/     (principles, patterns, concepts)");
