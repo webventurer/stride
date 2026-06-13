@@ -41,6 +41,7 @@ from linear import (  # noqa: E402
     list_team_states,
     list_teams,
     milestone_open_issues,
+    migrate_from_legacy,
     min_backlog_sort_order,
     project_content,
     provision_states,
@@ -184,6 +185,11 @@ def state_drift_cmd(team_key: str):
 )
 def provision_states_cmd(team_key: str):
     echo_json(provision_states(team_key))
+
+
+@cli.command("migrate-legacy-config")
+def migrate_legacy_config_cmd():
+    echo_json(migrate_from_legacy())
 
 
 # ---- Issue / comment / team / project / label / whoami subgroups ----

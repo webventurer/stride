@@ -1000,3 +1000,12 @@ def test_project_create_expands_at_file_content(tmp_path: Path):
 
     assert result.exit_code == 0, result.output
     assert mock.call_args.kwargs["content"] == "# Vision: stride"
+
+
+def test_migrate_legacy_config_emits_migrated_config_as_json():
+    config = {"project": "AI Thought Partner", "api_key_env": "LINEAR_PERSONAL_API_KEY"}
+    with patch("linear_cli.migrate_from_legacy", return_value=config):
+        result = CliRunner().invoke(linear_cli.cli, ["migrate-legacy-config"])
+
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output) == config
