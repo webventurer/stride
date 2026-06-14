@@ -206,7 +206,17 @@ If the project has tests, run them too. Fix any failures.
 
 Re-validate after fixes until the build passes cleanly.
 
-### 9. Review scope
+### 9. Working-tree review
+
+Surface the working tree in diffity *before* committing, while fixes are still cheap — an edit + re-stage now beats a fix-commit + force-push once a PR exists.
+
+<mark>**diffity absent → skip this step silently.**</mark> No prompt, no terminal `git diff` fallback — the step-16 post-PR review is the backstop.
+
+If diffity is present, launch it following [reference/diffity-review.md](reference/diffity-review.md) — same `which` check, wait, and short-URL surfacing — but with `diffity --new main` instead of a PR URL (`--compare` defaults to the working tree, so it shows everything diverging from `main`, committed or not). Surface the URL, then ask: **"Eyeball the working diff — anything to fix before I commit?"** If the user flags something, fix it, re-validate (step 8), refresh with `diffity --new main`, and ask again. When they're happy, continue.
+
+This pass and the step-16 review catch different things — this is the pre-squash working tree; step 16 is the reviewer's-eye diff (post-squash, vs merge-base). Keep both.
+
+### 10. Review scope
 
 Run these commands to understand what the PR will contain:
 
@@ -218,13 +228,13 @@ git log main..HEAD --oneline
 
 Warn if no commits ahead of main (stop — nothing to ship). Warn if changed files look unrelated to the issue.
 
-### 10. Auto-squash similar commits
+### 11. Auto-squash similar commits
 
-Iterative refinement during step 7 leaves journey-shaped commits — "first attempt", "wait that broke X", "format pass". Before push, group them by purpose and rewrite the messages to describe **where you ended up**, not how you got there. The agent makes the call automatically — the user gates via terminal review (step 15).
+Iterative refinement during step 7 leaves journey-shaped commits — "first attempt", "wait that broke X", "format pass". Before push, group them by purpose and rewrite the messages to describe **where you ended up**, not how you got there. The agent makes the call automatically — the user gates via terminal review (step 16).
 
 **Fast path.** If `git log main..HEAD --oneline` shows a single commit, skip this step entirely.
 
-**Algorithm.** Otherwise, with the diffs from step 9 in context:
+**Algorithm.** Otherwise, with the diffs from step 10 in context:
 
 1. **Group by purpose.** Walk `git log main..HEAD --oneline` and decide which commits serve the same purpose. Signals that two commits belong together:
    - They touch the same file(s) for the same reason (e.g. consecutive edits to one skill prompt while iterating on it)
@@ -265,21 +275,21 @@ Iterative refinement during step 7 leaves journey-shaped commits — "first atte
 
    Confirm the diff stat matches what was there before the squash (file changes preserved) and that the new commit count is ≤ the old count.
 
-**Reflog as recovery.** If anything goes wrong — or the user objects in step 15 — `git reflog` plus `git reset --hard <pre-squash-sha>` returns to the original commits.
+**Reflog as recovery.** If anything goes wrong — or the user objects in step 16 — `git reflog` plus `git reset --hard <pre-squash-sha>` returns to the original commits.
 
-### 11. Push
+### 12. Push
 
 Run `git push -u origin <current-branch>` if the branch has not been pushed yet.
 
 If this is a resume run and the branch was already pushed before the squash, use `git push --force-with-lease` instead. The squash rewrote SHAs; force-with-lease succeeds only if the remote tip matches what was last fetched, so it can't silently overwrite someone else's work.
 
-### 12. Check for existing PR
+### 13. Check for existing PR
 
 Run `gh pr list --head <branch> url,number`.
 
-If a PR already exists, show the URL and skip to step 14.
+If a PR already exists, show the URL and skip to step 15.
 
-### 13. Create PR
+### 14. Create PR
 
 Run `gh pr create`:
 
@@ -305,7 +315,7 @@ Then create the PR with `--body-file`:
 gh pr create --title "<title>" --body-file <body-file>
 ```
 
-### 14. Update Linear status → In Review
+### 15. Update Linear status → In Review
 
 ```bash
 uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state "In Review"
@@ -313,11 +323,11 @@ uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state "In Review"
 
 Only after the PR is confirmed created or already exists. Skip if the issue is already In Review. Warn (but proceed) if the issue is Done.
 
-### 15. Review
+### 16. Review
 
 <mark>**Run `which diffity` before doing anything else in this step.** Do not show the commit list, do not surface the summary, do not ask "does this look right?" — nothing until the diffity check is done.</mark>
 
-**Open the PR in diffity — it is the review surface.** Follow the launch procedure in [reference/diffity-review.md](reference/diffity-review.md); the PR URL is from step 13 (or the existing PR from step 12).
+**Open the PR in diffity — it is the review surface.** Follow the launch procedure in [reference/diffity-review.md](reference/diffity-review.md); the PR URL is from step 14 (or the existing PR from step 13).
 
 Then show the commit list for the user to review:
 
@@ -331,7 +341,7 @@ Ask: **"Does this look right, or do you want changes?"**
 
 If the user requests changes, make them, re-validate (step 8), commit, push, and refresh diffity on the updated PR (re-launch with `--new`). Repeat until the user is satisfied.
 
-If the user objects to a squash from step 10 ("don't squash these"), recover via `git reflog` to find the pre-squash SHA, then `git reset --hard <sha>`, then re-push with `--force-with-lease`.
+If the user objects to a squash from step 11 ("don't squash these"), recover via `git reflog` to find the pre-squash SHA, then `git reset --hard <sha>`, then re-push with `--force-with-lease`.
 
 <mark>**When the user approves, stop. Do not merge.** Say "Ready for `/finish` when you are" and end. Merging is `/finish`'s job — it uses `--merge` to preserve atomic commits. Never use `--squash`.</mark>
 

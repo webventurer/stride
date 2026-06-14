@@ -35,7 +35,7 @@ Pick the first sub-issue that isn't already `In Review` or `Done`. Run the full 
 
 ## E3. Stop at the PR — every time
 
-After the sub-issue reaches its PR and terminal review (step 15), **stop**. Do not merge, do not start the next sub-issue. Surface:
+After the sub-issue reaches its PR and terminal review (step 16), **stop**. Do not merge, do not start the next sub-issue. Surface:
 
 ```
 <SUB-X> is in review: <PR URL>

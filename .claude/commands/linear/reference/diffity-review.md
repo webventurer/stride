@@ -1,6 +1,6 @@
 # Open a PR diff in diffity
 
-The shared launch procedure for surfacing a PR's diff in diffity — a localhost diff viewer, independent of the editor's PR panel, so the visual diff always renders. Called at the review step of [`/linear:start`](../start.md) and [`/linear:quick`](../quick.md); each command decides *when* in its flow to invoke this and keeps its own framing around it.
+The shared launch procedure for surfacing a diff in diffity — a localhost diff viewer, independent of the editor's PR panel, so the visual diff always renders. The diff is usually a PR (`diffity --new <pr-url>`), but the same mechanics surface the working tree vs `main` (`diffity --new main`). Called at the review steps of [`/linear:start`](../start.md) — working tree before commit, and the PR after — and [`/linear:quick`](../quick.md); each command decides *when* in its flow to invoke this and keeps its own framing around it.
 
 <mark>**diffity is not a dependency.**</mark> If it's missing, skip the visual diff and let the PR on GitHub stand as the diff surface. Never fall back to a terminal `git diff` — no install, no prompt, no error.
 
