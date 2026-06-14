@@ -1,6 +1,6 @@
 # Plan work and create a Linear issue
 
-Accepts a description and optional flags: `/plan-work --research --craft --worktree --epic --bug --project <name> "add error handling to API calls"`. With `--worktree`, the command also sets up an isolated git worktree for the new issue after creation. With `--epic`, it skips size-sensing and goes straight to the parent-issue flow. With `--bug`, it skips shape-sensing and drafts straight to the bug template. With `--project`, it files the issue against a different Linear project and skips the Vision check (for quick adds when the target repo isn't cloned locally).
+Accepts a description and optional flags: `/plan-work --research --craft --epic --bug --project <name> "add error handling to API calls"`. With `--epic`, it skips size-sensing and goes straight to the parent-issue flow. With `--bug`, it skips shape-sensing and drafts straight to the bug template. With `--project`, it files the issue against a different Linear project and skips the Vision check (for quick adds when the target repo isn't cloned locally).
 
 ## Modes
 
@@ -11,7 +11,6 @@ Accepts a description and optional flags: `/plan-work --research --craft --workt
 
 - `--research` — explore codebase and Linear before drafting (adds implementation notes, code examples, related code and issues)
 - `--craft` — auto-run CRAFT prompt refinement without asking (skips the interactive prompt in step 4)
-- `--worktree` — after issue creation, set up an isolated git worktree at `../<repo-dirname>-<issue-id-lowercase>` and hand off to a new Claude Code session (see step 14). `/linear:start` runs inline by default; pass this flag at planning time if the work needs an isolated workspace.
 - `--epic` — skip size-sensing and go straight to the epic-sized parent-issue flow (see step 5). Pass this when you already know the description is a named initiative with multiple stories.
 - `--bug` — skip shape-sensing and draft straight to the bug template (see step 6). Pass this when you already know the description is a bug report (symptoms + repro + gap), not a feature request.
 - `--project <name>` — file the issue against the named Linear project instead of the current repo's `.stride.json`. Skips the Vision check entirely (the current repo's Vision doesn't apply to another project's work). Use this for quick cross-project adds when the target project's repo isn't cloned locally. The target project must exist in Linear; mistyped names fail fast at step 0.
@@ -109,7 +108,9 @@ Read `VISION.md` from the repo root.
 
 ### 2. Parse arguments
 
-Extract the description and flags from `$ARGUMENTS`. Determine if `--research`, `--craft`, `--worktree`, `--epic`, and/or `--bug` are present. (`--project` is parsed earlier in step 0 because project resolution and the Vision-check skip both depend on it.)
+Extract the description and flags from `$ARGUMENTS`. Determine if `--research`, `--craft`, `--epic`, and/or `--bug` are present. (`--project` is parsed earlier in step 0 because project resolution and the Vision-check skip both depend on it.)
+
+If `--worktree` is passed, it's no longer valid here — error and stop: *"`--worktree` is now part of `/linear:start`. File the issue first, then `/linear:start <id> --worktree` from the new session."*
 
 ### 3. Duplicate check (all modes)
 
@@ -306,58 +307,6 @@ Display:
 - Linear issue identifier (e.g., PG-184)
 - URL to the issue
 - Branch name from Linear's `gitBranchName` field
-
-### 14. Set up worktree (only with `--worktree`)
-
-Skip if `--worktree` was not passed in step 2. Otherwise, set up an isolated worktree for the new issue.
-
-Resolve the worktree path from the repo name and issue ID:
-
-```
-../<repo-dirname>-<issue-id-lowercase>
-```
-
-For example, if the repo is `lander` and the issue is `PG-210`, the worktree path is `../lander-pg-210`.
-
-Create the worktree using the branch name from Linear's `gitBranchName`:
-
-```bash
-git worktree add ../<repo-dirname>-<issue-id-lowercase> -b <gitBranchName>
-```
-
-Open VS Code in the worktree:
-
-```bash
-code <worktree-path>
-```
-
-If `code` is not found, warn the user:
-
-```
-⚠ `code` command not found. VS Code must be open in the worktree for the workflow to work.
-
-Fix: open VS Code, press Cmd+Shift+P, run "Shell Command: Install 'code' command in PATH".
-
-For VS Code Insiders, add to ~/.bash_profile or ~/.zprofile:
-export PATH="$PATH:/Applications/Visual Studio Code - Insiders.app/Contents/Resources/app/bin"
-```
-
-Then display the worktree summary and end the command — the user continues in a new Claude Code session:
-
-```
-The worktree is ready:
-
-- Path: <absolute-worktree-path>
-- Branch: <branch-name>
-- Linear: <issue-id> — <status>
-
-Open a Claude Code session there with:
-
-cd <absolute-worktree-path>
-claude
-
-Then run /linear:start <issue-id> — it will pick up the branch and continue from the Vision check onwards.
-```
 
 ## Error handling
 
