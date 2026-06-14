@@ -26,7 +26,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, "..");
 const destRoot = process.cwd();
 
-const STRIDE_SETTINGS = {
+export const STRIDE_SETTINGS = {
   hooks: {
     UserPromptSubmit: [
       {
@@ -67,25 +67,25 @@ function ask(question) {
   });
 }
 
-function deepMerge(base, overlay) {
+export function deepMerge(base, overlay) {
   for (const [key, val] of Object.entries(overlay)) {
     base[key] = mergeValue(base[key], val);
   }
   return base;
 }
 
-function mergeValue(existing, val) {
+export function mergeValue(existing, val) {
   if (isObject(existing) && isObject(val)) return deepMerge(existing, val);
   if (Array.isArray(existing) && Array.isArray(val))
     return dedupeHooks(existing, val);
   return val;
 }
 
-function isObject(v) {
+export function isObject(v) {
   return v !== null && typeof v === "object" && !Array.isArray(v);
 }
 
-function dedupeHooks(existing, incoming) {
+export function dedupeHooks(existing, incoming) {
   for (const item of incoming) {
     const isDupe = existing.some(
       (e) => JSON.stringify(e) === JSON.stringify(item),
@@ -453,4 +453,9 @@ async function main() {
   logAvailableSkills();
 }
 
-main();
+function isMainModule() {
+  if (!process.argv[1]) return false;
+  return realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
+}
+
+if (isMainModule()) main();
