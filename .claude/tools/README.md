@@ -110,3 +110,17 @@ python -m pytest .claude/tools/tests/test_linear.py
 
 Tiny OpenRouter CLI used by the `chorus` / plan-work feedback loops.
 Not part of the Linear client — just shares the same `.claude/tools/` home.
+
+## `stride_port.py`
+
+Prints the next free TCP port from a base (default 5000) — for parallel
+worktree streams whose dev servers would otherwise collide on the same
+default port. Splice it into any run command:
+
+```bash
+flask run --port "$(uv run .claude/tools/stride_port.py)"
+uv run .claude/tools/stride_port.py 8000   # honours a base; scans upward
+```
+
+Probes upward from the base (100 ports) and errors if none is free. One
+job — finding a port — no framework knowledge, no process management.
