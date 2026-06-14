@@ -122,5 +122,13 @@ flask run --port "$(uv run .claude/tools/stride_port.py)"
 uv run .claude/tools/stride_port.py 8000   # honours a base; scans upward
 ```
 
-Probes upward from the base (100 ports) and errors if none is free. One
-job — finding a port — no framework knowledge, no process management.
+Probes upward from the base (100 ports) and errors if none is free.
+
+`--run` adds an interactive launcher for people who'd rather not remember
+the shell-substitution: it asks which framework you're running (Flask,
+Vite/Node, Django, Rails, http.server, or a custom command), finds a free
+port, and starts it.
+
+```bash
+uv run .claude/tools/stride_port.py --run
+```
