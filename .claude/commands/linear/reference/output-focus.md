@@ -67,7 +67,7 @@ Never inflate implementation work into fake product impact to fill the Outcome o
 | **Footprint-audit line** | Omitted | Shown |
 | **Cleanup table** | Omitted | Shown |
 | **Vision alignment prose** | Omitted | Shown |
-| **Set via** | `.stride.json` `"focus": "outcome"` or absent | `.stride.json` `"focus": "technical"` |
+| **Set via** | `.stride.json` `"focus": "outcome"` (materialised by `/linear:setup`; absent reads the same) | `.stride.json` `"focus": "technical"` |
 
 ---
 

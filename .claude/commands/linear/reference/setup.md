@@ -93,7 +93,7 @@ The commands resolve the Linear project from a `.stride.json` file in the repo r
 
 - `project` — the Linear project name.
 - `api_key_env` — names the env var in `~/.env` that holds the workspace API key. When set, `linear_cli.py` reads the bearer token from that env var automatically, so per-call `LINEAR_API_KEY=$LINEAR_<X>_API_KEY` wraps aren't needed. Workspace-iterating commands (`/linear:check`, `/linear:setup`, `/linear:list-projects`) still use the explicit wrap since they target multiple workspaces.
-- `focus` — controls the abstraction level of command output. `"outcome"` (default) — commands answer "what shipped, what's different for the user, how have we moved forward?"; `"technical"` — full implementation narrative, decisions, and the torch. Omit the field to get `"outcome"` behaviour.
+- `focus` — controls the abstraction level of command output. `"outcome"` (the materialised default) — commands answer "what shipped, what's different for the user, how have we moved forward?"; `"technical"` — full implementation narrative, decisions, and the torch. `/linear:setup` writes the field into every `.stride.json`, so it's always present after setup; a config that predates the field still reads as `"outcome"` until the next setup run materialises it.
 
 Override the resolved token per-call with `LINEAR_API_KEY=<token>`.
 

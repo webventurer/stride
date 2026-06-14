@@ -25,7 +25,9 @@ sys.path.insert(0, str(TOOLS_DIR))
 
 import linear_cli  # noqa: E402
 from linear import (  # noqa: E402
+    DEFAULT_FOCUS,
     LinearError,
+    backfill_focus,
     looks_like_uuid,
     read_text_arg,
     bearer_token,
@@ -883,6 +885,42 @@ def test_migrate_from_legacy_keeps_original_when_malformed(tmp_path: Path):
         with pytest.raises(LinearError, match="malformed"):
             migrate_from_legacy()
     assert legacy.read_text() == "# only a comment, no project\n"
+    assert not stride.exists()
+
+
+# ---- WB-561: setup backfills focus into an existing focus-less config ----
+
+
+def test_backfill_focus_adds_default_when_missing(tmp_path: Path):
+    stride = tmp_path / ".stride.json"
+    stride.write_text('{\n  "project": "Foo",\n  "api_key_env": "LINEAR_FOO_API_KEY"\n}\n')
+    expected = {"project": "Foo", "api_key_env": "LINEAR_FOO_API_KEY", "focus": DEFAULT_FOCUS}
+    with patch("linear.STRIDE_CONFIG_PATH", stride):
+        assert backfill_focus() == expected
+    assert json.loads(stride.read_text()) == expected
+
+
+def test_backfill_focus_appends_focus_last(tmp_path: Path):
+    stride = tmp_path / ".stride.json"
+    stride.write_text('{\n  "project": "Foo",\n  "api_key_env": "LINEAR_FOO_API_KEY"\n}\n')
+    with patch("linear.STRIDE_CONFIG_PATH", stride):
+        backfill_focus()
+    assert list(json.loads(stride.read_text())) == ["project", "api_key_env", "focus"]
+
+
+def test_backfill_focus_leaves_explicit_choice_untouched(tmp_path: Path):
+    stride = tmp_path / ".stride.json"
+    original = '{\n  "project": "Foo",\n  "focus": "technical"\n}\n'
+    stride.write_text(original)
+    with patch("linear.STRIDE_CONFIG_PATH", stride):
+        assert backfill_focus() == {"project": "Foo", "focus": "technical"}
+    assert stride.read_text() == original
+
+
+def test_backfill_focus_no_op_when_file_missing(tmp_path: Path):
+    stride = tmp_path / ".stride.json"
+    with patch("linear.STRIDE_CONFIG_PATH", stride):
+        assert backfill_focus() == {}
     assert not stride.exists()
 
 
