@@ -34,6 +34,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] Right tool for right job: every branch in a stride skill points at the artifact designed for its case — story drafts to `issue.md`, epic drafts to `epic.md` — and never falls back to a generic "whatever's around" default
 - [ ] Stride's command files (`.claude/commands/*.md`) stay scannable as they grow — a reader can locate a step, rule, or flag in seconds, not minutes
 - [ ] Every `/linear:*` command produces the output its own spec documents — a documented column, sort, or field shows real data, never a silent blank or arbitrary order
+- [ ] You can predict how stride will behave by reading the repo, not by knowing hidden rules — a default that changes behaviour is materialised in the file it governs (e.g. `.stride.json`'s `focus`), so the active behaviour is inspectable on disk, never knowable only from prose or fallback code
 - [ ] The common path through every `/linear:*` command runs without prompts; interruptions appear only when stride detects friction worth the user's judgement
 - [ ] You can review your working changes at any point without leaving the flow — `/linear:start` surfaces the diff at its review step, and (with diffity installed) `/diffity-diff` opens a visual diff on demand
 - [ ] Every multi-step stride interaction discloses its scope upfront — number of steps, time estimate, escape hatch — so the user is never trapped in an open-ended sequence
