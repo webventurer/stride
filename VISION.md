@@ -37,6 +37,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] You can predict how stride will behave by reading the repo, not by knowing hidden rules — a default that changes behaviour is materialised in the file it governs (e.g. `.stride.json`'s `focus`), so the active behaviour is inspectable on disk, never knowable only from prose or fallback code
 - [ ] The common path through every `/linear:*` command runs without prompts; interruptions appear only when stride detects friction worth the user's judgement
 - [ ] You can review your working changes at any point without leaving the flow — `/linear:start` surfaces the diff at its review step, and (with diffity installed) `/diffity-diff` opens a visual diff on demand
+- [ ] Parallel work streams run without leaving the editor — `--worktree` prepares a worktree you open as a terminal in the current VS Code window, so multiple cards run side by side without alt-tabbing between windows
 - [ ] Every multi-step stride interaction discloses its scope upfront — number of steps, time estimate, escape hatch — so the user is never trapped in an open-ended sequence
 - [ ] When you list the commits this branch is adding, the story reads naturally to a non-engineer scanning top-to-bottom (`git log main..HEAD --oneline` to check)
 - [ ] Issue titles read as stakeholder outcomes, not implementation steps
