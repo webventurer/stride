@@ -4,6 +4,8 @@ Implement, validate, and open a PR in one headless flow.
 
 Accepts a story ID or an epic ID: `/start PG-205`. An epic argument triggers **[epic iteration](reference/epic-iteration.md)** — its sub-issues are worked one at a time, pausing at each PR.
 
+Pass `--worktree` to set up the issue in an isolated git worktree and hand off to a new terminal tab in your current VS Code window, instead of working inline — see **[worktree setup](reference/worktree-setup.md)**.
+
 If no argument is given, infer the issue ID from the current branch name (extract the `[A-Z]+-\d+` pattern, e.g. `PG-205`). If neither works, ask the user.
 
 Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if GitHub review feedback) → `/finish`
@@ -131,7 +133,9 @@ Branch priority:
 3. Linear `gitBranchName`
 4. Fallback pattern: `feature/<issue-id>-<slug>`
 
-If already on the correct branch (resuming from a worktree set up earlier via `/linear:plan-work --worktree`), skip to step 6.
+If already on the correct branch (resuming inside a worktree set up earlier with `--worktree`), skip to step 6.
+
+**If `--worktree` was passed**, don't create the branch inline — the worktree creates it. Skip the inline checkout; the worktree setup after step 6 handles branch creation (see [worktree setup](reference/worktree-setup.md)).
 
 Otherwise, create the branch inline:
 
@@ -140,8 +144,6 @@ git checkout -b <branch>
 ```
 
 Continue to step 6.
-
-> **Want an isolated worktree?** Set it up at planning time via `/linear:plan-work --worktree`. `/linear:start` runs inline by default — no prompt, no flag. If you want a worktree on a branch you've already created inline, use `git worktree add` manually.
 
 ### 6. Update Linear status → Doing
 
@@ -152,6 +154,8 @@ uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state Doing
 ```
 
 If already Doing, leave unchanged. Never set any other state in this step.
+
+**If `--worktree` was passed**, set up the worktree now and hand off — follow [worktree setup](reference/worktree-setup.md). It creates the worktree, prints the handoff, and **exits before step 7**; the fresh `claude` session resumes from there (re-running `/linear:start <issue-id>` without the flag picks up at step 5 already on the branch).
 
 ### 7. Implement
 
