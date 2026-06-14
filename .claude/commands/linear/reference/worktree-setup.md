@@ -39,7 +39,25 @@ If the branch already exists (a remote branch, or one created earlier), drop the
 git worktree add ../<repo-dirname>-<issue-id-lowercase> <gitBranchName>
 ```
 
-## W3. Print the handoff and exit
+## W3. Symlink the venv (Python projects)
+
+A fresh worktree has no `.venv`, so `cd`-ing in and running anything Python fails with `command not found`. If the parent repo root has a virtualenv, link it in so the stream can run immediately.
+
+After `git worktree add` succeeds:
+
+1. Look for a venv at the parent repo root — check `.venv` first, then `venv`.
+2. If one is found and the worktree has no matching directory or symlink, link it:
+
+   ```bash
+   ln -s <parent-repo>/.venv <worktree>/.venv
+   ```
+
+3. If none is found, **skip silently** — no message, no action. This is the path for Node, Rails, Go, and any non-Python project.
+4. When a symlink is created, print one line so the user knows: *"Shared venv from `<parent>/.venv` linked into the worktree."*
+
+Scope: the common `.venv` / `venv` layout only. Skip Poetry / Pipenv / Conda (their envs live outside the repo) and bespoke names — those users link manually. No Windows symlink support yet. The linked venv's `VIRTUAL_ENV` resolves to the parent path (cosmetic — binaries and packages still work), and a worktree always shares the parent's interpreter, so it never runs a different Python than its parent.
+
+## W4. Print the handoff and exit
 
 Stride opens nothing — the user drives the editor. Print this, then **exit before step 7 (Implement)**; the fresh `claude` session takes over from there:
 
@@ -60,6 +78,6 @@ Optional, from that tab:
 
 The second, flag-less `/linear:start` is the real work; the first invocation is setup-and-exit. The handoff names that explicitly so the double-invocation isn't a surprise.
 
-## W4. Resuming in the worktree
+## W5. Resuming in the worktree
 
 When the user runs `/linear:start <issue-id>` (no flag) from the worktree's terminal, step 5's branch resolution finds it already on the correct branch and skips to step 6 — the flow continues from the Vision check onward exactly as an inline run would.
