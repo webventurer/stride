@@ -1,64 +1,7 @@
 import { deepStrictEqual, strictEqual } from "node:assert";
+import { execFileSync } from "node:child_process";
 import { describe, it } from "node:test";
-
-function deepMerge(base, overlay) {
-  for (const [key, val] of Object.entries(overlay)) {
-    base[key] = mergeValue(base[key], val);
-  }
-  return base;
-}
-
-function mergeValue(existing, val) {
-  if (isObject(existing) && isObject(val)) return deepMerge(existing, val);
-  if (Array.isArray(existing) && Array.isArray(val))
-    return dedupeHooks(existing, val);
-  return val;
-}
-
-function isObject(v) {
-  return v !== null && typeof v === "object" && !Array.isArray(v);
-}
-
-function dedupeHooks(existing, incoming) {
-  for (const item of incoming) {
-    const isDupe = existing.some(
-      (e) => JSON.stringify(e) === JSON.stringify(item),
-    );
-    if (!isDupe) existing.push(item);
-  }
-  return existing;
-}
-
-const STRIDE_SETTINGS = {
-  hooks: {
-    UserPromptSubmit: [
-      {
-        hooks: [
-          {
-            type: "command",
-            command:
-              "$CLAUDE_PROJECT_DIR/.claude/hooks/userpromptsubmit/inject_design_principles.sh",
-          },
-        ],
-      },
-    ],
-    PreToolUse: [
-      {
-        matcher: "Bash",
-        hooks: [
-          {
-            type: "command",
-            command:
-              "$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse/block_bare_git_commit.sh",
-          },
-        ],
-      },
-    ],
-  },
-  permissions: {
-    deny: ["mcp__claude_ai_Linear__*"],
-  },
-};
+import { deepMerge, STRIDE_SETTINGS } from "../bin/install.mjs";
 
 function cloneConfig() {
   return JSON.parse(JSON.stringify(STRIDE_SETTINGS));
@@ -148,5 +91,18 @@ describe("dedupeHooks", () => {
 
     strictEqual(settings.hooks.UserPromptSubmit.length, 1);
     strictEqual(settings.hooks.PreToolUse.length, 1);
+  });
+});
+
+describe("direct-execution guard", () => {
+  it("importing the module does not run the installer", () => {
+    const moduleUrl = new URL("../bin/install.mjs", import.meta.url).href;
+    const output = execFileSync(
+      process.execPath,
+      ["--input-type=module", "-e", `import ${JSON.stringify(moduleUrl)}`],
+      { encoding: "utf8", timeout: 10000 },
+    );
+
+    strictEqual(output, "");
   });
 });
