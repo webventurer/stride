@@ -95,8 +95,9 @@ def require_env(name: str) -> str:
     return val
 
 
-STRIDE_CONFIG_PATH = Path(".stride.json")
-LEGACY_CONFIG_PATH = Path(".linear_project")
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+STRIDE_CONFIG_PATH = REPO_ROOT / ".stride.json"
+LEGACY_CONFIG_PATH = REPO_ROOT / ".linear_project"
 DEFAULT_FOCUS = "outcome"
 
 

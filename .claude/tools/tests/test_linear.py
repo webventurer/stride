@@ -23,6 +23,7 @@ from click.testing import CliRunner
 TOOLS_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(TOOLS_DIR))
 
+import linear  # noqa: E402
 import linear_cli  # noqa: E402
 from linear import (  # noqa: E402
     DEFAULT_FOCUS,
@@ -886,6 +887,16 @@ def test_migrate_from_legacy_keeps_original_when_malformed(tmp_path: Path):
             migrate_from_legacy()
     assert legacy.read_text() == "# only a comment, no project\n"
     assert not stride.exists()
+
+
+# ---- WB-541: config paths resolve from repo root, not the CWD ----
+
+
+def test_config_paths_anchored_to_repo_root():
+    repo_root = Path(linear.__file__).resolve().parent.parent.parent
+    assert linear.STRIDE_CONFIG_PATH == repo_root / ".stride.json"
+    assert linear.LEGACY_CONFIG_PATH == repo_root / ".linear_project"
+    assert linear.STRIDE_CONFIG_PATH.is_absolute()
 
 
 # ---- WB-561: setup backfills focus into an existing focus-less config ----
