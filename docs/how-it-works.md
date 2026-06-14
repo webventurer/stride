@@ -112,6 +112,19 @@ The first five stay within review — view a diff, browse the whole repo, leave 
 
 The `/diffity-diff` path and the checkpoint are complementary — `/diffity-diff` for on-demand review of uncommitted work mid-implementation, the `/linear:start` checkpoint as the gate before a PR ships. (Jumping straight to `/linear:finish` skips that checkpoint's auto-open, so `/diffity-diff` is how you review on your own terms regardless.) It's for reviewing your own working changes in-flow — not a replacement for formal PR review. diffity is optional; see the [install guide](/install) for setup.
 
+### Comment on the diff, then resolve
+
+The diff in the browser isn't read-only — you can **change the code by talking to it**. Click a line, type what you want in plain English — *"rename this variable"*, *"use Foo, not P"*, *"this sentence is unclear"* — and leave it as a comment, the same way you'd comment on a teammate's pull request. Then run **`/diffity-resolve`**: it reads your open comments, makes each change in the code, and marks the thread resolved. Refresh the view and the fixes are there.
+
+That turns review into a loop you drive without leaving the browser:
+
+1. **Open the diff** — `/diffity-diff`, or the diff `/linear:start` already opened at its checkpoint.
+2. **Leave comments** — click any line and say what you want changed.
+3. **`/diffity-resolve`** — the agent applies every open comment as a code change and resolves the threads.
+4. **Re-review** — refresh and repeat until it reads right.
+
+<mark>You don't hand-edit the change to fix a small thing — you point at where you spotted it and describe the fix.</mark> The comments are the instructions; resolve is the agent carrying them out. `/diffity-resolve-tree` does the same for comments left in the file-tree browser (`/diffity-tree`) rather than on a diff.
+
 ## The cross-model feedback loop
 
 `/linear:plan-work` optionally sends issue drafts to ChatGPT via OpenRouter for a second opinion before creating the issue. Three voices — Claude proposes, ChatGPT challenges, you steer — sharpen the issue through cross-model perspectives.
