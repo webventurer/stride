@@ -210,7 +210,7 @@ gh pr merge <number> --merge --subject "Merge branch '<gitBranchName>'" --body "
 
 Pass `--body ""` explicitly so `gh` does not fall back to the PR description.
 
-### 8. Clean up branches, remove worktree, close VS Code
+### 8. Clean up branches, remove worktree, close the worktree tab
 
 Detect the main repo path. Run `git worktree list` — the first entry is the main repo:
 
@@ -220,42 +220,22 @@ git worktree list
 
 **All git commands must use `git -C <main-repo-path>`** to avoid depending on the worktree directory.
 
-Derive the worktree path from the repo name and issue ID:
-
-```
-../<repo-dirname>-<issue-id-lowercase>
-```
-
 **Step 8a — Switch to main and pull:**
 
 ```bash
 git -C <main-repo-path> checkout main && git -C <main-repo-path> pull
 ```
 
-**Step 8b — Remove worktree:**
+**Step 8b — Tear down the worktree (if one was used):**
 
-Remove the worktree first — git refuses to delete a branch that a worktree is checked out on.
-
-```bash
-git -C <main-repo-path> worktree remove <worktree-path>
-```
-
-If the worktree directory does not exist, skip silently. If `git worktree remove` fails due to untracked files, use `--force`.
+Follow [worktree teardown](reference/worktree.md#teardown) — it removes the worktree and guides the user to close its tab in the current VS Code window. Do this **before** deleting the branch (git won't delete a branch a worktree has checked out). For an inline run with no worktree, it skips silently.
 
 **Step 8c — Delete branches:**
 
-Now that the worktree is gone, the branch can be deleted:
+Now that any worktree is gone, the branch can be deleted:
 
 - **Local**: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently
 - **Remote**: `git -C <main-repo-path> push origin --delete <gitBranchName>` — if already deleted (GitHub may auto-delete), skip silently
-
-**Step 8d — Ask user to close VS Code:**
-
-```
-Please close the VS Code window for <worktree-dirname>.
-```
-
-VS Code does not support programmatic window closing. The worktree directory is already gone, so VS Code will show an error state — the user just needs to close the window.
 
 ### 9. Update Linear → done
 

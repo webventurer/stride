@@ -1,12 +1,16 @@
-# Worktree setup
+# Worktree
 
-> The mechanics `/linear:start` follows when `--worktree` is passed. The decision — inline by default, isolated worktree when the flag is present — stays in `start.md` (step 6); this file holds the execution detail so the command stays scannable. Step numbers below refer to `/linear:start`'s steps.
+> The worktree lifecycle stride manages: **Setup** when `/linear:start` is given `--worktree` (step 6), **Teardown** when `/linear:finish` cleans up (step 8). The decision — inline by default, isolated worktree when the flag is present — stays in the command files; this file holds the execution detail so they stay scannable.
 
-> **Same-window model.** Stride does not open an editor or a terminal. It creates the worktree and prints a handoff; the user opens a new terminal tab in their **current** VS Code window, `cd`s in, and launches `claude`. A new terminal tab is a fresh shell, so nothing relocates the running session — and multiple cards become side-by-side tabs in one window, no alt-tabbing.
+> **Same-window model.** Stride does not open or close an editor or a terminal. On setup it creates the worktree and prints a handoff; the user opens a new terminal tab in their **current** VS Code window, `cd`s in, and launches `claude`. A new terminal tab is a fresh shell, so nothing relocates the running session — and multiple cards become side-by-side tabs in one window, no alt-tabbing. On teardown the worktree directory is removed and the user closes that tab.
 
 ---
 
-## W1. Guard the state
+## Setup
+
+The mechanics `/linear:start` follows when `--worktree` is passed. Step numbers refer to `/linear:start`'s steps.
+
+### Guard the state
 
 `--worktree` means "set up a workspace to **start** this issue in." If the issue is already `In Review` or `Done`, that's fix-or-finish territory, not start — stop and tell the user:
 
@@ -15,7 +19,7 @@ WB-123 is already <state>. --worktree sets up a fresh workspace to start an
 issue; for an issue in review or done, work in its existing checkout instead.
 ```
 
-## W2. Create the worktree
+### Create the worktree
 
 The branch is created **by the worktree**, not inline — so step 5's inline `git checkout -b` is skipped when `--worktree` is passed (see start.md step 5).
 
@@ -39,7 +43,7 @@ If the branch already exists (a remote branch, or one created earlier), drop the
 git worktree add ../<repo-dirname>-<issue-id-lowercase> <gitBranchName>
 ```
 
-## W3. Symlink the venv (Python projects)
+### Symlink the venv (Python projects)
 
 A fresh worktree has no `.venv`, so `cd`-ing in and running anything Python fails with `command not found`. If the parent repo root has a virtualenv, link it in so the stream can run immediately.
 
@@ -57,7 +61,7 @@ After `git worktree add` succeeds:
 
 Scope: the common `.venv` / `venv` layout only. Skip Poetry / Pipenv / Conda (their envs live outside the repo) and bespoke names — those users link manually. No Windows symlink support yet. The linked venv's `VIRTUAL_ENV` resolves to the parent path (cosmetic — binaries and packages still work), and a worktree always shares the parent's interpreter, so it never runs a different Python than its parent.
 
-## W4. Print the handoff and exit
+### Print the handoff and exit
 
 Stride opens nothing — the user drives the editor. Print this, then **exit before step 7 (Implement)**; the fresh `claude` session takes over from there:
 
@@ -78,6 +82,36 @@ Optional, from that tab:
 
 The second, flag-less `/linear:start` is the real work; the first invocation is setup-and-exit. The handoff names that explicitly so the double-invocation isn't a surprise.
 
-## W5. Resuming in the worktree
+### Resuming in the worktree
 
 When the user runs `/linear:start <issue-id>` (no flag) from the worktree's terminal, step 5's branch resolution finds it already on the correct branch and skips to step 6 — the flow continues from the Vision check onward exactly as an inline run would.
+
+---
+
+## Teardown
+
+The mechanics `/linear:finish` follows (step 8) when the issue was worked in a worktree. Run from the **main repo**, not the worktree that's about to vanish — `git worktree list`'s first entry is the main repo; use `git -C <main-repo-path>` for every command. Skip this whole section silently for an inline run (no worktree on disk).
+
+### Remove the worktree
+
+Remove the worktree **before** deleting its branch — git refuses to delete a branch a worktree has checked out. The path is the same one Setup derived: `../<repo-dirname>-<issue-id-lowercase>`.
+
+```bash
+git -C <main-repo-path> worktree remove <worktree-path>
+```
+
+If the worktree directory does not exist, skip silently. If `git worktree remove` fails due to untracked files, use `--force`.
+
+### Close the worktree's tab
+
+There is no separate window to close — the worktree was a terminal tab in the current window. Print:
+
+```
+The worktree is gone. In your VS Code window:
+- Close the terminal tab that was running in <worktree-dirname>.
+- If you added the worktree as a folder (code --add), remove it:
+  code --remove <worktree-path>, or right-click it in the Explorer
+  → Remove Folder from Workspace.
+```
+
+VS Code can't close a tab or remove a folder root programmatically, so this is a manual step. The wording holds whether or not the folder was ever added.
