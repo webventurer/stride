@@ -10,6 +10,8 @@
 
 The mechanics `/linear:start` follows when `--worktree` is passed. Step numbers refer to `/linear:start`'s steps.
 
+> **Resolve every path here to an absolute path.** The handoff's `cd` runs in a fresh terminal tab whose working directory you don't control, and the venv symlink's target must resolve from inside the worktree — relative paths break both. Compute the worktree path once as absolute (e.g. `/Users/you/projects/<repo-dirname>-<issue-id-lowercase>`) and use that everywhere below.
+
 ### Guard the state
 
 `--worktree` means "set up a workspace to **start** this issue in." If the issue is already `In Review` or `Done`, that's fix-or-finish territory, not start — stop and tell the user:
@@ -94,7 +96,7 @@ The mechanics `/linear:finish` follows (step 8) when the issue was worked in a w
 
 ### Remove the worktree
 
-Remove the worktree **before** deleting its branch — git refuses to delete a branch a worktree has checked out. The path is the same one Setup derived: `../<repo-dirname>-<issue-id-lowercase>`.
+Remove the worktree **before** deleting its branch — git refuses to delete a branch a worktree has checked out. Use the same **absolute** worktree path Setup used (`<abs-parent>/<repo-dirname>-<issue-id-lowercase>`).
 
 ```bash
 git -C <main-repo-path> worktree remove <worktree-path>
