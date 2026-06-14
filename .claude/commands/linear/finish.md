@@ -112,7 +112,7 @@ Autosquash them now before merging? (y / n / abort)
 
 <mark>**Why a prompt, not automatic.**</mark> Rewriting published history is the kind of action that needs explicit user authorisation (per stride's *executing actions with care* stance). Asking is the safer default.
 
-<mark>**Why fixup-specific, not all journey commits.**</mark> `fixup!` commits have an unambiguous target encoded in their subject (per `--fixup=<sha>`), so autosquash collapses them deterministically. Other journey-shaped commits ("WIP", "address feedback") are a `/linear:start` step 10 concern — caught at push time, not merge time.
+<mark>**Why fixup-specific, not all journey commits.**</mark> `fixup!` commits have an unambiguous target encoded in their subject (per `--fixup=<sha>`), so autosquash collapses them deterministically. Other journey-shaped commits ("WIP", "address feedback") are a `/linear:start` step 11 concern — caught at push time, not merge time.
 
 **Failure modes**:
 
