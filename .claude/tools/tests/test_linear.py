@@ -50,6 +50,7 @@ from linear import (  # noqa: E402
     graphql_data,
     in_canonical_order,
     label_drift,
+    labels_for_team,
     list_by_parent,
     list_by_project_state,
     list_by_project_state_type,
@@ -864,6 +865,18 @@ def test_resolve_labels_for_team_accepts_a_workspace_label():
         result = resolve_labels_for_team("lin_test", "team-1", ["Bug", "Issue"])
 
     assert result == ["lbl-bug", "lbl-issue"]
+
+
+def test_labels_for_team_includes_workspace_and_own_team_labels():
+    labels = [
+        {"name": "Bug", "team": None},
+        {"name": "Issue", "team": {"id": "team-1"}},
+        {"name": "Other", "team": {"id": "team-2"}},
+    ]
+
+    kept = [lbl["name"] for lbl in labels_for_team(labels, "team-1")]
+
+    assert kept == ["Bug", "Issue"]
 
 
 # ---- WB-454: extended issue mutations (create returns full object, update with parent) ----

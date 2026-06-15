@@ -408,7 +408,7 @@ def list_labels(api_key: str, team_id: str | None = None) -> list:
 
 
 def labels_for_team(labels: list, team_id: str) -> list:
-    return [lbl for lbl in labels if lbl.get("team") and lbl["team"]["id"] == team_id]
+    return [lbl for lbl in labels if label_usable(lbl, team_id)]
 
 
 # ---- Read: issues, projects, teams, comments, viewer ----
