@@ -1,6 +1,6 @@
 # Check Linear connections
 
-Verify stride can authenticate against every configured Linear workspace, then confirm each team's board carries the workflow states stride uses.
+Verify stride can authenticate against every configured Linear workspace, then confirm each team's board carries the workflow states and type labels stride uses.
 
 ## Steps
 
@@ -52,7 +52,28 @@ Report one row per team:
 
 If a team drifts, point the user at [`/linear:setup`](setup.md) for that team — on an empty board it provisions the states to match; on a populated board it reports the target order for the human to apply (rename the board state to match `linear_statuses.json`, or edit the JSON to match the board). stride never auto-reconciles — the board is the source of truth for what *exists*, the JSON for what stride *uses*. Only ever suggest `/linear:setup`; never run it automatically from `/linear:check`.
 
-### 4. Verify the repo is pinned to a project
+### 4. Verify each team carries stride's type labels
+
+The type labels stride tags cards with (`Bug`, `Epic`, `Issue`) live in one place: [`linear_labels.json`](linear_labels.json). A card-creating flow that asks for a label the board lacks can't apply it, so the card's type stays invisible. This step confirms every label stride declares exists on the live board.
+
+Run the drift check **once per team**, passing the team key — same teams enumerated in step 3. Without `--team` the tool checks only the workspace's first team:
+
+```bash
+LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py label-drift --team <TEAM-KEY>
+```
+
+It returns a JSON list of the `{name, color}` labels stride declares but the board lacks. An empty list (`[]`) means that team carries every type label stride uses (extra labels are fine — the JSON records what stride *uses*, not everything that exists). `label-drift` is read-only.
+
+Report one row per team:
+
+| Workspace | Team | Labels | Drift |
+|:----------|:-----|:-------|:------|
+| Org1 | ENG | ✅ in sync | — |
+| Org1 | OPS | ⚠️ drift | `Epic`, `Issue` missing |
+
+If a team drifts, point the user at [`/linear:setup`](setup.md) — `provision-labels` creates the missing ones non-destructively (no advise mode; creating a label never touches existing work). Only ever suggest `/linear:setup`; never run it automatically from `/linear:check`.
+
+### 5. Verify the repo is pinned to a project
 
 `/linear:setup` pins a repo to a Linear project by writing `.stride.json` (its [create-project step](reference/create-project.md)). This confirms that pin still resolves — the read-only mirror of what setup writes.
 
@@ -67,7 +88,7 @@ Read `.stride.json` at the repo root:
 
   A match confirms the binding is live. No match → the name in `.stride.json` doesn't resolve — the project was renamed or deleted, or `api_key_env` points at the wrong workspace. Point the user at `/linear:setup` to re-pin, or at `.stride.json` to fix the name.
 
-### 5. Remind about board ordering
+### 6. Remind about board ordering
 
 Linear only honours a manually pinned `sortOrder` — like an epic placed at the top of its project — when the board view is sorted by **Manual**. Under Created / Priority / Updated ordering the pin is ignored and the epic won't visibly move, even though the API write succeeded.
 
@@ -77,6 +98,6 @@ stride already sets Manual ordering on a *project's* board when it pins an epic 
 
 A health-check reminder, not a failure — it always prints, since the mode is unreadable.
 
-### 6. Summary
+### 7. Summary
 
-End with a one-line summary: "N of M Linear workspaces connected; K of L team boards in sync, N drifted; project binding ok / unresolved / not pinned." If any board drifted or the project binding didn't resolve, name `/linear:setup` as the next step.
+End with a one-line summary: "N of M Linear workspaces connected; K of L team boards in sync on states and labels, N drifted; project binding ok / unresolved / not pinned." If any board drifted (states or labels) or the project binding didn't resolve, name `/linear:setup` as the next step.
