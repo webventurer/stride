@@ -515,12 +515,16 @@ def resolve_state_for_issue(
 
 
 def resolve_labels_for_team(api_key: str, team_id: str, names: list) -> list:
-    labels = list_labels(api_key, team_id)
+    labels = [lbl for lbl in list_labels(api_key) if label_usable(lbl, team_id)]
     by_name = {lbl["name"]: lbl["id"] for lbl in labels}
     missing = [n for n in names if n not in by_name]
     if missing:
         raise LinearError(f"Labels not found on team: {missing}")
     return [by_name[n] for n in names]
+
+
+def label_usable(label: dict, team_id: str) -> bool:
+    return not label.get("team") or label["team"]["id"] == team_id
 
 
 def looks_like_uuid(value: str) -> bool:

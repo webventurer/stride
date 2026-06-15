@@ -855,6 +855,17 @@ def test_resolve_labels_for_team_raises_for_missing_label():
     assert "made-up" in str(excinfo.value)
 
 
+def test_resolve_labels_for_team_accepts_a_workspace_label():
+    labels = {"issueLabels": {"nodes": [
+        {"id": "lbl-bug", "name": "Bug", "team": None},
+        {"id": "lbl-issue", "name": "Issue", "team": {"id": "team-1"}},
+    ], "pageInfo": {"hasNextPage": False, "endCursor": None}}}
+    with patch("linear.requests.post", return_value=ok_response(labels)):
+        result = resolve_labels_for_team("lin_test", "team-1", ["Bug", "Issue"])
+
+    assert result == ["lbl-bug", "lbl-issue"]
+
+
 # ---- WB-454: extended issue mutations (create returns full object, update with parent) ----
 
 
