@@ -28,6 +28,10 @@ STATUSES_PATH = (
     Path(__file__).resolve().parent.parent / "commands/linear/linear_statuses.json"
 )
 
+LABELS_PATH = (
+    Path(__file__).resolve().parent.parent / "commands/linear/linear_labels.json"
+)
+
 
 # ---- GraphQL primitives ----
 
@@ -511,12 +515,16 @@ def resolve_state_for_issue(
 
 
 def resolve_labels_for_team(api_key: str, team_id: str, names: list) -> list:
-    labels = list_labels(api_key, team_id)
+    labels = [lbl for lbl in list_labels(api_key) if label_usable(lbl, team_id)]
     by_name = {lbl["name"]: lbl["id"] for lbl in labels}
     missing = [n for n in names if n not in by_name]
     if missing:
         raise LinearError(f"Labels not found on team: {missing}")
     return [by_name[n] for n in names]
+
+
+def label_usable(label: dict, team_id: str) -> bool:
+    return not label.get("team") or label["team"]["id"] == team_id
 
 
 def looks_like_uuid(value: str) -> bool:
@@ -917,3 +925,45 @@ def provision_states(team_key: str | None = None) -> dict:
     if team["has_issues"]:
         return advise_report(states, team["states"])
     return setup_empty_team(team["id"], states, team["states"])
+
+
+# ---- Provision type labels ----
+
+
+def provision_labels(team_key: str | None = None) -> dict:
+    team = team_with_labels(team_key or first_team_key())
+    if not team:
+        raise LinearError(f"no team found for key {team_key!r}")
+    created = [create_label(team["id"], lbl) for lbl in missing_labels(team)]
+    return {"created": created, "in_sync": not created}
+
+
+def label_drift(team_key: str | None = None) -> list:
+    return missing_labels(team_with_labels(team_key or first_team_key()))
+
+
+def missing_labels(team: dict) -> list:
+    present = {lbl["name"] for lbl in team.get("labels", {}).get("nodes", [])}
+    return [lbl for lbl in declared_labels() if lbl["name"] not in present]
+
+
+def declared_labels() -> list:
+    return json.loads(LABELS_PATH.read_text())["labels"]
+
+
+def team_with_labels(team_key: str) -> dict:
+    query = (
+        "query($key: String!) { teams(filter: { key: { eq: $key } }, first: 1) "
+        "{ nodes { id labels { nodes { name } } } } }"
+    )
+    nodes = graphql_data(query, {"key": team_key})["teams"]["nodes"]
+    return nodes[0] if nodes else {}
+
+
+def create_label(team_id: str, label: dict) -> dict:
+    query = (
+        "mutation($input: IssueLabelCreateInput!) { "
+        "issueLabelCreate(input: $input) { issueLabel { id name color } } }"
+    )
+    label_input = {"teamId": team_id, "name": label["name"], "color": label["color"]}
+    return graphql_data(query, {"input": label_input})["issueLabelCreate"]["issueLabel"]

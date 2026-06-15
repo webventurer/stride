@@ -32,6 +32,7 @@ from linear import (  # noqa: E402
     get_issue,
     get_project,
     get_team,
+    label_drift,
     list_by_parent,
     list_by_project_state,
     list_by_project_state_type,
@@ -45,6 +46,7 @@ from linear import (  # noqa: E402
     migrate_from_legacy,
     min_backlog_sort_order,
     project_content,
+    provision_labels,
     provision_states,
     read_text_arg,
     resolve_labels_for_team,
@@ -186,6 +188,28 @@ def state_drift_cmd(team_key: str):
 )
 def provision_states_cmd(team_key: str):
     echo_json(provision_states(team_key))
+
+
+@cli.command("label-drift")
+@click.option(
+    "--team",
+    "team_key",
+    default=None,
+    help="Team key (e.g. WB); defaults to the key's first team",
+)
+def label_drift_cmd(team_key: str):
+    echo_json(label_drift(team_key))
+
+
+@cli.command("provision-labels")
+@click.option(
+    "--team",
+    "team_key",
+    default=None,
+    help="Team key (e.g. WB); defaults to the key's first team",
+)
+def provision_labels_cmd(team_key: str):
+    echo_json(provision_labels(team_key))
 
 
 @cli.command("migrate-legacy-config")
