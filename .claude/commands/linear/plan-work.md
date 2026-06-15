@@ -285,6 +285,8 @@ Show the full draft to the user. Ask for explicit approval before creating.
 
 Only after explicit approval. Write the drafted description to a file first and pass it with `--description @<file>` — the body is multi-line markdown, so it goes through a file, never an inline string ([why](reference/workflow.md#how-skills-talk-to-linear)). `linear_cli.py` accepts state names directly — no separate ID lookup — and accepts the project's name on `--project`:
 
+**Type label.** Every stride card carries exactly one type label ([`linear_labels.json`](linear_labels.json)) so its shape shows on the board: `Bug` for a bug-shaped draft (the bug-shape branch of step 6), `Issue` for a standard story. The label is always first in `--labels`; any optional suggested labels follow it.
+
 ```bash
 uv run .claude/tools/linear_cli.py issue create \
   -t <TEAM-KEY> \
@@ -293,7 +295,7 @@ uv run .claude/tools/linear_cli.py issue create \
   --title "<from draft>" \
   --description @<draft-file> \
   --priority <0–4> \
-  --labels "<comma,separated>" \
+  --labels "<Bug|Issue>[,suggested,labels]" \
  
 ```
 

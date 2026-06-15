@@ -150,13 +150,14 @@ File the card now, or delay to bundle with more changes? (file / delay)
 ```
 
 - **delay** — hold this PR's URL, summary, and confirmed Vision criterion in the session's **pending bundle**, and skip filing. Tell the user it'll fold into the next `file`. The change is already shipped; only the card is deferred. (The bundle lives in this working session — a later `/linear:quick` that files picks it up.)
-- **file** — create one card in **Done** covering this change *and every PR held in the pending bundle*, then attach each PR *(auth per [reference/workflow.md](reference/workflow.md))*. Write the card description to a file first and pass it with `--description @<file>` — multi-line bodies go through a file, never an inline string ([why](reference/workflow.md#how-skills-talk-to-linear)):
+- **file** — create one card in **Done** covering this change *and every PR held in the pending bundle*, then attach each PR *(auth per [reference/workflow.md](reference/workflow.md))*. Write the card description to a file first and pass it with `--description @<file>` — multi-line bodies go through a file, never an inline string ([why](reference/workflow.md#how-skills-talk-to-linear)). The card carries the `Issue` type label ([`linear_labels.json`](linear_labels.json)) — quick handles small story-shaped changes, so its cards show as `Issue` on the board like any other story:
 
   ```bash
   uv run .claude/tools/linear_cli.py issue create \
     -t <TEAM> --project "<project>" --state Done \
     --title "<imperative summary of the change(s)>" \
-    --description @<card-file>
+    --description @<card-file> \
+    --labels "Issue"
   uv run .claude/tools/linear_cli.py issue attach <new-id> --url <merged-PR-URL>
   # ...repeat issue attach for each PR in the bundle
   ```
