@@ -1,0 +1,8 @@
+{
+  "_comment": "Single source of truth for the type labels stride applies to every card it creates, so a card's shape is visible on the board. Bug-template cards get Bug, epic parent issues get Epic, standard stories get Issue. `provision-labels` creates the missing ones idempotently; /linear:setup runs it; /linear:check reports missing ones as drift (linear_cli.py label-drift --team <TEAM>). Labels are team-scoped in Linear. Adapting stride to a workspace that names its type labels differently is an edit to this one file.",
+  "labels": [
+    { "name": "Bug", "color": "#eb5757" },
+    { "name": "Epic", "color": "#5e6ad2" },
+    { "name": "Issue", "color": "#4cb782" }
+  ]
+}

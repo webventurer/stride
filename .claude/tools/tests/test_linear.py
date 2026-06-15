@@ -49,6 +49,7 @@ from linear import (  # noqa: E402
     issues_query,
     graphql_data,
     in_canonical_order,
+    label_drift,
     list_by_parent,
     list_by_project_state,
     list_by_project_state_type,
@@ -63,6 +64,7 @@ from linear import (  # noqa: E402
     operation_name,
     order_states,
     project_content,
+    provision_labels,
     provision_states,
     raise_for_graphql_errors,
     raise_for_http,
@@ -623,6 +625,67 @@ def test_provision_states_in_sync_when_board_has_all_canonical():
     }
     # only the read query ran — no create/update mutations
     assert mock.call_count == 1
+
+
+# ---- type-label provisioning ----
+
+THREE_LABELS = [
+    {"name": "Bug", "color": "#eb5757"},
+    {"name": "Epic", "color": "#5e6ad2"},
+    {"name": "Issue", "color": "#4cb782"},
+]
+
+
+def test_provision_labels_creates_all_three_on_empty_team():
+    board = {"teams": {"nodes": [{"id": "t1", "labels": {"nodes": []}}]}}
+    created = {"issueLabelCreate": {"issueLabel": {"id": "new"}}}
+
+    def fake_post(url: str, json: dict | None = None, headers: dict | None = None, **kwargs) -> MagicMock:
+        query = json["query"]
+        return ok_response(board if "teams(" in query else created)
+
+    with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
+        with patch("linear.requests.post", side_effect=fake_post):
+            with patch("linear.declared_labels", return_value=THREE_LABELS):
+                result = provision_labels("WB")
+
+    assert len(result["created"]) == 3
+    assert result["in_sync"] is False
+
+
+def test_provision_labels_in_sync_when_team_has_all_declared():
+    board = {"teams": {"nodes": [{"id": "t1", "labels": {"nodes": [
+        {"name": "Bug"}, {"name": "Epic"}, {"name": "Issue"},
+    ]}}]}}
+    env, post = with_env_and_mock(board)
+    with env, post as mock:
+        with patch("linear.declared_labels", return_value=THREE_LABELS):
+            result = provision_labels("WB")
+
+    assert result == {"created": [], "in_sync": True}
+    # only the read query ran — no create mutations
+    assert mock.call_count == 1
+
+
+def test_label_drift_flags_declared_label_missing_from_team():
+    board = {"teams": {"nodes": [{"id": "t1", "labels": {"nodes": [{"name": "Bug"}]}}]}}
+    env, post = with_env_and_mock(board)
+    with env, post:
+        with patch("linear.declared_labels", return_value=THREE_LABELS):
+            assert label_drift("WB") == [
+                {"name": "Epic", "color": "#5e6ad2"},
+                {"name": "Issue", "color": "#4cb782"},
+            ]
+
+
+def test_provision_labels_surfaces_api_errors():
+    with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
+        with patch("linear.requests.post", return_value=graphql_errors_response([{"message": "team not found"}])):
+            with patch("linear.declared_labels", return_value=THREE_LABELS):
+                with pytest.raises(LinearError) as excinfo:
+                    provision_labels("WB")
+
+    assert "team not found" in str(excinfo.value)
 
 
 # ---- WB-454: fat-CLI helpers (get_issue / whoami / teams / comments / resolvers) ----
