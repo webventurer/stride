@@ -43,6 +43,16 @@ Drawn from stride's own writing:
 | Deterministic ordering | Always comes out in the same order |
 | Silent no-op | Quietly does nothing |
 
+And the everyday academic words that creep into any writing:
+
+| Academic | Clear speak |
+|:---------|:------------|
+| Completeness audit | Gap check |
+| Soundness audit | Logic check |
+| Synthesize | Pull together |
+| Articulate | Say clearly |
+| Facilitate | Help with |
+
 ## The principle
 
 <mark>**If a 16-year-old wouldn't understand it, rewrite it.**</mark>
