@@ -4,7 +4,7 @@
 >
 > **Why it exists**: An epic is the umbrella for several stories — its body needs to set context, name what success looks like, capture what's already been agreed, and draw the line so sub-issues stay coherent. The story-shaped sections (What we'll do / Won't do / Expected outcome / How to test) live on each sub-issue. The epic carries the strategic frame; the sub-issues carry the tactical detail.
 >
-> **Where it comes from**: The [CRAFT framework](../../../../skills/craft/SKILL.md) (Context, Role, Action, Format, Target audience) — the same meta-prompting technique [issue.md](issue.md) uses for stories. Parallel structure, different sections.
+> **Where it comes from**: The [CRAFT framework](../../../../skills/craft/SKILL.md) (Context, Role, Action, Format, Target audience) — the same meta-prompting technique [story.md](story.md) uses for stories. Parallel structure, different sections.
 
 ---
 

@@ -633,7 +633,7 @@ def test_provision_states_in_sync_when_board_has_all_canonical():
 THREE_LABELS = [
     {"name": "Bug", "color": "#eb5757"},
     {"name": "Epic", "color": "#5e6ad2"},
-    {"name": "Issue", "color": "#4cb782"},
+    {"name": "Story", "color": "#4cb782"},
 ]
 
 
@@ -656,7 +656,7 @@ def test_provision_labels_creates_all_three_on_empty_team():
 
 def test_provision_labels_in_sync_when_team_has_all_declared():
     board = {"teams": {"nodes": [{"id": "t1", "labels": {"nodes": [
-        {"name": "Bug"}, {"name": "Epic"}, {"name": "Issue"},
+        {"name": "Bug"}, {"name": "Epic"}, {"name": "Story"},
     ]}}]}}
     env, post = with_env_and_mock(board)
     with env, post as mock:
@@ -675,7 +675,7 @@ def test_label_drift_flags_declared_label_missing_from_team():
         with patch("linear.declared_labels", return_value=THREE_LABELS):
             assert label_drift("WB") == [
                 {"name": "Epic", "color": "#5e6ad2"},
-                {"name": "Issue", "color": "#4cb782"},
+                {"name": "Story", "color": "#4cb782"},
             ]
 
 
@@ -859,24 +859,24 @@ def test_resolve_labels_for_team_raises_for_missing_label():
 def test_resolve_labels_for_team_accepts_a_workspace_label():
     labels = {"issueLabels": {"nodes": [
         {"id": "lbl-bug", "name": "Bug", "team": None},
-        {"id": "lbl-issue", "name": "Issue", "team": {"id": "team-1"}},
+        {"id": "lbl-story", "name": "Story", "team": {"id": "team-1"}},
     ], "pageInfo": {"hasNextPage": False, "endCursor": None}}}
     with patch("linear.requests.post", return_value=ok_response(labels)):
-        result = resolve_labels_for_team("lin_test", "team-1", ["Bug", "Issue"])
+        result = resolve_labels_for_team("lin_test", "team-1", ["Bug", "Story"])
 
-    assert result == ["lbl-bug", "lbl-issue"]
+    assert result == ["lbl-bug", "lbl-story"]
 
 
 def test_labels_for_team_includes_workspace_and_own_team_labels():
     labels = [
         {"name": "Bug", "team": None},
-        {"name": "Issue", "team": {"id": "team-1"}},
+        {"name": "Story", "team": {"id": "team-1"}},
         {"name": "Other", "team": {"id": "team-2"}},
     ]
 
     kept = [lbl["name"] for lbl in labels_for_team(labels, "team-1")]
 
-    assert kept == ["Bug", "Issue"]
+    assert kept == ["Bug", "Story"]
 
 
 # ---- WB-454: extended issue mutations (create returns full object, update with parent) ----

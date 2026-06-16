@@ -113,6 +113,6 @@ The epic body deliberately has **no** "What we'll do", "How to test it", or "Ass
 
 Epic titles are prefixed `Epic: <stakeholder outcome>` so the umbrella is visible at a glance on the kanban board. The post-colon part still follows the same outcome-not-implementation rule as story titles.
 
-For the canonical worked example and the full mechanism, see [Epics and stories](/reference/epics-and-user-stories#how-epics-work). The CRAFT prompt that draws the body out of a description lives in [`epic.md`](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/templates/epic.md), the parallel of the [`issue.md`](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/templates/issue.md) used for stories.
+For the canonical worked example and the full mechanism, see [Epics and stories](/reference/epics-and-user-stories#how-epics-work). The CRAFT prompt that draws the body out of a description lives in [`epic.md`](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/templates/epic.md), the parallel of the [`story.md`](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/templates/story.md) used for stories.
 
 The template avoids overlap between sections. Earlier versions had separate Goal, Acceptance criteria, and Success metric sections that all answered "how do we know it's done?" — these were merged into a single Expected outcome.

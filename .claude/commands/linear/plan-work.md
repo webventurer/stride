@@ -131,7 +131,7 @@ Handle results in two tiers:
 
 If `--craft` flag is present, run CRAFT automatically. Otherwise, ask the user: "Would you like me to run `/craft` on your description first to sharpen the issue before drafting?"
 
-- If **yes** (or `--craft`): read [reference/templates/issue.md](reference/templates/issue.md) for story-sized work, or [reference/templates/epic.md](reference/templates/epic.md) when drafting the parent issue on the epic-sized path. Substitute `[user's description]` with what the user provided **and** `[VISION]` with the full contents of the `VISION.md` loaded in step 1, run `/craft` with the populated prompt, then use the refined output as the description for all subsequent steps. Substituting the entire Vision into the prompt is what lets the agent — or any model the prompt is sent to — anchor the draft on real criteria, real constraints, and real non-goals rather than guessing.
+- If **yes** (or `--craft`): read [reference/templates/story.md](reference/templates/story.md) for story-sized work, or [reference/templates/epic.md](reference/templates/epic.md) when drafting the parent issue on the epic-sized path. Substitute `[user's description]` with what the user provided **and** `[VISION]` with the full contents of the `VISION.md` loaded in step 1, run `/craft` with the populated prompt, then use the refined output as the description for all subsequent steps. Substituting the entire Vision into the prompt is what lets the agent — or any model the prompt is sent to — anchor the draft on real criteria, real constraints, and real non-goals rather than guessing.
 - If **no**: continue with the original description
 
 ### 5. Size — story by default, epic when warranted
@@ -220,11 +220,11 @@ Omit the section entirely when tests don't apply.
 
 <mark>**Read the linked template before drafting** — its sections are the source of truth, not this step's summary. Don't draft from memory or from the prose around the link; open the file and follow it.</mark>
 
-**Story drafts** (feature-shaped, story-sized — the default path) — use the full issue structure from [issue.md](reference/templates/issue.md). With `--research`, also append the research-mode additions described in that template.
+**Story drafts** (feature-shaped, story-sized — the default path) — use the full issue structure from [story.md](reference/templates/story.md). With `--research`, also append the research-mode additions described in that template.
 
 **Bug drafts** (bug-shaped, story-sized — `--bug` flag or the bug-shape branch of step 6) — use [bug.md](reference/templates/bug.md) instead. Symptoms / repro / expected vs actual / suspected causes are first-class sections, in place of *"Where things stand"* and *"What we'll do"*. With `--research`, append the research-mode additions described in that template.
 
-**Epic parent-issue drafts** — use [epic.md](reference/templates/epic.md) instead. Sub-issues under the parent default to issue.md — they're stories that happen to have a parent. When the epic is also bug-shaped (`--epic --bug`), sub-issues use bug.md instead. Research mode never applies to the epic itself; that detail belongs on each sub-issue.
+**Epic parent-issue drafts** — use [epic.md](reference/templates/epic.md) instead. Sub-issues under the parent default to story.md — they're stories that happen to have a parent. When the epic is also bug-shaped (`--epic --bug`), sub-issues use bug.md instead. Research mode never applies to the epic itself; that detail belongs on each sub-issue.
 
 **Ground the draft in the Vision** loaded at step 1 — *within-project mode only*. The "Why this matters" section must explicitly reference which Vision outcome the issue serves — quote the relevant Success criteria line or constraint, and explain how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
 
@@ -285,7 +285,7 @@ Show the full draft to the user. Ask for explicit approval before creating.
 
 Only after explicit approval. Write the drafted description to a file first and pass it with `--description @<file>` — the body is multi-line markdown, so it goes through a file, never an inline string ([why](reference/workflow.md#how-skills-talk-to-linear)). `linear_cli.py` accepts state names directly — no separate ID lookup — and accepts the project's name on `--project`:
 
-**Type label.** Every stride card carries exactly one type label ([`linear_labels.json`](linear_labels.json)) so its shape shows on the board: `Bug` for a bug-shaped draft (the bug-shape branch of step 6), `Issue` for a standard story. The label is always first in `--labels`; any optional suggested labels follow it.
+**Type label.** Every stride card carries exactly one type label ([`linear_labels.json`](linear_labels.json)) so its shape shows on the board: `Bug` for a bug-shaped draft (the bug-shape branch of step 6), `Story` for a standard story. The label is always first in `--labels`; any optional suggested labels follow it.
 
 ```bash
 uv run .claude/tools/linear_cli.py issue create \
