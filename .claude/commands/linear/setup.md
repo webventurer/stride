@@ -40,7 +40,7 @@ Run *(auth per [reference/workflow.md](reference/workflow.md))*:
 LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py provision-labels --team <TEAM-KEY>
 ```
 
-Unlike states, creating a label is non-destructive — it adds a tag, never reorders or archives existing work — so this runs the same way whether or not the team holds cards: it creates any declared type label ([`linear_labels.json`](linear_labels.json) — Bug, Epic, Issue) the team is missing and leaves the rest untouched. There's no advise mode.
+Unlike states, creating a label is non-destructive — it adds a tag, never reorders or archives existing work — so this runs the same way whether or not the team holds cards: it creates any declared type label ([`linear_labels.json`](linear_labels.json) — Bug, Epic, Story) the team is missing and leaves the rest untouched. There's no advise mode.
 
 - **`{"created": [...], "in_sync": false}`** — created the listed labels.
 - **`{"created": [], "in_sync": true}`** — every declared label already exists; nothing changed.
@@ -107,7 +107,7 @@ Then check for `.stride.json` at the repo root:
 
   | Team | Labels created |
   |:-----|:---------------|
-  | ENG (Engineering) | Bug, Epic, Issue |
+  | ENG (Engineering) | Bug, Epic, Story |
 
 - **advise**: state plainly that nothing was changed (the team has cards), then show the target order and what to fix:
 

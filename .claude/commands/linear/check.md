@@ -54,7 +54,7 @@ If a team drifts, point the user at [`/linear:setup`](setup.md) for that team �
 
 ### 4. Verify each team carries stride's type labels
 
-The type labels stride tags cards with (`Bug`, `Epic`, `Issue`) live in one place: [`linear_labels.json`](linear_labels.json). A card-creating flow that asks for a label the board lacks can't apply it, so the card's type stays invisible. This step confirms every label stride declares exists on the live board.
+The type labels stride tags cards with (`Bug`, `Epic`, `Story`) live in one place: [`linear_labels.json`](linear_labels.json). A card-creating flow that asks for a label the board lacks can't apply it, so the card's type stays invisible. This step confirms every label stride declares exists on the live board.
 
 Run the drift check **once per team**, passing the team key — same teams enumerated in step 3. Without `--team` the tool checks only the workspace's first team:
 
@@ -69,7 +69,7 @@ Report one row per team:
 | Workspace | Team | Labels | Drift |
 |:----------|:-----|:-------|:------|
 | Org1 | ENG | ✅ in sync | — |
-| Org1 | OPS | ⚠️ drift | `Epic`, `Issue` missing |
+| Org1 | OPS | ⚠️ drift | `Epic`, `Story` missing |
 
 If a team drifts, point the user at [`/linear:setup`](setup.md) — `provision-labels` creates the missing ones non-destructively (no advise mode; creating a label never touches existing work). Only ever suggest `/linear:setup`; never run it automatically from `/linear:check`.
 
