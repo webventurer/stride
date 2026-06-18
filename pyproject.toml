@@ -4,7 +4,10 @@
 line-length = 80
 
 [tool.ruff.lint]
-select = ["D202"]  # no blank line after a function docstring
+select = [
+    "I",     # import sorting (isort)
+    "D202",  # no blank line after a function docstring
+]
 
 [tool.ruff.format]
 quote-style = "double"
