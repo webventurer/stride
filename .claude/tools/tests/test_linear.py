@@ -684,7 +684,7 @@ def test_provision_labels_in_sync_when_labels_exist_at_workspace_scope():
     assert mock.call_count == 1
 
 
-def test_provision_labels_points_at_recovery_runbook_on_duplicate():
+def test_provision_labels_names_blocking_label_on_duplicate():
     page = labels_page([])
 
     def fake_post(url: str, json: dict | None = None, headers: dict | None = None, **kwargs) -> MagicMock:
@@ -698,7 +698,9 @@ def test_provision_labels_points_at_recovery_runbook_on_duplicate():
                 with pytest.raises(LinearError) as excinfo:
                     provision_labels()
 
-    assert "recovery/team-to-workspace-labels.md" in str(excinfo.value)
+    message = str(excinfo.value)
+    assert "team-scoped" in message
+    assert ".md" not in message
 
 
 def test_label_drift_empty_when_labels_exist_workspace_wide():
