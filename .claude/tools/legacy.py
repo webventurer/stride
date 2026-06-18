@@ -11,8 +11,8 @@ The dependency points one way — legacy → current — never the reverse.
 
 from linear import (
     DEFAULT_FOCUS,
-    LinearError,
     STRIDE_CONFIG_PATH,
+    LinearError,
     project_config,
     write_config,
 )

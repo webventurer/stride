@@ -21,6 +21,7 @@ import click
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+from legacy import backfill_focus, migrate_from_legacy  # noqa: E402
 from linear import (  # noqa: E402
     bearer_token,
     create_attachment,
@@ -48,6 +49,7 @@ from linear import (  # noqa: E402
     read_text_arg,
     resolve_project_id,
     resolve_state_for_issue,
+    resolve_workspace_labels,
     search_by_project,
     set_project_view_manual,
     set_sort_order,
@@ -58,9 +60,7 @@ from linear import (  # noqa: E402
     update_project_content,
     whoami,
     workspace_labels,
-    resolve_workspace_labels,
 )
-from legacy import backfill_focus, migrate_from_legacy  # noqa: E402
 
 
 @click.group()
