@@ -300,7 +300,9 @@ function logCopiedFiles(totals) {
   console.log("  commands/linear/ (Linear workflow commands)");
   console.log("  hooks/           (commit hook scripts)");
   console.log("  stride/docs/     (principles, patterns, concepts)");
-  console.log("  tools/           (Linear API client + cross-model feedback script)");
+  console.log(
+    "  tools/           (Linear API client + cross-model feedback script)",
+  );
 }
 
 async function confirmSettingsMerge() {
@@ -345,7 +347,9 @@ function logAvailableSkills() {
   console.log("  /linear:finish       — merge and close");
   console.log("  /linear:next-steps   — review priorities");
   console.log("  /linear:list-projects — list active Linear projects");
-  console.log("  /linear:update-vision — mirror VISION.md to the Linear project");
+  console.log(
+    "  /linear:update-vision — mirror VISION.md to the Linear project",
+  );
   console.log(
     "\nNext: run /vision to author your project's guiding light. Every /linear:* command reads VISION.md before deciding anything — without one, /linear:plan-work refuses to draft.\n",
   );

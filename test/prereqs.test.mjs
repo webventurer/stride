@@ -35,9 +35,7 @@ describe("missingPrereqs", () => {
 
 describe("prereqReport", () => {
   it("reports all-found when nothing is missing", () => {
-    deepStrictEqual(prereqReport([]), [
-      "Prerequisites: gh, uv, jq all found.",
-    ]);
+    deepStrictEqual(prereqReport([]), ["Prerequisites: gh, uv, jq all found."]);
   });
 
   it("names each missing tool with its install command", () => {

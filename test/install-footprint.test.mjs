@@ -92,7 +92,10 @@ describe("install footprint", () => {
 
     const claudeDir = join(fixtureRoot, ".claude");
     strictEqual(existsSync(join(claudeDir, "skills/commit")), true);
-    strictEqual(existsSync(join(claudeDir, "skills/clear-speak/SKILL.md")), true);
+    strictEqual(
+      existsSync(join(claudeDir, "skills/clear-speak/SKILL.md")),
+      true,
+    );
     strictEqual(existsSync(join(claudeDir, "commands/linear")), true);
     strictEqual(existsSync(join(claudeDir, "hooks")), true);
     strictEqual(existsSync(join(claudeDir, "tools/openrouter_cli.py")), true);
