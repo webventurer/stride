@@ -37,10 +37,10 @@ The tool checks whether the team holds any issues and branches:
 Run *(auth per [reference/workflow.md](reference/workflow.md))*:
 
 ```bash
-LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py provision-labels --team <TEAM-KEY>
+LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py provision-labels
 ```
 
-Unlike states, creating a label is non-destructive — it adds a tag, never reorders or archives existing work — so this runs the same way whether or not the team holds cards: it creates any declared type label ([`linear_labels.json`](linear_labels.json) — Bug, Epic, Story) the team is missing and leaves the rest untouched. There's no advise mode.
+Type labels are created at **workspace scope**, so every team inherits them and provisioning is once per workspace, not per team — no `--team` flag. Unlike states, creating a label is non-destructive — it adds a tag, never reorders or archives existing work — so this runs the same way whether or not any team holds cards: it creates any declared type label ([`linear_labels.json`](linear_labels.json) — Bug, Epic, Story) the workspace is missing and leaves the rest untouched. There's no advise mode.
 
 - **`{"created": [...], "in_sync": false}`** — created the listed labels.
 - **`{"created": [], "in_sync": true}`** — every declared label already exists; nothing changed.
