@@ -394,7 +394,7 @@ LIST_LABELS_QUERY = """{{
 }}"""
 
 
-def list_labels(api_key: str, team_id: str | None = None) -> list:
+def list_labels(api_key: str) -> list:
     labels, cursor = [], None
     while True:
         after = f', after: "{cursor}"' if cursor else ""
@@ -404,11 +404,7 @@ def list_labels(api_key: str, team_id: str | None = None) -> list:
         if not page["pageInfo"]["hasNextPage"]:
             break
         cursor = page["pageInfo"]["endCursor"]
-    return labels_for_team(labels, team_id) if team_id else labels
-
-
-def labels_for_team(labels: list, team_id: str) -> list:
-    return [lbl for lbl in labels if label_usable(lbl, team_id)]
+    return labels
 
 
 # ---- Read: issues, projects, teams, comments, viewer ----
@@ -514,17 +510,12 @@ def resolve_state_for_issue(
     raise LinearError(f"State {state_name!r} not found on team for {issue_identifier}")
 
 
-def resolve_labels_for_team(api_key: str, team_id: str, names: list) -> list:
-    labels = [lbl for lbl in list_labels(api_key) if label_usable(lbl, team_id)]
-    by_name = {lbl["name"]: lbl["id"] for lbl in labels}
+def resolve_workspace_labels(api_key: str, names: list) -> list:
+    by_name = {lbl["name"]: lbl["id"] for lbl in workspace_labels(api_key)}
     missing = [n for n in names if n not in by_name]
     if missing:
-        raise LinearError(f"Labels not found on team: {missing}")
+        raise LinearError(f"Labels not found: {missing}")
     return [by_name[n] for n in names]
-
-
-def label_usable(label: dict, team_id: str) -> bool:
-    return not label.get("team") or label["team"]["id"] == team_id
 
 
 def looks_like_uuid(value: str) -> bool:
@@ -940,8 +931,8 @@ def label_drift() -> list:
     return [lbl for lbl in declared_labels() if lbl["name"] not in present]
 
 
-def workspace_labels() -> list:
-    return [lbl for lbl in list_labels(bearer_token()) if not lbl.get("team")]
+def workspace_labels(api_key: str | None = None) -> list:
+    return [lbl for lbl in list_labels(api_key or bearer_token()) if not lbl.get("team")]
 
 
 def declared_labels() -> list:

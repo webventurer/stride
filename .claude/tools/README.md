@@ -53,7 +53,7 @@ Stride's Linear client is split across two files:
 
 - `resolve_project_id(api_key, name_or_id)` — round-trips UUIDs unchanged; resolves names via one query.
 - `resolve_state_for_issue(api_key, identifier, state_name)` — returns `(issue_uuid, state_id)` in a single round-trip.
-- `resolve_labels_for_team(api_key, team_id, names)` — translates label names → UUIDs scoped to a team.
+- `resolve_workspace_labels(api_key, names)` — translates workspace label names → UUIDs.
 
 `LinearError` is raised on HTTP, network, or GraphQL errors.
 
@@ -69,7 +69,7 @@ Every command outputs JSON. Slash commands parse JSON; ad-hoc terminal use pipes
 
 **Projects**: `project list` · `project create -t <team> --name <name> [--description <subtitle>] [--content <body>]` · `project get <name-or-id>` (accepts either) · `project update <id> --description "..."`
 
-**Labels**: `label list -t <team>`
+**Labels**: `label list`
 
 **Viewer**: `whoami`
 
