@@ -197,7 +197,7 @@ If no signals fire, skip silently and continue to step 7 — feature-shaped is t
 - Search the codebase for 2–5 relevant files using Grep/Glob — summarise patterns or constraints, avoid exhaustive repository analysis
 - Check Linear for similar issues via `uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "<keywords>"` (broader search than step 3)
 - Read relevant project documentation if necessary (see [reference/project-docs.md](reference/project-docs.md) for standard paths)
-- Fetch available labels via `uv run .claude/tools/linear_cli.py label list --team <TEAM>` for the resolved team
+- Fetch available labels via `uv run .claude/tools/linear_cli.py label list` (workspace-scoped)
 - Summarise findings for use in the draft
 
 ### 8. Test consideration

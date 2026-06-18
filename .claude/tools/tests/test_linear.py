@@ -51,7 +51,6 @@ from linear import (  # noqa: E402
     graphql_data,
     in_canonical_order,
     label_drift,
-    labels_for_team,
     list_by_parent,
     list_by_project_state,
     list_by_project_state_type,
@@ -70,9 +69,9 @@ from linear import (  # noqa: E402
     provision_states,
     raise_for_graphql_errors,
     raise_for_http,
-    resolve_labels_for_team,
     resolve_project_id,
     resolve_state_for_issue,
+    resolve_workspace_labels,
     search_by_project,
     set_project_view_manual,
     set_sort_order,
@@ -867,49 +866,38 @@ def test_resolve_state_for_issue_raises_when_state_name_missing():
     assert "In Progress" in str(excinfo.value)
 
 
-def test_resolve_labels_for_team_translates_names_to_ids():
+def test_resolve_workspace_labels_translates_names_to_ids():
     labels = {"issueLabels": {"nodes": [
-        {"id": "lbl-bug", "name": "bug", "team": {"id": "team-1"}},
-        {"id": "lbl-feat", "name": "feature", "team": {"id": "team-1"}},
+        {"id": "lbl-bug", "name": "bug", "team": None},
+        {"id": "lbl-feat", "name": "feature", "team": None},
     ], "pageInfo": {"hasNextPage": False, "endCursor": None}}}
     with patch("linear.requests.post", return_value=ok_response(labels)):
-        result = resolve_labels_for_team("lin_test", "team-1", ["bug", "feature"])
+        result = resolve_workspace_labels("lin_test", ["bug", "feature"])
 
     assert result == ["lbl-bug", "lbl-feat"]
 
 
-def test_resolve_labels_for_team_raises_for_missing_label():
+def test_resolve_workspace_labels_raises_for_missing_label():
     labels = {"issueLabels": {"nodes": [
-        {"id": "lbl-bug", "name": "bug", "team": {"id": "team-1"}},
+        {"id": "lbl-bug", "name": "bug", "team": None},
     ], "pageInfo": {"hasNextPage": False, "endCursor": None}}}
     with patch("linear.requests.post", return_value=ok_response(labels)):
         with pytest.raises(LinearError) as excinfo:
-            resolve_labels_for_team("lin_test", "team-1", ["bug", "made-up"])
+            resolve_workspace_labels("lin_test", ["bug", "made-up"])
 
     assert "made-up" in str(excinfo.value)
 
 
-def test_resolve_labels_for_team_accepts_a_workspace_label():
+def test_resolve_workspace_labels_ignores_team_scoped_label():
     labels = {"issueLabels": {"nodes": [
         {"id": "lbl-bug", "name": "Bug", "team": None},
         {"id": "lbl-story", "name": "Story", "team": {"id": "team-1"}},
     ], "pageInfo": {"hasNextPage": False, "endCursor": None}}}
     with patch("linear.requests.post", return_value=ok_response(labels)):
-        result = resolve_labels_for_team("lin_test", "team-1", ["Bug", "Story"])
+        with pytest.raises(LinearError) as excinfo:
+            resolve_workspace_labels("lin_test", ["Story"])
 
-    assert result == ["lbl-bug", "lbl-story"]
-
-
-def test_labels_for_team_includes_workspace_and_own_team_labels():
-    labels = [
-        {"name": "Bug", "team": None},
-        {"name": "Story", "team": {"id": "team-1"}},
-        {"name": "Other", "team": {"id": "team-2"}},
-    ]
-
-    kept = [lbl["name"] for lbl in labels_for_team(labels, "team-1")]
-
-    assert kept == ["Bug", "Story"]
+    assert "Story" in str(excinfo.value)
 
 
 # ---- WB-454: extended issue mutations (create returns full object, update with parent) ----

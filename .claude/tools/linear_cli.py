@@ -37,7 +37,6 @@ from linear import (  # noqa: E402
     list_by_project_state,
     list_by_project_state_type,
     list_comments,
-    list_labels,
     list_milestones,
     list_projects,
     list_team_states,
@@ -49,7 +48,6 @@ from linear import (  # noqa: E402
     provision_labels,
     provision_states,
     read_text_arg,
-    resolve_labels_for_team,
     resolve_project_id,
     resolve_state_for_issue,
     search_by_project,
@@ -61,6 +59,8 @@ from linear import (  # noqa: E402
     update_project,
     update_project_content,
     whoami,
+    workspace_labels,
+    resolve_workspace_labels,
 )
 
 
@@ -281,7 +281,7 @@ def issue_create_cmd(
         priority=priority,
         state_id=state_id_for_create(api, team, state_name),
         project_milestone_id=milestone_id_for_create(api, project_id, milestone_name),
-        label_ids=label_ids_for_create(api, team_obj["id"], labels),
+        label_ids=label_ids_for_create(api, labels),
         parent_id=parent_id_or_none(api, parent_identifier),
     ))
 
@@ -319,7 +319,7 @@ def issue_update_cmd(
         priority=priority,
         state_id=state_id_for_update(api, identifier, state_name),
         parent_id=parent_id_or_none(api, parent_identifier),
-        label_ids=label_ids_for_update(api, identifier, labels),
+        label_ids=label_ids_for_update(api, labels),
     ))
 
 
@@ -442,10 +442,8 @@ def label_group():
 
 
 @label_group.command("list")
-@click.option("-t", "--team", required=True, help="Team key (e.g. WB)")
-def label_list_cmd(team: str):
-    api = bearer_token()
-    echo_json(list_labels(api, team_or_fail(api, team)["id"]))
+def label_list_cmd():
+    echo_json(workspace_labels())
 
 
 # ---- CLI-only helpers ----
@@ -506,31 +504,20 @@ def milestone_id_for_create(
 
 def label_ids_for_create(
     api_key: str,
-    team_id: str,
     labels: str | None,
 ) -> list | None:
     if not labels:
         return None
-    return resolve_labels_for_team(
-        api_key,
-        team_id,
-        [n.strip() for n in labels.split(",")],
-    )
+    return resolve_workspace_labels(api_key, [n.strip() for n in labels.split(",")])
 
 
 def label_ids_for_update(
     api_key: str,
-    identifier: str,
     labels: str | None,
 ) -> list | None:
     if labels is None:
         return None
-    issue = get_issue(api_key, identifier)
-    return resolve_labels_for_team(
-        api_key,
-        issue["team"]["id"],
-        [n.strip() for n in labels.split(",")],
-    )
+    return resolve_workspace_labels(api_key, [n.strip() for n in labels.split(",")])
 
 
 if __name__ == "__main__":
