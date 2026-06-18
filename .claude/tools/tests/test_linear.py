@@ -684,6 +684,23 @@ def test_provision_labels_in_sync_when_labels_exist_at_workspace_scope():
     assert mock.call_count == 1
 
 
+def test_provision_labels_points_at_recovery_runbook_on_duplicate():
+    page = labels_page([])
+
+    def fake_post(url: str, json: dict | None = None, headers: dict | None = None, **kwargs) -> MagicMock:
+        if "issueLabelCreate" in json["query"]:
+            return graphql_errors_response([{"message": "duplicate label name"}])
+        return ok_response(page)
+
+    with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
+        with patch("linear.requests.post", side_effect=fake_post):
+            with patch("linear.declared_labels", return_value=THREE_LABELS):
+                with pytest.raises(LinearError) as excinfo:
+                    provision_labels()
+
+    assert "recovery/team-to-workspace-labels.md" in str(excinfo.value)
+
+
 def test_label_drift_empty_when_labels_exist_workspace_wide():
     page = labels_page([workspace_label("Bug"), workspace_label("Epic"), workspace_label("Story")])
     env, post = with_env_and_mock(page)

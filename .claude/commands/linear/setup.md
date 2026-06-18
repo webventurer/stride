@@ -44,6 +44,7 @@ Type labels are created at **workspace scope**, so every team inherits them and 
 
 - **`{"created": [...], "in_sync": false}`** — created the listed labels.
 - **`{"created": [], "in_sync": true}`** — every declared label already exists; nothing changed.
+- **Fails with `duplicate label name`** — an older install still carries a same-named **team-scoped** label, which blocks the workspace one. Point the user at the recovery runbook [recovery/team-to-workspace-labels.md](recovery/team-to-workspace-labels.md), which migrates team-scoped type labels to workspace scope.
 
 These are the labels stride applies at card creation (`/linear:plan-work`, `/linear:quick`, the epic flow) so a card's type is visible on the board.
 
