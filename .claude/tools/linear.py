@@ -107,7 +107,7 @@ DEFAULT_FOCUS = "outcome"
 
 def parse_legacy_config(text: str) -> dict:
     lines = [s for s in (r.strip() for r in text.splitlines()) if s and not s.startswith("#")]
-    config = {k.strip(): v.strip() for l in lines if "=" in l for k, v in [l.split("=", 1)]}
+    config = {k.strip(): v.strip() for line in lines if "=" in line for k, v in [line.split("=", 1)]}
     if lines and "=" not in lines[0]:
         config.setdefault("project", lines[0])
     return config
