@@ -75,13 +75,13 @@ Surface this as a closing note; setup can't do it for them.
 
 Provisioning readies a *team's* board; a repo also needs to know *which project* its `/linear:*` issues belong to — that binding is `.stride.json` at the repo root. Setup offers to create it when missing, so a fresh repo reaches a working board in one command.
 
-First, migrate any legacy `.linear_project` pin (INI-style, from before stride moved to `.stride.json`). This is a no-op when there's no legacy file, so it's always safe to run before the check:
+First, migrate any legacy `.linear_project` pin — safe to run always (a no-op when there's no legacy file):
 
 ```bash
 uv run .claude/tools/linear_cli.py migrate-legacy-config
 ```
 
-A legacy file is rewritten as `.stride.json` and deleted, so a previously legacy-pinned repo now reads as **already pinned** in the check below — that's what stops setup from creating a duplicate project. If the migration wrote `.stride.json`, append it to `.gitignore` when it isn't already listed.
+A migrated repo reads as **already pinned** in the check below, so setup won't create a duplicate project; append `.stride.json` to `.gitignore` if it isn't already listed. What the migration does, and how to recover a malformed legacy file: [recovery/legacy-config-to-stride-json.md](recovery/legacy-config-to-stride-json.md).
 
 Then materialise the `focus` default into an existing config that predates the field. This writes `"focus": "outcome"` into a `.stride.json` that lacks it, and is a no-op when the file is missing or already has `focus` (an explicit `"technical"` is never clobbered):
 
