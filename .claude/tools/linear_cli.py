@@ -22,7 +22,6 @@ import click
 sys.path.insert(0, str(Path(__file__).parent))
 
 from linear import (  # noqa: E402
-    backfill_focus,
     bearer_token,
     create_attachment,
     create_comment,
@@ -42,7 +41,6 @@ from linear import (  # noqa: E402
     list_team_states,
     list_teams,
     milestone_open_issues,
-    migrate_from_legacy,
     min_backlog_sort_order,
     project_content,
     provision_labels,
@@ -62,6 +60,7 @@ from linear import (  # noqa: E402
     workspace_labels,
     resolve_workspace_labels,
 )
+from legacy import backfill_focus, migrate_from_legacy  # noqa: E402
 
 
 @click.group()

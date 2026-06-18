@@ -101,38 +101,11 @@ def require_env(name: str) -> str:
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 STRIDE_CONFIG_PATH = REPO_ROOT / ".stride.json"
-LEGACY_CONFIG_PATH = REPO_ROOT / ".linear_project"
 DEFAULT_FOCUS = "outcome"
-
-
-def parse_legacy_config(text: str) -> dict:
-    lines = [s for s in (r.strip() for r in text.splitlines()) if s and not s.startswith("#")]
-    config = {k.strip(): v.strip() for line in lines if "=" in line for k, v in [line.split("=", 1)]}
-    if lines and "=" not in lines[0]:
-        config.setdefault("project", lines[0])
-    return config
 
 
 def write_config(config: dict) -> None:
     STRIDE_CONFIG_PATH.write_text(json.dumps(config, indent=2) + "\n")
-
-
-def migrate_from_legacy() -> dict:
-    if not LEGACY_CONFIG_PATH.exists():
-        return {}
-    config = parse_legacy_config(LEGACY_CONFIG_PATH.read_text())
-    require_project(config)
-    write_config(config)
-    LEGACY_CONFIG_PATH.unlink()
-    return config
-
-
-def require_project(config: dict):
-    if not config.get("project"):
-        raise LinearError(
-            f"{LEGACY_CONFIG_PATH} is malformed (no project found) — left in "
-            "place. Fix it or delete it and re-run /linear:setup."
-        )
 
 
 def read_config_json() -> dict:
@@ -149,14 +122,6 @@ def project_config() -> dict:
     return read_config_json() if STRIDE_CONFIG_PATH.exists() else {}
 
 
-def backfill_focus() -> dict:
-    config = project_config()
-    if config and "focus" not in config:
-        config["focus"] = DEFAULT_FOCUS
-        write_config(config)
-    return config
-
-
 def token_from_project_config() -> str | None:
     env_name = project_config().get("api_key_env")
     return os.environ.get(env_name) if env_name else None
@@ -166,9 +131,8 @@ def bearer_token() -> str:
     token = os.environ.get("LINEAR_API_KEY") or token_from_project_config()
     if not token:
         raise LinearError(
-            "No Linear credentials. Run /linear:setup to create .stride.json "
-            "(it also upgrades a legacy .linear_project), or set LINEAR_API_KEY "
-            "in ~/.env."
+            "No Linear credentials. Run /linear:setup to create .stride.json, "
+            "or set LINEAR_API_KEY in ~/.env."
         )
     return token
 
