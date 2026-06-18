@@ -83,13 +83,13 @@ uv run .claude/tools/linear_cli.py migrate-legacy-config
 
 A migrated repo reads as **already pinned** in the check below, so setup won't create a duplicate project; append `.stride.json` to `.gitignore` if it isn't already listed. What the migration does, and how to recover a malformed legacy file: [recovery/legacy-config-to-stride-json.md](recovery/legacy-config-to-stride-json.md).
 
-Then materialise the `focus` default into an existing config that predates the field. This writes `"focus": "outcome"` into a `.stride.json` that lacks it, and is a no-op when the file is missing or already has `focus` (an explicit `"technical"` is never clobbered):
+Then materialise the `focus` default into a config that predates the field — a no-op when the file is missing or already has `focus`:
 
 ```bash
 uv run .claude/tools/linear_cli.py backfill-focus
 ```
 
-Setup is the single place `focus` is materialised — the output-generating commands only ever *read* it (falling back to `outcome` when absent), so running them never rewrites the config as a side effect.
+Setup is the single place `focus` is materialised — the output-generating commands only ever *read* it (falling back to `outcome` when absent), so running them never rewrites the config as a side effect. What the backfill writes, the no-clobber rule, and how to recover a malformed config: [recovery/backfill-focus-field.md](recovery/backfill-focus-field.md).
 
 Then check for `.stride.json` at the repo root:
 
