@@ -1,6 +1,6 @@
 # Check Linear connections
 
-Verify stride can authenticate against every configured Linear workspace, then confirm each team's board carries the workflow states and type labels stride uses.
+Verify stride can authenticate against every configured Linear workspace, then confirm each team's board carries the workflow states stride uses and the workspace carries stride's type labels.
 
 ## Steps
 
@@ -52,26 +52,26 @@ Report one row per team:
 
 If a team drifts, point the user at [`/linear:setup`](setup.md) for that team — on an empty board it provisions the states to match; on a populated board it reports the target order for the human to apply (rename the board state to match `linear_statuses.json`, or edit the JSON to match the board). stride never auto-reconciles — the board is the source of truth for what *exists*, the JSON for what stride *uses*. Only ever suggest `/linear:setup`; never run it automatically from `/linear:check`.
 
-### 4. Verify each team carries stride's type labels
+### 4. Verify the workspace carries stride's type labels
 
-The type labels stride tags cards with (`Bug`, `Epic`, `Story`) live in one place: [`linear_labels.json`](linear_labels.json). A card-creating flow that asks for a label the board lacks can't apply it, so the card's type stays invisible. This step confirms every label stride declares exists on the live board.
+The type labels stride tags cards with (`Bug`, `Epic`, `Story`) live in one place: [`linear_labels.json`](linear_labels.json). A card-creating flow that asks for a label the board lacks can't apply it, so the card's type stays invisible. This step confirms every label stride declares exists in the workspace.
 
-Run the drift check **once per team**, passing the team key — same teams enumerated in step 3. Without `--team` the tool checks only the workspace's first team:
+Type labels are **workspace-scoped** — inherited by every team — so the drift check runs **once per workspace**, not per team — no `--team` flag:
 
 ```bash
-LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py label-drift --team <TEAM-KEY>
+LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py label-drift
 ```
 
-It returns a JSON list of the `{name, color}` labels stride declares but the board lacks. An empty list (`[]`) means that team carries every type label stride uses (extra labels are fine — the JSON records what stride *uses*, not everything that exists). `label-drift` is read-only.
+It returns a JSON list of the `{name, color}` labels stride declares but the workspace lacks. An empty list (`[]`) means the workspace carries every type label stride uses (extra labels are fine — the JSON records what stride *uses*, not everything that exists). `label-drift` is read-only.
 
-Report one row per team:
+Report one row per workspace:
 
-| Workspace | Team | Labels | Drift |
-|:----------|:-----|:-------|:------|
-| Org1 | ENG | ✅ in sync | — |
-| Org1 | OPS | ⚠️ drift | `Epic`, `Story` missing |
+| Workspace | Labels | Drift |
+|:----------|:-------|:------|
+| Org1 | ✅ in sync | — |
+| Org2 | ⚠️ drift | `Epic`, `Story` missing |
 
-If a team drifts, point the user at [`/linear:setup`](setup.md) — `provision-labels` creates the missing ones non-destructively (no advise mode; creating a label never touches existing work). Only ever suggest `/linear:setup`; never run it automatically from `/linear:check`.
+If a workspace drifts, point the user at [`/linear:setup`](setup.md) — `provision-labels` creates the missing ones non-destructively (no advise mode; creating a label never touches existing work). Only ever suggest `/linear:setup`; never run it automatically from `/linear:check`.
 
 ### 5. Verify the repo is pinned to a project
 
@@ -100,4 +100,4 @@ A health-check reminder, not a failure — it always prints, since the mode is u
 
 ### 7. Summary
 
-End with a one-line summary: "N of M Linear workspaces connected; K of L team boards in sync on states and labels, N drifted; project binding ok / unresolved / not pinned." If any board drifted (states or labels) or the project binding didn't resolve, name `/linear:setup` as the next step.
+End with a one-line summary: "N of M Linear workspaces connected; K of L team boards in sync on states, N drifted; type labels in sync / drifted per workspace; project binding ok / unresolved / not pinned." If any board drifted on states, any workspace drifted on labels, or the project binding didn't resolve, name `/linear:setup` as the next step.

@@ -927,43 +927,31 @@ def provision_states(team_key: str | None = None) -> dict:
     return setup_empty_team(team["id"], states, team["states"])
 
 
-# ---- Provision type labels ----
+# ---- Provision type labels (workspace-scoped) ----
 
 
-def provision_labels(team_key: str | None = None) -> dict:
-    team = team_with_labels(team_key or first_team_key())
-    if not team:
-        raise LinearError(f"no team found for key {team_key!r}")
-    created = [create_label(team["id"], lbl) for lbl in missing_labels(team)]
+def provision_labels() -> dict:
+    created = [create_label(lbl) for lbl in label_drift()]
     return {"created": created, "in_sync": not created}
 
 
-def label_drift(team_key: str | None = None) -> list:
-    return missing_labels(team_with_labels(team_key or first_team_key()))
-
-
-def missing_labels(team: dict) -> list:
-    present = {lbl["name"] for lbl in team.get("labels", {}).get("nodes", [])}
+def label_drift() -> list:
+    present = {lbl["name"] for lbl in workspace_labels()}
     return [lbl for lbl in declared_labels() if lbl["name"] not in present]
+
+
+def workspace_labels() -> list:
+    return [lbl for lbl in list_labels(bearer_token()) if not lbl.get("team")]
 
 
 def declared_labels() -> list:
     return json.loads(LABELS_PATH.read_text())["labels"]
 
 
-def team_with_labels(team_key: str) -> dict:
-    query = (
-        "query($key: String!) { teams(filter: { key: { eq: $key } }, first: 1) "
-        "{ nodes { id labels { nodes { name } } } } }"
-    )
-    nodes = graphql_data(query, {"key": team_key})["teams"]["nodes"]
-    return nodes[0] if nodes else {}
-
-
-def create_label(team_id: str, label: dict) -> dict:
+def create_label(label: dict) -> dict:
     query = (
         "mutation($input: IssueLabelCreateInput!) { "
         "issueLabelCreate(input: $input) { issueLabel { id name color } } }"
     )
-    label_input = {"teamId": team_id, "name": label["name"], "color": label["color"]}
+    label_input = {"name": label["name"], "color": label["color"]}
     return graphql_data(query, {"input": label_input})["issueLabelCreate"]["issueLabel"]
