@@ -921,9 +921,6 @@ def provision_states(team_key: str | None = None) -> dict:
 # ---- Provision type labels (workspace-scoped) ----
 
 
-RECOVERY_RUNBOOK = ".claude/commands/linear/recovery/team-to-workspace-labels.md"
-
-
 def provision_labels() -> dict:
     created = [provision_one(lbl) for lbl in label_drift()]
     return {"created": created, "in_sync": not created}
@@ -941,7 +938,7 @@ def raise_label_error(label: dict, err: LinearError):
         raise err
     raise LinearError(
         f"Can't create workspace label {label['name']!r} — a team-scoped "
-        f"label of the same name is blocking it. Recovery runbook: {RECOVERY_RUNBOOK}"
+        f"label of the same name is blocking it."
     ) from err
 
 
