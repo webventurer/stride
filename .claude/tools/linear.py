@@ -131,9 +131,8 @@ def bearer_token() -> str:
     token = os.environ.get("LINEAR_API_KEY") or token_from_project_config()
     if not token:
         raise LinearError(
-            "No Linear credentials. Run /linear:setup to create .stride.json "
-            "(it also upgrades a legacy .linear_project), or set LINEAR_API_KEY "
-            "in ~/.env."
+            "No Linear credentials. Run /linear:setup to create .stride.json, "
+            "or set LINEAR_API_KEY in ~/.env."
         )
     return token
 
