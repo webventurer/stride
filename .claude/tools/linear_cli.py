@@ -81,7 +81,9 @@ def search_by_project_cmd(project: str, text: str):
 @cli.command("list-by-project-state")
 @click.option("--project", required=True)
 @click.option("--state", required=True)
-@click.option("--since", default=None, help="ISO8601 duration/datetime, e.g. -P1W")
+@click.option(
+    "--since", default=None, help="ISO8601 duration/datetime, e.g. -P1W"
+)
 def list_by_project_state_cmd(project: str, state: str, since: str):
     echo_json(list_by_project_state(project, state, since))
 
@@ -119,7 +121,9 @@ def milestone_open_issues_cmd(milestone_id: str):
 @cli.command("create-milestone")
 @click.option("--project", "project_id", required=True)
 @click.option("--name", required=True)
-@click.option("--target-date", default=None, help="TimelessDate, e.g. 2026-12-31")
+@click.option(
+    "--target-date", default=None, help="TimelessDate, e.g. 2026-12-31"
+)
 def create_milestone_cmd(project_id: str, name: str, target_date: str):
     echo_json(create_milestone(project_id, name, target_date))
 
@@ -233,7 +237,9 @@ def issue_get_cmd(identifier: str):
 
 @issue_group.command("create")
 @click.option("-t", "--team", required=True, help="Team key (e.g. WB)")
-@click.option("--project", "project_name", default=None, help="Project name or UUID")
+@click.option(
+    "--project", "project_name", default=None, help="Project name or UUID"
+)
 @click.option(
     "--project-milestone",
     "milestone_name",
@@ -252,10 +258,15 @@ def issue_get_cmd(identifier: str):
     default="",
     help="Inline text, @path to read a file, or - to read stdin",
 )
-@click.option("--priority", type=int, default=None, help="0-4 (3=Medium default)")
+@click.option(
+    "--priority", type=int, default=None, help="0-4 (3=Medium default)"
+)
 @click.option("--labels", default=None, help="Comma-separated label names")
 @click.option(
-    "--parent", "parent_identifier", default=None, help="Parent issue identifier"
+    "--parent",
+    "parent_identifier",
+    default=None,
+    help="Parent issue identifier",
 )
 def issue_create_cmd(
     team: str,
@@ -271,25 +282,34 @@ def issue_create_cmd(
     api = bearer_token()
     team_obj = team_or_fail(api, team)
     project_id = resolve_project_id(api, project_name) if project_name else None
-    echo_json(create_issue(
-        api,
-        team_id=team_obj["id"],
-        title=title,
-        description=read_text_arg(description),
-        project_id=project_id,
-        priority=priority,
-        state_id=state_id_for_create(api, team, state_name),
-        project_milestone_id=milestone_id_for_create(api, project_id, milestone_name),
-        label_ids=label_ids_for_create(api, labels),
-        parent_id=parent_id_or_none(api, parent_identifier),
-    ))
+    echo_json(
+        create_issue(
+            api,
+            team_id=team_obj["id"],
+            title=title,
+            description=read_text_arg(description),
+            project_id=project_id,
+            priority=priority,
+            state_id=state_id_for_create(api, team, state_name),
+            project_milestone_id=milestone_id_for_create(
+                api, project_id, milestone_name
+            ),
+            label_ids=label_ids_for_create(api, labels),
+            parent_id=parent_id_or_none(api, parent_identifier),
+        )
+    )
 
 
 @issue_group.command("update")
 @click.argument("identifier")
-@click.option("--state", "state_name", default=None, help="State name (e.g. Doing)")
 @click.option(
-    "--parent", "parent_identifier", default=None, help="Parent issue identifier"
+    "--state", "state_name", default=None, help="State name (e.g. Doing)"
+)
+@click.option(
+    "--parent",
+    "parent_identifier",
+    default=None,
+    help="Parent issue identifier",
 )
 @click.option("--title", default=None)
 @click.option(
@@ -297,7 +317,9 @@ def issue_create_cmd(
     default=None,
     help="Inline text, @path to read a file, or - to read stdin",
 )
-@click.option("--labels", default=None, help="Comma-separated label names (replaces)")
+@click.option(
+    "--labels", default=None, help="Comma-separated label names (replaces)"
+)
 @click.option("--priority", type=int, default=None)
 def issue_update_cmd(
     identifier: str,
@@ -310,16 +332,18 @@ def issue_update_cmd(
 ):
     api = bearer_token()
     issue_uuid = get_issue(api, identifier)["id"]
-    echo_json(update_issue(
-        api,
-        issue_uuid,
-        title=title,
-        description=read_text_arg(description),
-        priority=priority,
-        state_id=state_id_for_update(api, identifier, state_name),
-        parent_id=parent_id_or_none(api, parent_identifier),
-        label_ids=label_ids_for_update(api, labels),
-    ))
+    echo_json(
+        update_issue(
+            api,
+            issue_uuid,
+            title=title,
+            description=read_text_arg(description),
+            priority=priority,
+            state_id=state_id_for_update(api, identifier, state_name),
+            parent_id=parent_id_or_none(api, parent_identifier),
+            label_ids=label_ids_for_update(api, labels),
+        )
+    )
 
 
 @issue_group.command("attach")
@@ -411,7 +435,10 @@ def project_create_cmd(
     api = bearer_token()
     team_obj = team_or_fail(api, team)
     project_id = create_project(
-        api, team_obj["id"], name, description=description,
+        api,
+        team_obj["id"],
+        name,
+        description=description,
         content=read_text_arg(content),
     )
     echo_json(get_project(api, project_id))
@@ -431,7 +458,9 @@ def project_update_cmd(identifier: str, description: str | None):
     if description is None:
         raise click.ClickException("Nothing to update — pass --description")
     api = bearer_token()
-    update_project(api, resolve_project_id(api, identifier), description=description)
+    update_project(
+        api, resolve_project_id(api, identifier), description=description
+    )
     echo_json({"identifier": identifier, "updated": True})
 
 
@@ -459,7 +488,9 @@ def team_or_fail(api_key: str, team_key: str) -> dict:
     return team
 
 
-def parent_id_or_none(api_key: str, parent_identifier: str | None) -> str | None:
+def parent_id_or_none(
+    api_key: str, parent_identifier: str | None
+) -> str | None:
     if parent_identifier is None:
         return None
     return get_issue(api_key, parent_identifier)["id"]
@@ -475,7 +506,9 @@ def state_id_for_create(
     for state in list_team_states(api_key, team_key):
         if state["name"] == state_name:
             return state["id"]
-    raise click.ClickException(f"State {state_name!r} not found on team {team_key!r}")
+    raise click.ClickException(
+        f"State {state_name!r} not found on team {team_key!r}"
+    )
 
 
 def state_id_for_update(
@@ -507,7 +540,9 @@ def label_ids_for_create(
 ) -> list | None:
     if not labels:
         return None
-    return resolve_workspace_labels(api_key, [n.strip() for n in labels.split(",")])
+    return resolve_workspace_labels(
+        api_key, [n.strip() for n in labels.split(",")]
+    )
 
 
 def label_ids_for_update(
@@ -516,7 +551,9 @@ def label_ids_for_update(
 ) -> list | None:
     if labels is None:
         return None
-    return resolve_workspace_labels(api_key, [n.strip() for n in labels.split(",")])
+    return resolve_workspace_labels(
+        api_key, [n.strip() for n in labels.split(",")]
+    )
 
 
 if __name__ == "__main__":

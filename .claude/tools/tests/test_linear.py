@@ -149,7 +149,9 @@ def test_raise_for_http_passes_on_2xx():
 
 def test_raise_for_graphql_errors_raises_when_errors_present():
     with pytest.raises(LinearError) as excinfo:
-        raise_for_graphql_errors({"errors": [{"message": "bad filter"}]}, "query { x }")
+        raise_for_graphql_errors(
+            {"errors": [{"message": "bad filter"}]}, "query { x }"
+        )
 
     assert "bad filter" in str(excinfo.value)
 
@@ -176,25 +178,41 @@ def test_bearer_token_raises_when_no_credentials():
 
 def test_graphql_sends_query_and_variables_to_linear_endpoint():
     with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
-        with patch("linear.requests.post", return_value=ok_response({"viewer": {"id": "u1"}})) as mock:
-            result = graphql("lin_test", "query { viewer { id } }", variables={"x": 1})
+        with patch(
+            "linear.requests.post",
+            return_value=ok_response({"viewer": {"id": "u1"}}),
+        ) as mock:
+            result = graphql(
+                "lin_test", "query { viewer { id } }", variables={"x": 1}
+            )
 
     assert result == {"data": {"viewer": {"id": "u1"}}}
     args, kwargs = mock.call_args
     assert args[0] == "https://api.linear.app/graphql"
-    assert kwargs["json"] == {"query": "query { viewer { id } }", "variables": {"x": 1}}
+    assert kwargs["json"] == {
+        "query": "query { viewer { id } }",
+        "variables": {"x": 1},
+    }
     assert kwargs["headers"]["Authorization"] == "lin_test"
 
 
 def test_graphql_data_returns_data_payload_not_full_body():
     with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
-        with patch("linear.requests.post", return_value=ok_response({"viewer": {"id": "u1"}})):
-            assert graphql_data("query { viewer { id } }", {}) == {"viewer": {"id": "u1"}}
+        with patch(
+            "linear.requests.post",
+            return_value=ok_response({"viewer": {"id": "u1"}}),
+        ):
+            assert graphql_data("query { viewer { id } }", {}) == {
+                "viewer": {"id": "u1"}
+            }
 
 
 def test_graphql_data_raises_on_graphql_errors():
     with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
-        with patch("linear.requests.post", return_value=graphql_errors_response([{"message": "bad filter"}])):
+        with patch(
+            "linear.requests.post",
+            return_value=graphql_errors_response([{"message": "bad filter"}]),
+        ):
             with pytest.raises(LinearError) as excinfo:
                 graphql_data("query { x }", {})
 
@@ -223,9 +241,9 @@ def with_env_and_mock(data: dict):
     def make_response():
         return ok_response(data)
 
-    return patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False), patch(
-        "linear.requests.post", return_value=make_response()
-    )
+    return patch.dict(
+        "os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False
+    ), patch("linear.requests.post", return_value=make_response())
 
 
 def test_search_by_project_passes_variables_and_returns_nodes():
@@ -302,7 +320,11 @@ def test_list_by_parent_filters_by_parent_id():
 
 
 def test_list_milestones_extracts_nested_nodes():
-    data = {"project": {"projectMilestones": {"nodes": [{"id": "m1", "name": "Phase 1"}]}}}
+    data = {
+        "project": {
+            "projectMilestones": {"nodes": [{"id": "m1", "name": "Phase 1"}]}
+        }
+    }
     env, post = with_env_and_mock(data)
     with env, post:
         assert list_milestones("proj-1") == [{"id": "m1", "name": "Phase 1"}]
@@ -319,7 +341,11 @@ def test_milestone_open_issues_filters_open_states():
 
 
 def test_create_milestone_includes_target_date_when_given():
-    data = {"projectMilestoneCreate": {"projectMilestone": {"id": "m2", "name": "Q4"}}}
+    data = {
+        "projectMilestoneCreate": {
+            "projectMilestone": {"id": "m2", "name": "Q4"}
+        }
+    }
     env, post = with_env_and_mock(data)
     with env, post as mock:
         result = create_milestone("proj-1", "Q4", target_date="2026-12-31")
@@ -330,7 +356,11 @@ def test_create_milestone_includes_target_date_when_given():
 
 
 def test_create_milestone_omits_target_date_when_absent():
-    data = {"projectMilestoneCreate": {"projectMilestone": {"id": "m3", "name": "Q4"}}}
+    data = {
+        "projectMilestoneCreate": {
+            "projectMilestone": {"id": "m3", "name": "Q4"}
+        }
+    }
     env, post = with_env_and_mock(data)
     with env, post as mock:
         create_milestone("proj-1", "Q4")
@@ -343,7 +373,9 @@ def test_update_milestone_description_returns_success():
     data = {"projectMilestoneUpdate": {"success": True}}
     env, post = with_env_and_mock(data)
     with env, post:
-        assert update_milestone_description("m1", "Completed: 2026-05-24") is True
+        assert (
+            update_milestone_description("m1", "Completed: 2026-05-24") is True
+        )
 
 
 # ---- project content ----
@@ -363,14 +395,21 @@ def test_update_project_content_passes_content_and_returns_success():
         result = update_project_content("proj-1", "# Vision: stride")
 
     assert result is True
-    assert sent_variables(mock) == {"id": "proj-1", "content": "# Vision: stride"}
+    assert sent_variables(mock) == {
+        "id": "proj-1",
+        "content": "# Vision: stride",
+    }
 
 
 # ---- board order ----
 
 
 def test_min_backlog_sort_order_returns_minimum_not_first_node():
-    nodes = [{"sortOrder": -204750}, {"sortOrder": -205050}, {"sortOrder": -204850}]
+    nodes = [
+        {"sortOrder": -204750},
+        {"sortOrder": -205050},
+        {"sortOrder": -204850},
+    ]
     data = {"project": {"issues": {"nodes": nodes}}}
     env, post = with_env_and_mock(data)
     with env, post:
@@ -438,7 +477,9 @@ def teams(nodes: list) -> dict:
 
 
 def test_board_states_filters_by_team_key_and_flattens_nodes():
-    data = teams([{"states": {"nodes": [{"name": "Doing", "type": "started"}]}}])
+    data = teams(
+        [{"states": {"nodes": [{"name": "Doing", "type": "started"}]}}]
+    )
     env, post = with_env_and_mock(data)
     with env, post as mock:
         result = board_states("WB")
@@ -455,7 +496,9 @@ def test_board_states_returns_empty_when_no_team_matches():
 
 
 def test_declared_states_flattens_grouped_names_into_typed_pairs():
-    config = {"states": {"started": ["Doing", "In Review"], "completed": ["Done"]}}
+    config = {
+        "states": {"started": ["Doing", "In Review"], "completed": ["Done"]}
+    }
 
     assert declared_states(config) == {
         ("Doing", "started"),
@@ -466,20 +509,30 @@ def test_declared_states_flattens_grouped_names_into_typed_pairs():
 
 def test_state_drift_flags_declared_state_missing_from_board():
     statuses = {"states": {"started": ["Doing", "In Progress"]}}
-    board = teams([{"states": {"nodes": [{"name": "Doing", "type": "started"}]}}])
+    board = teams(
+        [{"states": {"nodes": [{"name": "Doing", "type": "started"}]}}]
+    )
     env, post = with_env_and_mock(board)
     with env, post:
         with patch("linear.load_statuses", return_value=statuses):
-            assert state_drift("WB") == [{"name": "In Progress", "type": "started"}]
+            assert state_drift("WB") == [
+                {"name": "In Progress", "type": "started"}
+            ]
 
 
 def test_state_drift_empty_when_board_carries_every_declared_state():
     statuses = {"states": {"started": ["Doing"]}}
     board = teams(
-        [{"states": {"nodes": [
-            {"name": "Doing", "type": "started"},
-            {"name": "Done", "type": "completed"},
-        ]}}]
+        [
+            {
+                "states": {
+                    "nodes": [
+                        {"name": "Doing", "type": "started"},
+                        {"name": "Done", "type": "completed"},
+                    ]
+                }
+            }
+        ]
     )
     env, post = with_env_and_mock(board)
     with env, post:
@@ -502,7 +555,9 @@ ONE_TYPE = {"started": ["Doing", "In Review"]}
 
 
 def test_create_workflow_state_passes_typed_input_and_color():
-    data = {"workflowStateCreate": {"workflowState": {"id": "s1", "name": "Doing"}}}
+    data = {
+        "workflowStateCreate": {"workflowState": {"id": "s1", "name": "Doing"}}
+    }
     env, post = with_env_and_mock(data)
     with env, post as mock:
         create_workflow_state("team-1", "Doing", "started", "#f2c94c", 2.0)
@@ -586,18 +641,45 @@ def test_in_canonical_order_ignores_cross_group_positions():
 
 
 def test_provision_states_creates_missing_and_reports_them():
-    board = {"teams": {"nodes": [{"id": "t1", "issues": {"nodes": []}, "states": {"nodes": [
-        {"id": "b", "name": "Backlog", "type": "backlog", "position": 0.0},
-    ]}}]}}
+    board = {
+        "teams": {
+            "nodes": [
+                {
+                    "id": "t1",
+                    "issues": {"nodes": []},
+                    "states": {
+                        "nodes": [
+                            {
+                                "id": "b",
+                                "name": "Backlog",
+                                "type": "backlog",
+                                "position": 0.0,
+                            },
+                        ]
+                    },
+                }
+            ]
+        }
+    }
     created_state = {"workflowStateCreate": {"workflowState": {"id": "new"}}}
 
-    def fake_post(url: str, json: dict | None = None, headers: dict | None = None, **kwargs) -> MagicMock:
+    def fake_post(
+        url: str,
+        json: dict | None = None,
+        headers: dict | None = None,
+        **kwargs,
+    ) -> MagicMock:
         query = json["query"]
         return ok_response(board if "teams(" in query else created_state)
 
     with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
         with patch("linear.requests.post", side_effect=fake_post):
-            with patch("linear.load_statuses", return_value={"states": {"backlog": ["Backlog"], "started": ["Doing"]}}):
+            with patch(
+                "linear.load_statuses",
+                return_value={
+                    "states": {"backlog": ["Backlog"], "started": ["Doing"]}
+                },
+            ):
                 result = provision_states("WB")
 
     assert result["created"] == [{"name": "Doing", "type": "started"}]
@@ -605,13 +687,40 @@ def test_provision_states_creates_missing_and_reports_them():
 
 
 def test_provision_states_in_sync_when_board_has_all_canonical():
-    board = {"teams": {"nodes": [{"id": "t1", "issues": {"nodes": []}, "states": {"nodes": [
-        {"id": "b", "name": "Backlog", "type": "backlog", "position": 0.0},
-        {"id": "d", "name": "Doing", "type": "started", "position": 1.0},
-    ]}}]}}
+    board = {
+        "teams": {
+            "nodes": [
+                {
+                    "id": "t1",
+                    "issues": {"nodes": []},
+                    "states": {
+                        "nodes": [
+                            {
+                                "id": "b",
+                                "name": "Backlog",
+                                "type": "backlog",
+                                "position": 0.0,
+                            },
+                            {
+                                "id": "d",
+                                "name": "Doing",
+                                "type": "started",
+                                "position": 1.0,
+                            },
+                        ]
+                    },
+                }
+            ]
+        }
+    }
     env, post = with_env_and_mock(board)
     with env, post as mock:
-        with patch("linear.load_statuses", return_value={"states": {"backlog": ["Backlog"], "started": ["Doing"]}}):
+        with patch(
+            "linear.load_statuses",
+            return_value={
+                "states": {"backlog": ["Backlog"], "started": ["Doing"]}
+            },
+        ):
             result = provision_states("WB")
 
     assert result == {
@@ -635,7 +744,12 @@ THREE_LABELS = [
 
 
 def labels_page(nodes: list) -> dict:
-    return {"issueLabels": {"nodes": nodes, "pageInfo": {"hasNextPage": False, "endCursor": None}}}
+    return {
+        "issueLabels": {
+            "nodes": nodes,
+            "pageInfo": {"hasNextPage": False, "endCursor": None},
+        }
+    }
 
 
 def workspace_label(name: str) -> dict:
@@ -643,9 +757,15 @@ def workspace_label(name: str) -> dict:
 
 
 def test_create_label_omits_team_id_from_input():
-    created = {"issueLabelCreate": {"issueLabel": {"id": "new", "name": "Bug", "color": "#eb5757"}}}
+    created = {
+        "issueLabelCreate": {
+            "issueLabel": {"id": "new", "name": "Bug", "color": "#eb5757"}
+        }
+    }
     with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
-        with patch("linear.requests.post", return_value=ok_response(created)) as mock:
+        with patch(
+            "linear.requests.post", return_value=ok_response(created)
+        ) as mock:
             create_label({"name": "Bug", "color": "#eb5757"})
 
     sent = sent_variables(mock)["input"]
@@ -657,8 +777,15 @@ def test_provision_labels_creates_all_three_at_workspace_scope():
     page = labels_page([])
     created = {"issueLabelCreate": {"issueLabel": {"id": "new"}}}
 
-    def fake_post(url: str, json: dict | None = None, headers: dict | None = None, **kwargs) -> MagicMock:
-        return ok_response(created if "issueLabelCreate" in json["query"] else page)
+    def fake_post(
+        url: str,
+        json: dict | None = None,
+        headers: dict | None = None,
+        **kwargs,
+    ) -> MagicMock:
+        return ok_response(
+            created if "issueLabelCreate" in json["query"] else page
+        )
 
     with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
         with patch("linear.requests.post", side_effect=fake_post):
@@ -670,7 +797,13 @@ def test_provision_labels_creates_all_three_at_workspace_scope():
 
 
 def test_provision_labels_in_sync_when_labels_exist_at_workspace_scope():
-    page = labels_page([workspace_label("Bug"), workspace_label("Epic"), workspace_label("Story")])
+    page = labels_page(
+        [
+            workspace_label("Bug"),
+            workspace_label("Epic"),
+            workspace_label("Story"),
+        ]
+    )
     env, post = with_env_and_mock(page)
     with env, post as mock:
         with patch("linear.declared_labels", return_value=THREE_LABELS):
@@ -684,9 +817,16 @@ def test_provision_labels_in_sync_when_labels_exist_at_workspace_scope():
 def test_provision_labels_names_blocking_label_on_duplicate():
     page = labels_page([])
 
-    def fake_post(url: str, json: dict | None = None, headers: dict | None = None, **kwargs) -> MagicMock:
+    def fake_post(
+        url: str,
+        json: dict | None = None,
+        headers: dict | None = None,
+        **kwargs,
+    ) -> MagicMock:
         if "issueLabelCreate" in json["query"]:
-            return graphql_errors_response([{"message": "duplicate label name"}])
+            return graphql_errors_response(
+                [{"message": "duplicate label name"}]
+            )
         return ok_response(page)
 
     with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
@@ -701,7 +841,13 @@ def test_provision_labels_names_blocking_label_on_duplicate():
 
 
 def test_label_drift_empty_when_labels_exist_workspace_wide():
-    page = labels_page([workspace_label("Bug"), workspace_label("Epic"), workspace_label("Story")])
+    page = labels_page(
+        [
+            workspace_label("Bug"),
+            workspace_label("Epic"),
+            workspace_label("Story"),
+        ]
+    )
     env, post = with_env_and_mock(page)
     with env, post:
         with patch("linear.declared_labels", return_value=THREE_LABELS):
@@ -729,7 +875,12 @@ def test_label_drift_ignores_a_same_name_team_scoped_label():
 
 def test_provision_labels_surfaces_api_errors():
     with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
-        with patch("linear.requests.post", return_value=graphql_errors_response([{"message": "api unavailable"}])):
+        with patch(
+            "linear.requests.post",
+            return_value=graphql_errors_response(
+                [{"message": "api unavailable"}]
+            ),
+        ):
             with patch("linear.declared_labels", return_value=THREE_LABELS):
                 with pytest.raises(LinearError) as excinfo:
                     provision_labels()
@@ -741,7 +892,13 @@ def test_provision_labels_surfaces_api_errors():
 
 
 def test_get_issue_returns_full_issue_object():
-    data = {"issue": {"identifier": "WB-453", "title": "Vendor a client", "state": {"name": "Done"}}}
+    data = {
+        "issue": {
+            "identifier": "WB-453",
+            "title": "Vendor a client",
+            "state": {"name": "Done"},
+        }
+    }
     with patch("linear.requests.post", return_value=ok_response(data)) as mock:
         result = get_issue("lin_test", "WB-453")
 
@@ -750,7 +907,13 @@ def test_get_issue_returns_full_issue_object():
 
 
 def test_get_project_returns_full_project_object():
-    data = {"project": {"id": "p1", "name": "Stride", "description": "Apply guardrails"}}
+    data = {
+        "project": {
+            "id": "p1",
+            "name": "Stride",
+            "description": "Apply guardrails",
+        }
+    }
     with patch("linear.requests.post", return_value=ok_response(data)) as mock:
         result = get_project("lin_test", "p1")
 
@@ -767,7 +930,9 @@ def test_whoami_wraps_viewer_in_authenticated_envelope():
 
 
 def test_list_teams_returns_team_nodes():
-    data = {"teams": {"nodes": [{"id": "t1", "key": "WB", "name": "Webventurer"}]}}
+    data = {
+        "teams": {"nodes": [{"id": "t1", "key": "WB", "name": "Webventurer"}]}
+    }
     with patch("linear.requests.post", return_value=ok_response(data)):
         result = list_teams("lin_test")
 
@@ -775,7 +940,9 @@ def test_list_teams_returns_team_nodes():
 
 
 def test_get_team_returns_first_match():
-    data = {"teams": {"nodes": [{"id": "t1", "key": "WB", "name": "Webventurer"}]}}
+    data = {
+        "teams": {"nodes": [{"id": "t1", "key": "WB", "name": "Webventurer"}]}
+    }
     with patch("linear.requests.post", return_value=ok_response(data)) as mock:
         result = get_team("lin_test", "WB")
 
@@ -784,15 +951,38 @@ def test_get_team_returns_first_match():
 
 
 def test_get_team_returns_none_when_no_match():
-    with patch("linear.requests.post", return_value=ok_response({"teams": {"nodes": []}})):
+    with patch(
+        "linear.requests.post",
+        return_value=ok_response({"teams": {"nodes": []}}),
+    ):
         assert get_team("lin_test", "NOPE") is None
 
 
 def test_list_team_states_returns_states_for_team():
-    data = {"teams": {"nodes": [{"states": {"nodes": [
-        {"id": "s1", "name": "Backlog", "type": "backlog", "position": 0.0},
-        {"id": "s2", "name": "Doing", "type": "started", "position": 1.0},
-    ]}}]}}
+    data = {
+        "teams": {
+            "nodes": [
+                {
+                    "states": {
+                        "nodes": [
+                            {
+                                "id": "s1",
+                                "name": "Backlog",
+                                "type": "backlog",
+                                "position": 0.0,
+                            },
+                            {
+                                "id": "s2",
+                                "name": "Doing",
+                                "type": "started",
+                                "position": 1.0,
+                            },
+                        ]
+                    }
+                }
+            ]
+        }
+    }
     with patch("linear.requests.post", return_value=ok_response(data)):
         result = list_team_states("lin_test", "WB")
 
@@ -800,14 +990,27 @@ def test_list_team_states_returns_states_for_team():
 
 
 def test_list_team_states_returns_empty_when_team_missing():
-    with patch("linear.requests.post", return_value=ok_response({"teams": {"nodes": []}})):
+    with patch(
+        "linear.requests.post",
+        return_value=ok_response({"teams": {"nodes": []}}),
+    ):
         assert list_team_states("lin_test", "NOPE") == []
 
 
 def test_list_comments_returns_comment_nodes():
-    data = {"issue": {"comments": {"nodes": [
-        {"id": "c1", "body": "Looks good", "user": {"name": "Mike"}},
-    ]}}}
+    data = {
+        "issue": {
+            "comments": {
+                "nodes": [
+                    {
+                        "id": "c1",
+                        "body": "Looks good",
+                        "user": {"name": "Mike"},
+                    },
+                ]
+            }
+        }
+    }
     with patch("linear.requests.post", return_value=ok_response(data)):
         result = list_comments("lin_test", "WB-453")
 
@@ -820,7 +1023,9 @@ def test_create_comment_sends_issue_uuid_and_body():
         result = create_comment("lin_test", "issue-uuid-1", "Hello")
 
     assert result == {"id": "c1", "body": "Hello"}
-    assert sent_variables(mock) == {"input": {"issueId": "issue-uuid-1", "body": "Hello"}}
+    assert sent_variables(mock) == {
+        "input": {"issueId": "issue-uuid-1", "body": "Hello"}
+    }
 
 
 # ---- WB-454: resolver helpers ----
@@ -834,7 +1039,9 @@ def testlooks_like_uuid_recognises_standard_uuid_format():
 
 def test_resolve_project_id_round_trips_uuids_without_a_query():
     with patch("linear.requests.post") as mock:
-        result = resolve_project_id("lin_test", "21cec394-2ee6-4ed9-b2aa-4acfed3caf00")
+        result = resolve_project_id(
+            "lin_test", "21cec394-2ee6-4ed9-b2aa-4acfed3caf00"
+        )
 
     assert result == "21cec394-2ee6-4ed9-b2aa-4acfed3caf00"
     mock.assert_not_called()
@@ -850,7 +1057,10 @@ def test_resolve_project_id_looks_up_names():
 
 
 def test_resolve_project_id_raises_when_name_unknown():
-    with patch("linear.requests.post", return_value=ok_response({"projects": {"nodes": []}})):
+    with patch(
+        "linear.requests.post",
+        return_value=ok_response({"projects": {"nodes": []}}),
+    ):
         with pytest.raises(LinearError) as excinfo:
             resolve_project_id("lin_test", "Nonexistent")
 
@@ -858,23 +1068,40 @@ def test_resolve_project_id_raises_when_name_unknown():
 
 
 def test_resolve_state_for_issue_returns_issue_uuid_and_state_id():
-    data = {"issue": {
-        "id": "issue-uuid",
-        "team": {"states": {"nodes": [
-            {"id": "s-backlog", "name": "Backlog"},
-            {"id": "s-doing", "name": "Doing"},
-        ]}},
-    }}
+    data = {
+        "issue": {
+            "id": "issue-uuid",
+            "team": {
+                "states": {
+                    "nodes": [
+                        {"id": "s-backlog", "name": "Backlog"},
+                        {"id": "s-doing", "name": "Doing"},
+                    ]
+                }
+            },
+        }
+    }
     with patch("linear.requests.post", return_value=ok_response(data)):
-        issue_uuid, state_id = resolve_state_for_issue("lin_test", "WB-453", "Doing")
+        issue_uuid, state_id = resolve_state_for_issue(
+            "lin_test", "WB-453", "Doing"
+        )
 
     assert (issue_uuid, state_id) == ("issue-uuid", "s-doing")
 
 
 def test_resolve_state_for_issue_raises_when_state_name_missing():
-    data = {"issue": {"id": "issue-uuid", "team": {"states": {"nodes": [
-        {"id": "s-backlog", "name": "Backlog"},
-    ]}}}}
+    data = {
+        "issue": {
+            "id": "issue-uuid",
+            "team": {
+                "states": {
+                    "nodes": [
+                        {"id": "s-backlog", "name": "Backlog"},
+                    ]
+                }
+            },
+        }
+    }
     with patch("linear.requests.post", return_value=ok_response(data)):
         with pytest.raises(LinearError) as excinfo:
             resolve_state_for_issue("lin_test", "WB-453", "In Progress")
@@ -883,10 +1110,15 @@ def test_resolve_state_for_issue_raises_when_state_name_missing():
 
 
 def test_resolve_workspace_labels_translates_names_to_ids():
-    labels = {"issueLabels": {"nodes": [
-        {"id": "lbl-bug", "name": "bug", "team": None},
-        {"id": "lbl-feat", "name": "feature", "team": None},
-    ], "pageInfo": {"hasNextPage": False, "endCursor": None}}}
+    labels = {
+        "issueLabels": {
+            "nodes": [
+                {"id": "lbl-bug", "name": "bug", "team": None},
+                {"id": "lbl-feat", "name": "feature", "team": None},
+            ],
+            "pageInfo": {"hasNextPage": False, "endCursor": None},
+        }
+    }
     with patch("linear.requests.post", return_value=ok_response(labels)):
         result = resolve_workspace_labels("lin_test", ["bug", "feature"])
 
@@ -894,9 +1126,14 @@ def test_resolve_workspace_labels_translates_names_to_ids():
 
 
 def test_resolve_workspace_labels_raises_for_missing_label():
-    labels = {"issueLabels": {"nodes": [
-        {"id": "lbl-bug", "name": "bug", "team": None},
-    ], "pageInfo": {"hasNextPage": False, "endCursor": None}}}
+    labels = {
+        "issueLabels": {
+            "nodes": [
+                {"id": "lbl-bug", "name": "bug", "team": None},
+            ],
+            "pageInfo": {"hasNextPage": False, "endCursor": None},
+        }
+    }
     with patch("linear.requests.post", return_value=ok_response(labels)):
         with pytest.raises(LinearError) as excinfo:
             resolve_workspace_labels("lin_test", ["bug", "made-up"])
@@ -905,10 +1142,15 @@ def test_resolve_workspace_labels_raises_for_missing_label():
 
 
 def test_resolve_workspace_labels_ignores_team_scoped_label():
-    labels = {"issueLabels": {"nodes": [
-        {"id": "lbl-bug", "name": "Bug", "team": None},
-        {"id": "lbl-story", "name": "Story", "team": {"id": "team-1"}},
-    ], "pageInfo": {"hasNextPage": False, "endCursor": None}}}
+    labels = {
+        "issueLabels": {
+            "nodes": [
+                {"id": "lbl-bug", "name": "Bug", "team": None},
+                {"id": "lbl-story", "name": "Story", "team": {"id": "team-1"}},
+            ],
+            "pageInfo": {"hasNextPage": False, "endCursor": None},
+        }
+    }
     with patch("linear.requests.post", return_value=ok_response(labels)):
         with pytest.raises(LinearError) as excinfo:
             resolve_workspace_labels("lin_test", ["Story"])
@@ -920,34 +1162,58 @@ def test_resolve_workspace_labels_ignores_team_scoped_label():
 
 
 def test_create_issue_returns_full_issue_object():
-    issue = {"id": "i1", "identifier": "WB-100", "title": "New", "state": {"name": "Backlog"}}
+    issue = {
+        "id": "i1",
+        "identifier": "WB-100",
+        "title": "New",
+        "state": {"name": "Backlog"},
+    }
     data = {"issueCreate": {"issue": issue}}
     with patch("linear.requests.post", return_value=ok_response(data)) as mock:
         result = create_issue("lin_test", team_id="t1", title="New")
 
     assert result == issue
-    assert sent_variables(mock) == {"input": {"teamId": "t1", "title": "New", "description": ""}}
+    assert sent_variables(mock) == {
+        "input": {"teamId": "t1", "title": "New", "description": ""}
+    }
 
 
 def test_create_issue_passes_optional_fields_when_provided():
     data = {"issueCreate": {"issue": {"id": "i1"}}}
     with patch("linear.requests.post", return_value=ok_response(data)) as mock:
         create_issue(
-            "lin_test", team_id="t1", title="New", project_id="p1",
-            state_id="s1", description="desc", label_ids=["l1"],
-            parent_id="parent-uuid", project_milestone_id="m1", priority=2,
+            "lin_test",
+            team_id="t1",
+            title="New",
+            project_id="p1",
+            state_id="s1",
+            description="desc",
+            label_ids=["l1"],
+            parent_id="parent-uuid",
+            project_milestone_id="m1",
+            priority=2,
         )
 
     input_data = sent_variables(mock)["input"]
     assert input_data == {
-        "teamId": "t1", "title": "New", "description": "desc",
-        "projectId": "p1", "stateId": "s1", "labelIds": ["l1"],
-        "parentId": "parent-uuid", "projectMilestoneId": "m1", "priority": 2,
+        "teamId": "t1",
+        "title": "New",
+        "description": "desc",
+        "projectId": "p1",
+        "stateId": "s1",
+        "labelIds": ["l1"],
+        "parentId": "parent-uuid",
+        "projectMilestoneId": "m1",
+        "priority": 2,
     }
 
 
 def test_update_issue_accepts_parent_id():
-    data = {"issueUpdate": {"issue": {"id": "i1", "parent": {"identifier": "WB-450"}}}}
+    data = {
+        "issueUpdate": {
+            "issue": {"id": "i1", "parent": {"identifier": "WB-450"}}
+        }
+    }
     with patch("linear.requests.post", return_value=ok_response(data)) as mock:
         result = update_issue("lin_test", "i1", parent_id="parent-uuid")
 
@@ -981,8 +1247,10 @@ def test_project_config_returns_empty_when_file_missing():
 
 
 def test_project_config_does_not_migrate_legacy_when_file_missing():
-    with patch("linear.STRIDE_CONFIG_PATH") as stride_path, \
-         patch("legacy.LEGACY_CONFIG_PATH") as legacy_path:
+    with (
+        patch("linear.STRIDE_CONFIG_PATH") as stride_path,
+        patch("legacy.LEGACY_CONFIG_PATH") as legacy_path,
+    ):
         stride_path.exists.return_value = False
         legacy_path.exists.return_value = True
         assert project_config() == {}
@@ -1001,7 +1269,9 @@ def test_config_paths_anchored_to_repo_root():
 def test_project_config_raises_on_invalid_json():
     with patch("linear.STRIDE_CONFIG_PATH") as path:
         path.exists.return_value = True
-        path.read_text.return_value = "project = Stride\napi_key_env = LINEAR_KEY\n"
+        path.read_text.return_value = (
+            "project = Stride\napi_key_env = LINEAR_KEY\n"
+        )
         with pytest.raises(LinearError, match="invalid JSON"):
             project_config()
 
@@ -1009,7 +1279,10 @@ def test_project_config_raises_on_invalid_json():
 def test_token_from_project_config_reads_named_env_var():
     data = {"project": "Stride", "api_key_env": "LINEAR_TEST_API_KEY"}
     env = {"LINEAR_TEST_API_KEY": "lin_from_named"}
-    with patch("linear.STRIDE_CONFIG_PATH") as path, patch.dict("os.environ", env, clear=True):
+    with (
+        patch("linear.STRIDE_CONFIG_PATH") as path,
+        patch.dict("os.environ", env, clear=True),
+    ):
         path.exists.return_value = True
         path.read_text.return_value = json.dumps(data)
         assert token_from_project_config() == "lin_from_named"
@@ -1017,7 +1290,10 @@ def test_token_from_project_config_reads_named_env_var():
 
 def test_token_from_project_config_returns_none_when_api_key_env_absent():
     data = {"project": "Stride"}
-    with patch("linear.STRIDE_CONFIG_PATH") as path, patch.dict("os.environ", {}, clear=True):
+    with (
+        patch("linear.STRIDE_CONFIG_PATH") as path,
+        patch.dict("os.environ", {}, clear=True),
+    ):
         path.exists.return_value = True
         path.read_text.return_value = json.dumps(data)
         assert token_from_project_config() is None
@@ -1032,7 +1308,10 @@ def test_token_from_project_config_returns_none_when_file_missing():
 def test_bearer_token_falls_through_to_project_config_when_no_env():
     data = {"project": "Stride", "api_key_env": "LINEAR_TEST_API_KEY"}
     env = {"LINEAR_TEST_API_KEY": "lin_from_config"}
-    with patch("linear.STRIDE_CONFIG_PATH") as path, patch.dict("os.environ", env, clear=True):
+    with (
+        patch("linear.STRIDE_CONFIG_PATH") as path,
+        patch.dict("os.environ", env, clear=True),
+    ):
         path.exists.return_value = True
         path.read_text.return_value = json.dumps(data)
         assert bearer_token() == "lin_from_config"
@@ -1042,8 +1321,11 @@ def test_create_project_returns_id_and_sends_team_input():
     data = {"projectCreate": {"project": {"id": "p-new"}}}
     with patch("linear.requests.post", return_value=ok_response(data)) as mock:
         result = create_project(
-            "lin_test", "team-1", "Stride",
-            description="tagline", content="# Vision",
+            "lin_test",
+            "team-1",
+            "Stride",
+            description="tagline",
+            content="# Vision",
         )
 
     assert result == "p-new"
@@ -1056,6 +1338,7 @@ def test_create_project_returns_id_and_sends_team_input():
 
 
 # ---- read_text_arg: resolve inline / @file / - stdin body arguments ----
+
 
 def test_read_text_arg_returns_none_unchanged():
     assert read_text_arg(None) is None
@@ -1102,30 +1385,46 @@ def test_issue_update_expands_at_file_description(tmp_path: Path):
     body = tmp_path / "desc.md"
     body.write_text("### Real content\nfrom a file")
 
-    with patch("linear_cli.bearer_token", return_value="lin_test"), patch(
-        "linear_cli.get_issue", return_value={"id": "issue-uuid"}
-    ), patch("linear_cli.update_issue", return_value={"id": "issue-uuid"}) as mock:
+    with (
+        patch("linear_cli.bearer_token", return_value="lin_test"),
+        patch("linear_cli.get_issue", return_value={"id": "issue-uuid"}),
+        patch(
+            "linear_cli.update_issue", return_value={"id": "issue-uuid"}
+        ) as mock,
+    ):
         result = CliRunner().invoke(
             linear_cli.cli,
             ["issue", "update", "WB-1", "--description", f"@{body}"],
         )
 
     assert result.exit_code == 0, result.output
-    assert mock.call_args.kwargs["description"] == "### Real content\nfrom a file"
+    assert (
+        mock.call_args.kwargs["description"] == "### Real content\nfrom a file"
+    )
 
 
 def test_project_create_expands_at_file_content(tmp_path: Path):
     vision = tmp_path / "VISION.md"
     vision.write_text("# Vision: stride")
 
-    with patch("linear_cli.bearer_token", return_value="lin_test"), patch(
-        "linear_cli.get_team", return_value={"id": "t1"}
-    ), patch("linear_cli.create_project", return_value="p1") as mock, patch(
-        "linear_cli.get_project", return_value={"id": "p1"}
+    with (
+        patch("linear_cli.bearer_token", return_value="lin_test"),
+        patch("linear_cli.get_team", return_value={"id": "t1"}),
+        patch("linear_cli.create_project", return_value="p1") as mock,
+        patch("linear_cli.get_project", return_value={"id": "p1"}),
     ):
         result = CliRunner().invoke(
             linear_cli.cli,
-            ["project", "create", "-t", "WB", "--name", "X", "--content", f"@{vision}"],
+            [
+                "project",
+                "create",
+                "-t",
+                "WB",
+                "--name",
+                "X",
+                "--content",
+                f"@{vision}",
+            ],
         )
 
     assert result.exit_code == 0, result.output
@@ -1133,7 +1432,10 @@ def test_project_create_expands_at_file_content(tmp_path: Path):
 
 
 def test_migrate_legacy_config_emits_migrated_config_as_json():
-    config = {"project": "AI Thought Partner", "api_key_env": "LINEAR_PERSONAL_API_KEY"}
+    config = {
+        "project": "AI Thought Partner",
+        "api_key_env": "LINEAR_PERSONAL_API_KEY",
+    }
     with patch("linear_cli.migrate_from_legacy", return_value=config):
         result = CliRunner().invoke(linear_cli.cli, ["migrate-legacy-config"])
 

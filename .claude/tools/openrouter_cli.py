@@ -34,7 +34,11 @@ def send(prompt: str, model: str, system: str = "", effort: str = "") -> dict:
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
-    payload = {"model": model, "messages": messages, "max_tokens": DEFAULT_MAX_TOKENS}
+    payload = {
+        "model": model,
+        "messages": messages,
+        "max_tokens": DEFAULT_MAX_TOKENS,
+    }
     if effort:
         payload["reasoning"] = {"enabled": True, "effort": effort}
     resp = httpx.post(
@@ -53,11 +57,17 @@ def send(prompt: str, model: str, system: str = "", effort: str = "") -> dict:
 @click.command()
 @click.argument("prompt")
 @click.option(
-    "-m", "--model", default=DEFAULT_MODEL, help=f"Model ID. Default: {DEFAULT_MODEL}."
+    "-m",
+    "--model",
+    default=DEFAULT_MODEL,
+    help=f"Model ID. Default: {DEFAULT_MODEL}.",
 )
 @click.option("-s", "--system", default="", help="System message.")
 @click.option(
-    "-r", "--reasoning-effort", default="", help="Reasoning effort: low, medium, high."
+    "-r",
+    "--reasoning-effort",
+    default="",
+    help="Reasoning effort: low, medium, high.",
 )
 def main(prompt: str, model: str, system: str, reasoning_effort: str):
     check_env()

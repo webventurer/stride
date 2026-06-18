@@ -35,7 +35,12 @@ FRAMEWORKS = {
 
 @click.command()
 @click.argument("base", type=int, default=5000)
-@click.option("--run", "launch_server", is_flag=True, help="Pick a framework and launch it on a free port.")
+@click.option(
+    "--run",
+    "launch_server",
+    is_flag=True,
+    help="Pick a framework and launch it on a free port.",
+)
 def main(base: int, launch_server: bool):
     if launch_server:
         run_framework(base)

@@ -25,11 +25,13 @@ import requests
 API_URL = "https://api.linear.app/graphql"
 
 STATUSES_PATH = (
-    Path(__file__).resolve().parent.parent / "commands/linear/linear_statuses.json"
+    Path(__file__).resolve().parent.parent
+    / "commands/linear/linear_statuses.json"
 )
 
 LABELS_PATH = (
-    Path(__file__).resolve().parent.parent / "commands/linear/linear_labels.json"
+    Path(__file__).resolve().parent.parent
+    / "commands/linear/linear_labels.json"
 )
 
 
@@ -263,7 +265,9 @@ def create_attachment(
         input_data["subtitle"] = subtitle
     if metadata:
         input_data["metadata"] = metadata
-    data = graphql(api_key, CREATE_ATTACHMENT_QUERY, variables={"input": input_data})
+    data = graphql(
+        api_key, CREATE_ATTACHMENT_QUERY, variables={"input": input_data}
+    )
     return data["data"]["attachmentCreate"]["attachment"]["id"]
 
 
@@ -288,7 +292,9 @@ def create_project(
         input_data["description"] = description
     if content is not None:
         input_data["content"] = content
-    data = graphql(api_key, CREATE_PROJECT_QUERY, variables={"input": input_data})
+    data = graphql(
+        api_key, CREATE_PROJECT_QUERY, variables={"input": input_data}
+    )
     return data["data"]["projectCreate"]["project"]["id"]
 
 
@@ -347,7 +353,11 @@ def list_projects(api_key: str, team_id: str | None = None) -> list:
 
 
 def filter_by_team(projects: list, team_id: str) -> list:
-    return [p for p in projects if any(t["id"] == team_id for t in p["teams"]["nodes"])]
+    return [
+        p
+        for p in projects
+        if any(t["id"] == team_id for t in p["teams"]["nodes"])
+    ]
 
 
 LIST_LABELS_QUERY = """{{
@@ -375,7 +385,9 @@ def list_labels(api_key: str) -> list:
 
 
 def get_issue(api_key: str, identifier: str) -> dict:
-    query = f"query($id: String!) {{ issue(id: $id) {{ {ISSUE_FULL_FIELDS} }} }}"
+    query = (
+        f"query($id: String!) {{ issue(id: $id) {{ {ISSUE_FULL_FIELDS} }} }}"
+    )
     return graphql(api_key, query, {"id": identifier})["data"]["issue"]
 
 
@@ -422,9 +434,9 @@ def list_comments(api_key: str, issue_id: str) -> list:
         id body createdAt updatedAt
         user { id name email }
     } } } }"""
-    return graphql(api_key, query, {"id": issue_id})["data"]["issue"]["comments"][
-        "nodes"
-    ]
+    return graphql(api_key, query, {"id": issue_id})["data"]["issue"][
+        "comments"
+    ]["nodes"]
 
 
 CREATE_COMMENT_QUERY = """mutation($input: CommentCreateInput!) {
@@ -453,7 +465,9 @@ def resolve_project_id(api_key: str, name_or_id: str) -> str:
         "query($name: String!) { projects(filter: { name: { eq: $name } }, first: 1) "
         "{ nodes { id } } }"
     )
-    nodes = graphql(api_key, query, {"name": name_or_id})["data"]["projects"]["nodes"]
+    nodes = graphql(api_key, query, {"name": name_or_id})["data"]["projects"][
+        "nodes"
+    ]
     if not nodes:
         raise LinearError(f"Project not found: {name_or_id!r}")
     return nodes[0]["id"]
@@ -471,7 +485,9 @@ def resolve_state_for_issue(
     for state in issue["team"]["states"]["nodes"]:
         if state["name"] == state_name:
             return issue["id"], state["id"]
-    raise LinearError(f"State {state_name!r} not found on team for {issue_identifier}")
+    raise LinearError(
+        f"State {state_name!r} not found on team for {issue_identifier}"
+    )
 
 
 def resolve_workspace_labels(api_key: str, names: list) -> list:
@@ -485,7 +501,8 @@ def resolve_workspace_labels(api_key: str, names: list) -> list:
 def looks_like_uuid(value: str) -> bool:
     return bool(
         re.fullmatch(
-            r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", value or ""
+            r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+            value or "",
         )
     )
 
@@ -508,18 +525,26 @@ def search_by_project(project: str, text: str) -> list:
         "$project: String!, $text: String!",
         "project: { name: { eq: $project } } searchableContent: { contains: $text }",
     )
-    return graphql_data(query, {"project": project, "text": text})["issues"]["nodes"]
+    return graphql_data(query, {"project": project, "text": text})["issues"][
+        "nodes"
+    ]
 
 
-def list_by_project_state(project: str, state: str, since: str | None = None) -> list:
+def list_by_project_state(
+    project: str, state: str, since: str | None = None
+) -> list:
     params = "$project: String!, $state: String!"
-    filters = "project: { name: { eq: $project } } state: { name: { eq: $state } }"
+    filters = (
+        "project: { name: { eq: $project } } state: { name: { eq: $state } }"
+    )
     variables = {"project": project, "state": state}
     if since:
         params += ", $since: DateTimeOrDuration!"
         filters += " createdAt: { gt: $since }"
         variables["since"] = since
-    return graphql_data(issues_query(params, filters), variables)["issues"]["nodes"]
+    return graphql_data(issues_query(params, filters), variables)["issues"][
+        "nodes"
+    ]
 
 
 def list_by_project_state_type(project: str, state_type: str) -> list:
@@ -527,9 +552,9 @@ def list_by_project_state_type(project: str, state_type: str) -> list:
         "$project: String!, $type: String!",
         "project: { name: { eq: $project } } state: { type: { eq: $type } }",
     )
-    return graphql_data(query, {"project": project, "type": state_type})["issues"][
-        "nodes"
-    ]
+    return graphql_data(query, {"project": project, "type": state_type})[
+        "issues"
+    ]["nodes"]
 
 
 def list_by_parent(parent_id: str) -> list:
@@ -616,7 +641,9 @@ def min_backlog_sort_order(project_id: str) -> float | None:
         'issues(first: 250, filter: { state: { type: { eq: "backlog" } } }) '
         "{ nodes { sortOrder } } } }"
     )
-    nodes = graphql_data(query, {"project": project_id})["project"]["issues"]["nodes"]
+    nodes = graphql_data(query, {"project": project_id})["project"]["issues"][
+        "nodes"
+    ]
     orders = [n["sortOrder"] for n in nodes if n["sortOrder"] is not None]
     return min(orders) if orders else None
 
@@ -626,9 +653,9 @@ def set_sort_order(issue_id: str, sort_order: float) -> bool:
         "mutation($id: String!, $order: Float!) { "
         "issueUpdate(id: $id, input: { sortOrder: $order }) { success } }"
     )
-    return graphql_data(query, {"id": issue_id, "order": sort_order})["issueUpdate"][
-        "success"
-    ]
+    return graphql_data(query, {"id": issue_id, "order": sort_order})[
+        "issueUpdate"
+    ]["success"]
 
 
 def set_project_view_manual(project_id: str) -> bool:
@@ -643,13 +670,17 @@ def set_project_view_manual(project_id: str) -> bool:
         "projectId": project_id,
         "preferences": {"viewOrdering": "manual"},
     }
-    return graphql_data(query, {"input": view})["viewPreferencesCreate"]["success"]
+    return graphql_data(query, {"input": view})["viewPreferencesCreate"][
+        "success"
+    ]
 
 
 def view_pref_id_for(project_id: str) -> str:
     seed = f"stride:project-view-manual:{project_id}".encode()
     bits = bytearray(hashlib.sha256(seed).digest()[:16])
-    bits[6] = (bits[6] & 0x0F) | 0x40  # RFC-4122 v4 shape; Linear validates id format
+    bits[6] = (
+        bits[6] & 0x0F
+    ) | 0x40  # RFC-4122 v4 shape; Linear validates id format
     bits[8] = (bits[8] & 0x3F) | 0x80
     return str(uuid.UUID(bytes=bytes(bits)))
 
@@ -667,14 +698,16 @@ def board_states(team_key: str) -> list:
 
 
 def first_team_key() -> str | None:
-    nodes = graphql_data("query { teams(first: 1) { nodes { key } } }", {})["teams"][
-        "nodes"
-    ]
+    nodes = graphql_data("query { teams(first: 1) { nodes { key } } }", {})[
+        "teams"
+    ]["nodes"]
     return nodes[0]["key"] if nodes else None
 
 
 def declared_states(config: dict) -> set:
-    return {(name, t) for t, names in config["states"].items() for name in names}
+    return {
+        (name, t) for t, names in config["states"].items() for name in names
+    }
 
 
 def load_statuses() -> dict:
@@ -682,7 +715,10 @@ def load_statuses() -> dict:
 
 
 def state_drift(team_key: str | None = None) -> list:
-    board = {(s["name"], s["type"]) for s in board_states(team_key or first_team_key())}
+    board = {
+        (s["name"], s["type"])
+        for s in board_states(team_key or first_team_key())
+    }
     missing = declared_states(load_statuses()) - board
     return [{"name": n, "type": t} for n, t in sorted(missing)]
 
@@ -761,8 +797,12 @@ def set_state_position(state_id: str, position: float) -> bool:
 
 
 def archive_workflow_state(state_id: str) -> bool:
-    query = "mutation($id: String!) { workflowStateArchive(id: $id) { success } }"
-    return graphql_data(query, {"id": state_id})["workflowStateArchive"]["success"]
+    query = (
+        "mutation($id: String!) { workflowStateArchive(id: $id) { success } }"
+    )
+    return graphql_data(query, {"id": state_id})["workflowStateArchive"][
+        "success"
+    ]
 
 
 def canonical_sequence(states: dict) -> list:
@@ -834,14 +874,18 @@ def create_missing(team_id: str, states: dict, ids: dict) -> list:
     ]
     for state_type, name in todo:
         color = TYPE_COLORS[state_type]
-        ids[name] = create_workflow_state(team_id, name, state_type, color, 0.0)["id"]
+        ids[name] = create_workflow_state(
+            team_id, name, state_type, color, 0.0
+        )["id"]
     return [{"name": name, "type": state_type} for state_type, name in todo]
 
 
 def archive_extra(states: dict, board: list) -> list:
     canon = set(canonical_sequence(states))
     extra = [
-        s for s in board if s["name"] not in canon and s["type"] not in RESERVED_TYPES
+        s
+        for s in board
+        if s["name"] not in canon and s["type"] not in RESERVED_TYPES
     ]
     for s in extra:
         archive_workflow_state(s["id"])
@@ -912,7 +956,11 @@ def label_drift() -> list:
 
 
 def workspace_labels(api_key: str | None = None) -> list:
-    return [lbl for lbl in list_labels(api_key or bearer_token()) if not lbl.get("team")]
+    return [
+        lbl
+        for lbl in list_labels(api_key or bearer_token())
+        if not lbl.get("team")
+    ]
 
 
 def declared_labels() -> list:
@@ -925,4 +973,6 @@ def create_label(label: dict) -> dict:
         "issueLabelCreate(input: $input) { issueLabel { id name color } } }"
     )
     label_input = {"name": label["name"], "color": label["color"]}
-    return graphql_data(query, {"input": label_input})["issueLabelCreate"]["issueLabel"]
+    return graphql_data(query, {"input": label_input})["issueLabelCreate"][
+        "issueLabel"
+    ]

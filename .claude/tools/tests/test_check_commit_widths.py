@@ -65,7 +65,10 @@ def test_message_in_reads_file_for_dash_capital_f(tmp_path: Path):
     body = tmp_path / "msg.txt"
     body.write_text("feat: Subject\n\nBody from file")
 
-    assert message_in(["--args", "-F", str(body)]) == "feat: Subject\n\nBody from file"
+    assert (
+        message_in(["--args", "-F", str(body)])
+        == "feat: Subject\n\nBody from file"
+    )
 
 
 def test_message_in_empty_when_args_carry_no_message():

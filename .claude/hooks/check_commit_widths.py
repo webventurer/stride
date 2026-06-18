@@ -32,13 +32,21 @@ def message_in(argv: list) -> str:
 
 
 def inline_message(args: list) -> str:
-    flagged = [value_after(args, i) for i, a in enumerate(args) if a in ("-m", "--message")]
+    flagged = [
+        value_after(args, i)
+        for i, a in enumerate(args)
+        if a in ("-m", "--message")
+    ]
     equals = [a.split("=", 1)[1] for a in args if a.startswith("--message=")]
     return "\n\n".join(p for p in flagged + equals if p)
 
 
 def file_message(args: list) -> str:
-    flagged = [value_after(args, i) for i, a in enumerate(args) if a in ("-F", "--file")]
+    flagged = [
+        value_after(args, i)
+        for i, a in enumerate(args)
+        if a in ("-F", "--file")
+    ]
     equals = [a.split("=", 1)[1] for a in args if a.startswith("--file=")]
     paths = [p for p in flagged + equals if p and p != "-"]
     return text_of(paths[0]) if paths else ""
@@ -81,10 +89,19 @@ def overlong_prose(line: str) -> bool:
 
 
 def report(problems: list) -> None:
-    print("Commit blocked: message breaks the 50/72 rule (see /commit).", file=sys.stderr)
+    print(
+        "Commit blocked: message breaks the 50/72 rule (see /commit).",
+        file=sys.stderr,
+    )
     for lineno, length, limit, text in problems:
-        print(f"  line {lineno}: {length} chars (max {limit}) — {text}", file=sys.stderr)
-    print("Fix: wrap body at 72, subject at 50 — or pass a wrapped -F file.", file=sys.stderr)
+        print(
+            f"  line {lineno}: {length} chars (max {limit}) — {text}",
+            file=sys.stderr,
+        )
+    print(
+        "Fix: wrap body at 72, subject at 50 — or pass a wrapped -F file.",
+        file=sys.stderr,
+    )
 
 
 if __name__ == "__main__":
