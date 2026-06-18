@@ -191,25 +191,13 @@ def provision_states_cmd(team_key: str):
 
 
 @cli.command("label-drift")
-@click.option(
-    "--team",
-    "team_key",
-    default=None,
-    help="Team key (e.g. WB); defaults to the key's first team",
-)
-def label_drift_cmd(team_key: str):
-    echo_json(label_drift(team_key))
+def label_drift_cmd():
+    echo_json(label_drift())
 
 
 @cli.command("provision-labels")
-@click.option(
-    "--team",
-    "team_key",
-    default=None,
-    help="Team key (e.g. WB); defaults to the key's first team",
-)
-def provision_labels_cmd(team_key: str):
-    echo_json(provision_labels(team_key))
+def provision_labels_cmd():
+    echo_json(provision_labels())
 
 
 @cli.command("migrate-legacy-config")

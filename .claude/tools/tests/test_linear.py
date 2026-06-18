@@ -36,6 +36,7 @@ from linear import (  # noqa: E402
     board_states,
     create_comment,
     create_issue,
+    create_label,
     create_milestone,
     create_project,
     create_workflow_state,
@@ -628,7 +629,7 @@ def test_provision_states_in_sync_when_board_has_all_canonical():
     assert mock.call_count == 1
 
 
-# ---- type-label provisioning ----
+# ---- type-label provisioning (workspace-scoped) ----
 
 THREE_LABELS = [
     {"name": "Bug", "color": "#eb5757"},
@@ -637,56 +638,88 @@ THREE_LABELS = [
 ]
 
 
-def test_provision_labels_creates_all_three_on_empty_team():
-    board = {"teams": {"nodes": [{"id": "t1", "labels": {"nodes": []}}]}}
+def labels_page(nodes: list) -> dict:
+    return {"issueLabels": {"nodes": nodes, "pageInfo": {"hasNextPage": False, "endCursor": None}}}
+
+
+def workspace_label(name: str) -> dict:
+    return {"name": name, "team": None}
+
+
+def test_create_label_omits_team_id_from_input():
+    created = {"issueLabelCreate": {"issueLabel": {"id": "new", "name": "Bug", "color": "#eb5757"}}}
+    with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
+        with patch("linear.requests.post", return_value=ok_response(created)) as mock:
+            create_label({"name": "Bug", "color": "#eb5757"})
+
+    sent = sent_variables(mock)["input"]
+    assert "teamId" not in sent
+    assert sent == {"name": "Bug", "color": "#eb5757"}
+
+
+def test_provision_labels_creates_all_three_at_workspace_scope():
+    page = labels_page([])
     created = {"issueLabelCreate": {"issueLabel": {"id": "new"}}}
 
     def fake_post(url: str, json: dict | None = None, headers: dict | None = None, **kwargs) -> MagicMock:
-        query = json["query"]
-        return ok_response(board if "teams(" in query else created)
+        return ok_response(created if "issueLabelCreate" in json["query"] else page)
 
     with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
         with patch("linear.requests.post", side_effect=fake_post):
             with patch("linear.declared_labels", return_value=THREE_LABELS):
-                result = provision_labels("WB")
+                result = provision_labels()
 
     assert len(result["created"]) == 3
     assert result["in_sync"] is False
 
 
-def test_provision_labels_in_sync_when_team_has_all_declared():
-    board = {"teams": {"nodes": [{"id": "t1", "labels": {"nodes": [
-        {"name": "Bug"}, {"name": "Epic"}, {"name": "Story"},
-    ]}}]}}
-    env, post = with_env_and_mock(board)
+def test_provision_labels_in_sync_when_labels_exist_at_workspace_scope():
+    page = labels_page([workspace_label("Bug"), workspace_label("Epic"), workspace_label("Story")])
+    env, post = with_env_and_mock(page)
     with env, post as mock:
         with patch("linear.declared_labels", return_value=THREE_LABELS):
-            result = provision_labels("WB")
+            result = provision_labels()
 
     assert result == {"created": [], "in_sync": True}
     # only the read query ran — no create mutations
     assert mock.call_count == 1
 
 
-def test_label_drift_flags_declared_label_missing_from_team():
-    board = {"teams": {"nodes": [{"id": "t1", "labels": {"nodes": [{"name": "Bug"}]}}]}}
-    env, post = with_env_and_mock(board)
+def test_label_drift_empty_when_labels_exist_workspace_wide():
+    page = labels_page([workspace_label("Bug"), workspace_label("Epic"), workspace_label("Story")])
+    env, post = with_env_and_mock(page)
     with env, post:
         with patch("linear.declared_labels", return_value=THREE_LABELS):
-            assert label_drift("WB") == [
+            assert label_drift() == []
+
+
+def test_label_drift_flags_declared_label_missing_from_workspace():
+    page = labels_page([workspace_label("Bug")])
+    env, post = with_env_and_mock(page)
+    with env, post:
+        with patch("linear.declared_labels", return_value=THREE_LABELS):
+            assert label_drift() == [
                 {"name": "Epic", "color": "#5e6ad2"},
                 {"name": "Story", "color": "#4cb782"},
             ]
 
 
+def test_label_drift_ignores_a_same_name_team_scoped_label():
+    page = labels_page([{"name": "Bug", "team": {"id": "team-1"}}])
+    env, post = with_env_and_mock(page)
+    with env, post:
+        with patch("linear.declared_labels", return_value=THREE_LABELS):
+            assert label_drift() == THREE_LABELS
+
+
 def test_provision_labels_surfaces_api_errors():
     with patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}, clear=False):
-        with patch("linear.requests.post", return_value=graphql_errors_response([{"message": "team not found"}])):
+        with patch("linear.requests.post", return_value=graphql_errors_response([{"message": "api unavailable"}])):
             with patch("linear.declared_labels", return_value=THREE_LABELS):
                 with pytest.raises(LinearError) as excinfo:
-                    provision_labels("WB")
+                    provision_labels()
 
-    assert "team not found" in str(excinfo.value)
+    assert "api unavailable" in str(excinfo.value)
 
 
 # ---- WB-454: fat-CLI helpers (get_issue / whoami / teams / comments / resolvers) ----
