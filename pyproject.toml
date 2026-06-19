@@ -1,0 +1,13 @@
+# Ruff config for stride's own Python under .claude/. Run on demand via
+# `pnpm tidy`, never on the commit path.
+[tool.ruff]
+line-length = 80
+
+[tool.ruff.lint]
+select = [
+    "I",     # import sorting (isort)
+    "D202",  # no blank line after a function docstring
+]
+
+[tool.ruff.format]
+quote-style = "double"

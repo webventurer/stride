@@ -37,13 +37,22 @@ def command_registry(group: click.Group, prefix: tuple = ()) -> dict:
         if isinstance(cmd, click.Group):
             registry.update(command_registry(cmd, path))
             continue
-        flags = {opt for p in cmd.params if isinstance(p, click.Option) for opt in p.opts}
+        flags = {
+            opt
+            for p in cmd.params
+            if isinstance(p, click.Option)
+            for opt in p.opts
+        }
         registry[path] = flags | {"--help"}
     return registry
 
 
 REGISTRY = command_registry(linear_cli.cli)
-GROUPS = {name for name, cmd in linear_cli.cli.commands.items() if isinstance(cmd, click.Group)}
+GROUPS = {
+    name
+    for name, cmd in linear_cli.cli.commands.items()
+    if isinstance(cmd, click.Group)
+}
 
 
 def invocation_segments(text: str):
@@ -54,10 +63,14 @@ def invocation_segments(text: str):
         if marker == -1:
             i += 1
             continue
-        segment = lines[i][marker + len("linear_cli.py"):]
+        segment = lines[i][marker + len("linear_cli.py") :]
         while segment.rstrip().endswith("\\"):
             i += 1
-            segment = segment.rstrip()[:-1] + " " + (lines[i] if i < len(lines) else "")
+            segment = (
+                segment.rstrip()[:-1]
+                + " "
+                + (lines[i] if i < len(lines) else "")
+            )
         # Stop at a closing inline-code backtick or a shell pipe (jq et al. follow `|`).
         yield segment.split("`")[0].split("|")[0]
         i += 1
@@ -91,7 +104,10 @@ def drift_in(path: Path) -> list:
 
 
 def test_command_docs_reference_only_real_cli_flags():
-    drift = [f for md in sorted(COMMANDS_DIR.rglob("*.md")) for f in drift_in(md)]
-    assert not drift, "Doc-vs-CLI drift — docs reference flags/subcommands the CLI lacks:\n" + "\n".join(
-        f"  {name}: `{cmd}` → {flag}" for name, cmd, flag in drift
+    drift = [
+        f for md in sorted(COMMANDS_DIR.rglob("*.md")) for f in drift_in(md)
+    ]
+    assert not drift, (
+        "Doc-vs-CLI drift — docs reference flags/subcommands the CLI lacks:\n"
+        + "\n".join(f"  {name}: `{cmd}` → {flag}" for name, cmd, flag in drift)
     )
