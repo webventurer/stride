@@ -101,9 +101,19 @@ Atomicity has two failure modes, not one. Find the sweet spot between them:
 
 ---
 
+## Group by purpose, not by origin
+
+<mark>**Group changes by what they're *for*, not by where they came from.**</mark> A commit's boundary is its purpose — the one thing it accomplishes — never the circumstances that produced it. *When* the changes were made, *who* asked for them, *which tool* emitted them, *which directory* they touched: all of that is origin, and origin is irrelevant to atomicity. Ask "what is this change *for*?" and let the answer draw the line.
+
+This is the move that catches the most common AI mistake: lumping a whole session into one commit because it was one conversation. A session is an origin; it spans as many purposes as it spans, and each gets its own commit.
+
+**Worked example — a multi-day session, split by purpose.** One sitting cleaned up three days of notes: a 20 June daily, a behavioural lesson lifted from a 22 June exchange, and a 23 June opportunity thread (an inbound, its call-prep, the board update). "All one session" would have been a single dump. By *purpose*, it was eleven commits — each daily its own record, the lesson its own change, the pitch materials their own, the board state its own. Same keystrokes, eleven purposes, eleven gifts to your future self.
+
+The corollary: the list below catalogues the *origins* that masquerade as purposes. Each is a way of grouping by where the change came from — reject all of them.
+
 ## Common AI atomicity mistakes
 
-<mark>**These are not valid reasons for combining changes into one commit:**</mark>
+<mark>**These are not valid reasons for combining changes into one commit — each is an *origin*, not a purpose:**</mark>
 
 - **Modified in the same session** — files changed during one conversation are not automatically one atomic commit
 - **Sharing a prefix** — using `docs:` on two unrelated documentation changes does not make them atomic
