@@ -13,12 +13,15 @@
 | 2 | **Standards** | Verify message format against checklists |
 | 3 | **Final review** | Sanity check before committing |
 | 4 | **Post-commit** | Verify atomicity after committing |
+| 5 | **Independent review** | For 2+ commits: a fresh sub-agent verifies the set ([REVIEW.md](REVIEW.md)) |
 
 ---
 
 ## Before you start
 
 Read [SKILL.md](SKILL.md) first — it contains the coherence test, AI atomicity mistakes, commit format reference, and the pre-commit atomicity trap.
+
+For a run that produces 2+ commits, [Pass 5](#pass-5-independent-atomicity-review-2-commits) hands the finished set to an independent reviewer defined by [REVIEW.md](REVIEW.md). Read that file too — it is the reviewer's brief and defines the over-split, under-split, and misfiled rubric the whole skill is calibrated against.
 
 ---
 
@@ -31,6 +34,14 @@ Read [SKILL.md](SKILL.md) first — it contains the coherence test, AI atomicity
 ### Step 1: See what changed
 
 Run `git status` to see all changed files and `git diff` to understand the changes.
+
+**Record the session base** — before creating any commit, capture the current tip so [Pass 5](#pass-5-independent-atomicity-review-2-commits) can review exactly the commits this session adds, no more:
+
+```bash
+BASE=$(git rev-parse HEAD)   # the commit range this session reviews is $BASE..HEAD
+```
+
+This is exact where `git log --since=today` is not — it never sweeps in a commit from earlier work.
 
 ### Step 2: Per-file independence gate
 
@@ -260,27 +271,52 @@ git add .
 
 Only use `--amend` for unpushed commits.
 
-### Pass 4b: Session coherence check
+---
 
-<mark>**If 2+ commits were made this session**, review them as a set before moving on.</mark>
+## Pass 5: Independent atomicity review (2+ commits)
 
-```bash
-# Show all session commits with their files
-for hash in $(git log --oneline --since="today" --format="%h"); do
-  echo "--- $(git log -1 --format='%h %s' $hash) ---"
-  git diff-tree --no-commit-id --name-only -r "$hash"
-  echo
-done
-```
+<mark>**If this session produced 2+ commits, do not sign off on your own grouping. Hand the finished set to a fresh sub-agent that never saw why you grouped it that way.**</mark>
 
-- [ ] Does each commit's file list match its message?
-- [ ] Could any file move between commits and improve coherence?
-- [ ] Do the commits tell a clear story reading the log forward?
-- [ ] Does any commit message contain "and"? If so, it may be two commits wearing a trench coat — the [and test](SKILL.md#the-and-test) is easier to spot in hindsight than during drafting
+A single commit skips this pass — [Pass 4](#pass-4-post-commit-verification) already checked it in isolation, and with one commit there is no misfiling between commits. Two or more is where hidden "and"s and wrong-commit files cluster, and where reviewing your own work fails: you share the frame that made the grouping, so you rationalise a borderline call instead of splitting it. The fix is not another self-check — it is a reviewer with clean context. See [REVIEW.md](REVIEW.md) for why the separation is the mechanism.
 
-**What this catches that Pass 4 doesn't:** Pass 4 checks one commit in isolation. Pass 4b checks whether files landed in the *right* commit. A file that belongs to commit B but ended up in commit A passes Pass 4 (both commits are internally coherent) but fails Pass 4b (the narrative is wrong).
+The atomicity "and" test runs in the reviewer's clean context via [REVIEW.md](REVIEW.md), not as a self-check you run first — the Pass 2 subject-line "and" check is drafting hygiene, but re-judging your own grouping here only adds a rationalisation you might anchor on.
 
-**Example:** Adding ShellCheck to pre-commit requires the `.pre-commit-config.yaml` change *and* the violation fixes in the same commit — config without fixes breaks pre-commit. If the config ended up in an earlier unrelated commit, Pass 4 wouldn't catch it, but Pass 4b would.
+### The loop
+
+1. **Spawn the reviewer.** Use the Task tool (`general-purpose`, model `opus` — the verdict is judgement-dense). Give it **only** the range and the output path — never your reasoning for the grouping:
+
+   > Read `.claude/skills/commit/REVIEW.md` and follow it. Review the commits in `$BASE..HEAD`. Write one JSONL verdict per commit to `<output-path>`. Judge from the diff and message alone.
+
+   Do not paste the diffs, your commit plan, or this conversation into the prompt. The reviewer runs `git log -p` itself. Its blindness to your grouping is the point.
+
+2. **Collate from disk.** Read the JSONL file — not the sub-agent's chat reply. Cross-check: the line count must equal the number of commits in `$BASE..HEAD`. A mismatch means a commit was dropped or invented — re-run before trusting the verdicts.
+
+3. **Act on the verdicts.** If every line is `atomic`, the gate is passed — stop. Otherwise, regroup:
+
+   ```bash
+   # Collapse this session's commits back to the working tree, keeping every change
+   git reset --soft "$BASE"
+   git reset HEAD .            # unstage, so you can re-stage per corrected group
+
+   # Re-commit each logical change per the reviewer's verdicts (Pass 1 + Pass 2)
+   git add <files-for-change-1>
+   .claude/hooks/do_commit.sh -m "prefix: First logical change"
+   # ...
+   ```
+
+   Read each verdict's fields as you re-stage: a `split` becomes two groups at the named seam, a `merge` folds the named siblings into one, a `misfiled` moves the named `moveFile` into its `toCommit` group. Resetting to `$BASE` (not `HEAD~1`) is safe because everything above `$BASE` is this session's own unpushed work. For a one-line `merge` of adjacent tip commits, [fold](SKILL.md#how-to-fold) instead of a full reset.
+
+4. **Re-review after acting.** Regrouping rewrites SHAs, so spawn a **new** fresh reviewer over the new `$BASE..HEAD`. Never reuse the previous reviewer or your own judgement of the fix — a fresh pass is the only trustworthy signal.
+
+5. **Converge or escalate.** Loop until a full pass returns all `atomic`. Cap at **3 iterations**. Stop early and surface the verdicts to the user if:
+   - the reviewer flip-flops (flags a commit you split, then flags the merged version) — a sign it is thrashing, not converging, and the call is genuinely yours, or
+   - iteration 3 still returns a non-`atomic` verdict.
+
+### Guarding against over-splitting
+
+The reviewer earns a `split`/`merge`/`misfiled` only by naming a concrete consequence (a second purpose, a broken intermediate, or the narrative a misplaced file breaks). A verdict with no named consequence is noise — treat it as `atomic`. Do **not** regroup on "it feels like two things." REVIEW.md holds the reviewer to this; you hold it too when you act on the file.
+
+**What this catches that Pass 4 doesn't:** Pass 4 checks one commit in isolation. Pass 5 checks the *set* — whether files landed in the right commit and whether the log tells one story per step. A file that belongs to commit B but ended up in commit A passes Pass 4 (both commits are internally coherent) but fails Pass 5 (the narrative is wrong). Independence catches what a self-review talks itself past.
 
 ---
 
@@ -329,11 +365,11 @@ component-per-directory architecture, zero Tailwind.
 
 ## Verification gate
 
-<mark>**All four passes must complete before the commit is final.**</mark>
+<mark>**Every pass must complete before the commit is final.**</mark>
 
 - [ ] Pre-flight: atomic changes identified
 - [ ] Content: files staged selectively, coherence test passed
 - [ ] Standards: message format verified against checklists
 - [ ] Final review: sanity check passed
 - [ ] Post-commit: atomicity verified, output displayed
-- [ ] Session coherence: if 2+ commits this session, reviewed as a set
+- [ ] Independent review: if 2+ commits this session, a fresh sub-agent ([REVIEW.md](REVIEW.md)) returned an all-`atomic` pass (or the user signed off on a flagged verdict)

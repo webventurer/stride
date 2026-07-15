@@ -1,18 +1,19 @@
 ---
 name: commit
-description: Create atomic git commits using a four-pass methodology — content, standards, final review, and post-commit verification. Use when committing code or documentation changes. Triggers on "commit", "git commit", or when the user asks to commit changes.
+description: Create atomic git commits using a multi-pass methodology — content, standards, final review, post-commit verification, and an independent review of the set. Use when committing code or documentation changes. Triggers on "commit", "git commit", or when the user asks to commit changes.
 ---
 
 # Commit
 
-> Create atomic git commits using a four-pass methodology that separates content decisions from formatting standards.
+> Create atomic git commits using a multi-pass methodology that separates content decisions from formatting standards.
 
 ## Skill documents
 
 | File | Purpose |
 |:-----|:--------|
 | [SKILL.md](SKILL.md) | Overview, commit format reference, atomicity rules |
-| [WORKFLOW.md](WORKFLOW.md) | Four-pass execution sequence |
+| [WORKFLOW.md](WORKFLOW.md) | Five-pass execution sequence |
+| [REVIEW.md](REVIEW.md) | The independent reviewer's brief — over-split, under-split, and misfiled rubric, run by a fresh sub-agent in Pass 5 for 2+ commits |
 | [references/chris-beams-commit-style.md](references/chris-beams-commit-style.md) | The 7 rules our format is built on |
 
 ---
@@ -33,7 +34,7 @@ description: Create atomic git commits using a four-pass methodology — content
 
 ## Quick reference
 
-<mark>**One logical change per commit. Separate concerns across four passes: content, standards, final review, post-commit verification.**</mark>
+<mark>**One logical change per commit. Separate concerns across passes: content, standards, final review, post-commit verification, and an independent review of the set.**</mark>
 
 ---
 
@@ -98,6 +99,8 @@ Atomicity has two failure modes, not one. Find the sweet spot between them:
 **The sweet spot**: all changes share a common purpose that you can explain in one sentence. If removing any change leaves a hole, it belongs. If adding another change would require a second explanation, it doesn't.
 
 **The test**: look in both directions. Ask "am I grouping unrelated things?" (under-atomising) AND "am I splitting apart things that need each other?" (over-atomising). When neither question raises a flag, you've found the right granularity.
+
+For a session of 2+ commits, this two-directional test is operationalised in [WORKFLOW.md](WORKFLOW.md#pass-5-independent-atomicity-review-2-commits) Pass 5: a fresh sub-agent applies the [REVIEW.md](REVIEW.md) rubric to the finished set with no knowledge of how you grouped it — the independence that catches what your own review talks itself past.
 
 ---
 
@@ -181,7 +184,7 @@ This is the same principle as the auto-squash rule in `/linear:start` — *descr
 
 ## Content focus blindness
 
-Both people and AI consistently miss formatting standards while focused on content logic. The four-pass approach solves this by making standards verification a dedicated step (Pass 2) separate from content decisions (Pass 1).
+Both people and AI consistently miss formatting standards while focused on content logic. The multi-pass approach solves this by making standards verification a dedicated step (Pass 2) separate from content decisions (Pass 1).
 
 ---
 
