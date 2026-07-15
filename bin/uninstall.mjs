@@ -124,7 +124,7 @@ function main() {
 
   console.log("Removed stride files from .claude/:");
   console.log("  skills/vision/   (project Vision authoring skill)");
-  console.log("  skills/commit/   (4-pass atomic commit skill)");
+  console.log("  skills/commit/   (multi-pass atomic commit skill)");
   console.log("  skills/craft/    (CRAFT prompt skill)");
   console.log("  skills/clear-speak/ (plain-language rewrite skill)");
   console.log("  commands/linear/ (Linear workflow commands)");

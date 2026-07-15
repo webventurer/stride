@@ -59,7 +59,7 @@ Stride is designed for exactly that moment. Not a replacement product — a cont
 | **[app-starter](https://github.com/webventurer/app-starter)** | React + TypeScript + Vite + Hono + Neon + Clerk + Drizzle + shadcn/ui + Biome. Sensible defaults, every layer independently replaceable. | The same "don't make me pick a stack" energy — but yours, locally, with the seams visible. |
 | **`/craft`** | Structured prompts (Context, Role, Action, Format, Target) that sharpen the ask *before* the agent starts. | Replaces the "just type what you want" chat box with a frame that the agent can actually execute against. |
 | **`/linear`** | Kanban board + atomic issues synced with Claude Code. Every piece of work has a card, every card has a state. | Replaces "chat history with the agent" with a real board anyone on the team can read. |
-| **`/commit`** | Four-pass atomic commits — one idea per commit, independently revertible, with a reason attached. | Replaces the monolithic Lovable → GitHub sync with a git history you can `bisect`, `blame`, and `revert` without fear. |
+| **`/commit`** | Multi-pass atomic commits — one idea per commit, independently revertible, with a reason attached. | Replaces the monolithic Lovable → GitHub sync with a git history you can `bisect`, `blame`, and `revert` without fear. |
 
 <mark>The starter-app borrows Lovable's lesson — sensible defaults, wired together, don't make the user choose. Then Stride adds the things that only matter once the codebase is real: atomicity, traceability, team-readable structure.</mark>
 

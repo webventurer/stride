@@ -71,7 +71,7 @@ If anything fails, stop — do not merge. Show what failed.
 
 ### 5. Check for pending fixup commits
 
-Before the merge, scan the branch for `fixup!` commits. These are journey-shaped commits meant to fold into an earlier target via `git rebase --autosquash` — if they land on `main` verbatim, the log fills with `fixup! feat: ...` subjects whose bodies don't explain why each change exists. That breaks the Vision criterion: *"Every commit on a stride-managed branch passes four-pass atomicity — no monolithic commits, every message explains why."*
+Before the merge, scan the branch for `fixup!` commits. These are journey-shaped commits meant to fold into an earlier target via `git rebase --autosquash` — if they land on `main` verbatim, the log fills with `fixup! feat: ...` subjects whose bodies don't explain why each change exists. That breaks the Vision criterion: *"Every commit on a stride-managed branch passes multi-pass atomicity — no monolithic commits, every message explains why."*
 
 Count them:
 

@@ -295,7 +295,7 @@ function installHeader({ copied, skipped }) {
 function logCopiedFiles(totals) {
   console.log(`\n${installHeader(totals)}`);
   console.log("  skills/vision/   (project Vision authoring skill)");
-  console.log("  skills/commit/   (4-pass atomic commit skill)");
+  console.log("  skills/commit/   (multi-pass atomic commit skill)");
   console.log("  skills/craft/    (CRAFT prompt skill)");
   console.log("  commands/linear/ (Linear workflow commands)");
   console.log("  hooks/           (commit hook scripts)");
@@ -334,7 +334,7 @@ function logAvailableSkills() {
   console.log(
     "  /vision              — author the project Vision (run this first)",
   );
-  console.log("  /commit              — 4-pass atomic git commits");
+  console.log("  /commit              — multi-pass atomic git commits");
   console.log("  /craft               — CRAFT prompt framework");
   console.log("  /linear:check        — verify Linear access");
   console.log("  /linear:setup        — provision Linear workflow states");
