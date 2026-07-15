@@ -95,7 +95,7 @@ These aren't independent concerns. `/craft` feeds into `/linear:plan-work` to pr
 
 <mark>As AI models improve, structured documentation gets *more* from them, not less.</mark>
 
-A better model following vague instructions still produces vague output. A better model following the four-pass commit methodology produces *tighter* atomic commits. A better model working from a well-structured Linear issue produces *more precise* implementations.
+A better model following vague instructions still produces vague output. A better model following the multi-pass commit methodology produces *tighter* atomic commits. A better model working from a well-structured Linear issue produces *more precise* implementations.
 
 The investment in structure pays increasing returns as the tools get better. Vibe coding doesn't scale with model improvements — the bottleneck was never the model's capability, it was the absence of structure around it.
 

@@ -2,7 +2,7 @@
 
 **Required reading**: [Atomicity](../../concepts/atomicity.md) — the underlying principle that this document applies to git commits.
 
-**Commit workflow**: The four-pass commit workflow (content, standards, final review, post-commit) lives in `.claude/skills/commit/` — use `/commit` to execute it.
+**Commit workflow**: The multi-pass commit workflow (content, standards, final review, post-commit, independent review) lives in `.claude/skills/commit/` — use `/commit` to execute it.
 
 ## Overview
 

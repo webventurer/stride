@@ -17,10 +17,10 @@ Everything installs as plain text into your `.claude/` directory — markdown sk
 ![Kanban board](docs/public/kanban-board.svg)
 *Issues flow from Backlog through In Progress to Done — driven entirely by `/linear` commands.*
 
-**`/commit`** — Four-pass atomic commits, called by `/linear` at every commit point. The agent stages selectively, checks coherence, verifies formatting, and writes commit messages that explain *why*, not just what. Every commit is one complete logical change, independently revertible.
+**`/commit`** — Multi-pass atomic commits, called by `/linear` at every commit point. The agent stages selectively, checks coherence, verifies formatting, and writes commit messages that explain *why*, not just what. Every commit is one complete logical change, independently revertible.
 
 ![Commit pipeline](docs/public/commit-pipeline.svg)
-*Four passes separate content decisions from formatting standards — catching the mistakes AI agents make.*
+*Multiple passes separate content decisions from formatting standards — catching the mistakes AI agents make.*
 
 **`/craft`** — Structured prompt generation using the **C.R.A.F.T.** framework (Context, Role, Action, Format, Target). Built into `/linear:plan-work --craft` to sharpen issue descriptions *before* the agent drafts them. Without it, the agent works from whatever you typed — ambiguity in, ambiguity out. With it, you get a clear problem statement, well-scoped goals, and acceptance criteria that the agent can actually execute against.
 

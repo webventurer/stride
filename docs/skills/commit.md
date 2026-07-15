@@ -1,9 +1,9 @@
 # /commit — Atomic git commits
 
-AI agents make specific atomicity mistakes — grouping changes by session, by shared prefix, or by proximity rather than by purpose. The `/commit` skill catches these through a four-pass methodology that separates content decisions from formatting standards.
+AI agents make specific atomicity mistakes — grouping changes by session, by shared prefix, or by proximity rather than by purpose. The `/commit` skill catches these through a multi-pass methodology that separates content decisions from formatting standards.
 
 ![Commit pipeline](/commit-pipeline.svg)
-*Four passes separate content decisions from formatting standards — catching the mistakes AI agents make.*
+*Multiple passes separate content decisions from formatting standards — catching the mistakes AI agents make.*
 
 Commit messages follow the [Chris Beams commit style](/reference/commit-style) — the de facto standard for clear, human-readable git history.
 
@@ -28,7 +28,7 @@ AI assistants frequently group files into commits based on the wrong criteria:
 - **Touching the same area** — editing three files in `src/auth/` for different reasons is three commits
 - **"While I was in there" changes** — noticing a typo while fixing a bug does not make the typo part of the bug fix
 
-## The four passes
+## The passes
 
 | Pass | Action | Goal |
 |:-----|:-------|:-----|

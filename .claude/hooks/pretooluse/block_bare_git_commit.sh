@@ -17,6 +17,6 @@ cat >&2 <<EOF
 BLOCKED: bare "git commit" is not allowed.
 
 You MUST invoke the /commit skill using the Skill tool before committing.
-Do not call do_commit.sh directly — follow the four-pass workflow first.
+Do not call do_commit.sh directly — follow the multi-pass workflow first.
 EOF
 exit 2

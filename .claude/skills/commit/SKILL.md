@@ -1,18 +1,19 @@
 ---
 name: commit
-description: Create atomic git commits using a four-pass methodology — content, standards, final review, and post-commit verification. Use when committing code or documentation changes. Triggers on "commit", "git commit", or when the user asks to commit changes.
+description: Create atomic git commits using a multi-pass methodology — content, standards, final review, post-commit verification, and an independent review of the set. Use when committing code or documentation changes. Triggers on "commit", "git commit", or when the user asks to commit changes.
 ---
 
 # Commit
 
-> Create atomic git commits using a four-pass methodology that separates content decisions from formatting standards.
+> Create atomic git commits using a multi-pass methodology that separates content decisions from formatting standards.
 
 ## Skill documents
 
 | File | Purpose |
 |:-----|:--------|
 | [SKILL.md](SKILL.md) | Overview, commit format reference, atomicity rules |
-| [WORKFLOW.md](WORKFLOW.md) | Four-pass execution sequence |
+| [WORKFLOW.md](WORKFLOW.md) | Five-pass execution sequence |
+| [REVIEW.md](REVIEW.md) | The independent reviewer's brief — over-split, under-split, and misfiled rubric, run by a fresh sub-agent in Pass 5 for 2+ commits |
 | [references/chris-beams-commit-style.md](references/chris-beams-commit-style.md) | The 7 rules our format is built on |
 
 ---
@@ -33,7 +34,7 @@ description: Create atomic git commits using a four-pass methodology — content
 
 ## Quick reference
 
-<mark>**One logical change per commit. Separate concerns across four passes: content, standards, final review, post-commit verification.**</mark>
+<mark>**One logical change per commit. Separate concerns across passes: content, standards, final review, post-commit verification, and an independent review of the set.**</mark>
 
 ---
 
@@ -99,11 +100,32 @@ Atomicity has two failure modes, not one. Find the sweet spot between them:
 
 **The test**: look in both directions. Ask "am I grouping unrelated things?" (under-atomising) AND "am I splitting apart things that need each other?" (over-atomising). When neither question raises a flag, you've found the right granularity.
 
+For a session of 2+ commits, this two-directional test is operationalised in [WORKFLOW.md](WORKFLOW.md#pass-5-independent-atomicity-review-2-commits) Pass 5: a fresh sub-agent applies the [REVIEW.md](REVIEW.md) rubric to the finished set with no knowledge of how you grouped it — the independence that catches what your own review talks itself past.
+
+### Forward and backward: prevent, then detect
+
+The skill solves atomicity from both directions — once as each commit is formed, once after the set exists.
+
+- **[Group by purpose](#group-by-purpose-not-by-origin) is the forward pass.** As each of the 1+ commits is formed, you draw its boundary by *purpose*, so every commit goes in atomic. Prevention, at authoring time.
+- **The [independent Pass 5 review](WORKFLOW.md#pass-5-independent-atomicity-review-2-commits) is the backward pass.** Once the set exists, a fresh reviewer retrospectively checks the groupings hold — no hidden "and", no misfiled file. Detection, after the fact.
+
+You need both because the forward pass runs in *your* head: you share the frame that produced the grouping, so you rationalise a borderline call. The backward pass runs in *clean* context — that is what catches what the forward pass talked itself past. Prevention narrows the errors; independent detection catches the residue.
+
 ---
+
+## Group by purpose, not by origin
+
+<mark>**Group changes by what they're *for*, not by where they came from.**</mark> A commit's boundary is its purpose — the one thing it accomplishes — never the circumstances that produced it. *When* the changes were made, *who* asked for them, *which tool* emitted them, *which directory* they touched: all of that is origin, and origin is irrelevant to atomicity. Ask "what is this change *for*?" and let the answer draw the line.
+
+This is the move that catches the most common AI mistake: lumping a whole session into one commit because it was one conversation. A session is an origin; it spans as many purposes as it spans, and each gets its own commit.
+
+**Worked example — a multi-day session, split by purpose.** One sitting cleaned up three days of notes: a 20 June daily, a behavioural lesson lifted from a 22 June exchange, and a 23 June opportunity thread (an inbound, its call-prep, the board update). "All one session" would have been a single dump. By *purpose*, it was eleven commits — each daily its own record, the lesson its own change, the pitch materials their own, the board state its own. Same keystrokes, eleven purposes, eleven gifts to your future self.
+
+The corollary: the list below catalogues the *origins* that masquerade as purposes. Each is a way of grouping by where the change came from — reject all of them.
 
 ## Common AI atomicity mistakes
 
-<mark>**These are not valid reasons for combining changes into one commit:**</mark>
+<mark>**These are not valid reasons for combining changes into one commit — each is an *origin*, not a purpose:**</mark>
 
 - **Modified in the same session** — files changed during one conversation are not automatically one atomic commit
 - **Sharing a prefix** — using `docs:` on two unrelated documentation changes does not make them atomic
@@ -171,7 +193,7 @@ This is the same principle as the auto-squash rule in `/linear:start` — *descr
 
 ## Content focus blindness
 
-Both people and AI consistently miss formatting standards while focused on content logic. The four-pass approach solves this by making standards verification a dedicated step (Pass 2) separate from content decisions (Pass 1).
+Both people and AI consistently miss formatting standards while focused on content logic. The multi-pass approach solves this by making standards verification a dedicated step (Pass 2) separate from content decisions (Pass 1).
 
 ---
 
