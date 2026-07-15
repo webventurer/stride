@@ -102,6 +102,15 @@ Atomicity has two failure modes, not one. Find the sweet spot between them:
 
 For a session of 2+ commits, this two-directional test is operationalised in [WORKFLOW.md](WORKFLOW.md#pass-5-independent-atomicity-review-2-commits) Pass 5: a fresh sub-agent applies the [REVIEW.md](REVIEW.md) rubric to the finished set with no knowledge of how you grouped it — the independence that catches what your own review talks itself past.
 
+### Forward and backward: prevent, then detect
+
+The skill solves atomicity from both directions — once as each commit is formed, once after the set exists.
+
+- **[Group by purpose](#group-by-purpose-not-by-origin) is the forward pass.** As each of the 1+ commits is formed, you draw its boundary by *purpose*, so every commit goes in atomic. Prevention, at authoring time.
+- **The [independent Pass 5 review](WORKFLOW.md#pass-5-independent-atomicity-review-2-commits) is the backward pass.** Once the set exists, a fresh reviewer retrospectively checks the groupings hold — no hidden "and", no misfiled file. Detection, after the fact.
+
+You need both because the forward pass runs in *your* head: you share the frame that produced the grouping, so you rationalise a borderline call. The backward pass runs in *clean* context — that is what catches what the forward pass talked itself past. Prevention narrows the errors; independent detection catches the residue.
+
 ---
 
 ## Group by purpose, not by origin
