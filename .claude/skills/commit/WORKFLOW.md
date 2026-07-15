@@ -294,14 +294,15 @@ The atomicity "and" test runs in the reviewer's clean context via [REVIEW.md](RE
 3. **Act on the verdicts.** If every line is `atomic`, the gate is passed — stop. Otherwise, regroup:
 
    ```bash
-   # Collapse this session's commits back to the working tree, keeping every change
-   git reset --soft "$BASE"
-   git reset HEAD .            # unstage, so you can re-stage per corrected group
+   # Undo this session's commits; every change stays unstaged in the working tree
+   git reset "$BASE"          # default --mixed: moves HEAD to $BASE and unstages all
 
-   # Re-commit each logical change per the reviewer's verdicts (Pass 1 + Pass 2)
-   git add <files-for-change-1>
+   # Re-stage and commit each corrected group (Pass 1 + Pass 2)
+   git add <files-for-group-1>
    .claude/hooks/do_commit.sh -m "prefix: First logical change"
-   # ...
+
+   git add <files-for-group-2>
+   .claude/hooks/do_commit.sh -m "prefix: Second logical change"
    ```
 
    Read each verdict's fields as you re-stage: a `split` becomes two groups at the named seam, a `merge` folds the named siblings into one, a `misfiled` moves the named `moveFile` into its `toCommit` group. Resetting to `$BASE` (not `HEAD~1`) is safe because everything above `$BASE` is this session's own unpushed work. For a one-line `merge` of adjacent tip commits, [fold](SKILL.md#how-to-fold) instead of a full reset.
