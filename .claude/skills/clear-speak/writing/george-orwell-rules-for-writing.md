@@ -1,5 +1,7 @@
 # George Orwell's six rules for great writing
 
+<img src="img/george-orwell.png" alt="George Orwell" width="200">
+
 ## The rules
 1. Never use a metaphor, simile, or other figure of speech which you are used to seeing in print.
 2. Never use a long word where a short one will do.
