@@ -1,6 +1,6 @@
 # Clear speak workflow
 
-> **AI Assistant Note**: When writing or reviewing stride's own output — command files, issue drafts, commit messages, README text — apply this workflow to replace jargon with concrete, immediately understandable language. Proactively suggest clear-speak alternatives when you notice abstract or academic terms.
+> **AI Assistant Note**: When writing or reviewing any content — docs, command files, issue drafts, commit messages, README text — apply this workflow to replace jargon with concrete, immediately understandable language. Proactively suggest clear-speak alternatives when you notice abstract or academic terms.
 
 Replace fancy words with ones that land immediately. Academic language creates barriers. Clear speak creates understanding.
 
@@ -63,7 +63,7 @@ The answer is usually your clear-speak version.
 
 ## Before and after examples
 
-### From stride's own output
+### From code and ops writing
 
 | Before (jargon) | After (clear speak) |
 |:----------------|:--------------------|
@@ -72,6 +72,16 @@ The answer is usually your clear-speak version.
 | The lazy migration trigger fires from credential lookup | The upgrade runs on its own the first time a command needs your login |
 | Removes dead code | Removes code nothing uses anymore |
 | Idempotent re-install dedupes hooks | Running the install twice is safe — it won't add the same hook again |
+
+### From docs and conceptual prose
+
+| Before (jargon) | After (clear speak) |
+|:----------------|:--------------------|
+| The section performs a literal enumeration of the available options | The section lists the options |
+| Grasping the intent requires inference and subtext | You have to read between the lines to get the intent |
+| A pedagogical flip surfaces what a newcomer would miss | Fresh eyes surface what a newcomer would miss |
+| This doc facilitates conceptualisation of the framework | This doc helps you picture the framework |
+| The heading utilises abstract nouns that obscure the action | The heading hides the action behind vague nouns |
 
 ### Common transformations
 
