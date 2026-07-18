@@ -42,7 +42,7 @@ description: Create atomic git commits using a multi-pass methodology — conten
 
 Read before executing:
 
-1. `.claude/docs/patterns/git/atomic-git-commits.md` — the full atomic commit methodology and Conventional Commits standard
+1. `.claude/stride/docs/patterns/git/atomic-git-commits.md` — the full atomic commit methodology and Conventional Commits standard
 
 ---
 
