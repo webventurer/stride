@@ -353,7 +353,7 @@ Atomic commits aren't just a discipline. They're a position that creates possibi
 | **Automatic changelog** | Typed prefixes + clear subjects let tooling generate changelogs mechanically — no human curation required |
 | **Narrative arc** | The commit log reads like a story of the journey — what was built, why, in what order. Future developers inherit *context*, not just code |
 | **Independent revertibility** | Any commit can be undone without collateral damage — you remove one idea, not a tangle of ideas |
-| **Bisectability** | `git bisect` works because every commit is a working state — the bug hides in exactly one commit, not somewhere across a session dump |
+| **Bisectability** | `git bisect` narrows a bug to a small, coherent commit rather than a session dump. Bisecting commit-by-commit assumes every commit is green — a stronger guarantee than `/commit`'s default [tip-green gate](WORKFLOW.md#step-4-verify-the-tree-is-green-before-committing); enforce it per-commit (or via CI) when a repo needs it |
 | **Review in logical steps** | Reviewers follow the author's reasoning one thought at a time, instead of reverse-engineering intent from a wall of diffs |
 | **Cherry-picking** | Individual changes move cleanly between branches — a fix doesn't drag an unrelated feature along for the ride |
 | **Blame that explains** | `git blame` points to a commit that says *why*, not a grab-bag that says "various changes" |

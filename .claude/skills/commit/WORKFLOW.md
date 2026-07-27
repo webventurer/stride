@@ -116,6 +116,22 @@ Check the [common AI atomicity mistakes](SKILL.md#common-ai-atomicity-mistakes) 
 - Multiple unrelated bug fixes
 - New file creation + existing file modifications for different purposes
 
+### Step 4: Verify the tree is green before committing
+
+<mark>**Run the repo's test/build command once, now — before staging anything. Don't re-run it after each commit: the working tree holds every change until the last commit lands, so a per-commit run only re-tests the same full set.**</mark>
+
+Whatever the repo defines (e.g. `pnpm test`, `make check`, `pytest`) is the gate. Everything you're about to slice into commits is carved from this one green tree.
+
+| Result | Action |
+|:-------|:-------|
+| **Green** | Proceed to Pass 1. |
+| **Red** | **Stop. Show the failure and ask** whether to fix first or commit anyway — default to fixing. |
+| **No test/build command** | Skip explicitly — report **"no build gate for this repo"** (stride itself is markdown-only). Don't invent a check that can't fail. |
+
+**A fix for a red tree is usually its own commit.** A pre-existing failure — or any breakage separable from this session's work — is a distinct purpose: land it as its own `fix:` or `test:` commit *first*, then build the session's work on a green base. Only fold the fix into a session commit if that commit is what broke the tree (see [How to fold](SKILL.md#how-to-fold)).
+
+This is a **tip guarantee, not a per-commit one.** A correctly-atomic commit is green on its own anyway — the [coherence test](SKILL.md#the-coherence-test) forbids a slice that leans on a later commit to pass — so one green tree plus atomic slicing yields green commits without N test runs. Proving each commit green *in isolation* is a stronger, costlier gate (checking out and testing every commit); add it via CI only when a repo needs strict bisectability.
+
 ---
 
 ## Pass 1: Content
@@ -216,7 +232,7 @@ If the commit fails because hooks fix files:
 **Goal**: Last sanity check before the commit lands.
 
 - [ ] Does this commit represent one complete idea?
-- [ ] Do all tests pass?
+- [ ] Was the tree verified green before committing? (Pass 0 [Step 4](#step-4-verify-the-tree-is-green-before-committing))
 - [ ] Re-read the commit message — does it tell a complete story?
 - [ ] Check the diff one more time — are all changes intentional?
 - [ ] Can this be reverted independently?
@@ -368,7 +384,7 @@ component-per-directory architecture, zero Tailwind.
 
 <mark>**Every pass must complete before the commit is final.**</mark>
 
-- [ ] Pre-flight: atomic changes identified
+- [ ] Pre-flight: atomic changes identified, tree verified green (or no build gate)
 - [ ] Content: files staged selectively, coherence test passed
 - [ ] Standards: message format verified against checklists
 - [ ] Final review: sanity check passed
