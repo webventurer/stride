@@ -7,7 +7,7 @@ description: Create atomic git commits using a multi-pass methodology — conten
 
 > Create atomic git commits using a multi-pass methodology that separates content decisions from formatting standards.
 
-> 🚨 **Read this first — mandatory.** Before any `git add` or `.claude/hooks/do_commit.sh` this session, your **first action must be to Read [WORKFLOW.md](WORKFLOW.md) in full** — and [REVIEW.md](REVIEW.md) as well once the session will land 2+ commits. <mark>This SKILL.md is injected into context automatically; WORKFLOW.md is not. Having this file in front of you is **not** a substitute for opening the workflow — the five passes live there, and skipping them is exactly how atomicity breaks while everything still *looks* fine.</mark> Do not stage or commit until you have.
+> 🚨 **Read this first — mandatory.** Before any `git add` or `.claude/hooks/do_commit.sh` this session, your **first action must be to Read [WORKFLOW.md](WORKFLOW.md) and [REVIEW.md](REVIEW.md) in full**. <mark>This SKILL.md is injected into context automatically; WORKFLOW.md is not. Having this file in front of you is **not** a substitute for opening the workflow — the five passes live there, and skipping them is exactly how atomicity breaks while everything still *looks* fine.</mark> Do not stage or commit until you have.
 
 ## Skill documents
 
@@ -15,7 +15,7 @@ description: Create atomic git commits using a multi-pass methodology — conten
 |:-----|:--------|
 | [SKILL.md](SKILL.md) | Overview, commit format reference, atomicity rules |
 | [WORKFLOW.md](WORKFLOW.md) | Five-pass execution sequence |
-| [REVIEW.md](REVIEW.md) | The independent reviewer's brief — over-split, under-split, and misfiled rubric, run by a fresh sub-agent in Pass 5 for 2+ commits |
+| [REVIEW.md](REVIEW.md) | The independent reviewer's brief — over-split, under-split, and misfiled rubric, run by a fresh sub-agent in every Pass 5 |
 | [references/chris-beams-commit-style.md](references/chris-beams-commit-style.md) | The 7 rules our format is built on |
 
 ---
@@ -102,14 +102,14 @@ Atomicity has two failure modes, not one. Find the sweet spot between them:
 
 **The test**: look in both directions. Ask "am I grouping unrelated things?" (under-atomising) AND "am I splitting apart things that need each other?" (over-atomising). When neither question raises a flag, you've found the right granularity.
 
-For a session of 2+ commits, this two-directional test is operationalised in [WORKFLOW.md](WORKFLOW.md#pass-5-independent-atomicity-review-2-commits) Pass 5: a fresh sub-agent applies the [REVIEW.md](REVIEW.md) rubric to the finished set with no knowledge of how you grouped it — the independence that catches what your own review talks itself past.
+For every session, this two-directional test is operationalised in [WORKFLOW.md](WORKFLOW.md#pass-5-independent-atomicity-review) Pass 5: a fresh sub-agent applies the [REVIEW.md](REVIEW.md) rubric to the finished commit or set with no knowledge of how you grouped it — the independence that catches what your own review talks itself past.
 
 ### Forward and backward: prevent, then detect
 
 The skill solves atomicity from both directions — once as each commit is formed, once after the set exists.
 
 - **[Group by purpose](#group-by-purpose-not-by-origin) is the forward pass.** As each of the 1+ commits is formed, you draw its boundary by *purpose*, so every commit goes in atomic. Prevention, at authoring time.
-- **The [independent Pass 5 review](WORKFLOW.md#pass-5-independent-atomicity-review-2-commits) is the backward pass.** Once the set exists, a fresh reviewer retrospectively checks the groupings hold — no hidden "and", no misfiled file. Detection, after the fact.
+- **The [independent Pass 5 review](WORKFLOW.md#pass-5-independent-atomicity-review) is the backward pass.** Once the commit or set exists, a fresh reviewer retrospectively checks the grouping holds — no hidden "and" and, for multi-commit sessions, no misfiled file. Detection, after the fact.
 
 You need both because the forward pass runs in *your* head: you share the frame that produced the grouping, so you rationalise a borderline call. The backward pass runs in *clean* context — that is what catches what the forward pass talked itself past. Prevention narrows the errors; independent detection catches the residue.
 

@@ -1,6 +1,6 @@
 # Commit review
 
-> The brief for an **independent** reviewer of a session's commits. A fresh sub-agent reads this file and judges the commits from the diff and message alone — never from the author's reasoning for grouping them that way.
+> The brief for an **independent** reviewer of a session's commits. A fresh sub-agent reads this file and judges the commits from the diff and message alone — never from the author's reasoning for grouping them that way. This review runs for every session, including one that produces a single commit.
 
 ---
 
@@ -22,6 +22,8 @@ For each commit in the range you are given, return one verdict:
 | `split` | Over-sized — contains two purposes; name where the seam is |
 | `merge` | Under-sized — cannot stand alone; name the sibling it needs |
 | `misfiled` | Right-sized, wrong home — a file belongs in a different commit; name the file and its destination |
+
+For a range containing one commit, return only `atomic` or `split`: there is no sibling commit to merge with or move a file into.
 
 You **report**. You do not run `git reset`, `rebase`, `commit`, or edit history — the orchestrator acts on your verdicts. Write output only.
 
@@ -85,8 +87,8 @@ A piece cannot stand on its own. The tell is a **broken intermediate**: check ou
 ## Procedure
 
 1. **Read the range.** You are given a commit range (e.g. `<base>..HEAD`). Run `git log -p --reverse <range>` to see every commit's message and full diff, oldest first.
-2. **Judge each commit in isolation** against the rubric — over-sized, under-sized, or right.
-3. **Check the set for misfiling.** Beyond each commit standing alone, ask: does any file sit in the wrong commit? A file that belongs to commit B but landed in commit A passes the isolation test yet breaks the narrative. Give commit A the `misfiled` verdict, naming the file (`moveFile`) and the commit it belongs in (`toCommit`).
+2. **Judge each commit in isolation** against the rubric — over-sized, under-sized, or right. For a one-commit range, this is the full review: return `atomic` or `split`.
+3. **For a multi-commit range, check the set for misfiling.** Beyond each commit standing alone, ask: does any file sit in the wrong commit? A file that belongs to commit B but landed in commit A passes the isolation test yet breaks the narrative. Give commit A the `misfiled` verdict, naming the file (`moveFile`) and the commit it belongs in (`toCommit`).
 4. **Cross-check counts.** Your output must carry one verdict per commit in the range — no commit skipped, none invented.
 
 ---

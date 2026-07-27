@@ -13,7 +13,7 @@
 | 2 | **Standards** | Verify message format against checklists |
 | 3 | **Final review** | Sanity check before committing |
 | 4 | **Post-commit** | Verify atomicity after committing |
-| 5 | **Independent review** | For 2+ commits: a fresh sub-agent verifies the set ([REVIEW.md](REVIEW.md)) |
+| 5 | **Independent review** | A fresh sub-agent verifies every commit and, for multi-commit sessions, the set ([REVIEW.md](REVIEW.md)) |
 
 ---
 
@@ -21,7 +21,7 @@
 
 Read [SKILL.md](SKILL.md) first — it contains the coherence test, AI atomicity mistakes, commit format reference, and the pre-commit atomicity trap.
 
-For a run that produces 2+ commits, [Pass 5](#pass-5-independent-atomicity-review-2-commits) hands the finished set to an independent reviewer defined by [REVIEW.md](REVIEW.md). Read that file too — it is the reviewer's brief and defines the over-split, under-split, and misfiled rubric the whole skill is calibrated against.
+Every run reaches [Pass 5](#pass-5-independent-atomicity-review), which hands the finished commit or set to an independent reviewer defined by [REVIEW.md](REVIEW.md). Read that file too — it is the reviewer's brief and defines the over-split, under-split, and misfiled rubric the whole skill is calibrated against.
 
 ---
 
@@ -35,7 +35,7 @@ For a run that produces 2+ commits, [Pass 5](#pass-5-independent-atomicity-revie
 
 Run `git status` to see all changed files and `git diff` to understand the changes.
 
-**Record the session base** — before creating any commit, capture the current tip so [Pass 5](#pass-5-independent-atomicity-review-2-commits) can review exactly the commits this session adds, no more:
+**Record the session base** — before creating any commit, capture the current tip so [Pass 5](#pass-5-independent-atomicity-review) can review exactly the commits this session adds, no more:
 
 ```bash
 BASE=$(git rev-parse HEAD)   # the commit range this session reviews is $BASE..HEAD
@@ -289,17 +289,17 @@ Only use `--amend` for unpushed commits.
 
 ---
 
-## Pass 5: Independent atomicity review (2+ commits)
+## Pass 5: Independent atomicity review
 
-<mark>**If this session produced 2+ commits, do not sign off on your own grouping. Hand the finished set to a fresh sub-agent that never saw why you grouped it that way.**</mark>
+<mark>**Do not sign off on your own grouping. Hand every finished commit or set to a fresh sub-agent that never saw why you grouped it that way.**</mark>
 
-A single commit skips this pass — [Pass 4](#pass-4-post-commit-verification) already checked it in isolation, and with one commit there is no misfiling between commits. Two or more is where hidden "and"s and wrong-commit files cluster, and where reviewing your own work fails: you share the frame that made the grouping, so you rationalise a borderline call instead of splitting it. The fix is not another self-check — it is a reviewer with clean context. See [REVIEW.md](REVIEW.md) for why the separation is the mechanism.
+Even a single commit can hide an unrelated second purpose, and self-review shares the frame that made the grouping. A clean reviewer catches that `split` decision without being anchored by the author's rationale. For two or more commits, the same review also catches under-splitting and files in the wrong commit. The fix is not another self-check — it is a reviewer with clean context. See [REVIEW.md](REVIEW.md) for why the separation is the mechanism.
 
 The atomicity "and" test runs in the reviewer's clean context via [REVIEW.md](REVIEW.md), not as a self-check you run first — the Pass 2 subject-line "and" check is drafting hygiene, but re-judging your own grouping here only adds a rationalisation you might anchor on.
 
 ### The loop
 
-1. **Spawn the reviewer.** Use the Task tool (`general-purpose`, model `opus` — the verdict is judgement-dense). Give it **only** the range and the output path — never your reasoning for the grouping:
+1. **Spawn the reviewer.** Use the Task tool (`general-purpose`, model `opus` — the verdict is judgement-dense). Give it **only** the range and the output path — never your reasoning for the grouping. For a one-commit range, tell it to judge only `atomic` or `split`; `merge` and `misfiled` need sibling commits:
 
    > Read `.claude/skills/commit/REVIEW.md` and follow it. Review the commits in `$BASE..HEAD`. Write one JSONL verdict per commit to `<output-path>`. Judge from the diff and message alone.
 
@@ -333,7 +333,7 @@ The atomicity "and" test runs in the reviewer's clean context via [REVIEW.md](RE
 
 The reviewer earns a `split`/`merge`/`misfiled` only by naming a concrete consequence (a second purpose, a broken intermediate, or the narrative a misplaced file breaks). A verdict with no named consequence is noise — treat it as `atomic`. Do **not** regroup on "it feels like two things." REVIEW.md holds the reviewer to this; you hold it too when you act on the file.
 
-**What this catches that Pass 4 doesn't:** Pass 4 checks one commit in isolation. Pass 5 checks the *set* — whether files landed in the right commit and whether the log tells one story per step. A file that belongs to commit B but ended up in commit A passes Pass 4 (both commits are internally coherent) but fails Pass 5 (the narrative is wrong). Independence catches what a self-review talks itself past.
+**What this catches that Pass 4 doesn't:** Pass 4 is the author's self-check. Pass 5 gives even a single commit an unanchored second opinion on whether it has a hidden second purpose. For multi-commit sessions, it also checks the *set* — whether files landed in the right commit and whether the log tells one story per step. A file that belongs to commit B but ended up in commit A passes Pass 4 (both commits are internally coherent) but fails Pass 5 (the narrative is wrong). Independence catches what a self-review talks itself past.
 
 ---
 
@@ -389,4 +389,4 @@ component-per-directory architecture, zero Tailwind.
 - [ ] Standards: message format verified against checklists
 - [ ] Final review: sanity check passed
 - [ ] Post-commit: atomicity verified, output displayed
-- [ ] Independent review: if 2+ commits this session, a fresh sub-agent ([REVIEW.md](REVIEW.md)) returned an all-`atomic` pass (or the user signed off on a flagged verdict)
+- [ ] Independent review: a fresh sub-agent ([REVIEW.md](REVIEW.md)) returned an all-`atomic` pass (or the user signed off on a flagged verdict)
