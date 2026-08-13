@@ -116,21 +116,21 @@ Check the [common AI atomicity mistakes](SKILL.md#common-ai-atomicity-mistakes) 
 - Multiple unrelated bug fixes
 - New file creation + existing file modifications for different purposes
 
-### Step 4: Verify the tree is green before committing
+### Step 4: Run the tests before you commit
 
-<mark>**Run the repo's test/build command once, now — before staging anything. Don't re-run it after each commit: the working tree holds every change until the last commit lands, so a per-commit run only re-tests the same full set.**</mark>
+<mark>**Run the repo's test command once, now — before you stage anything. Don't run it again between commits: the files on disk don't change as you commit, so every extra run tests exactly the same thing.**</mark>
 
-Whatever the repo defines (e.g. `pnpm test`, `make check`, `pytest`) is the gate. Everything you're about to slice into commits is carved from this one green tree.
+Use whatever the repo defines — `pnpm test`, `make check`, `pytest`. Everything you're about to split into commits comes from this one set of passing files.
 
 | Result | Action |
 |:-------|:-------|
-| **Green** | Proceed to Pass 1. |
-| **Red** | **Stop. Show the failure and ask** whether to fix first or commit anyway — default to fixing. |
-| **No test/build command** | Skip explicitly — report **"no build gate for this repo"** (stride itself is markdown-only). Don't invent a check that can't fail. |
+| **Tests pass** | Proceed to Pass 1. |
+| **Tests fail** | **Stop. Show the failure and ask** whether to fix first or commit anyway — default to fixing. |
+| **No test command** | Skip this step and say so — report **"no test command for this repo"**. Don't invent a check that can't fail. |
 
-**A fix for a red tree is usually its own commit.** A pre-existing failure — or any breakage separable from this session's work — is a distinct purpose: land it as its own `fix:` or `test:` commit *first*, then build the session's work on a green base. Only fold the fix into a session commit if that commit is what broke the tree (see [How to fold](SKILL.md#how-to-fold)).
+**A fix for failing tests is usually its own commit.** A failure that was already there — or any breakage you can separate from this session's work — is a different purpose: land it as its own `fix:` or `test:` commit *first*, then build the session's work on top of passing tests. Only fold the fix into a session commit if that commit is what broke the tests (see [How to fold](SKILL.md#how-to-fold)).
 
-This is a **tip guarantee, not a per-commit one.** A correctly-atomic commit is green on its own anyway — the [coherence test](SKILL.md#the-coherence-test) forbids a slice that leans on a later commit to pass — so one green tree plus atomic slicing yields green commits without N test runs. Proving each commit green *in isolation* is a stronger, costlier gate (checking out and testing every commit); add it via CI only when a repo needs strict bisectability.
+**What this proves, and what it doesn't.** One run tells you the finished result passes. It doesn't tell you that each commit would pass if you checked it out on its own. In practice a properly atomic commit passes anyway — the [coherence test](SKILL.md#the-coherence-test) rules out a commit that leans on a later one to work. Checking out and testing every commit is stronger but much slower; leave that to CI, and only when a repo needs `git bisect` to be reliable.
 
 ---
 
@@ -232,7 +232,7 @@ If the commit fails because hooks fix files:
 **Goal**: Last sanity check before the commit lands.
 
 - [ ] Does this commit represent one complete idea?
-- [ ] Was the tree verified green before committing? (Pass 0 [Step 4](#step-4-verify-the-tree-is-green-before-committing))
+- [ ] Did the tests pass before you started committing? (Pass 0 [Step 4](#step-4-run-the-tests-before-you-commit))
 - [ ] Re-read the commit message — does it tell a complete story?
 - [ ] Check the diff one more time — are all changes intentional?
 - [ ] Can this be reverted independently?
@@ -384,7 +384,7 @@ component-per-directory architecture, zero Tailwind.
 
 <mark>**Every pass must complete before the commit is final.**</mark>
 
-- [ ] Pre-flight: atomic changes identified, tree verified green (or no build gate)
+- [ ] Pre-flight: atomic changes identified, tests passing (or no test command)
 - [ ] Content: files staged selectively, coherence test passed
 - [ ] Standards: message format verified against checklists
 - [ ] Final review: sanity check passed
