@@ -75,7 +75,7 @@ Never inflate implementation work into fake product impact to fill the Outcome o
 
 > **Plain language throughout.** Every "plain-English sentence" in the templates below follows the [`/clear-speak` skill](../../../skills/clear-speak/SKILL.md) — stride's canonical standard for what counts as jargon and how to replace it. Write each summary so a non-engineer can scan it top-to-bottom.
 
-### `/linear:start` step 16 and `/linear:fix` step 11 (review gate)
+### `/linear:start` step 17 and `/linear:fix` step 11 (review gate)
 
 **Outcome mode:**
 
@@ -93,7 +93,7 @@ Branch: <name>
 Build: passed
 PR: <url>
 Linear: In Review
-[Squashed N commits into M — if step 10 grouped commits]
+[Squashed N commits into M — if step 12 grouped commits]
 
 Does this look right?
 ```
