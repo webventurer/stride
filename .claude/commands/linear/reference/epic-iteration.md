@@ -31,11 +31,11 @@ Starting with the first unfinished one: <SUB-X>. Say stop to bail out.
 
 ## E2. Work the next unfinished sub-issue
 
-Pick the first sub-issue that isn't already `In Review` or `Done`. Run the full per-story flow — `/linear:start` steps 1–15 — for that sub-issue: branch, implement, validate, PR, status → In Review, terminal review. Sub-issues already In Review or Done are skipped (named in the disclosure, not re-worked).
+Pick the first sub-issue that isn't already `In Review` or `Done`. Run the full per-story flow — `/linear:start` steps 1–17 — for that sub-issue: branch, implement, validate, PR, status → In Review, terminal review. Sub-issues already In Review or Done are skipped (named in the disclosure, not re-worked).
 
 ## E3. Stop at the PR — every time
 
-After the sub-issue reaches its PR and terminal review (step 16), **stop**. Do not merge, do not start the next sub-issue. Surface:
+After the sub-issue reaches its PR and terminal review (step 17), **stop**. Do not merge, do not start the next sub-issue. Surface:
 
 ```
 <SUB-X> is in review: <PR URL>
