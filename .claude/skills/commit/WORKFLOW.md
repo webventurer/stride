@@ -297,6 +297,14 @@ Even a single commit can hide an unrelated second purpose, and self-review share
 
 The atomicity "and" test runs in the reviewer's clean context via [REVIEW.md](REVIEW.md), not as a self-check you run first — the Pass 2 subject-line "and" check is drafting hygiene, but re-judging your own grouping here only adds a rationalisation you might anchor on.
 
+### Spawning the reviewer needs no permission
+
+<mark>**Invoking `/commit` is the authorisation. Spawn the reviewer and report its verdicts — never stop to ask whether you may.**</mark>
+
+A standing rule against reaching for sub-agents governs the ones you reach for on your own initiative. This one is a step in a workflow the user already started, no more discretionary than `git add`. Asking permission for it puts the gate in the user's lap, which is the one place it cannot do its job: they cannot see what the reviewer would have seen.
+
+There are exactly two moments Pass 5 hands anything back to the user: a non-`atomic` verdict you cannot resolve within the iteration cap, and a reviewer that cannot be launched at all. In the second case, say plainly that Pass 5 did not run — do not let a silent skip pass for a clean pass.
+
 ### The loop
 
 1. **Spawn the reviewer.** Use the Task tool (`general-purpose`, model `opus` — the verdict is judgement-dense). Give it **only** the range and the output path — never your reasoning for the grouping. For a one-commit range, tell it to judge only `atomic` or `split`; `merge` and `misfiled` need sibling commits:
