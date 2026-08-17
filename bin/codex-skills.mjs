@@ -36,7 +36,7 @@ function commandFiles(commandsDir) {
 }
 
 function planSkill(commandsDir, file) {
-  const description = parseDescription(
+  const description = frontmatterDescription(
     readFileSync(join(commandsDir, file), "utf8"),
   );
   if (!description) {
@@ -53,7 +53,7 @@ function planSkill(commandsDir, file) {
   };
 }
 
-function parseDescription(content) {
+function frontmatterDescription(content) {
   const frontmatter = content.match(/^---\n([\s\S]*?)\n---\n/);
   if (!frontmatter) return null;
   const description = frontmatter[1].match(/^description:[ \t]*(.+)$/m);
