@@ -6,13 +6,17 @@
 // the only place a command body is authored.
 
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 export const COMMANDS_ROOT = ".claude/commands";
 export const SKILLS_ROOT = ".codex/skills";
 
 // The only command namespace stride ships.
 const NAMESPACE = "linear";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const SKILL_TEMPLATE = join(__dirname, "templates/codex-skill.md");
 
 function parseDescription(content) {
   const frontmatter = content.match(/^---\n([\s\S]*?)\n---\n/);
@@ -22,18 +26,18 @@ function parseDescription(content) {
 }
 
 function renderSkill({ name, description, commandRef }) {
-  return `---
-name: ${name}
-description: ${description}
----
+  return fillTemplate(readFileSync(SKILL_TEMPLATE, "utf8"), {
+    NAME: name,
+    DESCRIPTION: description,
+    COMMAND_REF: commandRef,
+  });
+}
 
-# ${name}
-
-Read \`${commandRef}\` in full, then carry out every step it describes.
-
-Treat whatever the user typed alongside the skill mention as the command's
-argument.
-`;
+function fillTemplate(template, values) {
+  return template.replace(
+    /\{\{(\w+)\}\}/g,
+    (placeholder, key) => values[key] ?? placeholder,
+  );
 }
 
 function commandFiles(commandsDir) {
