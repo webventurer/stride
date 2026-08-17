@@ -18,26 +18,14 @@ const NAMESPACE = "linear";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SKILL_TEMPLATE = join(__dirname, "templates/codex-skill.md");
 
-function parseDescription(content) {
-  const frontmatter = content.match(/^---\n([\s\S]*?)\n---\n/);
-  if (!frontmatter) return null;
-  const description = frontmatter[1].match(/^description:[ \t]*(.+)$/m);
-  return description ? description[1].trim() : null;
-}
-
-function renderSkill({ name, description, commandRef }) {
-  return fillTemplate(readFileSync(SKILL_TEMPLATE, "utf8"), {
-    NAME: name,
-    DESCRIPTION: description,
-    COMMAND_REF: commandRef,
-  });
-}
-
-function fillTemplate(template, values) {
-  return template.replace(
-    /\{\{(\w+)\}\}/g,
-    (placeholder, key) => values[key] ?? placeholder,
+export function renderCodexSkills(repoRoot) {
+  const commandsDir = join(repoRoot, COMMANDS_ROOT, NAMESPACE);
+  const skills = commandFiles(commandsDir).map((file) =>
+    planSkill(commandsDir, file),
   );
+
+  for (const skill of skills) writeSkill(repoRoot, skill);
+  return skills.map((skill) => skill.name);
 }
 
 function commandFiles(commandsDir) {
@@ -65,16 +53,30 @@ function planSkill(commandsDir, file) {
   };
 }
 
-export function renderCodexSkills(repoRoot) {
-  const commandsDir = join(repoRoot, COMMANDS_ROOT, NAMESPACE);
-  const skills = commandFiles(commandsDir).map((file) =>
-    planSkill(commandsDir, file),
-  );
+function parseDescription(content) {
+  const frontmatter = content.match(/^---\n([\s\S]*?)\n---\n/);
+  if (!frontmatter) return null;
+  const description = frontmatter[1].match(/^description:[ \t]*(.+)$/m);
+  return description ? description[1].trim() : null;
+}
 
-  for (const skill of skills) {
-    const dir = join(repoRoot, SKILLS_ROOT, skill.name);
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, "SKILL.md"), renderSkill(skill));
-  }
-  return skills.map((skill) => skill.name);
+function writeSkill(repoRoot, skill) {
+  const dir = join(repoRoot, SKILLS_ROOT, skill.name);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "SKILL.md"), renderSkill(skill));
+}
+
+function renderSkill({ name, description, commandRef }) {
+  return fillTemplate(readFileSync(SKILL_TEMPLATE, "utf8"), {
+    NAME: name,
+    DESCRIPTION: description,
+    COMMAND_REF: commandRef,
+  });
+}
+
+function fillTemplate(template, values) {
+  return template.replace(
+    /\{\{(\w+)\}\}/g,
+    (placeholder, key) => values[key] ?? placeholder,
+  );
 }
