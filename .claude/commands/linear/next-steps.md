@@ -1,3 +1,7 @@
+---
+description: Recommend what to work on next, ranked against the project Vision.
+---
+
 # Review priorities and recommend next work
 
 Review what's happening and recommend what to work on next.

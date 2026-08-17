@@ -1,3 +1,7 @@
+---
+description: Merge an approved PR, clean up branches, and mark the Linear issue Done.
+---
+
 # Finish issue
 
 Merge an approved PR, clean up branches, and mark the issue Done.
