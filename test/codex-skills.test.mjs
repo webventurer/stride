@@ -18,10 +18,18 @@ const fixtureRoot = join("/tmp", `stride-codex-skills-${process.pid}`);
 const skillsDir = join(fixtureRoot, SKILLS_ROOT);
 
 const COMMANDS = {
-  "start.md":
-    "---\ndescription: Implement a Linear issue and open a PR.\n---\n\n# Start work on a Linear issue\n",
-  "finish.md":
-    "---\ndescription: Merge the PR and close the Linear issue.\n---\n\n# Finish issue\n",
+  "start.md": `---
+description: Implement a Linear issue and open a PR.
+---
+
+# Start work on a Linear issue
+`,
+  "finish.md": `---
+description: Merge the PR and close the Linear issue.
+---
+
+# Finish issue
+`,
   "reference/workflow.md": "# Linear workflow\n",
   "recovery/backfill-focus-field.md": "# Backfill focus\n",
   "linear_statuses.json": "{}\n",
