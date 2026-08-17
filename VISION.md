@@ -6,13 +6,13 @@
 
 Manage your own dev team on a Kanban board so everything's visible — except the team is AI.
 
-stride turns AI speed into maintainable codebases. It gives Claude Code the discipline of atomic commits, a Linear-tracked story flow, and a shared vocabulary for sizing work. Plain markdown into `.claude/` — no runtime, no lock-in.
+stride turns AI speed into maintainable codebases. It gives your coding agent the discipline of atomic commits, a Linear-tracked story flow, and a shared vocabulary for sizing work — Claude Code, Codex, Gemini, or any CLI that speaks the same open standards. Plain markdown, authored once in `.claude/` and generated out to whichever tool you run — no runtime, no lock-in.
 
 The result: a `git log` you can trust, a kanban board that reflects reality, and a codebase that stays navigable as it grows.
 
 ## Who it's for
 
-Developers using Claude Code who care about codebases that survive past day 30 — solo builders, small teams, anyone running a real project. Explicitly *not* for vibe coders who want a working demo in an hour and never plan to touch it again — stride's setup friction would be pure cost in that case.
+Developers driving an AI coding CLI (Claude Code, Codex, Gemini, or the next one) who care about codebases that survive past day 30 — solo builders, small teams, anyone running a real project. Explicitly *not* for vibe coders who want a working demo in an hour and never plan to touch it again — stride's setup friction would be pure cost in that case.
 
 ## Why it exists
 
@@ -50,13 +50,14 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] After `/linear:update-vision` runs, the Linear project description matches `VISION.md`
 - [ ] `npx github:webventurer/stride` installs in under 30 seconds, no global side effects
 - [ ] Setup gets a fresh user from `npx` to their first successful `/linear:start` in under 90 seconds on any supported OS. Authentication uses a Personal API Key in `~/.env`, feeding a single code path through every command. No external CLI dependencies that require building from source.
+- [ ] The same story flow runs from any supported CLI without a second copy of stride — the `/linear:*` commands are reachable by that tool's own convention and the bare-`git commit` block still fires, both generated at install time from the `.claude/` source
 - [ ] Onboarding wall-clock time is measured by a smoke-test that runs end-to-end against a clean container on each release. A run that exceeds 90 seconds blocks the release until the regression is identified.
 - [ ] Install is verified on macOS (Apple Silicon), Ubuntu LTS, and Windows-via-WSL2. Each supported OS has a tested install path that runs without compiling dependencies from source.
 - [ ] The prereq-doctor names every missing prerequisite — tools to install **and** permissions to request — with the exact remediation step (a command, a Linear docs link, or a message template for the user to send their admin).
 
 ## What can't change
 
-- Currently Claude Code is the only supported AI agent — AgentSDK integration would unlock others
+- A CLI is supported only where it already implements the open standards stride targets — Agent Skills, `AGENTS.md`, lifecycle hooks — and only through install-time generation. `.claude/` is the authoring source of truth: no hand-maintained second tree, no symlinks, no per-tool fork
 - Plain text in stride's own footprint — markdown skills plus a small Python helper, no build step, no compiled binaries inside `.claude/`. Consumer-side prerequisites (e.g. `gh`, `uv`, `jq`) are acceptable when they're lightweight and install in a single step.
 - Linear only — no Jira, no GitHub Projects support
 - `npx` install — consumers need npm
@@ -67,7 +68,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 
 - **Not a project orchestrator.** stride manages stories, not multi-sprint roadmaps. Autonomous loops and vision-refinement cycles belong in a separate tool
 - **Not a vibe-coding accelerator.** stride adds friction up front for compounding returns by day 30+
-- **Not installed globally.** Everything lives in the consumer's `.claude/` — no machine-wide state
+- **Not installed globally.** Everything lives in the consumer's repo — `.claude/` plus whatever per-tool footprint is generated beside it — no machine-wide state
 - **Not lock-in.** Read the markdown, change it, fork it, remove it
 - **Not replacing PR review.** stride structures the steps *before* review, not the review itself
 
