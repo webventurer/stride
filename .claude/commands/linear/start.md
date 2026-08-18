@@ -1,3 +1,7 @@
+---
+description: Implement a Linear issue — branch, code, validate, review, open a PR.
+---
+
 # Start work on a Linear issue
 
 Implement, validate, and open a PR in one headless flow.

@@ -1,3 +1,7 @@
+---
+description: Mirror VISION.md into the connected Linear project page.
+---
+
 # Mirror VISION.md to the Linear project
 
 Push `VISION.md` into the Linear project so the project page reflects the canonical Vision: the full document into the `content` field, and the opening tagline into the `description` field — the **subtitle** shown under the project name.

@@ -1,3 +1,7 @@
+---
+description: Verify Linear auth, workflow states, and type labels. Use when Linear commands fail.
+---
+
 # Check Linear connections
 
 Verify stride can authenticate against every configured Linear workspace, then confirm each team's board carries the workflow states stride uses and the workspace carries stride's type labels.

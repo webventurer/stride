@@ -1,3 +1,7 @@
+---
+description: Address PR review feedback, validate, and push. Use when a review left comments.
+---
+
 # Fix PR review feedback
 
 Address reviewer feedback on an open PR, validate, and push.

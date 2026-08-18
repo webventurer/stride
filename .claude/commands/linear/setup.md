@@ -1,3 +1,7 @@
+---
+description: Provision a Linear team's workflow states and type labels for stride.
+---
+
 # Provision Linear workflow states
 
 Make a Linear team's board match the workflow states stride needs ([`linear_statuses.json`](linear_statuses.json)) — so `/linear:start` / `/linear:finish` transitions land instead of silently no-opping on a missing or misnamed column. It also provisions the type labels stride tags cards with ([`linear_labels.json`](linear_labels.json)), so a card's shape shows on the board. When the repo isn't yet pinned to a Linear project, setup also offers to create one and write `.stride.json` (step 7) — so a fresh repo reaches a working board in a single command.

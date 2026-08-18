@@ -1,3 +1,7 @@
+---
+description: List all projects in the connected Linear workspace.
+---
+
 # List Linear projects
 
 Show all projects in the connected Linear workspace.

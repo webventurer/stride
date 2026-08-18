@@ -1,3 +1,7 @@
+---
+description: Draft a Linear story, epic, or bug anchored to a Vision outcome, before any code.
+---
+
 # Plan work and create a Linear issue
 
 Accepts a description and optional flags: `/plan-work --research --craft --epic --bug --project <name> "add error handling to API calls"`. With `--epic`, it skips size-sensing and goes straight to the parent-issue flow. With `--bug`, it skips shape-sensing and drafts straight to the bug template. With `--project`, it files the issue against a different Linear project and skips the Vision check (for quick adds when the target repo isn't cloned locally).

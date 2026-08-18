@@ -1,3 +1,7 @@
+---
+description: Ship a small change, then file the Linear card in Done after it merges.
+---
+
 # Quick: ship a small change, then file the card
 
 Ship a small, well-scoped change and file the Linear card *after* it merges — so a copy tweak or padding fix doesn't pay the up-front card-drafting tax. The card lands directly in **Done**, pointing at the merged PR.
