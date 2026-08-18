@@ -18,6 +18,7 @@ import {
 import { dirname, join, relative, sep } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
+import { HOOKS_FILE, writeCodexHooks } from "./codex-hooks.mjs";
 import { renderCodexSkills, SKILLS_ROOT } from "./codex-skills.mjs";
 import { buildSection, removeSection } from "./gitignore.mjs";
 import { requirePrerequisites } from "./prereqs.mjs";
@@ -308,9 +309,14 @@ function installCodexSkill(name, agents) {
 function installCodexFootprint(agents) {
   for (const skill of SHIPPED_SKILLS) installCodexSkill(skill, agents);
   const rendered = renderCodexSkills(destRoot);
+  assertUnderAllowedDir(HOOKS_FILE, agents);
+  writeCodexHooks(destRoot);
   console.log(
     `\nSet up Codex CLI in ${SKILLS_ROOT}/: ` +
       `${SHIPPED_SKILLS.length} skill(s), ${rendered.length} command skill(s).`,
+  );
+  console.log(
+    `Wrote ${HOOKS_FILE} — trust the hooks with /hooks in Codex or they will not run.`,
   );
 }
 
@@ -402,7 +408,9 @@ function logAvailableSkills() {
 
 function gitignoreEntries(agents) {
   const entries = DIRS.filter((d) => d !== ".claude/hooks").map((d) => `${d}/`);
-  const generated = agents.includes("codex") ? [`${SKILLS_ROOT}/`] : [];
+  const generated = agents.includes("codex")
+    ? [`${SKILLS_ROOT}/`, HOOKS_FILE]
+    : [];
   return [...entries, ...generated, ...HOOKS].sort();
 }
 
