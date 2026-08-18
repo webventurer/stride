@@ -8,17 +8,7 @@ This copies skills, commands, hooks, and tools into your project's `.claude/` di
 
 That command installs stride itself, not the CLIs the workflow relies on — see **What you need to install first** below, before your first `/linear:*` command.
 
-## Installing for Codex
-
-```bash
-npx github:webventurer/stride --agent codex
-```
-
-`--agent` chooses which CLIs to set up: `claude` (the default), `codex`, both as `claude,codex`, or `all`. `.claude/` is installed either way — it holds the skills, commands and docs every CLI reads, and the Codex skills point back into it.
-
-Selecting `codex` additionally writes `.codex/skills/` (stride's skills, plus one skill per Linear command, invoked as `$linear-start`) and `.codex/hooks.json`. Both are generated from `.claude/`, so they are gitignored as build artifacts and regenerated on each install.
-
-<mark>**Codex will not run the hooks until you trust them.**</mark> Open Codex in the project and run `/hooks` to review and approve them. Codex records that approval against each hook's content hash, so a stride update changes the hash and quarantines the hooks again — re-approve after every install, or the bare-commit block silently stops firing.
+Running Codex? Follow this page first — `.claude/` installs either way — then see [Install for Codex](/install-codex) for the extra flag and, importantly, the step that makes the guardrails actually run.
 
 ## What you need to install first
 
@@ -133,17 +123,7 @@ This removes all copied directories, the example file, and strips the stride hoo
 └── stride/docs/         # supporting patterns and concepts
 ```
 
-With `--agent codex`, a second tree is generated beside it:
-
-```text
-.codex/
-├── skills/              # stride's skills + one skill per Linear command
-└── hooks.json           # registers the same hook scripts with Codex
-```
-
-Both hooks are the same scripts under `.claude/hooks/` — `hooks.json` only wires them up, so the two tools never drift.
-
-The installer only writes under `.claude/` and, when Codex is selected, `.codex/` — it never touches other directories in your repo. Hook config goes into `.claude/settings.local.json` (gitignored) — your committed `settings.json` is never modified. Claude Code concatenates hooks from both files, so repo hooks and stride hooks run together.
+The installer only writes under `.claude/` — it never touches other directories in your repo. Hook config goes into `.claude/settings.local.json` (gitignored) — your committed `settings.json` is never modified. Claude Code concatenates hooks from both files, so repo hooks and stride hooks run together.
 
 The installer also offers to add stride's paths to your root `.gitignore` in a marker-delimited section (`# >>> stride ... # <<< stride`). Accept the prompt to keep `git status` clean; decline to commit stride's content into your repo instead. Uninstall removes the section cleanly.
 
@@ -204,18 +184,6 @@ npx github:webventurer/stride#<commit-sha>
 The commit safety hook (`block_bare_git_commit.sh`) is a shell script. If it fails — wrong shell, missing permissions, Windows without WSL — the enforcement disappears silently. The agent will happily use bare `git commit` without the multi-pass methodology.
 
 **Check it's working:** if you can run `.claude/hooks/do_commit.sh --help` without errors, you're fine. If not, check that the scripts are executable (`chmod +x .claude/hooks/*.sh`).
-
-### Codex guardrails can be switched off by an administrator
-
-Codex honours `allow_managed_hooks_only = true` in a managed `requirements.toml`. When that is set, Codex ignores user, project and session hook config entirely — including stride's `.codex/hooks.json`.
-
-**What this means:** in a managed environment the bare-commit block may never run, with no error and nothing in the output to say so. If commits are landing without the multi-pass workflow, check that setting before assuming the hook is broken.
-
-### Linear MCP is denied under Claude only
-
-Stride blocks the `mcp__claude_ai_Linear__*` tools so Linear writes go through `linear_cli.py`, which is the path every command is written against. That block is a Claude Code permission, and Codex has no matching primitive.
-
-**What this means:** under Codex nothing stops an agent reaching Linear through an MCP server instead of the CLI. The commands still call `linear_cli.py`, so the common path is unaffected — but the guardrail is documentation rather than enforcement there.
 
 ### Settings merge strategy
 
