@@ -1,19 +1,21 @@
+// Checks the CLIs stride's workflow needs before anything is written, and
+// stops the install if any are absent — half an install leaves a broken state.
+// Install commands mirror docs/install.md so the two never drift. Native
+// Windows cannot run the POSIX probes at all, so it is pointed at WSL rather
+// than told every tool is missing.
+
 import { execSync } from "node:child_process";
 
-// The CLIs the /linear:* workflow needs on PATH. Install commands mirror
-// docs/install.md so the two never drift; brew covers macOS and Linux.
 export const PREREQS = [
   { cmd: "gh", install: "brew install gh" },
   { cmd: "uv", install: "brew install uv" },
   { cmd: "jq", install: "brew install jq" },
 ];
 
-// The prereqs absent from PATH. `isPresent` is injectable so tests don't shell out.
 export function missingPrereqs(isPresent = onPath) {
   return PREREQS.filter((p) => !isPresent(p.cmd));
 }
 
-// The lines the doctor prints — pure, so tests assert on the array.
 export function prereqReport(missing) {
   if (missing.length === 0) return ["Prerequisites: gh, uv, jq all found."];
   return [
@@ -23,9 +25,6 @@ export function prereqReport(missing) {
   ];
 }
 
-// What native Windows sees instead of the (POSIX-only) tool probes. WSL is
-// stride's supported Windows path — the hooks need a POSIX shell — so say
-// that plainly rather than report every tool "missing".
 export function windowsReport() {
   return [
     "stride requires WSL on Windows — its commit hooks need a bash/zsh",
@@ -34,11 +33,6 @@ export function windowsReport() {
   ];
 }
 
-// Blocking gate: print the report, and stop the installer if anything is
-// missing — stride's /linear:* workflow can't run without these tools, so
-// installing half of stride leaves a broken state. On native Windows the
-// POSIX `command -v` probe can't run at all, so point at WSL instead of
-// reporting a misleading all-missing result.
 export function requirePrerequisites(
   isPresent = onPath,
   log = console.log,

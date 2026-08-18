@@ -8,7 +8,6 @@ import {
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
 
-// Stride's own dev artifacts — never shipped into a consumer's footprint.
 const EXCLUDE = new Set(["tests", "__pycache__"]);
 
 export function walkFiles(root, base = root) {
