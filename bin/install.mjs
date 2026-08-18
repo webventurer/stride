@@ -18,6 +18,7 @@ import {
 import { dirname, join, relative, sep } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
+import { renderCodexSkills, SKILLS_ROOT } from "./codex-skills.mjs";
 import { buildSection, removeSection } from "./gitignore.mjs";
 import { requirePrerequisites } from "./prereqs.mjs";
 import { REMOVED_PATHS } from "./removed-paths.mjs";
@@ -95,11 +96,10 @@ export function dedupeHooks(existing, incoming) {
   return existing;
 }
 
+const SHIPPED_SKILLS = ["commit", "craft", "vision", "clear-speak"];
+
 const DIRS = [
-  ".claude/skills/commit",
-  ".claude/skills/craft",
-  ".claude/skills/vision",
-  ".claude/skills/clear-speak",
+  ...SHIPPED_SKILLS.map((skill) => `.claude/skills/${skill}`),
   ".claude/commands/linear",
   ".claude/hooks",
   ".claude/stride/docs/patterns/git",
@@ -115,11 +115,34 @@ const HOOKS = [
   ".claude/hooks/userpromptsubmit/inject_design_principles.sh",
 ];
 
-function assertUnderClaudeDir(dir) {
-  if (dir.startsWith(".claude/") || dir === ".claude") return;
+const AGENTS = {
+  claude: { root: ".claude" },
+  codex: { root: ".codex" },
+};
+
+export function parseAgents(argv) {
+  const flag = argv.indexOf("--agent");
+  if (flag === -1) return ["claude"];
+  const value = argv[flag + 1] ?? "";
+  if (value === "all") return Object.keys(AGENTS);
+  const names = value.split(",").filter(Boolean);
+  const unknown = names.filter((name) => !(name in AGENTS));
+  if (names.length === 0 || unknown.length > 0) {
+    console.error(
+      `\nERROR: unknown agent: ${unknown.join(", ") || "(none given)"}\n` +
+        `Choose from: ${Object.keys(AGENTS).join(", ")}, or all.`,
+    );
+    process.exit(1);
+  }
+  return names;
+}
+
+function assertUnderAllowedDir(dir, agents) {
+  const roots = [".claude", ...agents.map((name) => AGENTS[name].root)];
+  if (roots.some((root) => dir === root || dir.startsWith(`${root}/`))) return;
   console.error(
-    `\nERROR: refusing to write outside .claude/: ${dir}\n` +
-      `Stride's install footprint is .claude/ only. This is a bug in DIRS.`,
+    `\nERROR: refusing to write outside ${roots.join(", ")}: ${dir}\n` +
+      `Stride only writes the footprints the selected agents own.`,
   );
   process.exit(1);
 }
@@ -223,10 +246,10 @@ async function resolveSymlinkedRoot(dir, srcDir, rootPath, summary) {
   copyAndRecord(srcDir, dir, summary);
 }
 
-async function installDir(dir) {
+async function installDir(dir, agents) {
   const srcDir = join(srcRoot, dir);
   if (!existsSync(srcDir)) return emptySummary();
-  assertUnderClaudeDir(dir);
+  assertUnderAllowedDir(dir, agents);
   const summary = emptySummary();
   const rootPath = join(destRoot, dir);
   if (isSymlinkedRoot(rootPath)) {
@@ -262,12 +285,33 @@ function makeExecutable(hook) {
   if (existsSync(path)) chmodSync(path, 0o755);
 }
 
-async function copyFiles() {
+async function copyFiles(agents) {
   const totals = emptySummary();
-  for (const dir of DIRS) mergeSummary(totals, await installDir(dir));
+  for (const dir of DIRS) mergeSummary(totals, await installDir(dir, agents));
   HOOKS.forEach(makeExecutable);
   if (totals.conflicts.length > 0) reportConflictsAndExit(totals.conflicts);
   return totals;
+}
+
+function installCodexSkill(name, agents) {
+  const srcDir = join(srcRoot, ".claude/skills", name);
+  const destRel = join(SKILLS_ROOT, name);
+  assertUnderAllowedDir(destRel, agents);
+  for (const rel of walkFiles(srcDir)) {
+    const srcFile = join(srcDir, rel);
+    const destFile = join(destRoot, destRel, rel);
+    if (existsSync(destFile) && contentsMatch(srcFile, destFile)) continue;
+    copyFile(srcFile, destFile);
+  }
+}
+
+function installCodexFootprint(agents) {
+  for (const skill of SHIPPED_SKILLS) installCodexSkill(skill, agents);
+  const rendered = renderCodexSkills(destRoot);
+  console.log(
+    `\nSet up Codex CLI in ${SKILLS_ROOT}/: ` +
+      `${SHIPPED_SKILLS.length} skill(s), ${rendered.length} command skill(s).`,
+  );
 }
 
 function mergeSettings() {
@@ -283,8 +327,9 @@ function mergeSettings() {
   writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 }
 
-async function installFiles() {
-  logCopiedFiles(await copyFiles());
+async function installFiles(agents) {
+  logCopiedFiles(await copyFiles(agents));
+  if (agents.includes("codex")) installCodexFootprint(agents);
 }
 
 function installHeader({ copied, skipped }) {
@@ -355,9 +400,10 @@ function logAvailableSkills() {
   );
 }
 
-function gitignoreEntries() {
+function gitignoreEntries(agents) {
   const entries = DIRS.filter((d) => d !== ".claude/hooks").map((d) => `${d}/`);
-  return [...entries, ...HOOKS].sort();
+  const generated = agents.includes("codex") ? [`${SKILLS_ROOT}/`] : [];
+  return [...entries, ...generated, ...HOOKS].sort();
 }
 
 async function confirmGitignoreWrite() {
@@ -365,20 +411,20 @@ async function confirmGitignoreWrite() {
   return !answer || answer === "y" || answer === "yes";
 }
 
-function writeGitignoreSection() {
+function writeGitignoreSection(agents) {
   const path = join(destRoot, ".gitignore");
   const existing = existsSync(path) ? readFileSync(path, "utf8") : "";
   const stripped = removeSection(existing);
   const prefix = stripped ? `${stripped.trimEnd()}\n\n` : "";
-  writeFileSync(path, `${prefix}${buildSection(gitignoreEntries())}\n`);
+  writeFileSync(path, `${prefix}${buildSection(gitignoreEntries(agents))}\n`);
 }
 
-async function configureGitignore() {
+async function configureGitignore(agents) {
   if (!(await confirmGitignoreWrite())) {
     console.log("Skipped .gitignore update");
     return;
   }
-  writeGitignoreSection();
+  writeGitignoreSection(agents);
   console.log("Updated .gitignore with stride paths");
 }
 
@@ -448,11 +494,12 @@ function refuseIfInsideClaudeDir() {
 
 async function main() {
   refuseIfInsideClaudeDir();
+  const agents = parseAgents(process.argv);
   console.log("\nstride — All the speed. None of the mess.\n");
   requirePrerequisites();
-  await installFiles();
+  await installFiles(agents);
   await pruneRemovedPaths();
-  await configureGitignore();
+  await configureGitignore(agents);
   if (!(await installHookConfig())) return;
   logAvailableSkills();
 }
