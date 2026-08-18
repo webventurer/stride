@@ -211,6 +211,12 @@ Codex honours `allow_managed_hooks_only = true` in a managed `requirements.toml`
 
 **What this means:** in a managed environment the bare-commit block may never run, with no error and nothing in the output to say so. If commits are landing without the multi-pass workflow, check that setting before assuming the hook is broken.
 
+### Linear MCP is denied under Claude only
+
+Stride blocks the `mcp__claude_ai_Linear__*` tools so Linear writes go through `linear_cli.py`, which is the path every command is written against. That block is a Claude Code permission, and Codex has no matching primitive.
+
+**What this means:** under Codex nothing stops an agent reaching Linear through an MCP server instead of the CLI. The commands still call `linear_cli.py`, so the common path is unaffected — but the guardrail is documentation rather than enforcement there.
+
 ### Settings merge strategy
 
 Hook config is written to `.claude/settings.local.json` (gitignored), not `settings.json`. This keeps your committed settings untouched — see [decision 001](decisions/001-hooks-in-settings-local.md) for rationale.
