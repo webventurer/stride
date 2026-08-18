@@ -39,7 +39,7 @@ Stride's two hook scripts and four skills are already in the shared column. **Th
 | Concern | Claude | Codex | Gemini |
 |:--------|:-------|:------|:-------|
 | Skills directory | `.claude/skills/` | `.codex/skills/` or `.agents/skills/` | `.gemini/skills/` or `.agents/skills/` |
-| Commands | `.claude/commands/linear/*.md`, `$ARGUMENTS` | none — render each to a skill, arguments lost | `.gemini/commands/linear/*.toml`, `{{args}}` |
+| Commands | `.claude/commands/linear/*.md`, `$ARGUMENTS` | none — render each to a skill, arguments lost | `.gemini/commands/linear/*.toml`, <code v-pre>{{args}}</code> |
 | Pre-tool event | `PreToolUse`, matcher `Bash` | `PreToolUse`, matcher `^Bash$` | `BeforeTool`, matcher `run_shell_command` |
 | Prompt event | `UserPromptSubmit` | `UserPromptSubmit` | `BeforeAgent` |
 | Hook registration | `.claude/settings.local.json` | `.codex/hooks.json` | `.gemini/settings.json` |
@@ -53,9 +53,9 @@ Stride's two hook scripts and four skills are already in the shared column. **Th
 Codex has no namespaced slash commands, so WB-631 rendered each command to a skill invoked as `$linear-start`, losing both the `linear:` namespace and argument substitution. Gemini needs none of that:
 
 - `.gemini/commands/linear/start.toml` becomes `/linear:start` — subdirectories create the namespace, exactly as Claude's directories do.
-- `{{args}}` in the `prompt` field receives whatever followed the command, the direct equivalent of Claude's `$ARGUMENTS`.
+- <code v-pre>{{args}}</code> in the `prompt` field receives whatever followed the command, the direct equivalent of Claude's `$ARGUMENTS`.
 
-Verified live. A probe command at `.gemini/commands/linear/probe.toml` containing `prompt = "Report the argument you were given: {{args}}"`, invoked as `/linear:probe WB-123`, answered *"The argument you provided is: WB-123"*.
+Verified live. A probe command at `.gemini/commands/linear/probe.toml` containing `prompt = "Report the argument you were given: &#123;&#123;args&#125;&#125;"`, invoked as `/linear:probe WB-123`, answered *"The argument you provided is: WB-123"*.
 
 The TOML file itself is two fields — `description` and `prompt` — so the renderer's real work is deciding what the `prompt` says. The cheapest version points at the canonical command file the way the Codex skills do, keeping `.claude/commands/linear/` the only place a body is authored.
 
