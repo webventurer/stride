@@ -12,6 +12,7 @@ import {
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { HOOKS_FILE } from "./codex-hooks.mjs";
 import { COMMANDS_ROOT, SKILLS_ROOT } from "./codex-skills.mjs";
 import { removeSection } from "./gitignore.mjs";
 
@@ -126,6 +127,7 @@ function codexSkillNames() {
 }
 
 function removeCodexFootprint() {
+  rmSync(join(destRoot, HOOKS_FILE), { force: true });
   const skillsRoot = join(destRoot, SKILLS_ROOT);
   if (!existsSync(skillsRoot)) return;
   for (const name of codexSkillNames()) {

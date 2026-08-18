@@ -1,9 +1,12 @@
 #!/bin/bash
-# UserPromptSubmit hook: inject design decision principles.
-#
-# Outputs the design principles on every user message so they
-# stay active even in long conversations where doc context may
-# get compressed.
+# UserPromptSubmit hook: inject design decision principles. Emits the JSON
+# both Claude Code and Codex read, resolving the doc from the payload's cwd so
+# neither tool needs an environment variable the other does not set.
 
-cat "$CLAUDE_PROJECT_DIR/.claude/stride/docs/principles/design-decisions.md"
-exit 0
+ROOT=$(jq -r '.cwd // empty')
+DOC="$ROOT/.claude/stride/docs/principles/design-decisions.md"
+
+[ -f "$DOC" ] || exit 0
+
+jq -n --rawfile context "$DOC" \
+  '{hookSpecificOutput: {hookEventName: "UserPromptSubmit", additionalContext: $context}}'
