@@ -12,7 +12,7 @@ import {
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { codex } from "../install/agents/codex/index.mjs";
-import { removeSection } from "./gitignore.mjs";
+import { removeSection } from "../install/gitignore.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, "..");

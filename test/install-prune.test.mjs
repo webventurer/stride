@@ -11,7 +11,7 @@ import {
 import { dirname, join } from "node:path";
 import { after, describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
-import { REMOVED_PATHS } from "../bin/removed-paths.mjs";
+import { REMOVED_PATHS } from "../install/removed-paths.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const strideRoot = join(__dirname, "..");

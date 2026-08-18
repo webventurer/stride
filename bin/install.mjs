@@ -17,9 +17,9 @@ import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 import { codex } from "../install/agents/codex/index.mjs";
 import { contentsMatch, copyFile, walkFiles } from "../install/files.mjs";
-import { buildSection, removeSection } from "./gitignore.mjs";
-import { requirePrerequisites } from "./prereqs.mjs";
-import { REMOVED_PATHS } from "./removed-paths.mjs";
+import { buildSection, removeSection } from "../install/gitignore.mjs";
+import { requirePrerequisites } from "../install/prereqs.mjs";
+import { REMOVED_PATHS } from "../install/removed-paths.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, "..");
