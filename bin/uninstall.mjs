@@ -6,11 +6,13 @@ import {
   readdirSync,
   readFileSync,
   rmdirSync,
+  rmSync,
   unlinkSync,
   writeFileSync,
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { COMMANDS_ROOT, SKILLS_ROOT } from "./codex-skills.mjs";
 import { removeSection } from "./gitignore.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -22,11 +24,10 @@ if (existsSync(join(destRoot, "bin/install.mjs"))) {
   process.exit(1);
 }
 
+const SHIPPED_SKILLS = ["commit", "craft", "vision", "clear-speak"];
+
 const DIRS = [
-  ".claude/skills/commit",
-  ".claude/skills/craft",
-  ".claude/skills/vision",
-  ".claude/skills/clear-speak",
+  ...SHIPPED_SKILLS.map((skill) => `.claude/skills/${skill}`),
   ".claude/commands/linear",
   ".claude/hooks",
   ".claude/stride/docs/patterns/git",
@@ -115,10 +116,29 @@ function removeGitignoreSection() {
   writeFileSync(path, stripped.endsWith("\n") ? stripped : `${stripped}\n`);
 }
 
+function codexSkillNames() {
+  const commandsDir = join(srcRoot, COMMANDS_ROOT, "linear");
+  if (!existsSync(commandsDir)) return SHIPPED_SKILLS;
+  const commands = readdirSync(commandsDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
+    .map((entry) => `linear-${entry.name.replace(/\.md$/, "")}`);
+  return [...SHIPPED_SKILLS, ...commands];
+}
+
+function removeCodexFootprint() {
+  const skillsRoot = join(destRoot, SKILLS_ROOT);
+  if (!existsSync(skillsRoot)) return;
+  for (const name of codexSkillNames()) {
+    rmSync(join(skillsRoot, name), { recursive: true, force: true });
+  }
+  pruneEmptyDirs(skillsRoot);
+}
+
 function main() {
   console.log("\nstride — uninstalling\n");
 
   DIRS.forEach(removeStrideFiles);
+  removeCodexFootprint();
   removeHookConfig();
   removeGitignoreSection();
 
