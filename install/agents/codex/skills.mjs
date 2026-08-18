@@ -10,7 +10,6 @@ import { fileURLToPath } from "node:url";
 export const COMMANDS_ROOT = ".claude/commands";
 export const SKILLS_ROOT = ".codex/skills";
 
-// The only command namespace stride ships.
 const NAMESPACE = "linear";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

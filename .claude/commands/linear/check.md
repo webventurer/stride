@@ -31,7 +31,7 @@ If a workspace fails, show the error and suggest checking:
 
 - The API key is set in `~/.env` and the shell has loaded it (`source ~/.env` or restart the shell)
 - The key value matches an active personal API key in Linear's *Settings → API*
-- `uv` and `jq` are on the PATH (run `bin/prereqs.mjs` or `pnpm install` if not)
+- `uv` and `jq` are on the PATH (run `install/prereqs.mjs` or `pnpm install` if not)
 
 ### 3. Verify each team's board matches stride's states
 

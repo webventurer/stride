@@ -5,7 +5,7 @@ import {
   prereqReport,
   requirePrerequisites,
   windowsReport,
-} from "../bin/prereqs.mjs";
+} from "../install/prereqs.mjs";
 
 describe("missingPrereqs", () => {
   it("returns only the tools absent from PATH", () => {

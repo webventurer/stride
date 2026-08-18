@@ -5,7 +5,7 @@ import {
   GITIGNORE_BEGIN,
   GITIGNORE_END,
   removeSection,
-} from "../bin/gitignore.mjs";
+} from "../install/gitignore.mjs";
 
 describe("buildSection", () => {
   it("wraps entries in markers", () => {
