@@ -23,6 +23,7 @@ export default defineConfig({
           { text: 'Getting started', link: '/getting-started' },
           { text: 'How it works', link: '/how-it-works' },
           { text: 'Install', link: '/install' },
+          { text: 'Install for Codex', link: '/install-codex' },
         ],
       },
       {
