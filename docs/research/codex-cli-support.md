@@ -94,7 +94,7 @@ The built-in migrator is not a shipping path for stride, and the reasons are mec
 | `has_unsupported_command_template_features` rejects `$ARGUMENTS` | 4 files |
 | ...rejects `` !` `` command substitution | 1 file |
 | ...rejects any `@token` file mention | 6 files |
-| ...rejects `{{...}}` and `$<digit>` placeholders | 0 files |
+| ...rejects <code v-pre>{{...}}</code> and `$<digit>` placeholders | 0 files |
 | `README.md` stems skipped | — |
 | Recurses subdirectories | `reference/` and `recovery/` would become skills too |
 | Duplicate slugs dropped silently | — |
