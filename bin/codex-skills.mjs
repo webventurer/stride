@@ -1,9 +1,7 @@
-// Renders one Codex skill per stride command.
-//
-// Codex has no namespaced slash commands, so `/linear:start` cannot survive the
-// mapping — each command becomes a skill invoked as `$linear-start`. The skill
-// points at the command file instead of copying it, so `.claude/commands/` stays
-// the only place a command body is authored.
+// Renders one Codex skill per stride command. Codex has no namespaced slash
+// commands, so `/linear:start` can't survive the mapping — each command becomes
+// a skill invoked as `$linear-start`, pointing at the command file rather than
+// copying it, so `.claude/commands/` stays the only place a body is authored.
 
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
