@@ -2,7 +2,7 @@ import { deepStrictEqual, ok, strictEqual } from "node:assert";
 import { mkdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { after, beforeEach, describe, it } from "node:test";
-import { HOOKS_FILE, writeCodexHooks } from "../bin/codex-hooks.mjs";
+import { HOOKS_FILE, writeCodexHooks } from "../install/agents/codex/hooks.mjs";
 
 const fixtureRoot = join("/tmp", `stride-codex-hooks-${process.pid}`);
 

@@ -6,14 +6,12 @@ import {
   readdirSync,
   readFileSync,
   rmdirSync,
-  rmSync,
   unlinkSync,
   writeFileSync,
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { HOOKS_FILE } from "./codex-hooks.mjs";
-import { COMMANDS_ROOT, SKILLS_ROOT } from "./codex-skills.mjs";
+import { codex } from "../install/agents/codex/index.mjs";
 import { removeSection } from "./gitignore.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -117,30 +115,18 @@ function removeGitignoreSection() {
   writeFileSync(path, stripped.endsWith("\n") ? stripped : `${stripped}\n`);
 }
 
-function codexSkillNames() {
-  const commandsDir = join(srcRoot, COMMANDS_ROOT, "linear");
-  if (!existsSync(commandsDir)) return SHIPPED_SKILLS;
-  const commands = readdirSync(commandsDir, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
-    .map((entry) => `linear-${entry.name.replace(/\.md$/, "")}`);
-  return [...SHIPPED_SKILLS, ...commands];
-}
+const AGENTS = [codex];
 
-function removeCodexFootprint() {
-  rmSync(join(destRoot, HOOKS_FILE), { force: true });
-  const skillsRoot = join(destRoot, SKILLS_ROOT);
-  if (!existsSync(skillsRoot)) return;
-  for (const name of codexSkillNames()) {
-    rmSync(join(skillsRoot, name), { recursive: true, force: true });
-  }
-  pruneEmptyDirs(skillsRoot);
+function uninstallAgent(agent) {
+  agent.uninstall({ srcRoot, destRoot, skills: SHIPPED_SKILLS });
+  pruneEmptyDirs(join(destRoot, agent.root));
 }
 
 function main() {
   console.log("\nstride — uninstalling\n");
 
   DIRS.forEach(removeStrideFiles);
-  removeCodexFootprint();
+  AGENTS.forEach(uninstallAgent);
   removeHookConfig();
   removeGitignoreSection();
 

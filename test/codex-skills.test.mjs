@@ -12,7 +12,7 @@ import {
   COMMANDS_ROOT,
   renderCodexSkills,
   SKILLS_ROOT,
-} from "../bin/codex-skills.mjs";
+} from "../install/agents/codex/skills.mjs";
 
 const fixtureRoot = join("/tmp", `stride-codex-skills-${process.pid}`);
 const skillsDir = join(fixtureRoot, SKILLS_ROOT);

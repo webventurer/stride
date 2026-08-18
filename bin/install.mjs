@@ -1,9 +1,6 @@
 #!/usr/bin/env node
-
-import { createHash } from "node:crypto";
 import {
   chmodSync,
-  copyFileSync,
   existsSync,
   lstatSync,
   mkdirSync,
@@ -15,11 +12,11 @@ import {
   unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { dirname, join, relative, sep } from "node:path";
+import { dirname, join, sep } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
-import { HOOKS_FILE, writeCodexHooks } from "./codex-hooks.mjs";
-import { renderCodexSkills, SKILLS_ROOT } from "./codex-skills.mjs";
+import { codex } from "../install/agents/codex/index.mjs";
+import { contentsMatch, copyFile, walkFiles } from "../install/files.mjs";
 import { buildSection, removeSection } from "./gitignore.mjs";
 import { requirePrerequisites } from "./prereqs.mjs";
 import { REMOVED_PATHS } from "./removed-paths.mjs";
@@ -117,8 +114,8 @@ const HOOKS = [
 ];
 
 const AGENTS = {
-  claude: { root: ".claude" },
-  codex: { root: ".codex" },
+  claude: { root: ".claude", generates: [] },
+  codex,
 };
 
 export function parseAgents(argv) {
@@ -148,39 +145,10 @@ function assertUnderAllowedDir(dir, agents) {
   process.exit(1);
 }
 
-function hashFile(path) {
-  return createHash("sha256").update(readFileSync(path)).digest("hex");
-}
-
-function contentsMatch(srcFile, destFile) {
-  return hashFile(srcFile) === hashFile(destFile);
-}
-
-// Stride's own dev artifacts — never shipped into a consumer's .claude/.
-const INSTALL_EXCLUDE = new Set(["tests", "__pycache__"]);
-
-function walkFiles(root, base = root) {
-  const paths = [];
-  for (const entry of readdirSync(root)) {
-    if (INSTALL_EXCLUDE.has(entry)) continue;
-    const full = join(root, entry);
-    const stat = lstatSync(full);
-    if (stat.isSymbolicLink()) continue;
-    if (stat.isDirectory()) paths.push(...walkFiles(full, base));
-    else paths.push(relative(base, full));
-  }
-  return paths;
-}
-
 function planAction(srcFile, destFile) {
   if (!existsSync(destFile)) return "copy";
   if (statSync(destFile).isDirectory()) return "conflict";
   return contentsMatch(srcFile, destFile) ? "skip" : "conflict";
-}
-
-function copyFile(srcFile, destFile) {
-  mkdirSync(dirname(destFile), { recursive: true });
-  copyFileSync(srcFile, destFile);
 }
 
 const ACTIONS = {
@@ -294,30 +262,11 @@ async function copyFiles(agents) {
   return totals;
 }
 
-function installCodexSkill(name, agents) {
-  const srcDir = join(srcRoot, ".claude/skills", name);
-  const destRel = join(SKILLS_ROOT, name);
-  assertUnderAllowedDir(destRel, agents);
-  for (const rel of walkFiles(srcDir)) {
-    const srcFile = join(srcDir, rel);
-    const destFile = join(destRoot, destRel, rel);
-    if (existsSync(destFile) && contentsMatch(srcFile, destFile)) continue;
-    copyFile(srcFile, destFile);
-  }
-}
-
-function installCodexFootprint(agents) {
-  for (const skill of SHIPPED_SKILLS) installCodexSkill(skill, agents);
-  const rendered = renderCodexSkills(destRoot);
-  assertUnderAllowedDir(HOOKS_FILE, agents);
-  writeCodexHooks(destRoot);
-  console.log(
-    `\nSet up Codex CLI in ${SKILLS_ROOT}/: ` +
-      `${SHIPPED_SKILLS.length} skill(s), ${rendered.length} command skill(s).`,
-  );
-  console.log(
-    `Wrote ${HOOKS_FILE} — trust the hooks with /hooks in Codex or they will not run.`,
-  );
+function installAgent(name) {
+  const agent = AGENTS[name];
+  if (!agent.install) return;
+  const lines = agent.install({ srcRoot, destRoot, skills: SHIPPED_SKILLS });
+  console.log(`\n${lines.join("\n")}`);
 }
 
 function mergeSettings() {
@@ -335,7 +284,7 @@ function mergeSettings() {
 
 async function installFiles(agents) {
   logCopiedFiles(await copyFiles(agents));
-  if (agents.includes("codex")) installCodexFootprint(agents);
+  for (const name of agents) installAgent(name);
 }
 
 function installHeader({ copied, skipped }) {
@@ -408,9 +357,7 @@ function logAvailableSkills() {
 
 function gitignoreEntries(agents) {
   const entries = DIRS.filter((d) => d !== ".claude/hooks").map((d) => `${d}/`);
-  const generated = agents.includes("codex")
-    ? [`${SKILLS_ROOT}/`, HOOKS_FILE]
-    : [];
+  const generated = agents.flatMap((name) => AGENTS[name].generates);
   return [...entries, ...generated, ...HOOKS].sort();
 }
 
