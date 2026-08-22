@@ -4,6 +4,7 @@ export default defineConfig({
   title: 'stride',
   description: 'All the speed. None of the mess. Claude Code skills for atomic commits and Linear workflow.',
   base: '/stride/',
+  srcExclude: ['conventions/**'],
   themeConfig: {
     nav: [
       { text: 'Guide', link: '/getting-started' },
