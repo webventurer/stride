@@ -13,6 +13,10 @@ import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { codex } from "../install/agents/codex/index.mjs";
 import { removeSection } from "../install/gitignore.mjs";
+import {
+  SKILL_NAMES,
+  skillFootprintLines,
+} from "../install/shipped-skills.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, "..");
@@ -23,10 +27,8 @@ if (existsSync(join(destRoot, "bin/install.mjs"))) {
   process.exit(1);
 }
 
-const SHIPPED_SKILLS = ["commit", "craft", "vision", "clear-speak"];
-
 const DIRS = [
-  ...SHIPPED_SKILLS.map((skill) => `.claude/skills/${skill}`),
+  ...SKILL_NAMES.map((skill) => `.claude/skills/${skill}`),
   ".claude/commands/linear",
   ".claude/hooks",
   ".claude/stride/docs/patterns/git",
@@ -118,7 +120,7 @@ function removeGitignoreSection() {
 const AGENTS = [codex];
 
 function uninstallAgent(agent) {
-  agent.uninstall({ srcRoot, destRoot, skills: SHIPPED_SKILLS });
+  agent.uninstall({ srcRoot, destRoot, skills: SKILL_NAMES });
   pruneEmptyDirs(join(destRoot, agent.root));
 }
 
@@ -131,15 +133,12 @@ function main() {
   removeGitignoreSection();
 
   console.log("Removed stride files from .claude/:");
-  console.log("  skills/vision/   (project Vision authoring skill)");
-  console.log("  skills/commit/   (multi-pass atomic commit skill)");
-  console.log("  skills/craft/    (CRAFT prompt skill)");
-  console.log("  skills/clear-speak/ (plain-language rewrite skill)");
-  console.log("  commands/linear/ (Linear workflow commands)");
-  console.log("  hooks/           (commit hook scripts)");
-  console.log("  stride/docs/     (principles, patterns, concepts)");
-  console.log("  tools/           (cross-model feedback script)");
-  console.log("  hooks config     (from settings.local.json)");
+  for (const line of skillFootprintLines()) console.log(line);
+  console.log("  commands/linear/    (Linear workflow commands)");
+  console.log("  hooks/              (commit hook scripts)");
+  console.log("  stride/docs/        (principles, patterns, concepts)");
+  console.log("  tools/              (cross-model feedback script)");
+  console.log("  hooks config        (from settings.local.json)");
   console.log(
     "\nOther files in shared directories (codefu symlinks, your own hooks) left untouched.",
   );
