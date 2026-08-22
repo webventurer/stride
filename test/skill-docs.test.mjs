@@ -30,6 +30,14 @@ describe("skill documentation", () => {
     }
   });
 
+  it("shows every shipped skill in the how-it-works tree", () => {
+    const page = read("docs/how-it-works.md");
+
+    for (const { name } of SHIPPED_SKILLS) {
+      ok(page.includes(`${name}/`), `tree never shows ${name}/`);
+    }
+  });
+
   it("describes every shipped skill in the README", () => {
     const readme = read("README.md");
 
