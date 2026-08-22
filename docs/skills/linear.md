@@ -161,7 +161,7 @@ The merge fires *only* on an explicit ship phrase — the agent never decides on
 
 ### /linear:start
 
-**Start work on a Linear issue.** One headless flow: create or switch to the feature branch, move the issue to Doing, implement the changes, validate (build + tests), **auto-squash similar commits**, push, open a PR, move to In Review, then show the full diff for terminal review.
+**Start work on a Linear issue.** One headless flow: create or switch to the feature branch, move the issue to Doing, inspect the current repository, surface a concrete implementation checklist, work through it visibly, validate (build + tests), **auto-squash similar commits**, push, open a PR, move to In Review, then show the full diff for terminal review.
 
 Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). The command surfaces the outcome the issue serves (extracted from its "Why this matters" section) and carries it as context throughout implementation.
 
@@ -169,7 +169,7 @@ Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). The command su
 
 The agent groups commits by purpose and squashes similar ones into single commits with rewritten messages. Conservative by default — when uncertain whether two commits belong together, they stay separate. The user gates via terminal review and can recover the original commits via reflog if a squash was wrong.
 
-Trusts the issue — the plan was agreed during `/plan-work`. No approval gate mid-flow. Branches are created inline by default — no "worktree or inline?" prompt. To run on a worktree instead, opt in at planning time via `/linear:plan-work --worktree`.
+Treats the issue as the agreed specification — outcome, boundary, constraints, and proof — then derives an implementation checklist from the repository as it exists when work starts. The checklist names the affected files or responsibilities and the checks that prove the result; `/linear:start` shows it before editing and marks items complete as it works. It proceeds without an approval gate when the plan clearly satisfies the issue, and pauses only when the code exposes a missing decision, contradiction, or required scope expansion. The card is the contract; the checklist is the current route. Branches are created inline by default — no "worktree or inline?" prompt. To run on a worktree instead, opt in at planning time via `/linear:plan-work --worktree`.
 
 Ends by asking: "Does this look right, or do you want changes?"
 
