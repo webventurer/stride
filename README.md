@@ -24,6 +24,8 @@ Everything installs as plain text into your `.claude/` directory — markdown sk
 
 **`/craft`** — Structured prompt generation using the **C.R.A.F.T.** framework (Context, Role, Action, Format, Target). Built into `/linear:plan-work --craft` to sharpen issue descriptions *before* the agent drafts them. Without it, the agent works from whatever you typed — ambiguity in, ambiguity out. With it, you get a clear problem statement, well-scoped goals, and acceptance criteria that the agent can actually execute against.
 
+**`/clear-speak`** — Plain-language rewriting for anything the agent writes. Point it at a doc, a command file, an issue draft, a commit message, or a README paragraph and it replaces jargon with words a non-engineer can follow first time. `/linear:plan-work` and `/linear:finish` link to it as stride's standard for what counts as jargon, so issue titles and Vision-trace explanations stay readable.
+
 ## The loop
 
 The skills aren't independent — each one feeds the next.

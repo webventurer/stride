@@ -13,6 +13,7 @@ export default defineConfig({
         { text: '/commit', link: '/skills/commit' },
         { text: '/linear', link: '/skills/linear' },
         { text: '/craft', link: '/skills/craft' },
+        { text: '/clear-speak', link: '/skills/clear-speak' },
       ]},
       { text: 'GitHub', link: 'https://github.com/webventurer/stride' },
     ],
@@ -34,6 +35,7 @@ export default defineConfig({
           { text: '/commit — Atomic commits', link: '/skills/commit' },
           { text: '/linear — Linear workflow', link: '/skills/linear' },
           { text: '/craft — Prompt generation', link: '/skills/craft' },
+          { text: '/clear-speak — Plain language', link: '/skills/clear-speak' },
         ],
       },
       {
