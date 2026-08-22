@@ -31,6 +31,6 @@ export function skillFootprintLines() {
 
 export function skillCommandLines() {
   return SHIPPED_SKILLS.map(
-    ({ name, usage }) => `  ${`/${name}`.padEnd(21)}— ${usage}`,
+    ({ name, usage }) => `  ${`/${name}`.padEnd(22)}— ${usage}`,
   );
 }
