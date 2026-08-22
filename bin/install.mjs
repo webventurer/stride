@@ -20,6 +20,11 @@ import { contentsMatch, copyFile, walkFiles } from "../install/files.mjs";
 import { buildSection, removeSection } from "../install/gitignore.mjs";
 import { requirePrerequisites } from "../install/prereqs.mjs";
 import { REMOVED_PATHS } from "../install/removed-paths.mjs";
+import {
+  SKILL_NAMES,
+  skillCommandLines,
+  skillFootprintLines,
+} from "../install/shipped-skills.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, "..");
@@ -94,10 +99,8 @@ export function dedupeHooks(existing, incoming) {
   return existing;
 }
 
-const SHIPPED_SKILLS = ["commit", "craft", "vision", "clear-speak"];
-
 const DIRS = [
-  ...SHIPPED_SKILLS.map((skill) => `.claude/skills/${skill}`),
+  ...SKILL_NAMES.map((skill) => `.claude/skills/${skill}`),
   ".claude/commands/linear",
   ".claude/hooks",
   ".claude/stride/docs/patterns/git",
@@ -265,7 +268,7 @@ async function copyFiles(agents) {
 function installAgent(name) {
   const agent = AGENTS[name];
   if (!agent.install) return;
-  const lines = agent.install({ srcRoot, destRoot, skills: SHIPPED_SKILLS });
+  const lines = agent.install({ srcRoot, destRoot, skills: SKILL_NAMES });
   console.log(`\n${lines.join("\n")}`);
 }
 
@@ -294,14 +297,12 @@ function installHeader({ copied, skipped }) {
 
 function logCopiedFiles(totals) {
   console.log(`\n${installHeader(totals)}`);
-  console.log("  skills/vision/   (project Vision authoring skill)");
-  console.log("  skills/commit/   (multi-pass atomic commit skill)");
-  console.log("  skills/craft/    (CRAFT prompt skill)");
-  console.log("  commands/linear/ (Linear workflow commands)");
-  console.log("  hooks/           (commit hook scripts)");
-  console.log("  stride/docs/     (principles, patterns, concepts)");
+  for (const line of skillFootprintLines()) console.log(line);
+  console.log("  commands/linear/    (Linear workflow commands)");
+  console.log("  hooks/              (commit hook scripts)");
+  console.log("  stride/docs/        (principles, patterns, concepts)");
   console.log(
-    "  tools/           (Linear API client + cross-model feedback script)",
+    "  tools/              (Linear API client + cross-model feedback script)",
   );
 }
 
@@ -331,11 +332,7 @@ async function installHookConfig() {
 
 function logAvailableSkills() {
   console.log("\nDone. Available skills:");
-  console.log(
-    "  /vision              — author the project Vision (run this first)",
-  );
-  console.log("  /commit              — multi-pass atomic git commits");
-  console.log("  /craft               — CRAFT prompt framework");
+  for (const line of skillCommandLines()) console.log(line);
   console.log("  /linear:check        — verify Linear access");
   console.log("  /linear:setup        — provision Linear workflow states");
   console.log("  /linear:start        — implement a Linear issue");
