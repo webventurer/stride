@@ -16,7 +16,9 @@ Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if Gi
 
 ## Rules
 
-- Trust the issue — the plan was agreed during `/plan-work`
+- Treat the issue as the agreed contract — outcome, boundary, constraints, and
+  proof. Derive the implementation plan from the current repository in step 7;
+  do not turn the plan into new scope
 - Never work directly on `main`
 - Prefer extending existing patterns over inventing new architecture
 - Do not expand scope beyond what the issue describes
@@ -161,9 +163,40 @@ If already Doing, leave unchanged. Never set any other state in this step.
 
 **If `--worktree` was passed**, set up the worktree now and hand off — follow [worktree setup](reference/worktree.md#setup). It creates the worktree, prints the handoff, and **exits before step 7**; the fresh `claude` session resumes from there (re-running `/linear:start <issue-id>` without the flag picks up at step 5 already on the branch).
 
-### 7. Implement
+### 7. Plan, then implement
 
-Read the codebase as needed to understand existing patterns before making changes.
+The issue is the durable specification: what must be true, where the
+responsibility ends, what is excluded, and how completion is proved. It is
+deliberately not an edit list.
+
+#### Plan from the current code
+
+Before editing, inspect the code, tests, configuration, documentation, and
+callers relevant to the issue. Turn what the repository says now into a short,
+ordered Markdown checklist using `- [ ]` for each step. It names:
+
+- The exact files or existing responsibility boundaries affected
+- What changes in each place and why that edit is necessary
+- Existing patterns or interfaces to reuse
+- The tests and commands that will prove the issue's expected outcome
+- Any deliberate non-change needed to hold the scope boundary
+
+Do not invent files, abstractions, or edits to make the plan look complete.
+Surface the unchecked checklist before editing. When one clear plan satisfies
+the issue, continue without an approval prompt. Work through it in order and
+mark each item complete in progress updates so the user can see what remains.
+If the repository reveals a missing product decision, a contradiction in the
+issue, or scope that must expand, stop and ask one focused question before
+editing.
+
+The checklist is working context, not a second specification. If
+implementation evidence changes it, show the revised checklist and keep the
+issue's outcome, boundary, constraints, and proof fixed.
+
+#### Implement the plan
+
+Execute the plan, reading further where implementation exposes relevant
+details.
 
 - Follow conventions in the project's coding standards
 - Follow architecture decisions

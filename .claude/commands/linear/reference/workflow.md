@@ -112,9 +112,13 @@ Also assesses whether tests make sense for the change. If they do, the issue not
 
 ### `/linear:start`
 
-**Start work on a Linear issue.** One headless flow: create or switch to the feature branch, move the issue to Doing, implement the changes, validate (build + tests), commit, push, open a PR, move to In Review, then show the full diff for terminal review.
+**Start work on a Linear issue.** One headless flow: create or switch to the feature branch, move the issue to Doing, inspect the current repository, surface a concrete implementation checklist, work through it visibly, validate (build + tests), commit, push, open a PR, move to In Review, then show the full diff for terminal review.
 
-Trusts the issue — the plan was agreed during `/plan-work`. No approval gate mid-flow.
+Treats the issue as the agreed specification — outcome, boundary, constraints,
+and proof — then derives an implementation checklist from the current
+repository. It shows the checklist before editing and marks items complete as
+it works. The common path continues without approval; a missing decision,
+contradiction, or required scope expansion pauses before editing.
 
 Ends by asking: "Does this look right, or do you want changes?" If you request changes, it fixes, re-validates, and shows the updated diff. Repeat until satisfied.
 
