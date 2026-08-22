@@ -4,6 +4,7 @@ import { mkdirSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { after, beforeEach, describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
+import { linearCommandNames } from "../install/linear-commands.mjs";
 import { SHIPPED_SKILLS } from "../install/shipped-skills.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -32,6 +33,14 @@ describe("install reporting", () => {
     for (const { name } of SHIPPED_SKILLS) {
       ok(output.includes(`skills/${name}/`), `expected skills/${name}/`);
       ok(output.includes(`/${name} `), `expected the /${name} command line`);
+    }
+  });
+
+  it("names every linear command in the install output", () => {
+    const output = run("install.mjs");
+
+    for (const name of linearCommandNames(strideRoot)) {
+      ok(output.includes(`/linear:${name} `), `expected /linear:${name}`);
     }
   });
 

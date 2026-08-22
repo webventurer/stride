@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 import { codex } from "../install/agents/codex/index.mjs";
 import { contentsMatch, copyFile, walkFiles } from "../install/files.mjs";
 import { buildSection, removeSection } from "../install/gitignore.mjs";
+import { linearCommandLines } from "../install/linear-commands.mjs";
 import { requirePrerequisites } from "../install/prereqs.mjs";
 import { REMOVED_PATHS } from "../install/removed-paths.mjs";
 import {
@@ -333,20 +334,7 @@ async function installHookConfig() {
 function logAvailableSkills() {
   console.log("\nDone. Available skills:");
   for (const line of skillCommandLines()) console.log(line);
-  console.log("  /linear:check        — verify Linear access");
-  console.log("  /linear:setup        — provision Linear workflow states");
-  console.log("  /linear:start        — implement a Linear issue");
-  console.log("  /linear:plan-work    — create a Linear issue");
-  console.log(
-    "  /linear:quick        — ship a small change, file the card after",
-  );
-  console.log("  /linear:fix          — address PR review feedback");
-  console.log("  /linear:finish       — merge and close");
-  console.log("  /linear:next-steps   — review priorities");
-  console.log("  /linear:list-projects — list active Linear projects");
-  console.log(
-    "  /linear:update-vision — mirror VISION.md to the Linear project",
-  );
+  for (const line of linearCommandLines(srcRoot)) console.log(line);
   console.log(
     "\nNext: run /vision to author your project's guiding light. Every /linear:* command reads VISION.md before deciding anything — without one, /linear:plan-work refuses to draft.\n",
   );
