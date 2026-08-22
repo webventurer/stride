@@ -15,8 +15,11 @@ your-project/
     │   ├── commit/          # /commit skill
     │   │   ├── SKILL.md     # Principles, coherence test, atomicity rules
     │   │   └── WORKFLOW.md  # Multi-pass execution sequence
-    │   └── craft/           # /craft skill
-    │       └── SKILL.md     # CRAFT prompt framework
+    │   ├── craft/           # /craft skill
+    │   │   └── SKILL.md     # CRAFT prompt framework
+    │   └── clear-speak/     # /clear-speak skill
+    │       ├── SKILL.md     # The plain-language test and rewrites
+    │       └── WORKFLOW.md  # Spot the jargon, swap it, check it
     ├── commands/
     │   └── linear/          # /linear:* commands
     │       ├── start.md     # Implement an issue

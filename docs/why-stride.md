@@ -10,6 +10,6 @@
 
 stride gives you a **solid foundation from the start**. Three Claude Code skills that turn you from a vibe coder into an **agentic engineer** — a [Linear](https://linear.app) workflow that structures *what the agent works on*, atomic commits that structure *how it records each change*, and prompt generation that structures *how it thinks before starting*. All without leaving the terminal.
 
-A fourth skill, [`/vision`](/skills/vision), sits *above* the loop — it captures what the project is for, so every issue, every feature, and every commit traces back to a single anchor.
+A fourth skill, [`/vision`](/skills/vision), sits *above* the loop — it captures what the project is for, so every issue, every feature, and every commit traces back to a single anchor. A fifth, [`/clear-speak`](/skills/clear-speak), sits *beside* it — point it at any writing the agent produces and it swaps the jargon for words a non-engineer can follow.
 
 Ready? Head to [Getting started](/getting-started) for how the pieces fit together, or [Install](/install) to drop stride into your project.
