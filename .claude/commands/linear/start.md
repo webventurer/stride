@@ -403,8 +403,11 @@ the [`/clear-speak` standard](../../skills/clear-speak/SKILL.md) and use this
 order:
 
 1. One simple sentence saying what the feature now does
-2. An optional short paragraph when the sentence needs context
-3. A short `What changed` list naming exactly what was done
+2. A short `What changed` list naming exactly what was done
+3. A short paragraph explaining how it works
+
+This three-part handoff is mandatory. It overrides brevity or compression
+modes, including Ponytail and Caveman; do not drop or combine any part.
 
 Write for a 16-year-old who does not know the codebase. Describe behaviour they
 can understand, not class names, routes, storage types or other implementation
