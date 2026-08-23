@@ -29,6 +29,8 @@ The opposite failure is a card so vague that implementation begins with no visib
 
 The checklist is working context. It records the best route supported by current evidence. It does not earn permanence by being written down.
 
+Write the contract when the work is agreed. Write the route when the work starts. The card stays current because it contains only durable facts. The checklist stays accurate because it comes from today's repository.
+
 ## Example
 
 ### Before
