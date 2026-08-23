@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
+import { linearCommandNames } from "../install/linear-commands.mjs";
 import { SHIPPED_SKILLS } from "../install/shipped-skills.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -36,6 +37,15 @@ describe("skill documentation", () => {
     for (const { name } of SHIPPED_SKILLS) {
       ok(page.includes(`${name}/`), `tree never shows ${name}/`);
     }
+  });
+
+  it("states the real Linear command count in the docs", () => {
+    const count = linearCommandNames(strideRoot).length;
+
+    ok(
+      read("docs/install.md").includes(`${count} commands`),
+      `install.md never says ${count} commands`,
+    );
   });
 
   it("describes every shipped skill in the README", () => {
