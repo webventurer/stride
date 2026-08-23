@@ -247,7 +247,7 @@ Re-validate after fixes until the build passes cleanly.
 
 Step 7's YAGNI gate and footprint audit are the **forward pass** — prevention, run in the author's context moments after each piece felt necessary. This is the **backward pass**: a reviewer that never saw that reasoning, asked cold whether the implementation is the simplest thing that works.
 
-It runs before the working-tree review so the human always eyeballs the final shape, never a version about to change.
+It runs before the commit and PR so accepted deletions reach the final review.
 
 1. **Spawn the reviewer.** Use the Task tool (`general-purpose`, model `opus` — the judgement is the whole value). Give it **only** the issue and an output path — never your reasoning, never this conversation:
 
@@ -267,17 +267,15 @@ It runs before the working-tree review so the human always eyeballs the final sh
 
 <mark>**An empty findings file is a pass, not a failure.**</mark> An already-minimal implementation proposes nothing; report `simplification review: nothing to remove` and continue.
 
-**One pass, not a loop.** The human's working-tree review in step 10 is the convergence check — a second automated round would churn the diff the user is about to read.
+**One pass, not a loop.** The PR review in step 17 is the convergence check — a second automated round would churn the diff the user is about to read.
 
-### 10. Working-tree review
+### 10. Optional working-tree review
 
-Surface the working tree in diffity *before* committing, while fixes are still cheap — an edit + re-stage now beats a fix-commit + force-push once a PR exists.
+Run this step only when the user explicitly asks to review before committing. Otherwise continue without checking for diffity or prompting.
 
-<mark>**diffity absent → skip this step silently.**</mark> No prompt, no terminal `git diff` fallback — the step-17 post-PR review is the backstop.
+When asked, launch the working tree following [reference/diffity-review.md](reference/diffity-review.md), but use `diffity --new main` instead of a PR URL. Surface the URL, then ask: **"Eyeball the working diff — anything to fix before I commit?"** If the user flags something, fix it, re-validate (step 8), refresh with `diffity --new main`, and ask again.
 
-If diffity is present, launch it following [reference/diffity-review.md](reference/diffity-review.md) — same `which` check, wait, and short-URL surfacing — but with `diffity --new main` instead of a PR URL (`--compare` defaults to the working tree, so it shows everything diverging from `main`, committed or not). Surface the URL, then ask: **"Eyeball the working diff — anything to fix before I commit?"** If the user flags something, fix it, re-validate (step 8), refresh with `diffity --new main`, and ask again. When they're happy, continue.
-
-This pass and the step-17 review catch different things — this is the pre-squash working tree; step 17 is the reviewer's-eye diff (post-squash, vs merge-base). Keep both.
+<mark>**diffity absent → skip silently.**</mark> No terminal `git diff` fallback. The step-17 PR review remains the standard review gate.
 
 ### 11. Review scope
 
