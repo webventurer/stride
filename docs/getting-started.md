@@ -37,7 +37,7 @@ The `/commit` skill encodes a **multi-pass methodology** that separates content 
 
 ## The loop
 
-The three skills aren't independent — they're stages in the same loop, and each one makes the next one better.
+The three aren't independent — they're stages in the same loop, and each one makes the next one better.
 
 1. **`/craft`** sharpens the problem — structured prompt generation that turns a vague idea into a clear description *before* the agent starts work
 2. **`/linear`** turns that description into a tracked issue, then manages the full lifecycle — branching, implementation, PR, review, merge
