@@ -400,6 +400,18 @@ git log main..HEAD --oneline
 
 Read the output focus and apply this command's format from [reference/output-focus.md](reference/output-focus.md).
 
+Before asking for approval, explain the finished card in plain English. Follow
+the [`/clear-speak` standard](../../skills/clear-speak/SKILL.md) and use this
+order:
+
+1. One simple sentence saying what the feature now does
+2. An optional short paragraph when the sentence needs context
+3. A short `What changed` list naming exactly what was done
+
+Write for a 16-year-old who does not know the codebase. Describe behaviour they
+can understand, not class names, routes, storage types or other implementation
+detail. Do not make them infer the feature from the commit list or PR summary.
+
 Ask: **"Does this look right, or do you want changes?"**
 
 If the user requests changes, make them, re-validate (step 8), commit, push, and refresh diffity on the updated PR (re-launch with `--new`). Repeat until the user is satisfied.
