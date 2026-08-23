@@ -77,16 +77,25 @@ Never inflate implementation work into fake product impact to fill the Outcome o
 
 ### `/linear:start` step 17 and `/linear:fix` step 11 (review gate)
 
+Start with the completed-card explanation in both modes. It is a handoff to a
+person, not a changelog: one simple sentence saying what the feature does, an
+optional short paragraph for useful context, then concrete bullets saying
+exactly what changed. Follow the [`/clear-speak` skill](../../../skills/clear-speak/SKILL.md)
+and write so a 16-year-old who does not know the codebase can understand it on
+the first read.
+
 **Outcome mode:**
 
 ```
-Outcome: <one plain-English sentence — what the product/feature does differently>
+<one plain-English sentence — what the feature now does>
 
-Why it matters: <one sentence — what this unlocks or how it moves the project forward>
+[<optional short paragraph — why it matters or context the sentence needs>]
 
-User-visible change: <yes — [what a user sees] | no — internal change supporting [X]>
+What changed:
+- <one concrete thing that was done, in plain English>
+- <another concrete thing that was done, in plain English>
 
-Needs your call? <none | specific decision or risk — one sentence>
+[Needs your call: <specific decision or risk — only when one exists>]
 
 WB-XXX — <title>
 Branch: <name>
@@ -98,7 +107,14 @@ Linear: In Review
 Does this look right?
 ```
 
-**Technical mode** — same metadata, plus the footprint-audit line (`kept N helpers / dropped X / inlined Y`) and the full implementation narrative (What ships, Decisions worth flagging, The torch).
+When the change is internal, say that plainly in the opening sentence instead
+of inventing a user-visible benefit. Omit the optional paragraph when the
+sentence and bullets already explain the card.
+
+**Technical mode** — starts with the same plain-English explanation and uses
+the same metadata, then adds the footprint-audit line (`kept N helpers / dropped
+X / inlined Y`) and the full implementation narrative (What ships, Decisions
+worth flagging, The torch).
 
 ---
 
