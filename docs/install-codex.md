@@ -34,6 +34,17 @@ Each command becomes a skill named `linear-<command>`, and the four shipped skil
 
 The generated skill points at the command file under `.claude/commands/linear/` rather than copying it, so there is one place a command is authored and the two tools cannot drift.
 
+## Check the board before you start
+
+The Linear steps on the [Install](/install#connect-linear) page still apply — run them through the skill names:
+
+```text
+$linear-check
+$linear-setup
+```
+
+`$linear-check` confirms each API key authenticates. `$linear-setup` provisions the board with the exact states stride drives work through, then run `$linear-check` once more to confirm the columns landed. Do this before your first `$linear-start`: without the right columns, the state transitions silently no-op and the card never moves.
+
 ## What gets installed
 
 ```text
