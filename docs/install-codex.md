@@ -45,6 +45,19 @@ $linear-setup
 
 `$linear-check` confirms each API key authenticates. `$linear-setup` provisions the board with the exact states stride drives work through, then run `$linear-check` once more to confirm the columns landed. Do this before your first `$linear-start`: without the right columns, the state transitions silently no-op and the card never moves.
 
+## Skipping the approval prompts
+
+Codex asks before it runs commands and edits files. To turn those prompts off, edit `~/.codex/config.toml`:
+
+```toml
+default_permissions = ":danger-full-access"
+approval_policy = "never"
+```
+
+<mark>**This is Codex's equivalent of `--dangerously-skip-permissions`, and it is machine-wide.**</mark> `~/.codex/config.toml` is your user config, not the project's, so the setting applies to every repository you open in Codex — including ones you did not install stride into. The agent will run commands and write files without asking, so only set it on a machine where you are happy with that.
+
+Stride never writes this file. Nothing in the install footprint lives outside your repo, and a setting that widens what an agent may do is yours to make deliberately.
+
 ## What gets installed
 
 ```text
