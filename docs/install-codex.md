@@ -14,7 +14,7 @@ npx github:webventurer/stride --agent codex
 
 `--agent` chooses which CLIs to set up: `claude` (the default), `codex`, both as `claude,codex`, or `all`.
 
-Selecting `codex` additionally writes `.codex/skills/` — stride's skills, plus one skill per Linear command — and `.codex/hooks.json`. Both are generated from `.claude/`, so they are gitignored as build artifacts and rewritten on each install.
+Selecting `codex` additionally writes a `.codex/` footprint. It is generated from `.claude/`, so it is gitignored as a build artifact and rewritten on each install — never edit it by hand.
 
 ## Trust the hooks, or they will not run
 
@@ -29,6 +29,8 @@ Codex has no namespaced slash commands, so `/linear:start` is reachable as a ski
 ```text
 $linear-start WB-123
 ```
+
+That call needs a provisioned board — [check the board](#check-the-board-before-you-start) before the first one.
 
 Each command becomes a skill named `linear-<command>`, and the four shipped skills — `commit`, `craft`, `vision`, `clear-speak` — keep their names. Type `$` in Codex to see them, or `/skills` to browse.
 
@@ -45,7 +47,7 @@ $linear-setup
 
 `$linear-check` confirms each API key authenticates. `$linear-setup` provisions the board with the exact states stride drives work through, then run `$linear-check` once more to confirm the columns landed. Do this before your first `$linear-start`: without the right columns, the state transitions silently no-op and the card never moves.
 
-## Skipping the approval prompts
+## Skip the approval prompts
 
 Codex asks before it runs commands and edits files. To turn those prompts off, edit `~/.codex/config.toml`:
 
