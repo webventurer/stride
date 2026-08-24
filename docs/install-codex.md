@@ -22,6 +22,17 @@ Selecting `codex` additionally writes a `.codex/` footprint. It is generated fro
 
 Codex records that approval against each hook's exact content. A stride update changes the content, which changes the hash, which quarantines the hooks again — so re-approve after every install. Skip this and the bare-commit block silently stops firing, with nothing in the output to say so.
 
+## Check the board before you start
+
+The Linear steps on the [Install](/install#connect-linear) page still apply. Codex reaches stride's commands as skills rather than slash commands, so they carry a `$` and a hyphen — [Running the commands](#running-the-commands) covers the form in full:
+
+```text
+$linear-check
+$linear-setup
+```
+
+`$linear-check` confirms each API key authenticates. `$linear-setup` provisions the board with the exact states stride drives work through, then run `$linear-check` once more to confirm the columns landed. Do this first: without the right columns, the state transitions silently no-op and the card never moves.
+
 ## Running the commands
 
 Codex has no namespaced slash commands, so `/linear:start` is reachable as a skill instead:
@@ -30,22 +41,9 @@ Codex has no namespaced slash commands, so `/linear:start` is reachable as a ski
 $linear-start WB-123
 ```
 
-That call needs a provisioned board — [check the board](#check-the-board-before-you-start) before the first one.
-
 Each command becomes a skill named `linear-<command>`, and the four shipped skills — `commit`, `craft`, `vision`, `clear-speak` — keep their names. Type `$` in Codex to see them, or `/skills` to browse.
 
 The generated skill points at the command file under `.claude/commands/linear/` rather than copying it, so there is one place a command is authored and the two tools cannot drift.
-
-## Check the board before you start
-
-The Linear steps on the [Install](/install#connect-linear) page still apply — run them through the skill names:
-
-```text
-$linear-check
-$linear-setup
-```
-
-`$linear-check` confirms each API key authenticates. `$linear-setup` provisions the board with the exact states stride drives work through, then run `$linear-check` once more to confirm the columns landed. Do this before your first `$linear-start`: without the right columns, the state transitions silently no-op and the card never moves.
 
 ## Skip the approval prompts
 
