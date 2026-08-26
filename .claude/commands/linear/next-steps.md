@@ -6,6 +6,9 @@ description: Recommend what to work on next, ranked against the project Vision.
 
 Review what's happening and recommend what to work on next.
 
+Read [unattended mode](reference/unattended.md) before the first optional
+prompt. Unattended mode ranks all work and remains read-only.
+
 ## Decision rules
 
 - **Priority ordering**: build failure > PRs needing fix > in-progress work > PRs needing review > approved PRs to merge > backlog
@@ -25,17 +28,18 @@ Review what's happening and recommend what to work on next.
 Check for a `.stride.json` file in the repository root.
 
 - If **found**: read the project name from it (`project` field in JSON)
-- If **not found**: list available projects (`uv run .claude/tools/linear_cli.py project list` — auth per [reference/workflow.md](reference/workflow.md)), ask the user to choose, then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save all three fields as `.stride.json`:
+- If **not found**: list available projects (`uv run .claude/tools/linear_cli.py project list` — auth per [reference/workflow.md](reference/workflow.md)), ask the user to choose, then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save all four fields as `.stride.json`:
 
   ```json
   {
     "project": "<chosen-project-name>",
     "api_key_env": "LINEAR_<WORKSPACE>_API_KEY",
-    "focus": "outcome"
+    "focus": "outcome",
+    "unattended": false
   }
   ```
 
-  Then check the repo's `.gitignore` — if `.stride.json` isn't listed, append it. The `focus` field sets the default output abstraction — `"outcome"` is the default; see [reference/output-focus.md](reference/output-focus.md) for the accepted values.
+  Then check the repo's `.gitignore` — if `.stride.json` isn't listed, append it. The `focus` field sets the default output abstraction — `"outcome"` is the default; see [reference/output-focus.md](reference/output-focus.md) for the accepted values. The `unattended` field defaults to `false`; see [reference/unattended.md](reference/unattended.md).
 
 Use the resolved project name for all Linear API calls in this command.
 
@@ -122,7 +126,15 @@ This context should influence recommendations — prefer follow-up issues or rel
 
 Combine `unstarted` and `backlog` issues into a single candidate list. Exclude issues already in `started`. Exclude issues identified as blocked. Sort by priority (Urgent first).
 
-If milestones or parent-issue epics exist for the project, ask: **"Show next steps for a specific epic, or all work?"** Combine both signals when offering choices — list parent-issue epics (titles starting with `Epic: `) and milestones together as filter options, with the source labelled (e.g. "Epic: Make epics first-class kanban cards (parent issue)" vs "Q2 launch (milestone)"). If the user picks a parent-issue epic, filter the candidate list to issues whose `parentId` equals that epic's ID. If they pick a milestone, filter by `milestone`. If they pick all work, group the candidate list by epic and by milestone, with one group for issues that have neither.
+If milestones or parent-issue epics exist for the project, unattended mode uses
+all work and groups the list by epic and milestone. Interactive mode asks:
+**"Show next steps for a specific epic, or all work?"** Combine both signals
+when offering choices — list parent-issue epics (titles starting with `Epic: `)
+and milestones together as filter options, with the source labelled. If the
+user picks a parent-issue epic, filter the candidate list to issues whose
+`parentId` equals that epic's ID. If they pick a milestone, filter by
+`milestone`. If they pick all work, group the candidate list by epic and by
+milestone, with one group for issues that have neither.
 
 Show as a table per epic/milestone (or one combined table when no epics or milestones exist):
 
@@ -145,4 +157,6 @@ If a candidate doesn't cleanly trace to any Success criterion, surface that hone
 
 ### 8. Offer to start
 
-Ask: "Want me to start one of these? I can run `/start <ID>` for you."
+Interactive mode asks: "Want me to start one of these? I can run `/start <ID>`
+for you." Unattended mode ends after the recommendations; a read-only command
+never starts mutating work automatically.

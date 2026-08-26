@@ -12,6 +12,10 @@ If no argument is given, infer the issue ID from the current branch name (extrac
 
 Workflow: `/linear:plan-work` → `/linear:start` (includes terminal review) → `/linear:fix` (if GitHub review feedback) → **`/linear:finish`**
 
+Read [unattended mode](reference/unattended.md) before the first optional
+prompt. Interactive mode keeps the choices below; unattended mode applies only
+the deterministic branches named by this command.
+
 ## Rules
 
 - Never merge if tests fail
@@ -85,6 +89,12 @@ pending=$(git log main..HEAD --format=%s | grep -c '^fixup!')
 
 If `pending` is zero, skip silently and continue to step 6.
 
+In unattended mode, autosquash the fixups with the commands below and
+force-push with `--force-with-lease`. Rebase conflicts or a refused lease are
+hard stops. Continue to step 6 after a successful push.
+
+The remaining choices in this step are the interactive path.
+
 Otherwise, surface the fixups and offer three paths:
 
 ```
@@ -114,7 +124,7 @@ Autosquash them now before merging? (y / n / abort)
 
   Do not merge.
 
-<mark>**Why a prompt, not automatic.**</mark> Rewriting published history is the kind of action that needs explicit user authorisation (per stride's *executing actions with care* stance). Asking is the safer default.
+<mark>**Why interactive mode prompts.**</mark> Rewriting published history normally needs explicit user authorisation. Unattended mode supplies that authorisation through machine-local project config while `--force-with-lease` protects a moved remote.
 
 <mark>**Why fixup-specific, not all journey commits.**</mark> `fixup!` commits have an unambiguous target encoded in their subject (per `--fixup=<sha>`), so autosquash collapses them deterministically. Other journey-shaped commits ("WIP", "address feedback") are a `/linear:start` step 12 concern — caught at push time, not merge time.
 
@@ -150,6 +160,9 @@ No y/n prompt. The common path runs without interruption (Vision criterion #3).
 #### Drift — surface the difference, let the user pick
 
 The agent's best-fit differs from the issue's stated trace, *or* the stated trace is strained (one of the strain signals trips). Surface both candidates with the commit reminder so the user can decide:
+
+In unattended mode, stop after surfacing the difference. A Vision choice is
+judgement, so never pick or invent the criterion automatically.
 
 ```
 Branch ready to merge:
@@ -263,7 +276,9 @@ uv run .claude/tools/linear_cli.py milestone-open-issues <milestone-UUID>
 
 If any nodes come back, the milestone has remaining work — skip silently.
 
-If the nodes list is empty, all stories in the milestone are now Done. Prompt:
+If the nodes list is empty, all stories in the milestone are now Done. In
+unattended mode, append the completion note without prompting; the empty
+open-issue list makes this deterministic. In interactive mode, prompt:
 
 ```
 All stories in *[Milestone name]* are complete — mark the milestone done?
@@ -289,7 +304,9 @@ uv run .claude/tools/linear_cli.py list-by-parent <parent-id> | jq '[.[] | selec
 
 If any items come back, the epic has remaining sub-issues — skip silently.
 
-If the result is empty, all sub-issues of the epic are now Done. Prompt:
+If the result is empty, all sub-issues of the epic are now Done. In unattended
+mode, move the parent epic to Done without prompting; the empty open-sub-issue
+list makes this deterministic. In interactive mode, prompt:
 
 ```
 All sub-issues of *[Epic title]* are complete — mark the epic Done?
@@ -316,11 +333,16 @@ git -C <main-repo-path> diff <merge_commit>^..<merge_commit> --name-only
 
 If `VISION.md` is **not** in the file list, skip this entire step silently — no prompt, no noise. The common case (a PR that didn't touch Vision) sees no extra friction.
 
-If `VISION.md` **is** in the file list, surface a one-line note and run `/linear:update-vision`'s flow inline:
+If `VISION.md` **is** in the file list, run `/linear:update-vision`'s flow
+inline. Interactive mode surfaces:
 
 ```
 This PR changed VISION.md — sync to Linear?
 ```
+
+Unattended mode surfaces *"This PR changed VISION.md — syncing to Linear"*.
+Treat the one-way command contract as approval, show what differs, write the
+differing fields, and continue without prompting.
 
 Then:
 
@@ -332,7 +354,7 @@ Then:
    ```
 4. Compare both fields against `VISION.md` (after trimming surrounding whitespace). Linear normalises markdown on save (e.g. `-` list markers become `*`), so treat normalisation-only differences as in sync. The subtitle is the tagline vs the current `description`; skip the subtitle if VISION.md has no opening blockquote (never blank an existing one).
    - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 13.
-   - **Either differs**: show what will change (content diff and/or old→new subtitle) and ask:
+   - **Either differs**: show what will change (content diff and/or old→new subtitle). In unattended mode continue to the writes; in interactive mode ask:
 
      ```
      Replace the Linear content and/or subtitle with VISION.md? (y/n)

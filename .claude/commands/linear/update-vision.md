@@ -6,7 +6,11 @@ description: Mirror VISION.md into the connected Linear project page.
 
 Push `VISION.md` into the Linear project so the project page reflects the canonical Vision: the full document into the `content` field, and the opening tagline into the `description` field — the **subtitle** shown under the project name.
 
-Workflow: edit `VISION.md` → `/linear:update-vision` → confirm the diff → Linear updated.
+Workflow: edit `VISION.md` → `/linear:update-vision` → show the diff → Linear updated. Interactive mode confirms before the write.
+
+Read [unattended mode](reference/unattended.md) before the write gate.
+Unattended mode still shows the diff, then applies the one-way sync without an
+approval prompt.
 
 > **The two fields:** a project's `description` is a short, length-limited summary (the subtitle); its `content` is the long-form document body (the Vision). Writing a full Vision to `description` fails with a GraphQL `Argument Validation Error`, so the Vision goes in `content`. This command writes `content` via `linear_cli.py update-project-content` and the short subtitle via `linear_cli.py project update --description`.
 
@@ -14,7 +18,7 @@ Workflow: edit `VISION.md` → `/linear:update-vision` → confirm the diff → 
 
 - `VISION.md` at the repo root is the source of truth — this command is one-way (repo → Linear)
 - Two fields are mirrored: `content` (the full document) and `description` (the subtitle, from VISION.md's opening blockquote tagline). Touch no other metadata
-- For existing projects: show what will change, require explicit confirmation before writing
+- For existing projects: show what will change; interactive mode requires explicit confirmation, while unattended mode applies the one-way sync
 - For new projects (no `.stride.json`): the user supplies the name, `VISION.md` becomes the initial `content` and its tagline the subtitle, the team is resolved from `uv run .claude/tools/linear_cli.py team list` — no diff exists to confirm
 - If both `content` and subtitle already match `VISION.md`, skip the write — report and stop
 - If `VISION.md` has no opening blockquote, leave the subtitle untouched — never blank an existing one
@@ -95,7 +99,7 @@ Then:
   Linear already matches VISION.md (content + subtitle) — no update needed.
   ```
 
-- **Either differs**: show what will change (the content diff and/or the old→new subtitle), then ask:
+- **Either differs**: show what will change (the content diff and/or the old→new subtitle). Unattended mode continues to step 5. Interactive mode asks:
 
   ```
   Replace the Linear content and/or subtitle with VISION.md? (y/n)
@@ -105,7 +109,8 @@ Then:
 
 ### 5. Write
 
-Only after explicit yes — write whichever field differs:
+After interactive approval, or immediately in unattended mode, write whichever
+field differs:
 
 - **Content** (if it differs) — via `linear_cli.py` (the Vision is long; `uv run .claude/tools/linear_cli.py project update --description` can't carry it):
 
@@ -141,5 +146,5 @@ End the command — no further status changes, no follow-up commits.
 - `.stride.json` missing → resolve interactively per step 2 (pick existing or create new)
 - Project not found in Linear → stop, ask the user to verify `.stride.json`
 - `uv run .claude/tools/linear_cli.py team list` returns no teams (create-new path) → stop, ask the user to verify Linear access
-- User declines the diff → stop without writing
+- User declines the diff in interactive mode → stop without writing
 - `update-project-content` / `uv run .claude/tools/linear_cli.py project create` fails → show the error and stop; do not retry silently

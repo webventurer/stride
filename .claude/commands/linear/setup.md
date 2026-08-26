@@ -6,6 +6,10 @@ description: Provision a Linear team's workflow states and type labels for strid
 
 Make a Linear team's board match the workflow states stride needs ([`linear_statuses.json`](linear_statuses.json)) — so `/linear:start` / `/linear:finish` transitions land instead of silently no-opping on a missing or misnamed column. It also provisions the type labels stride tags cards with ([`linear_labels.json`](linear_labels.json)), so a card's shape shows on the board. When the repo isn't yet pinned to a Linear project, setup also offers to create one and write `.stride.json` (step 7) — so a fresh repo reaches a working board in a single command.
 
+Read [unattended mode](reference/unattended.md) when `.stride.json` exists.
+Setup never guesses a workspace, team, or destructive board change; unattended
+mode stops on those choices instead of answering them.
+
 <mark>**Card-aware, and that's the safety model.** An *empty* team (no issues) is set up authoritatively — create the canonical states, archive non-canonical ones, order them to match. A team that *already holds issues* is **never touched**; setup only reports what the board should be and asks the human to adjust it.</mark> A live board is the human's to change, not a script's.
 
 Two Linear constraints worth knowing:
@@ -17,11 +21,11 @@ Two Linear constraints worth knowing:
 
 ### 1. Pick the workspace
 
-Discover the configured workspaces — see [Workspaces and teams → Find configured workspaces](reference/workspaces-and-teams.md#find-configured-workspaces). Provisioning targets **one**: if exactly one is set, use it; if several, ask which workspace to use.
+Discover the configured workspaces — see [Workspaces and teams → Find configured workspaces](reference/workspaces-and-teams.md#find-configured-workspaces). Provisioning targets **one**: if exactly one is set, use it. If several exist, interactive mode asks which workspace to use; unattended mode lists them and stops rather than guessing.
 
 ### 2. Pick the team
 
-Provisioning writes to **one** team's board. List the workspace's teams — see [Workspaces and teams → List a workspace's teams](reference/workspaces-and-teams.md#list-a-workspaces-teams). If exactly one team exists, use its key. If several, <mark>**ask which team to target — never assume the first.**</mark> Capture the chosen team **key** (e.g. `WB`) for the `--team` flag below.
+Provisioning writes to **one** team's board. List the workspace's teams — see [Workspaces and teams → List a workspace's teams](reference/workspaces-and-teams.md#list-a-workspaces-teams). If exactly one team exists, use its key. If several, interactive mode asks which team to target; unattended mode lists them and stops. <mark>**Never assume the first.**</mark> Capture the chosen team **key** (e.g. `WB`) for the `--team` flag below.
 
 ### 3. Provision (card-aware)
 
@@ -87,18 +91,20 @@ uv run .claude/tools/linear_cli.py migrate-legacy-config
 
 A migrated repo reads as **already pinned** in the check below, so setup won't create a duplicate project; append `.stride.json` to `.gitignore` if it isn't already listed. What the migration does, and how to recover a malformed legacy file: [recovery/legacy-config-to-stride-json.md](recovery/legacy-config-to-stride-json.md).
 
-Then materialise the `focus` default into a config that predates the field — a no-op when the file is missing or already has `focus`:
+Then materialise any missing config defaults. Each command is a no-op when the
+file is missing or its field already exists:
 
 ```bash
 uv run .claude/tools/linear_cli.py backfill-focus
+uv run .claude/tools/linear_cli.py backfill-unattended
 ```
 
-Setup is the single place `focus` is materialised — the output-generating commands only ever *read* it (falling back to `outcome` when absent), so running them never rewrites the config as a side effect. What the backfill writes, the no-clobber rule, and how to recover a malformed config: [recovery/backfill-focus-field.md](recovery/backfill-focus-field.md).
+Setup is the single place config defaults are materialised — commands only ever *read* them, so running a delivery command never rewrites config as a side effect. `focus` falls back to `outcome`; `unattended` falls back to `false`. What the backfills write, the no-clobber rule, and how to recover a malformed config: [recovery/backfill-focus-field.md](recovery/backfill-focus-field.md) and [reference/unattended.md](reference/unattended.md).
 
 Then check for `.stride.json` at the repo root:
 
-- **Present** → the repo is pinned (already, or just migrated), and `focus` is now materialised; skip silently. Re-running setup never re-creates a project.
-- **Missing** → the repo is genuinely unpinned. Ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.stride.json` (`project`, `api_key_env`, and `focus`), and updates `.gitignore`.
+- **Present** → the repo is pinned (already, or just migrated), and its config defaults are materialised; skip silently. Re-running setup never re-creates a project.
+- **Missing** → the repo is genuinely unpinned. Ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.stride.json` (`project`, `api_key_env`, `focus`, and `unattended`), and updates `.gitignore`.
 
 ### 8. Summary
 
