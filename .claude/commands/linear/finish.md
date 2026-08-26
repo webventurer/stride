@@ -157,12 +157,11 @@ Trace verified against "<criterion>" — proceeding to merge.
 
 No y/n prompt. The common path runs without interruption (Vision criterion #3).
 
-#### Drift — surface the difference, let the user pick
+#### Different clean fit — surface the difference
 
-The agent's best-fit differs from the issue's stated trace, *or* the stated trace is strained (one of the strain signals trips). Surface both candidates with the commit reminder so the user can decide:
-
-In unattended mode, stop after surfacing the difference. A Vision choice is
-judgement, so never pick or invent the criterion automatically.
+The agent finds a different criterion that plainly fits, without tripping a
+strain signal. Surface both candidates with the commit reminder. Interactive
+mode stops so the user can decide:
 
 ```
 Branch ready to merge:
@@ -176,7 +175,7 @@ Issue's stated trace:
 Agent's best-fit reading:
   "<alternative criterion>"
 
-Which fits the work? (stated / alternative / something else)
+Which plainly fits the work? (stated / alternative / neither)
 ```
 
 The commit subjects are authored to be informative (atomic-commits discipline) — they're the canonical summary of what shipped. Single-commit branches still get the block.
@@ -193,29 +192,57 @@ Same content, ten times the readability.
 
 - **stated**: the agent was overconfident; user override stands. Continue to step 7 (Merge).
 - **alternative**: post a one-line Linear comment via `uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."` naming the agent's drift catch and the user-picked criterion. Continue to step 7. The drift is named on the issue; the body isn't auto-rewritten.
-- **something else**: drop into the missing-criterion path below.
+- **neither**: drop into the no-exact-fit path below.
 
-#### Something else — missing criterion path
+In unattended mode, post the same one-line comment naming the clean alternative
+and continue without asking. No Vision edit is needed because an existing
+criterion already plainly fits.
 
-Ask one follow-up — *"In one line, what shifted?"* — and post the user's answer as a Linear comment on the issue via `uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."`. Then ask:
+#### No exact fit — evolve the Vision
+
+Use this path when the stated trace is strained and a re-read finds no other
+criterion that plainly fits. Surface the commits, the closest criterion, and a
+plain-English explanation of why the fit is thin.
+
+Interactive mode stops before merge and asks:
 
 ```
-Stop and add the criterion to VISION.md before merging? (y/n)
+No Success criterion plainly fits this work.
+Update an existing Success criterion or add a new Success criterion? (update / add)
 ```
 
-- **Yes**: pause the flow. Tell the user:
+Either answer pauses the interactive flow. Ask one follow-up — *"In one line, what
+shifted?"* — and post the user's answer as a Linear comment on the issue via
+`uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."`.
+Then tell the user:
 
-  > *"Add the criterion to `VISION.md`, run `/commit` to add it as a separate atomic commit on this branch, then re-run `/linear:finish`."*
+> *"Run `/vision` to update or add the criterion in `VISION.md`, then run
+> `/commit` to add it as a separate atomic commit on this branch and re-run
+> `/linear:finish`."*
 
-  Exit cleanly. Do not merge. Re-running `/linear:finish` re-runs validation (step 4) and re-runs the trace check — which should now match against the just-added criterion.
+Exit cleanly. Do not merge, and never draft or edit the criterion from the
+current issue. Re-running `/linear:finish` re-runs validation (step 4) and the
+trace check against the user-authored Vision change.
 
-- **No**: continue to step 7 (Merge). The drift is named in the comment but not amended; the user can file a follow-up `VISION.md` PR if they want.
+In unattended mode, add a new Success criterion to `VISION.md`. Use the closest
+criterion as context, but write the durable outcome the work reveals rather
+than restating the current issue. Post a one-line comment naming the gap, run
+`/commit` so the Vision change is a separate atomic commit on this branch,
+re-run the trace, and continue without asking once the new criterion plainly
+fits.
 
 #### When in doubt, ask
 
-If the agent is genuinely uncertain whether the trace matches — neither obviously clean nor obviously drifted — fall back to the **drift** branch and surface both candidates rather than auto-confirming. <mark>**A false silent confirmation is worse than a borderline prompt:** the silent path's whole value is *trustworthy* trace verification, not speed at the cost of accuracy.</mark>
+If the agent is genuinely uncertain whether any criterion plainly fits, fall
+back to **No exact fit** rather than auto-confirming. In interactive mode this
+asks; in unattended mode it evolves the Vision before continuing. <mark>**A
+false silent confirmation is worse than a Vision update:** the silent match
+path's whole value is *trustworthy* verification.</mark>
 
-This step turns the "Why this matters" line from a write-once token into a verified reference — and (with the *Yes, stop* branch) makes the catch *amendable*: a missing criterion rides alongside its originating feature instead of needing a separate PR.
+This step turns the "Why this matters" line from a write-once token into a
+verified reference. A missing criterion rides alongside its originating feature
+instead of needing a separate PR. Interactive mode leaves the wording to the
+user; unattended mode treats its machine-local setting as authority to write it.
 
 ### 7. Merge (preserve commits)
 
@@ -395,7 +422,8 @@ Read the output focus and apply this command's format from [reference/output-foc
 - Tests fail → stop, do not merge
 - Fixup commits present + user picks "abort" → exit cleanly, do not merge (autosquash + force-push manually, then re-run)
 - Fixup rebase conflicts → abort rebase, surface conflict, do not merge
-- Vision-confirm answered "no" + user picks "stop and add criterion" → exit cleanly, do not merge (re-run after adding the criterion commit)
+- Vision has no exact fit in interactive mode → exit cleanly, do not merge (re-run after committing the user-authored Vision update)
+- Vision has no exact fit in unattended mode → warn, add and commit the closest durable Success criterion, re-check, then continue
 - Branch not fully merged → stop, warn (never force-delete)
 - Local branch already deleted → skip silently
 - Remote branch already deleted → skip silently
