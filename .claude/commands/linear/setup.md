@@ -99,7 +99,7 @@ uv run .claude/tools/linear_cli.py backfill-focus
 uv run .claude/tools/linear_cli.py backfill-unattended
 ```
 
-Setup is the single place config defaults are materialised — commands only ever *read* them, so running a delivery command never rewrites config as a side effect. `focus` falls back to `outcome`; `unattended` falls back to `false`. What the backfills write, the no-clobber rule, and how to recover a malformed config: [recovery/backfill-focus-field.md](recovery/backfill-focus-field.md) and [reference/unattended.md](reference/unattended.md).
+Setup is the single place config defaults are *authored* — no delivery command rewrites config as a side effect of shipping work. [`/linear:check`](check.md) may repair a config that predates a field, through these same idempotent commands, because it is where a user goes to ask whether the setup is sound. `focus` falls back to `outcome`; `unattended` falls back to `false`. What the backfills write, the no-clobber rule, and how to recover a malformed config: [recovery/backfill-focus-field.md](recovery/backfill-focus-field.md) and [reference/unattended.md](reference/unattended.md).
 
 Then check for `.stride.json` at the repo root:
 

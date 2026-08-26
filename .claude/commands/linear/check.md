@@ -6,8 +6,9 @@ description: Verify Linear auth, workflow states, and type labels. Use when Line
 
 Verify stride can authenticate against every configured Linear workspace, then confirm each team's board carries the workflow states stride uses and the workspace carries stride's type labels.
 
-Read [unattended mode](reference/unattended.md) before running. This command has
-no routine approval gate, so both modes follow the same read-only steps.
+Read [unattended mode](reference/unattended.md) before running. Every check is
+read-only. The one write is the repair offer in step 5, which materialises a
+missing config default.
 
 ## Steps
 
@@ -80,9 +81,9 @@ Report one row per workspace:
 
 If a workspace drifts, point the user at [`/linear:setup`](setup.md) — `provision-labels` creates the missing ones non-destructively (no advise mode; creating a label never touches existing work). Only ever suggest `/linear:setup`; never run it automatically from `/linear:check`.
 
-### 5. Verify the repo is pinned to a project
+### 5. Verify the repo's config
 
-`/linear:setup` pins a repo to a Linear project by writing `.stride.json` (its [create-project step](reference/create-project.md)). This confirms that pin still resolves — the read-only mirror of what setup writes.
+`/linear:setup` pins a repo to a Linear project by writing `.stride.json` (its [create-project step](reference/create-project.md)). This confirms that pin still resolves, and that the config says what mode the repo is in.
 
 Read `.stride.json` at the repo root:
 
@@ -94,6 +95,41 @@ Read `.stride.json` at the repo root:
   ```
 
   A match confirms the binding is live. No match → the name in `.stride.json` doesn't resolve — the project was renamed or deleted, or `api_key_env` points at the wrong workspace. Point the user at `/linear:setup` to re-pin, or at `.stride.json` to fix the name.
+
+Then read the config defaults. `focus` and `unattended` change how commands
+behave, so a config that omits them leaves the active behaviour knowable only
+from each command's fallback expression:
+
+```bash
+jq -r '.focus // "MISSING"' .stride.json
+jq -r '.unattended // "MISSING"' .stride.json
+```
+
+A repo pinned before a field existed carries neither. Report each missing field
+by name with the value that would be written — `focus` → `"outcome"`,
+`unattended` → `false` — then offer to write it:
+
+```
+Config defaults missing from .stride.json:
+  unattended → false
+
+Add them now? (y/n)
+```
+
+- **y** → run the backfill for each missing field. Both are idempotent and
+  never replace an explicit choice:
+
+  ```bash
+  uv run .claude/tools/linear_cli.py backfill-focus
+  uv run .claude/tools/linear_cli.py backfill-unattended
+  ```
+
+- **n** → leave the file alone. Behaviour is unchanged either way; the fallback
+  already reads as `outcome` and `false`.
+
+Unattended mode writes the missing defaults without asking — the value is
+already specified and the write is reversible. When both fields are present,
+say nothing: a complete config is the common path and earns no prompt.
 
 ### 6. Remind about board ordering
 
@@ -107,4 +143,4 @@ A health-check reminder, not a failure — it always prints, since the mode is u
 
 ### 7. Summary
 
-End with a one-line summary: "N of M Linear workspaces connected; K of L team boards in sync on states, N drifted; type labels in sync / drifted per workspace; project binding ok / unresolved / not pinned." If any board drifted on states, any workspace drifted on labels, or the project binding didn't resolve, name `/linear:setup` as the next step.
+End with a one-line summary: "N of M Linear workspaces connected; K of L team boards in sync on states, N drifted; type labels in sync / drifted per workspace; project binding ok / unresolved / not pinned; config defaults materialised / added / left missing." If any board drifted on states, any workspace drifted on labels, or the project binding didn't resolve, name `/linear:setup` as the next step.
