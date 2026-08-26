@@ -104,6 +104,7 @@ def require_env(name: str) -> str:
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 STRIDE_CONFIG_PATH = REPO_ROOT / ".stride.json"
 DEFAULT_FOCUS = "outcome"
+DEFAULT_UNATTENDED = False
 
 
 def write_config(config: dict) -> None:

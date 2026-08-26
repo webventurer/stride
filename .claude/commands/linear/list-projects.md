@@ -6,6 +6,9 @@ description: List all projects in the connected Linear workspace.
 
 Show all projects in the connected Linear workspace.
 
+Read [unattended mode](reference/unattended.md) before running. This command has
+no routine approval gate, so both modes follow the same read-only steps.
+
 ## Steps
 
 ### 1. Fetch projects

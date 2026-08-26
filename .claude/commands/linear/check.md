@@ -6,6 +6,9 @@ description: Verify Linear auth, workflow states, and type labels. Use when Line
 
 Verify stride can authenticate against every configured Linear workspace, then confirm each team's board carries the workflow states stride uses and the workspace carries stride's type labels.
 
+Read [unattended mode](reference/unattended.md) before running. This command has
+no routine approval gate, so both modes follow the same read-only steps.
+
 ## Steps
 
 ### 1. Find configured workspaces

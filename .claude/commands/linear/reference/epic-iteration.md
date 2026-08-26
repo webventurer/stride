@@ -2,7 +2,7 @@
 
 > The path `/linear:start` follows when its argument is an epic rather than a story. The decision — single story by default, iterate when the argument is an epic — stays in `start.md` (step 1); this file holds the execution mechanics so the command stays scannable. Step numbers below refer to `/linear:start`'s steps.
 
-> When the argument is an epic, `/linear:start` works its sub-issues one at a time, pausing at every PR. An epic has no code of its own — its work lives in its stories.
+> When the argument is an epic, `/linear:start` works its sub-issues one at a time. Interactive mode pauses at every PR; [unattended mode](unattended.md) finishes a passing story and continues. An epic has no code of its own — its work lives in its stories.
 
 ---
 
@@ -18,7 +18,7 @@ Order by `sortOrder` ascending (board order). When `sortOrder` is unset, fall ba
 
 ```
 Epic <ID>: <title>
-N sub-issues, worked one at a time — you review and /finish each PR before the next starts:
+N sub-issues, worked one at a time — interactive mode reviews and /finishes each PR; unattended mode continues after each passing finish:
   1. <SUB-1> — <title> [state]
   2. <SUB-2> — <title> [state]
   ...
@@ -35,18 +35,25 @@ Pick the first sub-issue that isn't already `In Review` or `Done`. Run the full 
 
 ## E3. Stop at the PR — every time
 
-After the sub-issue reaches its PR and terminal review (step 17), **stop**. Do not merge, do not start the next sub-issue. Surface:
+In interactive mode, after the sub-issue reaches its PR and terminal review
+(step 17), **stop**. Do not merge or start the next sub-issue. Surface:
 
 ```
 <SUB-X> is in review: <PR URL>
 Review it, run /linear:finish when ready, then re-run /linear:start <epic-ID> to pick up the next sub-issue (<SUB-Y>).
 ```
 
-<mark>**The epic advances across invocations, each gated by your /finish + re-run — never an open-ended in-run loop, never an auto-advance.**</mark> This is the same per-PR approval `/linear:start`'s [Rules](../start.md#rules) demand; epic iteration just sequences it.
+<mark>**Interactive mode advances across invocations, each gated by your /finish + re-run.**</mark> This is the same per-PR approval `/linear:start`'s [Rules](../start.md#rules) demand; unattended mode is the explicit opt-in to auto-advance.
+
+In unattended mode, `/linear:start` step 17 runs `/linear:finish` inline. After
+it succeeds, refresh the sub-issues and continue to the next unfinished
+sub-issue. Stop the loop immediately if finish hits a hard stop. When none
+remain, continue to E4.
 
 ## E4. Epic complete
 
-When every sub-issue is `Done`, report it and suggest moving the epic itself to Done:
+When every sub-issue is `Done`, report it. Interactive mode suggests moving the
+epic itself to Done; unattended mode moves it to Done without prompting:
 
 ```
 All N sub-issues of <epic-ID> are Done. Move the epic to Done? (it carries no code of its own)

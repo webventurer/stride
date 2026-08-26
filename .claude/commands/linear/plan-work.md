@@ -6,6 +6,10 @@ description: Draft a Linear story, epic, or bug anchored to a Vision outcome, be
 
 Accepts a description and optional flags: `/plan-work --research --craft --epic --bug --project <name> "add error handling to API calls"`. With `--epic`, it skips size-sensing and goes straight to the parent-issue flow. With `--bug`, it skips shape-sensing and drafts straight to the bug template. With `--project`, it files the issue against a different Linear project and skips the Vision check (for quick adds when the target repo isn't cloned locally).
 
+Read [unattended mode](reference/unattended.md) after resolving `.stride.json`.
+Unattended mode skips optional refinement and approval prompts, but never drafts
+past duplicate, scope, project, or Vision ambiguity.
+
 ## Modes
 
 - **Quick mode** (default): `/plan-work "description"` — draft, review, create
@@ -45,8 +49,8 @@ Accepts a description and optional flags: `/plan-work --research --craft --epic 
 
 ### Process
 
-- Duplicate handling is two-tier: exact/near-exact → warn strongly and ask; similar/related → mention briefly and continue.
-- The user always gets final approval before creation. Never auto-create.
+- Duplicate handling is two-tier: exact/near-exact → interactive mode warns and asks; unattended mode stops. Similar/related → mention briefly and continue.
+- Interactive mode always gets final approval before creation. Unattended mode creates after every hard check passes.
 - Never assign the issue unless the user explicitly asks.
 
 ## Steps
@@ -58,17 +62,18 @@ First, check `$ARGUMENTS` for the `--project <name>` flag.
 - **If `--project <name>` is present** (cross-project mode): use the flag's value as the project name. **Mark the run as cross-project mode** — step 1 (Vision check) is skipped and step 9 swaps the Vision-grounding requirement for a cross-project note.
 - **Otherwise** (within-project mode), check for a `.stride.json` file in the repository root.
   - If **found**: read the project name from it (`project` field in JSON).
-  - If **not found**: list available projects *(auth per [reference/workflow.md](reference/workflow.md))* and ask the user to choose. Then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save all three fields as `.stride.json`:
+  - If **not found**: list available projects *(auth per [reference/workflow.md](reference/workflow.md))* and ask the user to choose. Then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save all four fields as `.stride.json`:
 
     ```json
     {
       "project": "<chosen-project-name>",
       "api_key_env": "LINEAR_<WORKSPACE>_API_KEY",
-      "focus": "outcome"
+      "focus": "outcome",
+      "unattended": false
     }
     ```
 
-    Then check the repo's `.gitignore` — if `.stride.json` isn't listed, append it. The `api_key_env` field lets `linear_cli.py` read the bearer token without a per-call `LINEAR_API_KEY=` wrap. The `focus` field sets the default output abstraction for the `/linear:*` commands — `"outcome"` is the default; see [reference/output-focus.md](reference/output-focus.md) for the accepted values.
+    Then check the repo's `.gitignore` — if `.stride.json` isn't listed, append it. The `api_key_env` field lets `linear_cli.py` read the bearer token without a per-call `LINEAR_API_KEY=` wrap. The `focus` field sets the default output abstraction for the `/linear:*` commands — `"outcome"` is the default; see [reference/output-focus.md](reference/output-focus.md) for the accepted values. The `unattended` field defaults to `false`; see [reference/unattended.md](reference/unattended.md).
 
     ```bash
     uv run .claude/tools/linear_cli.py project list
@@ -126,14 +131,18 @@ uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --tex
 
 Handle results in two tiers:
 
-- **Exact or near-exact duplicates** (same problem, same scope): warn strongly, show them, and ask whether to proceed or stop.
+- **Exact or near-exact duplicates** (same problem, same scope): show them and
+  stop in unattended mode. Interactive mode warns strongly and asks whether to
+  proceed.
 - **Similar or related issues** (overlapping area but different scope/angle): show briefly, continue drafting, and reference them in the draft's "Related issues" section.
 
 ### 4. CRAFT prompt refinement (all modes)
 
 <mark>**When `--craft` is present, always run CRAFT before research. Never skip this step.**</mark> The user passes `--craft` to sharpen their description into a clearer prompt — skipping it means research works from a vaguer input than intended.
 
-If `--craft` flag is present, run CRAFT automatically. Otherwise, ask the user: "Would you like me to run `/craft` on your description first to sharpen the issue before drafting?"
+If `--craft` flag is present, run CRAFT automatically. Without the flag,
+unattended mode skips CRAFT and interactive mode asks: "Would you like me to
+run `/craft` on your description first to sharpen the issue before drafting?"
 
 - If **yes** (or `--craft`): read [reference/templates/story.md](reference/templates/story.md) for story-sized work, or [reference/templates/epic.md](reference/templates/epic.md) when drafting the parent issue on the epic-sized path. Substitute `[user's description]` with what the user provided **and** `[VISION]` with the full contents of the `VISION.md` loaded in step 1, run `/craft` with the populated prompt, then use the refined output as the description for all subsequent steps. Substituting the entire Vision into the prompt is what lets the agent — or any model the prompt is sent to — anchor the draft on real criteria, real constraints, and real non-goals rather than guessing.
 - If **no**: continue with the original description
@@ -153,6 +162,9 @@ Story is the default. Most descriptions are story-sized — one deliverable that
 
 If any signals fire, surface a **soft prompt** — not a forced gate:
 
+In unattended mode, stop and name the signals. Ask the user to re-run with
+`--epic` or a narrower story description; scope shape is not safe to guess.
+
 > *"This sounds epic-sized — I'm seeing [name the signals: multiple phases / unrelated outcomes / a rollout shape]. Want to break it into stories under an epic, narrow this to one story-sized deliverable, or proceed as one story?"*
 
 Three paths:
@@ -166,6 +178,10 @@ If no signals fire, skip silently and continue to step 7 as story-sized. The com
 <mark>**Size-sensing offers, doesn't force.**</mark> When signals are detected, the agent asks; the user always has final say. Auto-flipping silently would be a worse failure mode than the old forced ask.
 
 **Story-sized path** (default / "no, it's one story" / "narrow to story") — continue to step 7 as normal. At step 12 (create issue), also search for parent-issue epics in the project (`uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "`): if any exist, ask "Link this story to an existing epic?" and if yes, set the parent after creation via `uv run .claude/tools/linear_cli.py issue update <new-id> --parent <epic-id>`. Legacy milestones — boards may still have them from before stride moved to parent-issue epics; if `uv run .claude/tools/linear_cli.py list-milestones <project-UUID>` returns any, offer them as a secondary option and use the `--project-milestone "<name>"` flag on `uv run .claude/tools/linear_cli.py issue create` instead.
+
+In unattended mode, create the story without a parent or legacy milestone.
+Linkage requires an explicit ID or a later deliberate update; never infer it
+from a fuzzy search result.
 
 **Epic-sized path** (`--epic` / "break into epic") — follow [reference/epic-flow.md](reference/epic-flow.md): search for or create a parent issue, draft 1–3 sub-issues with `parentId` set, and position them on the backlog. <mark>Don't bundle all stories into one issue</mark> — each is its own sub-issue. (That reference also covers the legacy date-bound *milestone* alternative.)
 
@@ -182,6 +198,9 @@ Feature is the default. Most descriptions are feature-shaped — *"add / build /
 - The description names a symptom and a missing behaviour, not a desired capability
 
 If any signals fire, surface a **soft prompt** — not a forced gate:
+
+In unattended mode, stop and name the signals. Ask the user to re-run with
+`--bug` or confirm a feature description; issue shape is not safe to guess.
 
 > *"This sounds bug-shaped — I'm seeing [name the signals: e.g. 'silently' / 'fails to' / verb is 'fix']. Use the bug template (symptoms / repro / expected vs actual / suspected causes), or treat as a feature?"*
 
@@ -251,6 +270,9 @@ Apply the priority, labels, and scope guidance from the decision rules above.
 
 ### 10. Cross-model feedback loop (optional)
 
+Skip this step in unattended mode unless the user explicitly requested
+cross-model feedback in the same invocation.
+
 After drafting the issue:
 
 1. **Claude presents the draft** with its own assessment — what's strong, what could be better, any concerns about scope or feasibility
@@ -278,6 +300,12 @@ Each round has three voices: Claude proposes and synthesises, ChatGPT challenges
 
 ### 11. Present for approval
 
+In unattended mode, show the full draft for the record and continue directly
+to step 12. The config setting is the persistent approval for routine issue
+creation; duplicate, scope, project, and Vision ambiguity remain hard stops.
+
+The rest of this step is the interactive path.
+
 Show the full draft to the user. Ask for explicit approval before creating.
 
 <mark>**Present the draft as the final text output of the turn, and ask for approval in plain prose.**</mark> Never pair the draft with a tool-based approval dialog in the same turn — the dialog can suppress the text above it, and the user ends up approving a card they never saw. End the turn on the draft + prose question; the user's reply is the gate.
@@ -287,7 +315,12 @@ Show the full draft to the user. Ask for explicit approval before creating.
 
 ### 12. Create the issue
 
-Only after explicit approval. Write the drafted description to a file first and pass it with `--description @<file>` — the body is multi-line markdown, so it goes through a file, never an inline string ([why](reference/workflow.md#how-skills-talk-to-linear)). `linear_cli.py` accepts state names directly — no separate ID lookup — and accepts the project's name on `--project`:
+Only after interactive approval, or after every unattended hard check passes.
+Write the drafted description to a file first and pass it with `--description
+@<file>` — the body is multi-line markdown, so it goes through a file, never an
+inline string ([why](reference/workflow.md#how-skills-talk-to-linear)).
+`linear_cli.py` accepts state names directly — no separate ID lookup — and
+accepts the project's name on `--project`:
 
 **Type label.** Every stride card carries exactly one type label ([`linear_labels.json`](linear_labels.json)) so its shape shows on the board: `Bug` for a bug-shaped draft (the bug-shape branch of step 6), `Story` for a standard story. The label is always first in `--labels`; any optional suggested labels follow it.
 

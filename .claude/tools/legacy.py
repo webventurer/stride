@@ -1,8 +1,8 @@
 """One-time config upgrades — quarantined from linear.py's current behaviour.
 
 These migrate formats that predate stride's current config: the legacy
-`.linear_project` pin (superseded by `.stride.json`) and pre-`focus`
-configs. They run from `/linear:setup` and have recovery runbooks under
+`.linear_project` pin and configs missing materialised defaults. They run from
+`/linear:setup` and have recovery guidance under
 `.claude/commands/linear/recovery/`. Kept apart so `linear.py` reads as
 what stride does now, not what it once needed to upgrade from.
 
@@ -11,6 +11,7 @@ The dependency points one way — legacy → current — never the reverse.
 
 from linear import (
     DEFAULT_FOCUS,
+    DEFAULT_UNATTENDED,
     STRIDE_CONFIG_PATH,
     LinearError,
     project_config,
@@ -59,5 +60,13 @@ def backfill_focus() -> dict:
     config = project_config()
     if config and "focus" not in config:
         config["focus"] = DEFAULT_FOCUS
+        write_config(config)
+    return config
+
+
+def backfill_unattended() -> dict:
+    config = project_config()
+    if config and "unattended" not in config:
+        config["unattended"] = DEFAULT_UNATTENDED
         write_config(config)
     return config

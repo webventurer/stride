@@ -21,7 +21,11 @@ import click
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from legacy import backfill_focus, migrate_from_legacy  # noqa: E402
+from legacy import (  # noqa: E402
+    backfill_focus,
+    backfill_unattended,
+    migrate_from_legacy,
+)
 from linear import (  # noqa: E402
     bearer_token,
     create_attachment,
@@ -211,6 +215,11 @@ def migrate_legacy_config_cmd():
 @cli.command("backfill-focus")
 def backfill_focus_cmd():
     echo_json(backfill_focus())
+
+
+@cli.command("backfill-unattended")
+def backfill_unattended_cmd():
+    echo_json(backfill_unattended())
 
 
 # ---- Issue / comment / team / project / label / whoami subgroups ----

@@ -12,6 +12,9 @@ If no argument is given, infer the issue ID from the current branch name (extrac
 
 Workflow: `/plan-work` → `/start` (includes terminal review) → **`/fix`** (if GitHub review feedback) → `/finish`
 
+Read [unattended mode](reference/unattended.md) before running. This command has
+no routine approval gate, so both modes follow the same feedback flow.
+
 ## Rules
 
 - Reviewer feedback takes priority over the original issue — plans evolve through review

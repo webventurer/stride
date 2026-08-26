@@ -1,8 +1,8 @@
 """Tests for legacy — the one-time config upgrades quarantined from linear.py.
 
-These exercise the `.linear_project` → `.stride.json` migration and the
-pre-`focus` backfill as pure functions, patching the config paths so no
-real repo file is touched.
+These exercise the `.linear_project` → `.stride.json` migration and config
+default backfills as pure functions, patching the config paths so no real repo
+file is touched.
 
 Run with:
     python -m pytest .claude/tools/tests/test_legacy.py
@@ -20,8 +20,12 @@ sys.path.insert(0, str(TOOLS_DIR))
 
 import legacy  # noqa: E402
 import linear  # noqa: E402
-from legacy import backfill_focus, migrate_from_legacy  # noqa: E402
-from linear import DEFAULT_FOCUS, LinearError  # noqa: E402
+from legacy import (  # noqa: E402
+    backfill_focus,
+    backfill_unattended,
+    migrate_from_legacy,
+)
+from linear import DEFAULT_FOCUS, DEFAULT_UNATTENDED, LinearError  # noqa: E402
 
 
 def test_migrate_from_legacy_round_trip(tmp_path: Path):
@@ -102,3 +106,20 @@ def test_backfill_focus_no_op_when_file_missing(tmp_path: Path):
     with patch("linear.STRIDE_CONFIG_PATH", stride):
         assert backfill_focus() == {}
     assert not stride.exists()
+
+
+def test_backfill_unattended_adds_default_when_missing(tmp_path: Path):
+    stride = tmp_path / ".stride.json"
+    stride.write_text('{\n  "project": "Foo"\n}\n')
+    with patch("linear.STRIDE_CONFIG_PATH", stride):
+        config = backfill_unattended()
+    assert config == {"project": "Foo", "unattended": DEFAULT_UNATTENDED}
+
+
+def test_backfill_unattended_leaves_explicit_choice_untouched(tmp_path: Path):
+    stride = tmp_path / ".stride.json"
+    original = '{\n  "project": "Foo",\n  "unattended": true\n}\n'
+    stride.write_text(original)
+    with patch("linear.STRIDE_CONFIG_PATH", stride):
+        assert backfill_unattended()["unattended"] is True
+    assert stride.read_text() == original

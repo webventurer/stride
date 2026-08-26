@@ -87,13 +87,15 @@ The commands resolve the Linear project from a `.stride.json` file in the repo r
 {
   "project": "Stride >>>",
   "api_key_env": "LINEAR_WEBVENTURER_API_KEY",
-  "focus": "outcome"
+  "focus": "outcome",
+  "unattended": false
 }
 ```
 
 - `project` — the Linear project name.
 - `api_key_env` — names the env var in `~/.env` that holds the workspace API key. When set, `linear_cli.py` reads the bearer token from that env var automatically, so per-call `LINEAR_API_KEY=$LINEAR_<X>_API_KEY` wraps aren't needed. Workspace-iterating commands (`/linear:check`, `/linear:setup`, `/linear:list-projects`) still use the explicit wrap since they target multiple workspaces.
 - `focus` — controls the abstraction level of command output. `"outcome"` (the materialised default) — commands answer "what shipped, what's different for the user, how have we moved forward?"; `"technical"` — full implementation narrative, decisions, and the torch. `/linear:setup` writes the field into every `.stride.json`, so it's always present after setup; a config that predates the field still reads as `"outcome"` until the next setup run materialises it.
+- `unattended` — controls routine command pauses. `false` keeps interactive review and approval prompts; `true` follows [unattended mode](unattended.md). A missing field reads as `false` until `/linear:setup` materialises it.
 
 Override the resolved token per-call with `LINEAR_API_KEY=<token>`.
 

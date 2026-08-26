@@ -6,12 +6,16 @@ description: Ship a small change, then file the Linear card in Done after it mer
 
 Ship a small, well-scoped change and file the Linear card *after* it merges — so a copy tweak or padding fix doesn't pay the up-front card-drafting tax. The card lands directly in **Done**, pointing at the merged PR.
 
+Read [unattended mode](reference/unattended.md) before the first optional
+prompt. Unattended mode skips Diffity, the ship phrase, and bundle deferral after
+all hard checks pass.
+
 Two ways in:
 
 - **Describe it** — `/linear:quick "tighten the hero heading spacing"`: branch, implement, review, ship.
 - **Already did it** — make the change first, then run `/linear:quick`: it picks up your existing diff and files the card to match what you just created.
 
-Either way: review on the PR → **you say a ship phrase** → Vision trace → merge → file the Done card (or hold it to bundle with later changes). The PR opens at review time, so the change is viewable on GitHub before anything merges — only the merge waits for the ship phrase.
+Either way: validate → open the PR → Vision trace → merge → file the Done card. Interactive mode reviews the PR, waits for a ship phrase, and can hold the card for a bundle. Unattended mode continues after the hard checks pass.
 
 <mark>**Not a replacement for `/linear:plan-work`.**</mark> This is for changes whose shape is obvious and whose diff fits in one terminal scroll — copy/wording, design tweaks, doc polish, single-file refactors, config tweaks, dead-code removal. Anything that crosses files non-trivially, touches a shared contract or public API, needs a migration, or carries scope/risk uncertainty still earns the card-first discipline of `/linear:plan-work`.
 
@@ -33,17 +37,17 @@ The fast-loop fits work where the shape is already obvious from the description 
 
 ## The ship gate
 
-The merge fires **only** when you say an explicit ship phrase: **`ship`, `ship it`, `quick`, `jfdi`, `go`**. <mark>**The agent never decides on its own that the change is ready to merge.**</mark> No phrase, no merge — "looks done to me" and silent timeouts are not triggers.
+Interactive mode merges **only** when you say an explicit ship phrase: **`ship`, `ship it`, `quick`, `jfdi`, `go`**. Unattended mode does not require a ship phrase; passing validation and a clear Vision fit advance to merge.
 
 ## Rules
 
 - Never work directly on `main` — existing uncommitted changes on `main` move to a branch first
-- Never merge without one of the ship phrases above
-- The PR opens at **review** time (step 5); only the **merge** waits for the ship phrase
+- Never merge without a ship phrase in interactive mode
+- The PR opens at **review** time (step 5); in interactive mode only the **merge** waits for the ship phrase
 - Use `--merge` (not `--squash`) to preserve atomic commits
 - Keep scope to one change — if the diff grows past a one-scroll review, stop and suggest `/linear:plan-work`
 - <mark>**Don't shortcut the Vision trace.** A drift is surfaced for your decision — exactly as `/linear:finish` does — *before* the merge, while the catch is still actionable.</mark>
-- The card is filed once, directly in **Done** — or deferred to bundle with later changes
+- The card is filed once, directly in **Done** — interactive mode may defer it to bundle with later changes
 
 ---
 
@@ -107,15 +111,20 @@ gh pr create --title "<imperative summary>" --body-file <body-file>
 
 If a PR already exists for the branch (a resumed run), push to it instead of opening a second one.
 
-**Then open the PR in diffity — the visual diff is the review surface.** Follow the launch procedure in [reference/diffity-review.md](reference/diffity-review.md).
+In unattended mode, **Do not launch diffity** or show the gate prompt. Continue
+to step 6 after the PR is open and validation is green.
 
-Then surface the URL with the gate prompt: **"PR: \<url\> — ship it? (say `ship` / `ship it` / `quick` / `jfdi` / `go`, or tell me what to change.)"**
+In interactive mode, open the PR in diffity — the visual diff is the review
+surface. Follow the launch procedure in
+[reference/diffity-review.md](reference/diffity-review.md).
+
+Interactive mode then surfaces the URL with the gate prompt: **"PR: \<url\> — ship it? (say `ship` / `ship it` / `quick` / `jfdi` / `go`, or tell me what to change.)"**
 
 If the user requests changes, make them, re-validate (step 4), push to the same PR (`git push`, or `--force-with-lease` after a squash), and show the updated diff. Repeat until they say a ship phrase. <mark>**Opening the PR is reversible; the merge is not. Until a ship phrase, do nothing irreversible — above all, no merge.**</mark>
 
-### 6. On the ship phrase — trace Vision, then merge
+### 6. Trace Vision, then merge
 
-Only once the user says a ship phrase. **First run the Vision trace check — the same judgement `/linear:finish` makes, not a rubber stamp.** With the diff and commit subjects in hand, read them against the `VISION.md` Success criteria and pick the best-fit criterion:
+In interactive mode, continue only once the user says a ship phrase. In unattended mode, continue directly from step 5. **First run the Vision trace check — the same judgement `/linear:finish` makes, not a rubber stamp.** With the diff and commit subjects in hand, read them against the `VISION.md` Success criteria and pick the best-fit criterion:
 
 - **Match** — the change clearly serves one criterion. Surface a single line and continue to the merge:
 
@@ -123,7 +132,7 @@ Only once the user says a ship phrase. **First run the Vision trace check — th
   Trace verified against "<criterion>" — shipping.
   ```
 
-- **Drift / no clear fit** — surface it in plain English and let the user decide *before* the merge:
+- **Drift / no clear fit** — unattended mode stops with the change, closest criterion, and reason the fit is thin. Interactive mode surfaces it in plain English and lets the user decide *before* the merge:
 
   ```
   This change ships: <one-line description of the diff>
@@ -146,6 +155,11 @@ gh pr merge <number> --merge --subject "Merge branch 'quick/<slug>'" --body ""
 `--merge` keeps the atomic commits. Capture the merged PR URL.
 
 ### 7. File the card now, or hold it to bundle
+
+In unattended mode, file the card immediately and clear any pending bundle.
+Do not ask whether to delay.
+
+The rest of this step is the interactive path.
 
 Ask:
 
@@ -195,7 +209,8 @@ Display:
 - `VISION.md` missing → stop, suggest `/vision`
 - Uncommitted changes on `main` → branch + `/commit` before shipping (never ship from `main`)
 - Build/tests fail → fix before shipping; never merge red
-- No ship phrase given → never merge; keep iterating. The PR opened at step 5 stays open (reversible) — if the user abandons the flow, the open PR and pushed branch are theirs to close or resume; quick doesn't auto-close them
+- No ship phrase given in interactive mode → never merge; keep iterating. The PR opened at step 5 stays open (reversible) — if the user abandons the flow, the open PR and pushed branch are theirs to close or resume; quick doesn't auto-close them
+- Vision drift in unattended mode → stop before merge; never guess a criterion
 - Vision drift, user picks **add** → stop, don't merge; resume after the criterion is committed
 - Change outgrew a one-scroll diff → stop, suggest `/linear:plan-work`
 - `uv run .claude/tools/linear_cli.py issue create` / `attach` fails after merge → surface it; the PR is already merged, so re-running the file step (with the bundle intact) recovers the card
