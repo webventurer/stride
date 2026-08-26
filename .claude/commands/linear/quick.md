@@ -132,19 +132,29 @@ In interactive mode, continue only once the user says a ship phrase. In unattend
   Trace verified against "<criterion>" — shipping.
   ```
 
-- **Drift / no clear fit** — unattended mode stops with the change, closest criterion, and reason the fit is thin. Interactive mode surfaces it in plain English and lets the user decide *before* the merge:
+- **No clear fit** — the closest criterion only fits with stretching or bridging
+  language. Warn before the merge and explain why the fit is thin.
+
+  Interactive mode stops and asks the user to evolve the Vision:
 
   ```
-  This change ships: <one-line description of the diff>
+  This change would ship: <one-line description of the diff>
   Closest Vision criterion: "<best-fit>"
   But the fit is thin because <why>.
 
-  Ship anyway against that criterion, pick a better one, or add a
-  new criterion to VISION.md first? (ship / <criterion> / add)
+  No Success criterion plainly fits this work.
+  Update an existing Success criterion or add a new Success criterion? (update / add)
   ```
 
-  - **ship / pick** → continue to the merge; the chosen criterion becomes the card's *Why this matters*.
-  - **add** → pause. Tell the user: *"Add the criterion to `VISION.md`, `/commit` it on this branch (the push updates the open PR), then say a ship phrase again."* Don't merge. (The merge is still ahead, so the catch rides on the same branch and the same open PR — no follow-up PR needed.)
+  Either answer pauses the interactive flow. Tell the user to run `/vision`, make the
+  chosen update, and `/commit` it on this branch before re-running
+  `/linear:quick`. Never draft or edit the criterion from the current change.
+
+  In unattended mode, add a new Success criterion to `VISION.md`. Use the
+  closest criterion as context, but write the durable outcome this work reveals
+  rather than a criterion that merely restates the current card. Run `/commit`
+  so the Vision change is a separate atomic commit on the same branch, re-run
+  the trace, and continue without asking once the new criterion plainly fits.
 
 The merge hasn't happened yet, so a drift is fully actionable here. The PR is already open from step 5 — once the trace is settled, merge it:
 
@@ -210,7 +220,7 @@ Display:
 - Uncommitted changes on `main` → branch + `/commit` before shipping (never ship from `main`)
 - Build/tests fail → fix before shipping; never merge red
 - No ship phrase given in interactive mode → never merge; keep iterating. The PR opened at step 5 stays open (reversible) — if the user abandons the flow, the open PR and pushed branch are theirs to close or resume; quick doesn't auto-close them
-- Vision drift in unattended mode → stop before merge; never guess a criterion
-- Vision drift, user picks **add** → stop, don't merge; resume after the criterion is committed
+- Vision drift in interactive mode → stop before merge; resume after the user's Vision change is committed
+- Vision drift in unattended mode → warn, add and commit the closest durable Success criterion, re-check, then continue
 - Change outgrew a one-scroll diff → stop, suggest `/linear:plan-work`
 - `uv run .claude/tools/linear_cli.py issue create` / `attach` fails after merge → surface it; the PR is already merged, so re-running the file step (with the bundle intact) recovers the card

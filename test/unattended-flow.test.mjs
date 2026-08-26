@@ -47,10 +47,27 @@ describe("unattended Linear flow", () => {
     const setup = read(".claude/commands/linear/setup.md");
     const vision = read(".claude/commands/linear/update-vision.md");
     ok(plan.includes("scope shape is not safe to guess"));
-    ok(finish.includes("never pick or invent the criterion automatically"));
     ok(next.includes("a read-only command\nnever starts mutating work"));
     ok(setup.includes("stops rather than guessing"));
     ok(vision.includes("immediately in unattended mode"));
+  });
+
+  it("handles stretched Vision matches by mode", () => {
+    for (const name of ["quick", "finish"]) {
+      const command = read(`.claude/commands/linear/${name}.md`);
+      ok(command.includes("Update an existing Success criterion"), name);
+      ok(command.includes("add a new Success criterion"), name);
+      ok(command.includes("Interactive mode stops"), name);
+      ok(command.includes("In unattended mode, add a new Success criterion"), name);
+      ok(command.includes("separate atomic commit"), name);
+      ok(command.includes("continue without asking"), name);
+    }
+
+    const quick = read(".claude/commands/linear/quick.md");
+    ok(!quick.includes("Ship anyway against that criterion"));
+
+    const policy = read(".claude/commands/linear/reference/unattended.md");
+    ok(policy.includes("Vision fit follows the delivery command"));
   });
 
   it("materialises the default in new configs", () => {
