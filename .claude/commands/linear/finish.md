@@ -139,7 +139,10 @@ Autosquash them now before merging? (y / n / abort)
 
 If the issue has no "Why this matters" section (legacy soft path from `/linear:start`), skip silently and continue to step 7.
 
-Otherwise, run a **silent trace check** *before* deciding whether to prompt the user. Inputs (already in context from step 1 and the steps above):
+Otherwise, before drafting any Linear comment in this step, read [Linear card
+language](reference/card-language.md).
+
+Run a **silent trace check** *before* deciding whether to prompt the user. Inputs (already in context from step 1 and the steps above):
 
 - The criterion the issue's *Why this matters* section claims to advance.
 - The branch's commit subjects: `git log main..HEAD --oneline`.
