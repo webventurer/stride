@@ -60,6 +60,9 @@ These are the labels stride applies at card creation (`/linear:plan-work`, `/lin
 
 A freshly provisioned board has no issues, so Linear renders a blank screen. **If `mode` was `provisioned`**, create one sample card so the columns are visible:
 
+Before writing the sample card's title and description, read [Linear card
+language](reference/card-language.md).
+
 ```bash
 LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/linear_cli.py issue create -t <TEAM-KEY> --state Backlog \
   --title "Sample card — so the board shows its columns" \

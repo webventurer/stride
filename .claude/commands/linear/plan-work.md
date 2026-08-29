@@ -241,6 +241,10 @@ Omit the section entirely when tests don't apply.
 
 ### 9. Draft the issue
 
+Before drafting a card title or description in this step, read [Linear card
+language](reference/card-language.md). It applies to story, bug, epic, and
+sub-issue drafts.
+
 <mark>**Read the linked template before drafting** — its sections are the source of truth, not this step's summary. Don't draft from memory or from the prose around the link; open the file and follow it.</mark>
 
 **Story drafts** (feature-shaped, story-sized — the default path) — use the full issue structure from [story.md](reference/templates/story.md). With `--research`, also append the research-mode additions described in that template.

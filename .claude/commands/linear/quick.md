@@ -169,6 +169,9 @@ gh pr merge <number> --merge --subject "Merge branch 'quick/<slug>'" --body ""
 In unattended mode, file the card immediately and clear any pending bundle.
 Do not ask whether to delay.
 
+Before drafting the card title or description in this step, read [Linear card
+language](reference/card-language.md).
+
 The rest of this step is the interactive path.
 
 Ask:
