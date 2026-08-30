@@ -31,6 +31,10 @@ $linear-setup
 
 `$linear-check` confirms each API key authenticates. `$linear-setup` provisions the board with the exact states stride drives work through, then run `$linear-check` once more to confirm the columns landed. Do this first: without the right columns, the state transitions silently no-op and the card never moves.
 
+## Configure `.stride.json`
+
+After `$linear-setup`, read [`.stride.json` settings](/reference/stride-json). Stride creates this shared project settings file with safe defaults, but you need to check and configure its Linear project, API key variable, output style, and attended or unattended behaviour.
+
 ## Running the commands
 
 Codex has no namespaced slash commands, so `/linear:start` is reachable as a skill instead:
