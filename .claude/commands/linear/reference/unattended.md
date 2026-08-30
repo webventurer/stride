@@ -37,7 +37,9 @@ uv run .claude/tools/linear_cli.py backfill-unattended
 ```
 
 The command is idempotent: it adds `false` only when the field is missing and
-never replaces an explicit choice.
+never replaces an explicit choice. See the
+[recovery guide](../recovery/backfill-unattended-field.md) for manual use,
+invalid JSON, and verification.
 
 `/linear:check` reports the field when a pinned repo lacks it and offers the
 same backfill, so a config written before the field existed can be brought up
