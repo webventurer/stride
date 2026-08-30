@@ -53,20 +53,20 @@ mkdir -p ~/.claude/skills && for d in ~/.agents/skills/diffity-*; do ln -sfn "$d
 
 ### Connect Linear
 
-stride's `/linear:*` skills reach Linear via the vendored `linear_cli.py` (in `.claude/tools/`), authenticated by a per-workspace API key in `~/.env` — no `.mcp.json`, no OAuth, no external CLI install. Add one key per workspace:
+Stride uses its own Linear client, so you do not need OAuth, MCP, or another CLI.
+
+1. Create a [Personal API key](https://linear.app/settings/api) for each Linear workspace.
+2. Add it to `~/.env`, using the workspace name in the variable:
 
 ```
-LINEAR_<WORKSPACE>_API_KEY=lin_api_...
+LINEAR_ACME_API_KEY=lin_api_...
 ```
 
-Get a key at [linear.app/settings/api](https://linear.app/settings/api) (one per workspace). Per-project calls read the bearer token automatically from `.stride.json`'s `api_key_env` field (set on first run); workspace-iterating commands (`/linear:check`, `/linear:setup`, `/linear:list-projects`) wrap each call with `LINEAR_API_KEY=$LINEAR_<WORKSPACE>_API_KEY`. See [`.stride.json` settings](/reference/stride-json) for every available field, including the `unattended` switch. See [the Linear workflow](/skills/linear) for what each command does. Verify the connection with `/linear:check` — it confirms each key authenticates now, and (once your board is provisioned in the next step) that every team's board carries the states stride needs.
+3. Run `/linear:check` to confirm the key works.
 
-**How Linear API keys are scoped:** Linear API keys are per workspace (per user, scoped to the workspace), not per team.
+Stride saves the variable name in `.stride.json` so project commands can find the key. See [`.stride.json` settings](/reference/stride-json) for the available options and [the Linear workflow](/skills/linear) for the commands.
 
-- An API key is created by a user under Settings → API → Personal API keys, and inherits that user's permissions across the entire workspace — every team they have access to.
-- There is no concept of a team-scoped API key. To restrict scope to one team, you'd either use a dedicated service-account user that's only added to that team, or filter by `teamId` in your queries.
-
-One key per workspace is the model — substitute the workspace identifier for `<WORKSPACE>` (e.g. `LINEAR_ACME_API_KEY` for an Acme workspace).
+A key has the same workspace access as the user who created it. To limit access to one team, create a dedicated Linear user that belongs only to that team.
 
 ### Provision your Linear board
 
