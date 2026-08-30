@@ -10,7 +10,7 @@ The Vision is genuinely missing a criterion. The work has surfaced an outcome th
 
 ## The move
 
-Update an existing criterion or add the missing one in `VISION.md` **on the current branch**, as a separate atomic commit. Re-run the gate that fired — it now traces cleanly. Continue with the original work. When the PR merges, [`/linear:finish`'s Vision-sync step](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/finish.md) picks up the `VISION.md` change and syncs it to the Linear project description.
+Update an existing criterion or add the missing one in `VISION.md` **on the current branch**, as a separate atomic commit. Re-run the gate that fired — it now traces cleanly. Continue with the original work. When the PR merges, [`/linear:finish`'s Vision-sync step](/skills/linear#linear-finish) picks up the `VISION.md` change and syncs it to the Linear project description.
 
 One branch. One PR. The Vision evolution rides alongside the feature that revealed the gap.
 
@@ -20,9 +20,9 @@ The pattern fires at three distinct gates. Same move at each:
 
 | Gate | When it fires | What it does |
 |:--|:--|:--|
-| **[`/linear:plan-work`](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/plan-work.md) step 1 — Decision rules** | At draft time, the issue's *"Why this matters"* can't trace to any existing criterion | Prompt the user: add a new criterion to `VISION.md` (re-run `/vision` to evolve it), or drop the issue as out of scope |
-| **[`/linear:quick`](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/quick.md) step 6 — trace Vision** | Before merge, no criterion plainly fits the completed change | Explain the thin fit. Interactive mode stops for an update-or-add choice; unattended mode adds and commits the closest durable criterion, re-checks, and continues |
-| **[`/linear:finish`](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/finish.md) step 6 — confirm Vision outcome** | Before merge, the issue's stated trace is strained and no other criterion plainly fits | Post the gap to the issue. Interactive mode stops for an update-or-add choice; unattended mode adds and commits the closest durable criterion, re-checks, and continues |
+| **[`/linear:plan-work`](/skills/linear#linear-plan-work) step 1 — Decision rules** | At draft time, the issue's *"Why this matters"* can't trace to any existing criterion | Prompt the user: add a new criterion to `VISION.md` (re-run `/vision` to evolve it), or drop the issue as out of scope |
+| **[`/linear:quick`](/skills/linear#linear-quick) step 6 — trace Vision** | Before merge, no criterion plainly fits the completed change | Explain the thin fit. Interactive mode stops for an update-or-add choice; unattended mode adds and commits the closest durable criterion, re-checks, and continues |
+| **[`/linear:finish`](/skills/linear#linear-finish) step 6 — confirm Vision outcome** | Before merge, the issue's stated trace is strained and no other criterion plainly fits | Post the gap to the issue. Interactive mode stops for an update-or-add choice; unattended mode adds and commits the closest durable criterion, re-checks, and continues |
 
 The upfront gate is the cheap catch. The merge-time gates are the backup — they fire when the strain wasn't visible until after the work was built. All three end in the same move: evolve the Vision on the branch.
 

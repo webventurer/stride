@@ -58,7 +58,7 @@ Three signals that mean an issue *is* needed:
 | Add a new skill or command | Issue | Behaviour change, board-visible |
 | Fix a bug in `install.mjs` | Issue | Code change, deserves a PR record |
 
-For the related decision of *direct commit vs branch + PR* once you've decided you don't need an issue, see the agent-facing [pr-vs-direct-commit reference](https://github.com/webventurer/stride/blob/main/.claude/commands/linear/reference/pr-vs-direct-commit.md) inside the installed skill — adjacent decision, different scope.
+Once you've decided you don't need an issue, use a direct commit for an obvious documentation or configuration change. Use a branch and PR for code, behaviour, structure, or a diff that needs explanation.
 
 ## Vision is a hard prerequisite
 
