@@ -1,10 +1,10 @@
 # Install for Codex
 
-Stride runs under Codex CLI as well as Claude Code — the same commands, the same guardrails, generated from the same source.
+Codex support builds on top of Stride's shared `.claude/` installation. Stride first installs its skills, commands and hooks there, then creates the extra `.codex/` files that let Codex use them.
 
-Follow the [Install](/install) page first. Everything there applies: the prerequisites, the Linear connection, the Vision step. `.claude/` is installed whichever CLI you use, because it holds the skills, commands and docs every tool reads, and the Codex skills point back into it.
+This means installing Stride for Codex also leaves the project ready for Claude Code. It does not install either CLI itself — install Claude Code or Codex separately before using it.
 
-This page is only what differs.
+Follow the [Install](/install) page for the shared prerequisites, Linear connection and Vision step. This page covers only what Codex adds.
 
 ## Install with the Codex target
 
@@ -12,9 +12,7 @@ This page is only what differs.
 npx github:webventurer/stride --agent codex
 ```
 
-`--agent` chooses which CLIs to set up: `claude` (the default), `codex`, both as `claude,codex`, or `all`.
-
-Selecting `codex` additionally writes a `.codex/` footprint. It is generated from `.claude/`, so it is gitignored as a build artifact and rewritten on each install — never edit it by hand.
+Without `--agent`, Stride sets up Claude Code. With `--agent codex`, it keeps those shared, Claude-ready files and also writes the `.codex/` files. They are built from `.claude/`, ignored by git and replaced on each install — never edit them by hand.
 
 ## Trust the hooks, or they will not run
 
