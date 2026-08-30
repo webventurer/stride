@@ -82,6 +82,10 @@ It's **card-aware**. A team with **no issues** is set up automatically — it cr
 
 Two board-view preferences can't be set through the API, so toggle them once in Linear's UI: default the team to **Board** view, and enable **"Show empty groups"** so every column shows even before it holds a card.
 
+### Configure `.stride.json`
+
+After setup, read [`.stride.json` settings](/reference/stride-json). Stride creates this project settings file with safe defaults, but you need to check and configure its Linear project, API key variable, output style, and attended or unattended behaviour.
+
 ### Set the Linear board to Manual sort
 
 stride sequences your work by each issue's position on the board (`/linear:plan-work` places new issues; you arrange the backlog into the order you'll tackle it). **Set your Linear board — or whichever view you use for stride work — to "Manual" sort.** Under a Priority, Created, or Updated sort, Linear ignores those positions and stride's execution order looks scrambled. Board sort is a per-view UI setting, so stride can't set it for you.
