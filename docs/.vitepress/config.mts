@@ -26,6 +26,7 @@ export default defineConfig({
           { text: 'How it works', link: '/how-it-works' },
           { text: 'Install', link: '/install' },
           { text: 'Install for Codex', link: '/install-codex' },
+          { text: '.stride.json settings', link: '/reference/stride-json' },
         ],
       },
       {
