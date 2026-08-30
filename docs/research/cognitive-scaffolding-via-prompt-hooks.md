@@ -70,7 +70,7 @@ Both ends are failures. Over-provision turns the agent into a tax — every well
 
 This is the Vision's own principle — *"guardrails, not walls… the common path runs without prompts; friction appears only where it carries signal worth your judgement"* — applied to the **agent's output volume**. Every structured choice the agent raises has to earn its place exactly like a gate does: surface it when the human's answer genuinely changes what happens next; pick the obvious default and move when it doesn't.
 
-What makes it *work* is that the calibration is **driven by the human's signal, read live** ([feedback-from-action](https://github.com/webventurer/stride/blob/main/.claude/docs/patterns/context-speaks/act-then-adjust.md)):
+What makes it *work* is that the calibration is **driven by the human's signal, read live** (feedback from action):
 
 - *"just do it"* / *"jfdi"* → provide less; act, don't ask
 - *"wait, let me think"* / a clarifying question → provide more; slow down, lay out the seam
@@ -82,7 +82,7 @@ The scaffolding doesn't *solve* the tension — it makes the level **adjustable 
 
 ## The deeper claim
 
-stride's [Vision](https://github.com/webventurer/stride/blob/main/VISION.md) argues that *structured docs get **more** out of a capable model, not less* — and that the gap compounds as models improve. This mechanism is that thesis applied not to the codebase but to the **interaction layer**.
+stride's [getting-started guide](/getting-started) argues that *structured docs get **more** out of a capable model, not less* — and that the gap compounds as models improve. This mechanism is that thesis applied not to the codebase but to the **interaction layer**.
 
 A weaker model needs the scaffolding to avoid failing. A stronger model doesn't fail without it — but *with* it, the strong model spends its capability on the right things: catching the citation-vs-example distinction, naming the deferred decision, surfacing the absent frame. The scaffolding doesn't constrain a capable agent; it **gives its capability somewhere to land**.
 

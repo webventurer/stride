@@ -8,7 +8,7 @@ You're drafting an issue at `/linear:plan-work` time. The "Why this matters" sec
 
 ## The move
 
-Pause. Re-read [`VISION.md`](https://github.com/webventurer/stride/blob/main/VISION.md), Success criteria especially. Look for a criterion that fits *more directly*. Revise the candidate trace toward it.
+Pause. Re-read [`VISION.md`](/skills/vision#the-hard-part--measurable-success-criteria), Success criteria especially. Look for a criterion that fits *more directly*. Revise the candidate trace toward it.
 
 Two outcomes:
 

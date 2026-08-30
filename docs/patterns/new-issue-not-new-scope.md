@@ -46,6 +46,6 @@ This is the same shape as `/commit`'s subject-line rule (*"if your commit messag
 
 ## What this Pattern is *not*
 
-- **Not "never combine related work."** Genuinely inseparable pieces — a rename plus every call site, a deletion plus its cleanup, tests for new code — are *one* atomic change. See [*Patterns that DO belong together*](https://github.com/webventurer/stride/blob/main/.claude/skills/commit/SKILL.md) in `/commit`'s docs for the exception. The test: would splitting the work leave any intermediate state non-working? If yes, it belongs together. If no, it splits.
+- **Not "never combine related work."** Genuinely inseparable pieces — a rename plus every call site, a deletion plus its cleanup, tests for new code — are *one* atomic change. See [what makes a commit atomic](/skills/commit#what-makes-a-commit-atomic) for the exception. The test: would splitting the work leave any intermediate state non-working? If yes, it belongs together. If no, it splits.
 - **Not a way to defer real planning.** The new issue still goes through `/linear:plan-work` properly — Vision trace, *Why this matters*, *What we'll do*, the lot. *"Park it as a card"* doesn't mean *"file a one-line stub."*
 - **Not a license to file every passing thought.** The Pattern fires when work surfaces that you'd otherwise *do right now*. If the thought is *"someday it'd be nice if..."*, that's not scope creep — that's brainstorming. The Pattern is for the moment of temptation, not the moment of musing.
