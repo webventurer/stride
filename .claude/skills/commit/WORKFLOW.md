@@ -258,6 +258,33 @@ git log -1
 - [ ] No hitchhikers — could any file be removed and still leave a coherent change?
 - [ ] No stowaways — are there files that serve a different purpose?
 - [ ] Clean revert — if reverted, would it remove exactly one logical improvement?
+- [ ] **Nothing lost** — if this commit came from splitting one commit into several, does the set together produce exactly the tree the original produced? See below
+
+### Nothing lost, when a commit was split
+
+<mark>**Every check above asks whether something is in the commit that should not be. This one asks the inverse: did the split quietly drop something neither half meant to touch?**</mark>
+
+The failure is specific to splitting and it does not look like a mistake at the time. Separating a commit means deciding, line by line, which half each change belongs to — and the natural way to build the first half is to take the finished state and remove what belongs to the second. That works for lines the original commit *added*. It silently deletes any line the original merely *modified*, because removing the new version does not restore the old one: it removes the line altogether. A pre-existing requirement, a heading, a link, a config key, disappears in the first commit and reappears in the second, and both commits look coherent on their own.
+
+The check is one command. Before splitting, record the tree; after the last piece lands, compare:
+
+```bash
+ORIG=$(git rev-parse HEAD)      # before you start splitting
+
+# ... split, commit each half ...
+
+git diff --stat $ORIG HEAD      # must be empty
+```
+
+An empty diff proves the pieces reassemble into exactly what was there. Any output is a line the split moved, dropped or duplicated, and it names the file.
+
+The same applies to a file *renamed* apart from its content changes, and to any regroup driven by a [Pass 5](#pass-5-independent-atomicity-review) verdict — a `split`, and a `merge` that reshuffles hunks between commits.
+
+**When a piece has to revert a line rather than delete it**, take the line from the pre-split parent instead of removing it:
+
+```bash
+git show $ORIG~1:path/to/file    # the version the original commit changed
+```
 
 ### If verification fails
 
