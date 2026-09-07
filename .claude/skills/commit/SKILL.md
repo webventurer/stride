@@ -137,6 +137,7 @@ The corollary: the list below catalogues the *origins* that masquerade as purpos
 - **Produced by the same tool** — a test survey flags 3 files that need tests. Each test suite is its own commit. They share a prefix (`test:`) and came from the same analysis, but removing one leaves the others perfectly coherent
 - **Same change in different places** — applying the same refactor to two independent directories is two commits, not one. Each stands alone — either could be reverted without breaking the other
 - **Tests for pre-existing code** — <mark>**did the production code exist before this session?**</mark> If yes, tests are a separate `test:` commit. If no (new class + its test file), they belong together
+- **Moved and edited in one go** — <mark>**a rename or a move is its own commit.**</mark> Git infers a rename by comparing content across the two paths, so changing the file while moving it drops the similarity below the threshold and git records a delete plus an unrelated add. `git log --follow` stops at that boundary and `git blame` attributes every line to the move. Relocate first, in a commit carrying the move and every reference that has to change with it, then change what the files say in a following commit
 
 **Example of mixed changes that should be separated**:
 

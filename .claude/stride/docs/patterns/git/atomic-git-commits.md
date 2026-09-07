@@ -41,6 +41,7 @@ AI assistants frequently group files into commits based on the wrong criteria. T
 - **Requested as one task** - Being asked "update the docs and fix the bug" is two tasks and two commits, even though it was one instruction.
 - **Touching the same area** - Editing three files in `src/auth/` for different reasons is three commits, not one "auth changes" commit.
 - **"While I was in there" changes** - Noticing a typo while fixing a bug does not make the typo part of the bug fix. Separate commits.
+- **Moved and edited together** - Renaming or moving a file is its own commit. Editing its contents at the same time destroys git's ability to see it as a move, so the history of the file is lost. See [moving or renaming files](#moving-or-renaming-files).
 
 **The test**: If you removed any file from the commit, would the remaining files still represent the same complete logical change? If removing a file leaves a hole, it belongs. If removing a file leaves a perfectly coherent commit, it does not belong.
 
@@ -324,6 +325,33 @@ Tuning pool size and timeout values based on load testing results.
 - Add connection health check interval
 - Update monitoring alerts for new thresholds
 ```
+
+### Moving or renaming files
+
+**A move is its own commit. Never move a file and change its contents in the same commit.**
+
+Git does not store renames. It infers them by comparing the content of a deleted path against the content of an added one, and it only calls it a rename when the two are similar enough. Change the file while moving it and the similarity drops, so git records a deletion and an unrelated new file instead of a move. What is lost is not cosmetic: `git log --follow` stops at the boundary, `git blame` attributes every line to the move, and the diff shows the whole file as new rather than the handful of lines that actually changed.
+
+The move commit carries everything needed to keep the tree working after it, and nothing else:
+
+- The moved or renamed files themselves
+- Every reference that has to change to keep links and imports resolving
+
+That second part is not a violation of atomicity, it is what makes the move atomic. A rename committed apart from its call-sites leaves a broken intermediate, which is the under-sized failure rather than the over-sized one.
+
+```bash
+# First: the move, and only the move
+git mv docs/options/ai-ad-agency docs/options/creative-fire-agency
+grep -rl "ai-ad-agency" docs/ | xargs sed -i '' 's|ai-ad-agency|creative-fire-agency|g'
+git add docs/
+.claude/hooks/do_commit.sh -m "refactor: Rename the agency directory to its name"
+
+# Then, as a second commit: any change to what those files say
+git add docs/options/creative-fire-agency/ACTIONS.md
+.claude/hooks/do_commit.sh -m "docs: Record the investor's conditions"
+```
+
+The same rule applies to a file split in two, a directory reorganised, or a document broken into sections across new paths. Relocate first, change the words second.
 
 ## 🚫 What not to commit atomically
 
