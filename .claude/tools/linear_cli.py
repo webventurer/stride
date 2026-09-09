@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # /// script
-# dependencies = ["click", "requests"]
+# dependencies = ["click", "python-dotenv", "requests"]
 # ///
 """CLI front-end for the Linear GraphQL client in `linear.py`.
 

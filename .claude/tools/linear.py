@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # /// script
-# dependencies = ["requests"]
+# dependencies = ["python-dotenv", "requests"]
 # ///
 """Linear GraphQL client — the library the /linear:* skills' CLI sits on.
 
-Talks Linear's GraphQL API directly via `requests`. Reads the bearer
-token from `LINEAR_API_KEY` or from the env var named by
-`.stride.json`'s `api_key_env` field.
+Talks Linear's GraphQL API directly via `requests`. Loads `~/.env`,
+then reads the bearer token from `LINEAR_API_KEY` or from the env var
+named by `.stride.json`'s `api_key_env` field. A variable already set
+in the environment wins over the file.
 
 This module is import-only — for the CLI front-end, see `linear_cli.py`.
 """
@@ -20,7 +21,10 @@ import time
 import uuid
 from pathlib import Path
 
+import dotenv
 import requests
+
+dotenv.load_dotenv(Path.home() / ".env")
 
 API_URL = "https://api.linear.app/graphql"
 
