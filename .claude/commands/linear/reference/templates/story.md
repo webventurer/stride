@@ -82,7 +82,12 @@ ACTION:
    out of scope or the Vision needs a new criterion.
 2. Describe where things stand — the current state, whether
    that's a bug, a gap, or an opportunity for something new
-3. Define what we'll do — the deliverable and scope boundary
+3. Explain what we'll do — the concrete solution, then the
+   deliverable and scope boundary. When a relevant principle
+   exists, apply it to the context to derive concrete, testable
+   requirements. Explain the connection and identify choices
+   the principle does not settle. Describe the trigger, rule
+   and action, with worked examples before implementation details.
 4. Define what we won't do — scope exclusions, only if
    genuinely useful
 5. Define the expected outcome — observable results that prove
@@ -111,7 +116,16 @@ that makes this worth doing now.
 Current state — the bug, gap, or opportunity (1–2 sentences)
 
 ### What we'll do
-One-sentence deliverable, then bullet list of scope details
+State the solution in one sentence, then explain how it works
+in plain language. When a relevant principle exists, apply it
+to this context to derive concrete, testable requirements.
+Explain the connection and identify choices it does not settle.
+Describe what triggers the behaviour, what is checked, what
+happens when it passes or fails, and any material exception.
+Use concrete worked examples for distinct behaviour-changing
+rules. Mark example values as illustrative unless agreed.
+Follow with implementation and scope details; a list of
+settings or files is not an explanation of the solution.
 
 ### What we won't do
 (Only if genuinely useful — omit if nothing meaningful)
