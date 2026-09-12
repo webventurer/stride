@@ -22,6 +22,20 @@ remove it from version control and add it to `.gitignore`; repository content
 must not grant itself unattended merge authority. A missing file reads as
 interactive mode.
 
+For a symlinked `.stride.json`, check both the link and its source before
+honouring `true`. Resolve every link in the chain and check each path against
+the Git index of the checkout that owns it, including the final file. Run
+the same `git ls-files --error-unmatch` check with `git -C <owning-checkout>`
+and the path relative to that checkout. A file outside any Git repository
+is machine-local; inability to establish its location or ownership is not
+proof that it is untracked. Stop on a tracked path, broken link, unreadable
+file or invalid configuration. An untracked link must not grant authority
+from tracked content.
+
+[Worktree setup](worktree.md#share-stride-settings) creates a local link to
+the main checkout's settings before handoff. Read that shared file afresh;
+do not copy its values or carry unattended approval in session memory.
+
 | Value | Behaviour |
 |:------|:----------|
 | Missing or `false` | Interactive flow; keep the command's review and approval prompts |

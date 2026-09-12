@@ -45,6 +45,57 @@ If the branch already exists (a remote branch, or one created earlier), drop the
 git worktree add ../<repo-dirname>-<issue-id-lowercase> <gitBranchName>
 ```
 
+### Share Stride settings
+
+Worktrees of the same repository share the user's settings. After creating
+the worktree, link `.stride.json` before printing the handoff. A link keeps
+project, authentication selection, focus and unattended mode in sync; editing
+settings through either checkout changes the shared file.
+
+Resolve `main_repo` from the first worktree in `git worktree list --porcelain`
+(not the current directory, which may itself be a linked worktree). Set
+`worktree` to the new worktree's absolute path. Quote both paths.
+
+Before linking, apply the [machine-local check](unattended.md#read-the-mode)
+to the source, including any symlink targets. Confirm its fields are valid
+for the existing project settings; do not fill missing values from memory.
+If the source is missing, unreadable, invalid or tracked, stop before the
+handoff and report the reason. Use `/linear:setup` for missing configuration
+or repair the existing file; never invent unattended approval.
+
+Run this block only after those checks pass:
+
+```bash
+jq -e 'type == "object"' "$main_repo/.stride.json" >/dev/null || exit 1
+for settings_repo in "$main_repo" "$worktree"; do
+  if git -C "$settings_repo" ls-files --error-unmatch .stride.json >/dev/null 2>&1; then
+    printf 'Tracked .stride.json in %s; stop and remove it from version control.\n' "$settings_repo" >&2
+    exit 1
+  fi
+  git -C "$settings_repo" check-ignore -q .stride.json || exit 1
+done
+if [ -L "$worktree/.stride.json" ] && [ "$worktree/.stride.json" -ef "$main_repo/.stride.json" ]; then
+  : # Already linked to the shared settings.
+elif [ -e "$worktree/.stride.json" ] || [ -L "$worktree/.stride.json" ]; then
+  printf 'Existing .stride.json in %s; preserve it and resolve the conflict.\n' "$worktree" >&2
+  exit 1
+else
+  ln -s "$main_repo/.stride.json" "$worktree/.stride.json" || exit 1
+fi
+test -r "$worktree/.stride.json" && test "$worktree/.stride.json" -ef "$main_repo/.stride.json"
+```
+
+If either path is not ignored, add `.stride.json` to the appropriate local
+Git exclude file before retrying. If a different file, directory or link
+already occupies the destination, preserve it and report the conflict; this
+includes dangling links. Do not force replacement or announce readiness on
+failure. Re-running with the correct link leaves it unchanged.
+
+After success, print: *"Shared Stride settings from `<main-repo>/.stride.json`
+linked into the worktree."* The new session reads its local `.stride.json`
+normally. On each read, `unattended: true` and `false` reflect the shared
+file's current value; the usual validation and merge checks still apply.
+
 ### Symlink the venv (Python projects)
 
 A fresh worktree has no `.venv`, so `cd`-ing in and running anything Python fails with `command not found`. If the parent repo root has a virtualenv, link it in so the stream can run immediately.
@@ -103,6 +154,9 @@ git -C <main-repo-path> worktree remove <worktree-path>
 ```
 
 If the worktree directory does not exist, skip silently. If `git worktree remove` fails due to untracked files, use `--force`.
+
+Removing a worktree removes its `.stride.json` link, not the shared source.
+Never follow the link to delete the main checkout's settings.
 
 ### Close the worktree's tab
 
