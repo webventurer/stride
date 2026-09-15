@@ -73,7 +73,7 @@ If there are uncommitted changes, warn and stop — suggest `/commit`.
 
 ### 4. Validate
 
-Run the project's build command (e.g. `pnpm build`). If the project has tests, run them too.
+Run the project's required checks, build command (e.g. `pnpm build`) and tests locally. Reuse a passing run from this task when the relevant files have not changed. Follow the [local validation merge rule](reference/unattended.md#merge-after-local-validation): CI runs in the background and is not a Stride waiting gate.
 
 If anything fails, stop — do not merge. Show what failed.
 
