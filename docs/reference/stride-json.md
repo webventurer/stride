@@ -64,6 +64,8 @@ In unattended mode, Stride can:
 - complete routine cleanup and Linear updates without asking
 - warn about a missing Vision outcome, add the closest durable Success criterion, commit it separately, check the fit again and continue
 
+Passing local checks, build and tests satisfy the merge validation gate in both modes. CI runs in the background; Stride does not wait for it before merging. Repository-enforced branch protection and required reviews still apply. No additional setting is needed.
+
 Unattended mode does not mean “ignore errors.” Stride still stops for:
 
 - failed builds, tests or required checks

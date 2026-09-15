@@ -77,11 +77,17 @@ Success criterion based on the closest fit, commit the Vision change, re-check
 the trace, and continue without asking. The machine-local `unattended` setting
 is the authority for that write; never merge against the stretched criterion.
 
+## Merge after local validation
+
+In both modes, passing local checks, build and tests for the code being merged satisfy Stride's validation gate. Reuse a passing run from the current task when the relevant files have not changed. Once the command's review, approval and Vision steps are complete, merge without waiting for CI. Do not poll or watch CI to decide when to merge; it runs in the background. Report local validation and CI status separately, and surface any CI failure encountered.
+
+Repository-enforced branch protection and required reviews still apply. If GitHub blocks the merge on a required check, report that blocker; do not bypass protection. This rule adds no CI-wait setting and applies to both interactive and unattended delivery.
+
 ## Always stop
 
 Both modes stop for:
 
-- Failed validation, tests, builds, or required external checks
+- Failed validation, tests or builds locally, or a repository-enforced merge requirement
 - Unsafe repository state, including unresolved conflicts or unrelated changes
 - Missing or invalid configuration, issue data, Vision, branch, or pull request
 - Ambiguous scope, project, team, duplicate, or destructive choice

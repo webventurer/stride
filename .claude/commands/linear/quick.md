@@ -82,7 +82,7 @@ If the change starts crossing files non-trivially or the diff outgrows one termi
 
 ### 4. Validate
 
-Run the project's build and tests. Fix failures and re-run until clean. Never ship with a failing build.
+Run the project's required checks, build and tests locally. Fix failures and re-run until clean. Reuse a passing run from this task when the relevant files have not changed. Follow the [local validation merge rule](reference/unattended.md#merge-after-local-validation): CI runs in the background and is not a Stride waiting gate.
 
 ### 5. Review — open the PR, then gate
 
