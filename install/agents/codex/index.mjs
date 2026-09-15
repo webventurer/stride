@@ -1,4 +1,4 @@
-import { existsSync, rmSync } from "node:fs";
+import { existsSync, lstatSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { contentsMatch, copyFile, walkFiles } from "../../files.mjs";
 import { HOOKS_FILE, writeCodexHooks } from "./hooks.mjs";
@@ -31,11 +31,24 @@ export const codex = {
 
 function copySkill(srcRoot, destRoot, name) {
   const srcDir = join(srcRoot, ".claude/skills", name);
+  const destDir = join(destRoot, SKILLS_ROOT, name);
+  if (isDanglingSymlink(destDir)) rmSync(destDir);
   for (const rel of walkFiles(srcDir)) {
     const srcFile = join(srcDir, rel);
     const destFile = join(destRoot, SKILLS_ROOT, name, rel);
     if (existsSync(destFile) && contentsMatch(srcFile, destFile)) continue;
     copyFile(srcFile, destFile);
+  }
+}
+
+// A skill path left as a symlink to a directory that has since moved would
+// make mkdir throw ENOENT part-way through the install. Stride owns these
+// names, so a dead link is replaced with the real files.
+function isDanglingSymlink(path) {
+  try {
+    return lstatSync(path).isSymbolicLink() && !existsSync(path);
+  } catch {
+    return false;
   }
 }
 
