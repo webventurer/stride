@@ -7,7 +7,7 @@ description: Create atomic git commits using a multi-pass methodology — conten
 
 > Create atomic git commits using a multi-pass methodology that separates content decisions from formatting standards.
 
-> 🚨 **Read this first — mandatory.** Before any `git add` or `.claude/hooks/do_commit.sh` this session, your **first action must be to Read [WORKFLOW.md](WORKFLOW.md) and [REVIEW.md](REVIEW.md) in full**. <mark>This SKILL.md is injected into context automatically; WORKFLOW.md is not. Having this file in front of you is **not** a substitute for opening the workflow — the five passes live there, and skipping them is exactly how atomicity breaks while everything still *looks* fine.</mark> Do not stage or commit until you have.
+> 🚨 **Read this first — mandatory.** Before any `git add` or `.claude/hooks/do_commit.sh` in every commit run, including a second or third run in the same session, your **first action must be to Read [WORKFLOW.md](WORKFLOW.md) and [REVIEW.md](REVIEW.md) in full**. <mark>This SKILL.md is injected into context automatically; WORKFLOW.md is not. Having this file in front of you is **not** a substitute for opening the workflow, and neither is having read it earlier in the session — the five passes live there, and running them from memory is exactly how steps drop out while everything still *looks* fine.</mark> Do not stage or commit until you have.
 
 ## Skill documents
 
