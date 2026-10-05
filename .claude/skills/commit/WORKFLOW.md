@@ -419,9 +419,9 @@ component-per-directory architecture, zero Tailwind.
 
 <mark>**Every pass must complete before the commit is final.**</mark>
 
-- [ ] Pre-flight: atomic changes identified, tests passing (or no test command)
+- [ ] Pre-flight: atomic changes identified, tests passing (or no test command), and the per-file sentences shown in the output whenever two or more files changed
 - [ ] Content: files staged selectively, coherence test passed
 - [ ] Standards: message format verified against checklists
 - [ ] Final review: sanity check passed
-- [ ] Post-commit: atomicity verified, output displayed
+- [ ] Post-commit: atomicity verified, and the full message, subject and body, displayed for every commit in the run
 - [ ] Independent review: a fresh sub-agent ([REVIEW.md](REVIEW.md)) returned an all-`atomic` pass (or the user signed off on a flagged verdict)
