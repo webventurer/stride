@@ -19,6 +19,7 @@ the deterministic branches named by this command.
 ## Rules
 
 - Never merge if tests fail
+- Never merge a branch whose current content has no passing card check against the card's current wording
 - The merge commit message should read as if the work was done right the first time — no mention of rejections, fix cycles, or iterations
 - Use `--merge` (not `--squash`) to preserve atomic commits in the branch
 - Never force-delete branches
@@ -135,13 +136,13 @@ Autosquash them now before merging? (y / n / abort)
 
 ### 5b. Check every commit belongs to this card
 
-Follow [branch scope](reference/branch-scope.md): judge each commit in `git log main..HEAD` against the card's purpose from step 1, and move any commit that serves something else to `main` or its own branch before merging. Continue to step 6 once every remaining commit belongs.
+Follow [branch scope](reference/branch-scope.md): judge each commit in `git log main..HEAD` against the card's purpose from step 1, and move any commit that serves something else to `main` or its own branch before merging. Continue to step 6a once every remaining commit belongs.
 
-### 6. Confirm Vision outcome (before merge)
+### 6a. Confirm Vision outcome (before merge)
 
 <mark>**This step fires *before* the merge.**</mark> When trace drift is caught here, the catch is still actionable — the criterion can ride alongside its originating feature on the same branch, instead of needing a follow-up `VISION.md` PR.
 
-If the issue has no "Why this matters" section (legacy soft path from `/linear:start`), skip silently and continue to step 7.
+If the issue has no "Why this matters" section (legacy soft path from `/linear:start`), skip silently and continue to step 6b.
 
 Otherwise, before drafting any Linear comment in this step, read [Linear card
 language](reference/card-language.md).
@@ -156,10 +157,10 @@ Read the commit subjects against the Success criteria and apply the [*revise, do
 
 #### Match — silent confirmation
 
-The issue's stated trace matches the agent's best-fit criterion *and* the fit is unambiguous. Surface a single line and continue to step 7:
+The issue's stated trace matches the agent's best-fit criterion *and* the fit is unambiguous. Surface a single line and continue to step 6b:
 
 ```
-Trace verified against "<criterion>" — proceeding to merge.
+Trace verified against "<criterion>" — proceeding to the card check.
 ```
 
 No y/n prompt. The common path runs without interruption (Vision criterion #3).
@@ -197,8 +198,8 @@ A worked before/after:
 
 Same content, ten times the readability.
 
-- **stated**: the agent was overconfident; user override stands. Continue to step 7 (Merge).
-- **alternative**: post a one-line Linear comment via `uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."` naming the agent's drift catch and the user-picked criterion. Continue to step 7. The drift is named on the issue; the body isn't auto-rewritten.
+- **stated**: the agent was overconfident; user override stands. Continue to step 6b.
+- **alternative**: post a one-line Linear comment via `uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."` naming the agent's drift catch and the user-picked criterion. Continue to step 6b. The drift is named on the issue; the body isn't auto-rewritten.
 - **neither**: drop into the no-exact-fit path below.
 
 In unattended mode, post the same one-line comment naming the clean alternative
@@ -250,6 +251,12 @@ This step turns the "Why this matters" line from a write-once token into a
 verified reference. A missing criterion rides alongside its originating feature
 instead of needing a separate PR. Interactive mode leaves the wording to the
 user; unattended mode treats its machine-local setting as authority to write it.
+
+### 6b. Check the change against its card
+
+<mark>**This step runs last before the merge**</mark>, after every step that can change the branch, so the check covers exactly what merges.
+
+Follow [card check](reference/card-check.md), starting from [Before merge: is the record current?](reference/card-check.md#before-merge-is-the-record-current). When the pull request's recorded check matches the branch's current content and the card's current wording, and every verdict is Kept, continue to step 7. Otherwise run the check again, fix what it finds, re-run validation (step 4) and record the new verdicts in the pull request before merging.
 
 ### 7. Merge (preserve commits)
 
@@ -427,6 +434,7 @@ Read the output focus and apply this command's format from [reference/output-foc
 - No open PR for the branch → stop; run `/linear:start` to push and open the PR
 - Uncommitted changes → stop, suggest `/commit`
 - Tests fail → stop, do not merge
+- Card check finds an unclear promise, nothing checkable, or still fails after three rounds → stop, do not merge
 - Fixup commits present + user picks "abort" → exit cleanly, do not merge (autosquash + force-push manually, then re-run)
 - Fixup rebase conflicts → abort rebase, surface conflict, do not merge
 - Vision has no exact fit in interactive mode → exit cleanly, do not merge (re-run after committing the user-authored Vision update)

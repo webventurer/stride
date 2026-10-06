@@ -249,7 +249,7 @@ If the project has tests, run them too. Fix any failures.
 
 Re-validate after fixes until the build passes cleanly.
 
-### 9. Simplification review
+### 9a. Simplification review
 
 Step 7's YAGNI gate and footprint audit are the **forward pass** — prevention, run in the author's context moments after each piece felt necessary. This is the **backward pass**: a reviewer that never saw that reasoning, asked cold whether the implementation is the simplest thing that works.
 
@@ -274,6 +274,12 @@ It runs before the commit and PR so accepted deletions reach the final review.
 <mark>**An empty findings file is a pass, not a failure.**</mark> An already-minimal implementation proposes nothing; report `simplification review: nothing to remove` and continue.
 
 **One pass, not a loop.** The PR review in step 17 is the convergence check — a second automated round would churn the diff the user is about to read.
+
+### 9b. Card check
+
+Follow [card check](reference/card-check.md): a fresh reviewer compares the change with the card, promise by promise, and every kept-unproven or broken verdict is fixed before the pull request opens.
+
+Keep the passing verdicts, and the tree they checked, for the pull request body in step 15.
 
 ### 10. Optional working-tree review
 
@@ -374,6 +380,9 @@ Run `gh pr create`:
 
 ## Test plan
 - [ ] <checklist of things to verify>
+
+## Card check
+<the verdicts from step 9b, in the format from reference/card-check.md>
 ```
 
 Then create the PR with `--body-file`:
@@ -453,6 +462,7 @@ happens first.
 - No commits ahead of `main` → stop
 - Build fails → fix, re-validate, continue
 - Simplification reviewer proposes nothing → not an error, report and continue
+- Card check finds an unclear promise, nothing checkable, or still fails after three rounds → stop for the user, in both modes
 - PR already exists → not an error, show URL and continue
 - diffity missing or errors → skip the visual diff silently; the PR on GitHub is the diff surface, never a terminal `git diff`
 - Squash leaves the diff stat changed (file content drift) → abort the squash, restore via reflog, leave commits as-is
