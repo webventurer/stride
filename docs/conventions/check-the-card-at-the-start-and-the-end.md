@@ -4,11 +4,12 @@
 
 ## The check
 
-Before a change merges, ask:
+Before work starts on a card, and again before the change merges, ask:
 
-1. **Has someone who never saw the reasoning compared the change with the card?** The author reads their intent into the code; a stranger reads only what is there
-2. **Does every promise on the card have a verdict?** "Looks done" is not a verdict on any one promise
-3. **If the code and the card disagree, who decided which one changes?** Never the agent alone
+1. **Can every promise on the card be shown kept or broken?** A vague promise passes every check, because nothing can fail it
+2. **Has someone who never saw the reasoning compared the change with the card?** The author reads their intent into the code; a stranger reads only what is there
+3. **Does every promise on the card have a verdict?** "Looks done" is not a verdict on any one promise
+4. **If the code and the card disagree, who decided which one changes?** Never the agent alone
 
 <mark>Passing every other review does not mean the change does what the card said. Only a check against the card asks that question.</mark>
 
@@ -18,15 +19,28 @@ A card is the agreement about what a piece of work will do: its expected outcome
 
 That is what happened in the premium-alerts story MM-961. The only comparison of the finished work with its card ran after the merge. It found two ways the code reports a signal's history as complete when the card says it must not, and the simplification, atomicity and naming reviews had all passed it. With unattended mode on, there is no human approval step either, so nothing stood between the broken promise and `main`.
 
+The end check can only be as good as the promises it reads. A promise like "the history is reliable" can never be shown kept or broken, so it passes whatever the code does. Cards in an epic are usually drafted together at planning time, before any of them has shipped, so a promise can also go stale while it waits: an earlier card changes the code, and the later card still promises something that no longer fits.
+
 The tempting repair is the dangerous one. When code and card disagree, rewriting the card to match the code makes the check pass and the agreement worthless.
 
 ## The convention
 
 ### At the start
 
-<!-- The start-of-work check of the card itself (WB-760) fills this section. -->
+- **When it runs.** `/linear:start` runs it right after the Vision check, before a branch exists or any code is written — for each card as it is started, never for a whole epic at once, so a later card is checked against what the earlier ones actually shipped
+- **Who checks.** A fresh reviewer that reads the card, `VISION.md`, the current code and, for a card in an epic, what its finished sibling cards shipped — never the conversation that planned it
+- **What it reports.** Only problems, each naming the card's line and proposing new wording
 
-*To be written — the check that a card's promises are clear and checkable before work begins.*
+| Finding | Meaning |
+|:--------|:--------|
+| **Uncheckable** | A promise has no observable result — "works well", "is robust" |
+| **Contradictory** | Two promises cannot both hold, or the current code already makes one impossible |
+| **Missing** | The current code plainly has an edge case on the card's path that the card does not mention |
+| **Stale** | A promise or its Vision trace no longer fits, given what a sibling card shipped |
+
+A card with no findings starts without a prompt. With findings, the run stops before anything else happens. In interactive mode the user accepts, rewords or rejects each proposed wording; in unattended mode the run stops and leaves them for the user, because a card changes only with sign-off.
+
+The start check feeds the end check. Every promise that survives it can be shown kept or broken, so the verdicts at the end mean something: a kept promise was really tested, and a broken one has a real scenario.
 
 ### At the end
 
@@ -46,18 +60,19 @@ A change merges only when every promise is kept. Fixes and re-checks run without
 
 ### Never quietly rewrite the card
 
-- The agent never edits a card to make a verdict pass
+- The agent never edits a card to make a finding or a verdict go away
 - When the card itself looks wrong, the run stops and shows the promise and its verdict. The user decides whether to fix the code or change the card, in interactive and unattended mode alike
 - A changed card gets a comment on the card saying what changed, why, and that the user signed off. The check then runs again against the new wording
 
 ## Example
 
-Verdicts from the post-merge review of MM-961, the kind this check now gives before merge.
+The end verdicts come from the post-merge review of MM-961; the start finding is illustrative.
 
 ### Before
 
 ```text
-# ❌ Every review passes; no one reads the card
+# ❌ No one reads the card, at either end
+"The history is reliable" rides along from planning, untested
 simplification review: nothing to remove
 commit atomicity: all atomic
 Vision trace: verified
@@ -67,7 +82,16 @@ Vision trace: verified
 ### After
 
 ```text
-# ✅ Each promise gets a verdict before merge
+# ✅ At the start: every promise must be checkable
+"The history is reliable"
+  → uncheckable: nothing in the finished work could show it false
+    proposed: "complete is true only when every row since the
+    plan-added row is held"
+"covered_until is the newest report time on the latest page in an
+ unbroken run, never the time a page was fetched"
+  → no finding: it can be shown kept or broken
+
+# ✅ At the end: each promise gets a verdict before merge
 "The API reads while cron writes; a reader never sees a half-written file"
   → kept: the history is written to a temporary file and swapped in
 "Concurrent reads"
@@ -81,6 +105,7 @@ Vision trace: verified
 ## Why this is useful
 
 - What merges is what was agreed, not what the author believes was agreed
+- A vague or stale promise is fixed before code is written against it, while it is still cheap to change
 - A broken promise surfaces as a concrete scenario while it is still cheap to fix, not as a follow-up after merge
 - Unattended runs keep a real check in place of the human approval they skip
 - The card stays trustworthy, because it never bends to match the code without the user saying so
@@ -90,7 +115,7 @@ Vision trace: verified
 
 - `/linear:quick` work, which has no card until after it merges
 - Discovery spikes whose purpose is to learn what the result should be — there is nothing to keep yet
-- As a substitute for a good card. A vague card gets unclear verdicts; fix the card, not the check
+- As a substitute for writing a good card. The start check flags weak promises and proposes wording; deciding what the card should promise stays with the user
 
 ## Related conventions
 
@@ -100,4 +125,4 @@ Vision trace: verified
 
 ---
 
-_The card is the agreement. Check the work keeps it, and never bend the card to fit the work._
+_The card is the agreement. Make it checkable before the work, check the work keeps it before the merge, and never bend the card to fit the work._

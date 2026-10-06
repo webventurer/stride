@@ -31,12 +31,12 @@ Starting with the first unfinished one: <SUB-X>. Say stop to bail out.
 
 ## E2. Work the next unfinished sub-issue
 
-Pick the first sub-issue that isn't already `In Review` or `Done`. Run the full per-story flow — `/linear:start` steps 1–18 — for that sub-issue: branch, implement, validate, PR, status → In Review, terminal review. Sub-issues already In Review or Done are skipped (named in the disclosure, not re-worked).
+Pick the first sub-issue that isn't already `In Review` or `Done`. Run the full per-story flow — `/linear:start` steps 1–19 — for that sub-issue: branch, implement, validate, PR, status → In Review, terminal review. Sub-issues already In Review or Done are skipped (named in the disclosure, not re-worked).
 
 ## E3. Stop at the PR — every time
 
 In interactive mode, after the sub-issue reaches its PR and terminal review
-(step 18), **stop**. Do not merge or start the next sub-issue. Surface:
+(step 19), **stop**. Do not merge or start the next sub-issue. Surface:
 
 ```
 <SUB-X> is in review: <PR URL>
@@ -45,7 +45,7 @@ Review it, run /linear:finish when ready, then re-run /linear:start <epic-ID> to
 
 <mark>**Interactive mode advances across invocations, each gated by your /finish + re-run.**</mark> This is the same per-PR approval `/linear:start`'s [Rules](../start.md#rules) demand; unattended mode is the explicit opt-in to auto-advance.
 
-In unattended mode, `/linear:start` step 18 runs `/linear:finish` inline. After
+In unattended mode, `/linear:start` step 19 runs `/linear:finish` inline. After
 it succeeds, refresh the sub-issues and continue to the next unfinished
 sub-issue. Stop the loop immediately if finish hits a hard stop. When none
 remain, continue to E4.

@@ -161,7 +161,7 @@ The merge fires *only* on an explicit ship phrase — the agent never decides on
 
 ### /linear:start
 
-**Start work on a Linear issue.** One headless flow: create or switch to the feature branch, move the issue to Doing, inspect the current repository, surface a concrete implementation checklist, work through it visibly, validate (build + tests), **check the change against its card**, **auto-squash similar commits**, push, open a PR with the card check's verdicts, move to In Review, then show the full diff for terminal review.
+**Start work on a Linear issue.** One headless flow: check that the card's promises can be tested, create or switch to the feature branch, move the issue to Doing, inspect the current repository, surface a concrete implementation checklist, work through it visibly, validate (build + tests), **check the change against its card**, **auto-squash similar commits**, push, open a PR with the card check's verdicts, move to In Review, then show the full diff for terminal review.
 
 Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). The command surfaces the outcome the issue serves (extracted from its "Why this matters" section) and carries it as context throughout implementation.
 

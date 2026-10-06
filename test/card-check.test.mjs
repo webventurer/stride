@@ -11,10 +11,11 @@ function read(path) {
 }
 
 function inOrder(text, markers) {
-  const positions = markers.map((marker) => text.indexOf(marker));
-  return positions.every(
-    (at, i) => at !== -1 && (i === 0 || at > positions[i - 1]),
-  );
+  let at = -1;
+  return markers.every((marker) => {
+    at = text.indexOf(marker, at + 1);
+    return at !== -1;
+  });
 }
 
 describe("card check", () => {
@@ -23,10 +24,10 @@ describe("card check", () => {
 
     ok(
       inOrder(start, [
-        "### 9. Simplification review",
-        "### 10. Card check",
+        "### 10. Simplification review",
+        "### 11. Card check",
         "reference/card-check.md",
-        "### 16. Create PR",
+        "### 17. Create PR",
         "## Card check",
       ]),
     );
@@ -111,5 +112,61 @@ describe("card check", () => {
         "### Never quietly rewrite the card",
       ]),
     );
+    for (const finding of [
+      "Uncheckable",
+      "Contradictory",
+      "Missing",
+      "Stale",
+    ]) {
+      ok(convention.includes(`| **${finding}** |`), finding);
+    }
+  });
+});
+
+describe("card start check", () => {
+  it("runs in /linear:start after the Vision check and before any branch or code", () => {
+    const start = read(".claude/commands/linear/start.md");
+
+    ok(
+      inOrder(start, [
+        "### 2. Vision check",
+        "### 3. Check the card",
+        "reference/card-start-review.md",
+        "### 6. Resolve the correct branch",
+        "### 8. Plan, then implement",
+      ]),
+    );
+  });
+
+  it("starts a card with no findings without a prompt", () => {
+    const start = read(".claude/commands/linear/start.md");
+
+    ok(start.includes("continue to step 4 without a prompt"));
+  });
+
+  it("stops on any finding and changes the card only with sign-off", () => {
+    const start = read(".claude/commands/linear/start.md");
+
+    ok(start.includes("stop here, in both modes"));
+    ok(start.includes("**Unattended mode:** stop the run"));
+    ok(start.includes("reference/card-check.md#when-the-card-is-the-problem"));
+  });
+
+  it("reports four kinds of finding from a cold reviewer", () => {
+    const brief = read(
+      ".claude/commands/linear/reference/card-start-review.md",
+    );
+
+    for (const finding of [
+      "`uncheckable`",
+      "`contradictory`",
+      "`missing`",
+      "`stale`",
+    ]) {
+      ok(brief.includes(finding), finding);
+    }
+    ok(brief.includes("never from the conversation that planned it"));
+    ok(brief.includes("list-by-parent <epic-UUID>"));
+    ok(brief.includes("`evidence` and `proposed` are mandatory"));
   });
 });

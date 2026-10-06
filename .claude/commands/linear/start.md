@@ -21,7 +21,7 @@ inline only after implementation and validation pass.
 ## Rules
 
 - Treat the issue as the agreed contract — outcome, boundary, constraints, and
-  proof. Derive the implementation plan from the current repository in step 7;
+  proof. Derive the implementation plan from the current repository in step 8;
   do not turn the plan into new scope
 - Never work directly on `main`
 - Prefer extending existing patterns over inventing new architecture
@@ -113,15 +113,31 @@ If the issue has no "Why this matters" section, decide whether it qualifies for 
 
   Don't start implementation against a modern issue with no anchor.
 
-<mark>**The hard gate is on `VISION.md` and (for modern issues) on the outcome reference.**</mark> No Vision = stop. Modern issue with no outcome reference = stop. Legacy issue with no outcome reference = soft warning, continue. Carry the loaded Vision and (when present) the named outcome as context throughout step 7 (Implement) — when making design decisions, reference what the work is in service of.
+<mark>**The hard gate is on `VISION.md` and (for modern issues) on the outcome reference.**</mark> No Vision = stop. Modern issue with no outcome reference = stop. Legacy issue with no outcome reference = soft warning, continue. Carry the loaded Vision and (when present) the named outcome as context throughout step 8 (Implement) — when making design decisions, reference what the work is in service of.
 
-### 3. Load project context
+### 3. Check the card
+
+The card check in step 11 can only be as good as the promises it checks. Before a branch exists or any code is written, a fresh reviewer reads the card the way that check will, and reports any promise that cannot be checked, contradicts something, misses an edge case the code plainly has, or no longer fits what earlier cards shipped.
+
+1. **Spawn the reviewer.** Use the Task tool (`general-purpose`, model `opus`). Give it **only** the card, its parent epic when step 1 surfaced one, and an output path — never the planning conversation:
+
+   > Read `.claude/commands/linear/reference/card-start-review.md` and follow it. The card is: `<identifier> — <title>`, described as: `<issue description>`. Its parent epic is `<epic-identifier>`, UUID `<epic-UUID>`. Write your findings as JSONL to `<output-path>`.
+
+   The epic's UUID is the `parent.id` step 1 fetched. Leave out the epic sentence for a card with no parent epic. Read the findings from the JSONL file, not the sub-agent's chat reply.
+
+2. **No findings** — report `card start check: nothing to raise` and continue to step 4 without a prompt.
+
+3. **Findings** — stop here, in both modes, and show each one: its kind, the card's line, the evidence and the proposed wording.
+   - **Interactive mode:** the user accepts, rewords or rejects each finding. Apply accepted wording the way the [card check changes a card](reference/card-check.md#when-the-card-is-the-problem): only the wording the user gives or approves, recorded in a Linear comment saying what changed, why, and that the user signed off. A rejected finding leaves the card as it is. Then continue to step 4
+   - **Unattended mode:** stop the run and leave the findings for the user. A card changes only with sign-off
+
+### 4. Load project context
 
 Read project documentation using the paths in [reference/project-docs.md](reference/project-docs.md). Check what exists — only read what is found.
 
 Also check for feature docs matching the issue title, labels, or keywords.
 
-### 4. Inspect the repository state
+### 5. Inspect the repository state
 
 Run:
 
@@ -134,9 +150,9 @@ git branch -a
 
 If there are uncommitted changes, warn and stop — suggest `/commit`.
 
-Never work directly on `main`. If the current branch is `main`, proceed to step 5 to create or switch to a feature branch.
+Never work directly on `main`. If the current branch is `main`, proceed to step 6 to create or switch to a feature branch.
 
-### 5. Resolve the correct branch
+### 6. Resolve the correct branch
 
 Branch priority:
 
@@ -145,9 +161,9 @@ Branch priority:
 3. Linear `gitBranchName`
 4. Fallback pattern: `feature/<issue-id>-<slug>`
 
-If already on the correct branch (resuming inside a worktree set up earlier with `--worktree`), skip to step 6.
+If already on the correct branch (resuming inside a worktree set up earlier with `--worktree`), skip to step 7.
 
-**If `--worktree` was passed**, don't create the branch inline — the worktree creates it. Skip the inline checkout; the worktree setup after step 6 handles branch creation (see [worktree setup](reference/worktree.md#setup)).
+**If `--worktree` was passed**, don't create the branch inline — the worktree creates it. Skip the inline checkout; the worktree setup after step 7 handles branch creation (see [worktree setup](reference/worktree.md#setup)).
 
 Otherwise, create the branch inline:
 
@@ -155,9 +171,9 @@ Otherwise, create the branch inline:
 git checkout -b <branch>
 ```
 
-Continue to step 6.
+Continue to step 7.
 
-### 6. Update Linear status → Doing
+### 7. Update Linear status → Doing
 
 Only update if the current state is Todo, Backlog, or Backburner.
 
@@ -167,9 +183,9 @@ uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state Doing
 
 If already Doing, leave unchanged. Never set any other state in this step.
 
-**If `--worktree` was passed**, set up the worktree now and hand off — follow [worktree setup](reference/worktree.md#setup). It creates the worktree, prints the handoff, and **exits before step 7**; the fresh `claude` session resumes from there (re-running `/linear:start <issue-id>` without the flag picks up at step 5 already on the branch).
+**If `--worktree` was passed**, set up the worktree now and hand off — follow [worktree setup](reference/worktree.md#setup). It creates the worktree, prints the handoff, and **exits before step 8**; the fresh `claude` session resumes from there (re-running `/linear:start <issue-id>` without the flag picks up at step 6 already on the branch).
 
-### 7. Plan, then implement
+### 8. Plan, then implement
 
 The issue is the durable specification: what must be true, where the
 responsibility ends, what is excluded, and how completion is proved. It is
@@ -241,7 +257,7 @@ audited N helpers, M tests — kept all / dropped X / inlined Y
 footprint is minimal
 ```
 
-### 8. Validate
+### 9. Validate
 
 Run the project's build command (e.g. `pnpm build`). Stop if it fails — show the first error and fix it before continuing.
 
@@ -249,9 +265,9 @@ If the project has tests, run them too. Fix any failures.
 
 Re-validate after fixes until the build passes cleanly.
 
-### 9. Simplification review
+### 10. Simplification review
 
-Step 7's YAGNI gate and footprint audit are the **forward pass** — prevention, run in the author's context moments after each piece felt necessary. This is the **backward pass**: a reviewer that never saw that reasoning, asked cold whether the implementation is the simplest thing that works.
+Step 8's YAGNI gate and footprint audit are the **forward pass** — prevention, run in the author's context moments after each piece felt necessary. This is the **backward pass**: a reviewer that never saw that reasoning, asked cold whether the implementation is the simplest thing that works.
 
 It runs before the commit and PR so accepted deletions reach the final review.
 
@@ -263,7 +279,7 @@ It runs before the commit and PR so accepted deletions reach the final review.
 
 2. **Collate from disk.** Read the JSONL file — not the sub-agent's chat reply.
 
-3. **Apply what survives.** Drop any proposal that doesn't name what to delete *and* why nothing needs it — "feels complex" is not a finding. Drop any that would leave the result harder to read; the target is comprehension, not line count. Apply the rest, then re-run step 8 until the build passes.
+3. **Apply what survives.** Drop any proposal that doesn't name what to delete *and* why nothing needs it — "feels complex" is not a finding. Drop any that would leave the result harder to read; the target is comprehension, not line count. Apply the rest, then re-run step 9 until the build passes.
 
 4. **Report one line**, then continue:
 
@@ -273,23 +289,23 @@ It runs before the commit and PR so accepted deletions reach the final review.
 
 <mark>**An empty findings file is a pass, not a failure.**</mark> An already-minimal implementation proposes nothing; report `simplification review: nothing to remove` and continue.
 
-**One pass, not a loop.** The PR review in step 18 is the convergence check — a second automated round would churn the diff the user is about to read.
+**One pass, not a loop.** The PR review in step 19 is the convergence check — a second automated round would churn the diff the user is about to read.
 
-### 10. Card check
+### 11. Card check
 
 Follow [card check](reference/card-check.md): a fresh reviewer compares the change with the card, promise by promise, and every kept-unproven or broken verdict is fixed before the pull request opens.
 
-Keep the passing verdicts, and the tree they checked, for the pull request body in step 16.
+Keep the passing verdicts, and the tree they checked, for the pull request body in step 17.
 
-### 11. Optional working-tree review
+### 12. Optional working-tree review
 
 Run this step only when the user explicitly asks to review before committing. Otherwise continue without checking for diffity or prompting.
 
-When asked, launch the working tree following [reference/diffity-review.md](reference/diffity-review.md), but use `diffity --new main` instead of a PR URL. Surface the URL, then ask: **"Eyeball the working diff — anything to fix before I commit?"** If the user flags something, fix it, re-validate (step 8), refresh with `diffity --new main`, and ask again.
+When asked, launch the working tree following [reference/diffity-review.md](reference/diffity-review.md), but use `diffity --new main` instead of a PR URL. Surface the URL, then ask: **"Eyeball the working diff — anything to fix before I commit?"** If the user flags something, fix it, re-validate (step 9), refresh with `diffity --new main`, and ask again.
 
-<mark>**diffity absent → skip silently.**</mark> No terminal `git diff` fallback. The step-18 PR review remains the standard review gate.
+<mark>**diffity absent → skip silently.**</mark> No terminal `git diff` fallback. The step-19 PR review remains the standard review gate.
 
-### 12. Review scope
+### 13. Review scope
 
 Run these commands to understand what the PR will contain:
 
@@ -301,13 +317,13 @@ git log main..HEAD --oneline
 
 Warn if no commits ahead of main (stop — nothing to ship). Warn if changed files look unrelated to the issue.
 
-### 13. Auto-squash similar commits
+### 14. Auto-squash similar commits
 
-Iterative refinement during step 7 leaves journey-shaped commits — "first attempt", "wait that broke X", "format pass". Before push, group them by purpose and rewrite the messages to describe **where you ended up**, not how you got there. The agent makes the call automatically — the user gates via terminal review (step 18).
+Iterative refinement during step 8 leaves journey-shaped commits — "first attempt", "wait that broke X", "format pass". Before push, group them by purpose and rewrite the messages to describe **where you ended up**, not how you got there. The agent makes the call automatically — the user gates via terminal review (step 19).
 
 **Fast path.** If `git log main..HEAD --oneline` shows a single commit, skip this step entirely.
 
-**Algorithm.** Otherwise, with the diffs from step 12 in context:
+**Algorithm.** Otherwise, with the diffs from step 13 in context:
 
 1. **Group by purpose.** Walk `git log main..HEAD --oneline` and decide which commits serve the same purpose. Signals that two commits belong together:
    - They touch the same file(s) for the same reason (e.g. consecutive edits to one skill prompt while iterating on it)
@@ -348,21 +364,21 @@ Iterative refinement during step 7 leaves journey-shaped commits — "first atte
 
    Confirm the diff stat matches what was there before the squash (file changes preserved) and that the new commit count is ≤ the old count.
 
-**Reflog as recovery.** If anything goes wrong — or the user objects in step 18 — `git reflog` plus `git reset --hard <pre-squash-sha>` returns to the original commits.
+**Reflog as recovery.** If anything goes wrong — or the user objects in step 19 — `git reflog` plus `git reset --hard <pre-squash-sha>` returns to the original commits.
 
-### 14. Push
+### 15. Push
 
 Run `git push -u origin <current-branch>` if the branch has not been pushed yet.
 
 If this is a resume run and the branch was already pushed before the squash, use `git push --force-with-lease` instead. The squash rewrote SHAs; force-with-lease succeeds only if the remote tip matches what was last fetched, so it can't silently overwrite someone else's work.
 
-### 15. Check for existing PR
+### 16. Check for existing PR
 
 Run `gh pr list --head <branch> url,number`.
 
-If a PR already exists, show the URL and skip to step 17.
+If a PR already exists, show the URL and skip to step 18.
 
-### 16. Create PR
+### 17. Create PR
 
 Run `gh pr create`:
 
@@ -382,7 +398,7 @@ Run `gh pr create`:
 - [ ] <checklist of things to verify>
 
 ## Card check
-<the verdicts from step 10, in the format from reference/card-check.md>
+<the verdicts from step 11, in the format from reference/card-check.md>
 ```
 
 Then create the PR with `--body-file`:
@@ -391,7 +407,7 @@ Then create the PR with `--body-file`:
 gh pr create --title "<title>" --body-file <body-file>
 ```
 
-### 17. Update Linear status → In Review
+### 18. Update Linear status → In Review
 
 ```bash
 uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state "In Review"
@@ -399,7 +415,7 @@ uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state "In Review"
 
 Only after the PR is confirmed created or already exists. Skip if the issue is already In Review. Warn (but proceed) if the issue is Done.
 
-### 18. Review
+### 19. Review
 
 If unattended mode is active, do not launch diffity or ask for approval. Show
 the commit list and the plain-English handoff below, then run `/linear:finish`
@@ -412,7 +428,7 @@ The rest of this step is the interactive path.
 
 <mark>**Run `which diffity` before doing anything else in this step.** Do not show the commit list, do not surface the summary, do not ask "does this look right?" — nothing until the diffity check is done.</mark>
 
-**Open the PR in diffity — it is the review surface.** Follow the launch procedure in [reference/diffity-review.md](reference/diffity-review.md); the PR URL is from step 16 (or the existing PR from step 15).
+**Open the PR in diffity — it is the review surface.** Follow the launch procedure in [reference/diffity-review.md](reference/diffity-review.md); the PR URL is from step 17 (or the existing PR from step 16).
 
 Then show the commit list for the user to review:
 
@@ -439,9 +455,9 @@ detail. Do not make them infer the feature from the commit list or PR summary.
 
 Ask: **"Does this look right, or do you want changes?"**
 
-If the user requests changes, make them, re-validate (step 8), commit, push, and refresh diffity on the updated PR (re-launch with `--new`). Repeat until the user is satisfied.
+If the user requests changes, make them, re-validate (step 9), commit, push, and refresh diffity on the updated PR (re-launch with `--new`). Repeat until the user is satisfied.
 
-If the user objects to a squash from step 13 ("don't squash these"), recover via `git reflog` to find the pre-squash SHA, then `git reset --hard <sha>`, then re-push with `--force-with-lease`.
+If the user objects to a squash from step 14 ("don't squash these"), recover via `git reflog` to find the pre-squash SHA, then `git reset --hard <sha>`, then re-push with `--force-with-lease`.
 
 <mark>**In interactive mode, when the user approves, stop. Do not merge.** Say "Ready for `/finish` when you are" and end. Merging is `/finish`'s job — it uses `--merge` to preserve atomic commits. Never use `--squash`.</mark>
 
@@ -457,8 +473,9 @@ happens first.
 - Issue ID unresolvable → stop, ask the user
 - Issue not found in Linear → stop
 - `VISION.md` missing → stop, suggest `/vision`
+- Card start check raises findings → interactive mode decides each one with the user; unattended mode stops
 - Uncommitted changes → stop, suggest `/commit`
-- On `main` with no issue branch → create branch in step 5
+- On `main` with no issue branch → create branch in step 6
 - No commits ahead of `main` → stop
 - Build fails → fix, re-validate, continue
 - Simplification reviewer proposes nothing → not an error, report and continue

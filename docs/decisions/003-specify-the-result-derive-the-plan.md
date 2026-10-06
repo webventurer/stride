@@ -32,7 +32,7 @@ The card is the contract. The checklist is the current route, and evidence found
 
 ## Consequences
 
-- `/linear:start` step 7 is "plan, then implement": inspect the repository, show an unchecked `- [ ]` checklist, then work through it visibly ([#192](https://github.com/webventurer/stride/pull/192))
+- `/linear:start` step 8 is "plan, then implement": inspect the repository, show an unchecked `- [ ]` checklist, then work through it visibly ([#192](https://github.com/webventurer/stride/pull/192))
 - `/linear:plan-work` cards are written as outcomes with an explicit boundary and proof, not as edit lists
 - The workflow reference and the docs site restate the same behaviour, so all three descriptions of `/linear:start` agree
 - The conventions live in `docs/conventions/` ([#191](https://github.com/webventurer/stride/pull/191)), excluded from the published docs site while the set settles
