@@ -31,10 +31,11 @@ Follow [principles over rules](../../../stride/docs/principles/principles-over-r
 - Describe the trigger, the rule and the resulting action: "When X happens, check Y; if it fails, do Z." Include what happens when it passes and any material exception.
 - Give a concrete worked example for each distinct behaviour-changing rule, showing an allowed and a refused case where applicable. Keep examples internally consistent with all the rules.
 - Label illustrative numbers beside the example. Keep them separate from agreed defaults and unresolved policy choices; approval of an explanation does not approve its example values.
+- Describe the behaviour the user or caller sees, not the internal mechanism. State inputs, outputs, edge cases, constraints and the tests that prove them; leave how the code achieves them to the builder. Name an implementation detail only where a constraint forces it, such as "runs after the save so a failure cannot stop it". A card that prescribes an algorithm fixes choices the builder should make against real data, and every review then finds holes in the algorithm instead of checking the promises.
 - Put configuration names, files, recovery behaviour and test details after the explanation. Preserve the technical facts needed to implement it correctly.
 - When the user says a conversational explanation is clearer, make that explanation the card's main account of the solution rather than translating it back into abstract requirements.
 
-Before saving, check: could a 16-year-old use this card to predict what happens in a new example? If they can only repeat the goal or list the settings, rewrite the explanation first.
+Before saving, check: could a 16-year-old use this card to predict what happens in a new example? If they can only repeat the goal or list the settings, rewrite the explanation first. Then check each paragraph: does it say what the caller observes, or how the code achieves it? Move or cut the how unless a constraint forces it.
 
 ## Where it applies
 

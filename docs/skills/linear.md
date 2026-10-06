@@ -18,7 +18,7 @@ Ten commands covering the full development cycle, from setup through to merge �
   # ... you review the diff in the terminal ...
   # ... someone reviews on GitHub ...
 /linear:fix PG-X            # address GitHub review feedback (if any)
-/linear:finish PG-X         # squash merge, clean up, Done
+/linear:finish PG-X         # merge, clean up, Done
 
 # Ship-then-file (small changes)
 /linear:quick "small fix"   # implement, say "ship it", merge + file the card in Done
@@ -203,9 +203,9 @@ Reviewer feedback takes priority over the original issue — plans evolve throug
 
 ### /linear:finish
 
-**Finish the issue.** Runs build + tests (stops if they fail), squash merges the PR with a clean commit message, switches to main, deletes local and remote branches, and marks the issue Done in Linear.
+**Finish the issue.** Runs build + tests (stops if they fail), merges the PR with `--merge` so each atomic commit lands on `main` intact, switches to main, deletes local and remote branches, and marks the issue Done in Linear.
 
-The squash commit message reads as if the work was done right the first time — no mention of rejections, fix cycles, or iterations.
+The merge commit carries only the default subject. The branch's own commits explain what was built and why, each reading as if the work was done right the first time — no mention of rejections, fix cycles, or iterations.
 
 Before merging, it checks that every commit on the branch serves the card. A commit that serves something else moves to `main` or its own branch first, so the PR ships one deliverable.
 
