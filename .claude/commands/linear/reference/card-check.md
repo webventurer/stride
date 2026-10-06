@@ -1,6 +1,6 @@
 # Card check
 
-> Checks a finished change against its card, promise by promise, before it merges. Run by [`/linear:start`](../start.md) step 9b before the pull request opens, and by [`/linear:finish`](../finish.md) step 6b before the merge. Both modes follow it; [unattended mode](unattended.md) changes nothing here.
+> Checks a finished change against its card, promise by promise, before it merges. Run by [`/linear:start`](../start.md) step 10 before the pull request opens, and by [`/linear:finish`](../finish.md) step 7 before the merge. Both modes follow it; [unattended mode](unattended.md) changes nothing here.
 
 The card is the agreement about what the work will do. The simplification, atomicity and Vision reviews each ask a different question, so a change can pass them all and still miss a promise. This check asks the one they don't: **does the change do what the card said?**
 
@@ -70,7 +70,7 @@ uv run .claude/tools/linear_cli.py issue get <issue-id> | jq -r '.title + "\n\n"
 
 Moving the card between board columns keeps it; any change to the title or description gives a new one.
 
-- **`/linear:start`** writes this section into the body when it creates the pull request (step 15)
+- **`/linear:start`** writes this section into the body when it creates the pull request (step 16)
 - **`/linear:finish`** replaces the section after a re-check: save the body with `gh pr view <number> --json body -q .body`, replace the `## Card check` section, and write it back with `gh pr edit <number> --body-file <file>`
 
 ## Before merge: is the record current?

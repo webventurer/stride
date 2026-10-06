@@ -1,6 +1,6 @@
 # Simplification review
 
-> The brief for an **independent** reviewer of a finished implementation. A fresh sub-agent reads this file and judges the change from the diff and the issue alone — never from the author's reasoning for writing it that way. Called from [`/linear:start`](../start.md) step 9a, before the human sees the diff.
+> The brief for an **independent** reviewer of a finished implementation. A fresh sub-agent reads this file and judges the change from the diff and the issue alone — never from the author's reasoning for writing it that way. Called from [`/linear:start`](../start.md) step 9, before the human sees the diff.
 
 ---
 

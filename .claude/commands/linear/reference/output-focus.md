@@ -75,7 +75,7 @@ Never inflate implementation work into fake product impact to fill the Outcome o
 
 > **Plain language throughout.** Every "plain-English sentence" in the templates below follows the [`/clear-speak` skill](../../../skills/clear-speak/SKILL.md) — stride's canonical standard for what counts as jargon and how to replace it. Write each summary so a non-engineer can scan it top-to-bottom.
 
-### `/linear:start` step 17 and `/linear:fix` step 11 (review gate)
+### `/linear:start` step 18 and `/linear:fix` step 11 (review gate)
 
 Start with the completed-card explanation in both modes. It is a handoff to a
 person, not a changelog: one simple sentence saying what the feature does,
@@ -121,7 +121,7 @@ worth flagging, The torch).
 
 ---
 
-### `/linear:finish` step 13 (summary)
+### `/linear:finish` step 14 (summary)
 
 **Outcome mode:**
 

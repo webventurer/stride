@@ -23,10 +23,10 @@ describe("card check", () => {
 
     ok(
       inOrder(start, [
-        "### 9a. Simplification review",
-        "### 9b. Card check",
+        "### 9. Simplification review",
+        "### 10. Card check",
         "reference/card-check.md",
-        "### 15. Create PR",
+        "### 16. Create PR",
         "## Card check",
       ]),
     );
@@ -43,10 +43,10 @@ describe("card check", () => {
     ok(
       inOrder(finish, [
         "### 5b.",
-        "### 6a. Confirm Vision outcome",
-        "### 6b. Check the change against its card",
+        "### 6. Confirm Vision outcome",
+        "### 7. Check the change against its card",
         "reference/card-check.md",
-        "### 7. Merge",
+        "### 8. Merge",
       ]),
     );
   });
