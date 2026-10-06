@@ -143,7 +143,7 @@ When you already know it's epic-sized, pass `--epic` to skip sensing and go stra
 
 Two ways in: **describe it** (`/linear:quick "..."` — branch, implement, ship) or **already did it** (make the change first, then run `/linear:quick` to file the card matching your existing diff).
 
-The merge fires *only* on an explicit ship phrase — the agent never decides on its own that a change is ready. If the change grows past a one-scroll diff or crosses files non-trivially, it stops and points you back to `/linear:plan-work`. The Vision trace runs *before* the merge and is **surfaced like `/linear:finish`** — a drift is shown for your decision (ship against the best-fit criterion, pick a better one, or add one to `VISION.md` first), not silently shortcut. After the merge you can **file the card now or hold it to bundle** several small changes into one Done card.
+The merge fires *only* on an explicit ship phrase — the agent never decides on its own that a change is ready. If the change grows past a one-scroll diff or crosses files non-trivially, it stops and points you back to `/linear:plan-work`. Like `/linear:finish`, it first moves any commit that doesn't serve this change off the branch. The Vision trace runs *before* the merge and is **surfaced like `/linear:finish`** — a drift is shown for your decision (ship against the best-fit criterion, pick a better one, or add one to `VISION.md` first), not silently shortcut. After the merge you can **file the card now or hold it to bundle** several small changes into one Done card.
 
 **Good candidates for the fast loop.** The fast-loop fits work where the shape is already obvious from the description and the diff fits comfortably in one terminal scroll. Examples:
 
@@ -206,6 +206,8 @@ Reviewer feedback takes priority over the original issue — plans evolve throug
 **Finish the issue.** Runs build + tests (stops if they fail), squash merges the PR with a clean commit message, switches to main, deletes local and remote branches, and marks the issue Done in Linear.
 
 The squash commit message reads as if the work was done right the first time — no mention of rejections, fix cycles, or iterations.
+
+Before merging, it checks that every commit on the branch serves the card. A commit that serves something else moves to `main` or its own branch first, so the PR ships one deliverable.
 
 **Usage**:
 
