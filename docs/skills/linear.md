@@ -161,7 +161,7 @@ The merge fires *only* on an explicit ship phrase — the agent never decides on
 
 ### /linear:start
 
-**Start work on a Linear issue.** One headless flow: create or switch to the feature branch, move the issue to Doing, inspect the current repository, surface a concrete implementation checklist, work through it visibly, validate (build + tests), **auto-squash similar commits**, push, open a PR, move to In Review, then show the full diff for terminal review.
+**Start work on a Linear issue.** One headless flow: create or switch to the feature branch, move the issue to Doing, inspect the current repository, surface a concrete implementation checklist, work through it visibly, validate (build + tests), **check the change against its card**, **auto-squash similar commits**, push, open a PR with the card check's verdicts, move to In Review, then show the full diff for terminal review.
 
 Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). The command surfaces the outcome the issue serves (extracted from its "Why this matters" section) and carries it as context throughout implementation.
 
@@ -203,7 +203,7 @@ Reviewer feedback takes priority over the original issue — plans evolve throug
 
 ### /linear:finish
 
-**Finish the issue.** Runs build + tests (stops if they fail), merges the PR with `--merge` so each atomic commit lands on `main` intact, switches to main, deletes local and remote branches, and marks the issue Done in Linear.
+**Finish the issue.** Runs build + tests (stops if they fail), re-checks the change against its card if anything changed since the last passing check (stops if a promise is still broken), merges the PR with `--merge` so each atomic commit lands on `main` intact, switches to main, deletes local and remote branches, and marks the issue Done in Linear.
 
 The merge commit carries only the default subject. The branch's own commits explain what was built and why, each reading as if the work was done right the first time — no mention of rejections, fix cycles, or iterations.
 

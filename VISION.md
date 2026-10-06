@@ -34,6 +34,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] You can improve stride through using it — friction hit while working *in* the project can be surfaced, fixed, and used *on* the project within the same session, so the tool compounds
 - [ ] Every commit on a stride-managed branch passes multi-pass atomicity — no monolithic commits, every message explains *why*
 - [ ] What ships is the simplest thing that works — before you review a change, a reviewer that never saw the reasoning reads it cold and names what can be deleted, so scaffolding that felt necessary while writing it never reaches `main`
+- [ ] What merges does what its card promised — before merge, a reviewer that never saw the reasoning checks the change against the card's stated outcomes, and any gap is either fixed or the card is deliberately revised with sign-off, never quietly rewritten to match
 - [ ] Right tool for right job: every branch in a stride skill points at the artifact designed for its case — story drafts to `story.md`, epic drafts to `epic.md` — and never falls back to a generic "whatever's around" default
 - [ ] Stride's command files (`.claude/commands/*.md`) stay scannable as they grow — a reader can locate a step, rule, or flag in seconds, not minutes
 - [ ] Every `/linear:*` command produces the output its own spec documents — a documented column, sort, or field shows real data, never a silent blank or arbitrary order

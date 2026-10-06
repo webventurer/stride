@@ -19,6 +19,7 @@ the deterministic branches named by this command.
 ## Rules
 
 - Never merge if tests fail
+- Never merge a branch whose current content has no passing card check against the card's current wording
 - The merge commit message should read as if the work was done right the first time — no mention of rejections, fix cycles, or iterations
 - Use `--merge` (not `--squash`) to preserve atomic commits in the branch
 - Never force-delete branches
@@ -63,7 +64,7 @@ If the list is empty, stop:
 
 > *"No open PR for this branch — `/linear:finish` has nothing to merge. Run `/linear:start <issue-id>` to push and open the PR first."*
 
-Capture the PR `number`, `url`, and `mergeable` for the merge in step 7. This gate is the single PR precondition — later steps assume the PR exists and never re-stop on it.
+Capture the PR `number`, `url`, and `mergeable` for the merge in step 8. This gate is the single PR precondition — later steps assume the PR exists and never re-stop on it.
 
 ### 3. Check repo state
 
@@ -126,7 +127,7 @@ Autosquash them now before merging? (y / n / abort)
 
 <mark>**Why interactive mode prompts.**</mark> Rewriting published history normally needs explicit user authorisation. Unattended mode supplies that authorisation through machine-local project config while `--force-with-lease` protects a moved remote.
 
-<mark>**Why fixup-specific, not all journey commits.**</mark> `fixup!` commits have an unambiguous target encoded in their subject (per `--fixup=<sha>`), so autosquash collapses them deterministically. Other journey-shaped commits ("WIP", "address feedback") are a `/linear:start` step 12 concern — caught at push time, not merge time.
+<mark>**Why fixup-specific, not all journey commits.**</mark> `fixup!` commits have an unambiguous target encoded in their subject (per `--fixup=<sha>`), so autosquash collapses them deterministically. Other journey-shaped commits ("WIP", "address feedback") are a `/linear:start` step 13 concern — caught at push time, not merge time.
 
 **Failure modes**:
 
@@ -159,7 +160,7 @@ Read the commit subjects against the Success criteria and apply the [*revise, do
 The issue's stated trace matches the agent's best-fit criterion *and* the fit is unambiguous. Surface a single line and continue to step 7:
 
 ```
-Trace verified against "<criterion>" — proceeding to merge.
+Trace verified against "<criterion>" — proceeding to the card check.
 ```
 
 No y/n prompt. The common path runs without interruption (Vision criterion #3).
@@ -197,7 +198,7 @@ A worked before/after:
 
 Same content, ten times the readability.
 
-- **stated**: the agent was overconfident; user override stands. Continue to step 7 (Merge).
+- **stated**: the agent was overconfident; user override stands. Continue to step 7.
 - **alternative**: post a one-line Linear comment via `uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."` naming the agent's drift catch and the user-picked criterion. Continue to step 7. The drift is named on the issue; the body isn't auto-rewritten.
 - **neither**: drop into the no-exact-fit path below.
 
@@ -251,7 +252,13 @@ verified reference. A missing criterion rides alongside its originating feature
 instead of needing a separate PR. Interactive mode leaves the wording to the
 user; unattended mode treats its machine-local setting as authority to write it.
 
-### 7. Merge (preserve commits)
+### 7. Check the change against its card
+
+<mark>**This step runs last before the merge**</mark>, after every step that can change the branch, so the check covers exactly what merges.
+
+Follow [card check](reference/card-check.md), starting from [Before merge: is the record current?](reference/card-check.md#before-merge-is-the-record-current). When the pull request's recorded check matches the branch's current content and the card's current wording, and every verdict is Kept, continue to step 8. Otherwise run the check again, fix what it finds, re-run validation (step 4) and record the new verdicts in the pull request before merging.
+
+### 8. Merge (preserve commits)
 
 Merge with `--merge` to preserve the atomic commits from the branch. The merge commit gets the default subject only — no body. The individual commits on the branch already explain what was built and why; duplicating that in the merge commit just creates drift between the two messages.
 
@@ -261,7 +268,7 @@ gh pr merge <number> --merge --subject "Merge branch '<gitBranchName>'" --body "
 
 Pass `--body ""` explicitly so `gh` does not fall back to the PR description.
 
-### 8. Clean up branches, remove worktree, close the worktree tab
+### 9. Clean up branches, remove worktree, close the worktree tab
 
 Detect the main repo path. Run `git worktree list` — the first entry is the main repo:
 
@@ -271,24 +278,24 @@ git worktree list
 
 **All git commands must use `git -C <main-repo-path>`** to avoid depending on the worktree directory.
 
-**Step 8a — Switch to main and pull:**
+**Step 9a — Switch to main and pull:**
 
 ```bash
 git -C <main-repo-path> checkout main && git -C <main-repo-path> pull
 ```
 
-**Step 8b — Tear down the worktree (if one was used):**
+**Step 9b — Tear down the worktree (if one was used):**
 
 Follow [worktree teardown](reference/worktree.md#teardown) — it removes the worktree and guides the user to close its tab in the current VS Code window. Do this **before** deleting the branch (git won't delete a branch a worktree has checked out). For an inline run with no worktree, it skips silently.
 
-**Step 8c — Delete branches:**
+**Step 9c — Delete branches:**
 
 Now that any worktree is gone, the branch can be deleted:
 
 - **Local**: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently
 - **Remote**: `git -C <main-repo-path> push origin --delete <gitBranchName>` — if already deleted (GitHub may auto-delete), skip silently
 
-### 9. Update Linear → done
+### 10. Update Linear → done
 
 Move the issue to **Done**:
 
@@ -298,7 +305,7 @@ uv run .claude/tools/linear_cli.py issue update <issue-id> --state Done
 
 Only set Done status. Skip if already Done. Never set any other status.
 
-### 10. Check milestone completion
+### 11. Check milestone completion
 
 Skip this step if the issue had no milestone.
 
@@ -326,7 +333,7 @@ Completed: <YYYY-MM-DD> — all stories Done.
 
 If the user declines, leave the milestone untouched.
 
-### 11. Check parent-issue epic completion
+### 12. Check parent-issue epic completion
 
 Skip this step if the issue had no `parentId`, or if the parent's title doesn't start with `Epic: ` (the parent is a regular sub-issue parent, not a stride epic).
 
@@ -356,7 +363,7 @@ uv run .claude/tools/linear_cli.py issue update <parent-id> --state Done
 
 If the user declines, leave the epic untouched.
 
-### 12. Sync Vision if it changed
+### 13. Sync Vision if it changed
 
 Detect whether the merged PR's diff included `VISION.md`:
 
@@ -387,7 +394,7 @@ Then:
    uv run .claude/tools/linear_cli.py get-project-content <project-id>
    ```
 4. Compare both fields against `VISION.md` (after trimming surrounding whitespace). Linear normalises markdown on save (e.g. `-` list markers become `*`), so treat normalisation-only differences as in sync. The subtitle is the tagline vs the current `description`; skip the subtitle if VISION.md has no opening blockquote (never blank an existing one).
-   - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 13.
+   - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 14.
    - **Either differs**: show what will change (content diff and/or old→new subtitle). In unattended mode continue to the writes; in interactive mode ask:
 
      ```
@@ -399,11 +406,11 @@ Then:
    uv run .claude/tools/linear_cli.py update-project-content <project-id> --content @VISION.md
    uv run .claude/tools/linear_cli.py project update <project-id> --description "<tagline-from-step-3>"
    ```
-   On `n`: skip the writes and continue to step 13.
+   On `n`: skip the writes and continue to step 14.
 
-If any step in the sync flow fails (`.stride.json` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 13. The issue is already Done from step 9 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
+If any step in the sync flow fails (`.stride.json` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 14. The issue is already Done from step 10 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
 
-Track the outcome for the summary in step 13:
+Track the outcome for the summary in step 14:
 
 | State | When |
 |:------|:-----|
@@ -413,7 +420,7 @@ Track the outcome for the summary in step 13:
 | `failed: <reason>` | Sync attempted but errored |
 | *(omitted)* | `VISION.md` was not in the merged diff |
 
-### 13. Summary
+### 14. Summary
 
 Read the output focus and apply this command's format from [reference/output-focus.md](reference/output-focus.md).
 
@@ -427,6 +434,7 @@ Read the output focus and apply this command's format from [reference/output-foc
 - No open PR for the branch → stop; run `/linear:start` to push and open the PR
 - Uncommitted changes → stop, suggest `/commit`
 - Tests fail → stop, do not merge
+- Card check finds an unclear promise, nothing checkable, or still fails after three rounds → stop, do not merge
 - Fixup commits present + user picks "abort" → exit cleanly, do not merge (autosquash + force-push manually, then re-run)
 - Fixup rebase conflicts → abort rebase, surface conflict, do not merge
 - Vision has no exact fit in interactive mode → exit cleanly, do not merge (re-run after committing the user-authored Vision update)
