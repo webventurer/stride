@@ -13,7 +13,7 @@ The first four shape change: make the next change easier, declare the result and
 | **Keep every restatement true** | A rule stated twice is a fact with copies, and copies drift | [keep-every-restatement-true](keep-every-restatement-true.md) |
 | **Read the set as one document** | Read every document together after a change; contradictions are findings | [read-the-set-as-one-document](read-the-set-as-one-document.md) |
 | **Ask for the disproof** | State the hypothesis, then ask for it to be broken | [ask-for-the-disproof](ask-for-the-disproof.md) |
-| **Check the card at the start and the end** | Before merge, a reviewer who never saw the reasoning checks every promise on the card; the card never bends to fit the code | [check-the-card-at-the-start-and-the-end](check-the-card-at-the-start-and-the-end.md) |
+| **Check the card at the start and the end** | A reviewer who never saw the reasoning checks the card's promises can be tested before work starts, and are kept before merge; the card never bends to fit the code | [check-the-card-at-the-start-and-the-end](check-the-card-at-the-start-and-the-end.md) |
 
 New conventions copy [template.md](template.md).
 

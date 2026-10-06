@@ -112,6 +112,14 @@ describe("card check", () => {
         "### Never quietly rewrite the card",
       ]),
     );
+    for (const finding of [
+      "Uncheckable",
+      "Contradictory",
+      "Missing",
+      "Stale",
+    ]) {
+      ok(convention.includes(`| **${finding}** |`), finding);
+    }
   });
 });
 
