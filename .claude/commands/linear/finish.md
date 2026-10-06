@@ -127,7 +127,7 @@ Autosquash them now before merging? (y / n / abort)
 
 <mark>**Why interactive mode prompts.**</mark> Rewriting published history normally needs explicit user authorisation. Unattended mode supplies that authorisation through machine-local project config while `--force-with-lease` protects a moved remote.
 
-<mark>**Why fixup-specific, not all journey commits.**</mark> `fixup!` commits have an unambiguous target encoded in their subject (per `--fixup=<sha>`), so autosquash collapses them deterministically. Other journey-shaped commits ("WIP", "address feedback") are a `/linear:start` step 13 concern — caught at push time, not merge time.
+<mark>**Why fixup-specific, not all journey commits.**</mark> `fixup!` commits have an unambiguous target encoded in their subject (per `--fixup=<sha>`), so autosquash collapses them deterministically. Other journey-shaped commits ("WIP", "address feedback") are a `/linear:start` step 14 concern — caught at push time, not merge time.
 
 **Failure modes**:
 

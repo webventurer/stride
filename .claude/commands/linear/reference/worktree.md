@@ -1,6 +1,6 @@
 # Worktree
 
-> The worktree lifecycle stride manages: **Setup** when `/linear:start` is given `--worktree` (step 6), **Teardown** when `/linear:finish` cleans up (step 9). The decision — inline by default, isolated worktree when the flag is present — stays in the command files; this file holds the execution detail so they stay scannable.
+> The worktree lifecycle stride manages: **Setup** when `/linear:start` is given `--worktree` (step 7), **Teardown** when `/linear:finish` cleans up (step 9). The decision — inline by default, isolated worktree when the flag is present — stays in the command files; this file holds the execution detail so they stay scannable.
 
 > **Same-window model.** Stride does not open or close an editor or a terminal. On setup it creates the worktree and prints a handoff; the user opens a new terminal tab in their **current** VS Code window, `cd`s in, and launches `claude`. A new terminal tab is a fresh shell, so nothing relocates the running session — and multiple cards become side-by-side tabs in one window, no alt-tabbing. On teardown the worktree directory is removed and the user closes that tab.
 
@@ -23,7 +23,7 @@ issue; for an issue in review or done, work in its existing checkout instead.
 
 ### Create the worktree
 
-The branch is created **by the worktree**, not inline — so step 5's inline `git checkout -b` is skipped when `--worktree` is passed (see start.md step 5).
+The branch is created **by the worktree**, not inline — so step 6's inline `git checkout -b` is skipped when `--worktree` is passed (see start.md step 6).
 
 Resolve the path from the repo name and issue ID:
 
@@ -116,7 +116,7 @@ Scope: the common `.venv` / `venv` layout only. Skip Poetry / Pipenv / Conda (th
 
 ### Print the handoff and exit
 
-Stride opens nothing — the user drives the editor. Print this, then **exit before step 7 (Implement)**; the fresh `claude` session takes over from there:
+Stride opens nothing — the user drives the editor. Print this, then **exit before step 8 (Implement)**; the fresh `claude` session takes over from there:
 
 ```
 Worktree ready: <worktree-path>
@@ -137,7 +137,7 @@ The second, flag-less `/linear:start` is the real work; the first invocation is 
 
 ### Resuming in the worktree
 
-When the user runs `/linear:start <issue-id>` (no flag) from the worktree's terminal, step 5's branch resolution finds it already on the correct branch and skips to step 6 — the flow continues from the Vision check onward exactly as an inline run would.
+When the user runs `/linear:start <issue-id>` (no flag) from the worktree's terminal, step 6's branch resolution finds it already on the correct branch and skips to step 7 — the flow continues from the Vision check onward exactly as an inline run would.
 
 ---
 
