@@ -42,6 +42,7 @@ past duplicate, scope, project, or Vision ambiguity.
 
 - Titles are imperative and start with a verb (Add, Fix, Replace, Remove…). Avoid "Investigate" unless the outcome genuinely is a report, not a code change.
 - Titles describe the outcome a stakeholder would recognise — what changes from their perspective — not the implementation. *"Background jobs run reliably after the first one"*, not *"Reset Tortoise globals between RQ jobs"*. Infrastructure exception: when there's no user-visible outcome, name the *system behaviour* that changes (e.g. "Linter accepts 100-char lines"), not the file that changes. See `docs/reference/issue-template.md` for the canonical rule and examples.
+- Card bodies describe the behaviour the user or caller sees, not the internal mechanism — see [Linear card language](reference/card-language.md#explain-the-solution-before-the-implementation). Implementation detail appears only where a constraint forces it.
 - Titles use plain language — no bare jargon or stride-internal vocabulary. The [`/clear-speak` skill](../../skills/clear-speak/SKILL.md) is stride's canonical standard for what counts as jargon and how to replace it.
 - Labels are optional — suggest at most 3, only when clearly relevant. Prefer no labels over speculative ones.
 - Priority defaults to Medium. Only upgrade if the user says it's urgent or the description implies user-facing impact (breakage, a time-sensitive launch, etc.).

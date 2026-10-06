@@ -124,8 +124,10 @@ Describe what triggers the behaviour, what is checked, what
 happens when it passes or fails, and any material exception.
 Use concrete worked examples for distinct behaviour-changing
 rules. Mark example values as illustrative unless agreed.
-Follow with implementation and scope details; a list of
-settings or files is not an explanation of the solution.
+Describe the behaviour the caller sees, not the internal
+mechanism. Follow with implementation details only where a
+constraint forces them, then scope; a list of settings or
+files is not an explanation of the solution.
 
 ### What we won't do
 (Only if genuinely useful — omit if nothing meaningful)
