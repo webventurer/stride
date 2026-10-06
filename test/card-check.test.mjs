@@ -98,4 +98,18 @@ describe("card check", () => {
       ),
     );
   });
+
+  it("explains both ends of the check in the conventions", () => {
+    const page = "check-the-card-at-the-start-and-the-end.md";
+    const convention = read(`docs/conventions/${page}`);
+
+    ok(read("docs/conventions/index.md").includes(`(${page})`));
+    ok(
+      inOrder(convention, [
+        "### At the start",
+        "### At the end",
+        "### Never quietly rewrite the card",
+      ]),
+    );
+  });
 });
