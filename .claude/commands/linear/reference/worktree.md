@@ -1,6 +1,6 @@
 # Worktree
 
-> The worktree lifecycle stride manages: **Setup** when `/linear:start` is given `--worktree` (step 6), **Teardown** when `/linear:finish` cleans up (step 8). The decision — inline by default, isolated worktree when the flag is present — stays in the command files; this file holds the execution detail so they stay scannable.
+> The worktree lifecycle stride manages: **Setup** when `/linear:start` is given `--worktree` (step 6), **Teardown** when `/linear:finish` cleans up (step 9). The decision — inline by default, isolated worktree when the flag is present — stays in the command files; this file holds the execution detail so they stay scannable.
 
 > **Same-window model.** Stride does not open or close an editor or a terminal. On setup it creates the worktree and prints a handoff; the user opens a new terminal tab in their **current** VS Code window, `cd`s in, and launches `claude`. A new terminal tab is a fresh shell, so nothing relocates the running session — and multiple cards become side-by-side tabs in one window, no alt-tabbing. On teardown the worktree directory is removed and the user closes that tab.
 
@@ -143,7 +143,7 @@ When the user runs `/linear:start <issue-id>` (no flag) from the worktree's term
 
 ## Teardown
 
-The mechanics `/linear:finish` follows (step 8) when the issue was worked in a worktree. Run from the **main repo**, not the worktree that's about to vanish — `git worktree list`'s first entry is the main repo; use `git -C <main-repo-path>` for every command. Skip this whole section silently for an inline run (no worktree on disk).
+The mechanics `/linear:finish` follows (step 9) when the issue was worked in a worktree. Run from the **main repo**, not the worktree that's about to vanish — `git worktree list`'s first entry is the main repo; use `git -C <main-repo-path>` for every command. Skip this whole section silently for an inline run (no worktree on disk).
 
 ### Remove the worktree
 
