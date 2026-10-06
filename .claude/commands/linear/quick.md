@@ -122,9 +122,9 @@ Interactive mode then surfaces the URL with the gate prompt: **"PR: \<url\> — 
 
 If the user requests changes, make them, re-validate (step 4), push to the same PR (`git push`, or `--force-with-lease` after a squash), and show the updated diff. Repeat until they say a ship phrase. <mark>**Opening the PR is reversible; the merge is not. Until a ship phrase, do nothing irreversible — above all, no merge.**</mark>
 
-### 6. Trace Vision, then merge
+### 6. Check scope, trace Vision, then merge
 
-In interactive mode, continue only once the user says a ship phrase. In unattended mode, continue directly from step 5. **First run the Vision trace check — the same judgement `/linear:finish` makes, not a rubber stamp.** With the diff and commit subjects in hand, read them against the `VISION.md` Success criteria and pick the best-fit criterion:
+In interactive mode, continue only once the user says a ship phrase. In unattended mode, continue directly from step 5. **First check the branch's scope** with [branch scope](reference/branch-scope.md): every commit must serve this change, and any that serves something else moves to `main` or its own branch before the merge. **Then run the Vision trace check — the same judgement `/linear:finish` makes, not a rubber stamp.** With the diff and commit subjects in hand, read them against the `VISION.md` Success criteria and pick the best-fit criterion:
 
 - **Match** — the change clearly serves one criterion. Surface a single line and continue to the merge:
 

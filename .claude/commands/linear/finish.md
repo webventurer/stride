@@ -77,7 +77,7 @@ Run the project's required checks, build command (e.g. `pnpm build`) and tests l
 
 If anything fails, stop — do not merge. Show what failed.
 
-### 5. Check for pending fixup commits
+### 5a. Check for pending fixup commits
 
 Before the merge, scan the branch for `fixup!` commits. These are journey-shaped commits meant to fold into an earlier target via `git rebase --autosquash` — if they land on `main` verbatim, the log fills with `fixup! feat: ...` subjects whose bodies don't explain why each change exists. That breaks the Vision criterion: *"Every commit on a stride-managed branch passes multi-pass atomicity — no monolithic commits, every message explains why."*
 
@@ -87,11 +87,11 @@ Count them:
 pending=$(git log main..HEAD --format=%s | grep -c '^fixup!')
 ```
 
-If `pending` is zero, skip silently and continue to step 6.
+If `pending` is zero, skip silently and continue to step 5b.
 
 In unattended mode, autosquash the fixups with the commands below and
 force-push with `--force-with-lease`. Rebase conflicts or a refused lease are
-hard stops. Continue to step 6 after a successful push.
+hard stops. Continue to step 5b after a successful push.
 
 The remaining choices in this step are the interactive path.
 
@@ -114,9 +114,9 @@ Autosquash them now before merging? (y / n / abort)
   git push --force-with-lease
   ```
 
-  `--force-with-lease` refuses if the remote tip has moved since the last fetch, so it can't silently overwrite someone else's push. Continue to step 6 with the rewritten history.
+  `--force-with-lease` refuses if the remote tip has moved since the last fetch, so it can't silently overwrite someone else's push. Continue to step 5b with the rewritten history.
 
-- **n** → continue to step 6 as-is. The user has explicitly chosen to merge the fixups verbatim. The drift is named on the issue (via the prompt the user just saw), not silently shipped.
+- **n** → continue to step 5b as-is. The user has explicitly chosen to merge the fixups verbatim. The drift is named on the issue (via the prompt the user just saw), not silently shipped.
 
 - **abort** → exit cleanly. Tell the user:
 
@@ -132,6 +132,10 @@ Autosquash them now before merging? (y / n / abort)
 
 - Rebase conflicts → abort the rebase (`git rebase --abort`), surface the conflict, tell the user to resolve manually and re-run.
 - `--force-with-lease` refused → the remote moved between fetch and push. Fetch, re-run.
+
+### 5b. Check every commit belongs to this card
+
+Follow [branch scope](reference/branch-scope.md): judge each commit in `git log main..HEAD` against the card's purpose from step 1, and move any commit that serves something else to `main` or its own branch before merging. Continue to step 6 once every remaining commit belongs.
 
 ### 6. Confirm Vision outcome (before merge)
 
