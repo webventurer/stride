@@ -120,6 +120,7 @@ describe("card check", () => {
     ]) {
       ok(convention.includes(`| **${finding}** |`), finding);
     }
+    ok(convention.includes("Stops the run when"));
   });
 });
 
@@ -144,15 +145,24 @@ describe("card start check", () => {
     ok(start.includes("continue to step 4 without a prompt"));
   });
 
-  it("stops on any finding and changes the card only with sign-off", () => {
+  it("stops only for a stop and changes the card only with sign-off", () => {
     const start = read(".claude/commands/linear/start.md");
 
-    ok(start.includes("stop here, in both modes"));
-    ok(start.includes("**Unattended mode:** stop the run"));
+    ok(
+      start.includes(
+        "**Notes only** — post them as one comment on the card and continue",
+      ),
+    );
+    ok(start.includes("**Stops** — pause here, before any branch exists"));
+    ok(
+      start.includes(
+        "**Unattended mode:** post the notes as the one comment and end the run",
+      ),
+    );
     ok(start.includes("reference/card-check.md#when-the-card-is-the-problem"));
   });
 
-  it("reports four kinds of finding from a cold reviewer", () => {
+  it("reports four kinds of finding, each with a level", () => {
     const brief = read(
       ".claude/commands/linear/reference/card-start-review.md",
     );
@@ -165,6 +175,8 @@ describe("card start check", () => {
     ]) {
       ok(brief.includes(finding), finding);
     }
+    ok(brief.includes('"level": "stop | note"'));
+    ok(brief.includes("A note never stops the run"));
     ok(brief.includes("never from the conversation that planned it"));
     ok(brief.includes("list-by-parent <epic-UUID>"));
     ok(brief.includes("`evidence` and `proposed` are mandatory"));

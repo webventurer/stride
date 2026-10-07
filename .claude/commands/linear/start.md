@@ -125,11 +125,15 @@ The card check in step 11 can only be as good as the promises it checks. Before 
 
    The epic's UUID is the `parent.id` step 1 fetched. Leave out the epic sentence for a card with no parent epic. Read the findings from the JSONL file, not the sub-agent's chat reply.
 
-2. **No findings** — report `card start check: nothing to raise` and continue to step 4 without a prompt.
+2. **Read the levels.** Each finding is a `stop` or a `note`.
 
-3. **Findings** — stop here, in both modes, and show each one: its kind, the card's line, the evidence and the proposed wording.
-   - **Interactive mode:** the user accepts, rewords or rejects each finding. Apply accepted wording the way the [card check changes a card](reference/card-check.md#when-the-card-is-the-problem): only the wording the user gives or approves, recorded in a Linear comment saying what changed, why, and that the user signed off. A rejected finding leaves the card as it is. Then continue to step 4
-   - **Unattended mode:** stop the run and leave the findings for the user. A card changes only with sign-off
+3. **No findings** — report `card start check: nothing to raise` and continue to step 4 without a prompt.
+
+4. **Notes only** — post them as one comment on the card and continue to step 4 without a prompt, in both modes. Write the comment following [Linear card language](reference/card-language.md): each note's card line, what the reviewer found and its proposed wording, with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`.
+
+5. **Stops** — pause here, before any branch exists, and show each stop: its kind, the card's line, the evidence and the proposed wording. Show the notes alongside them.
+   - **Interactive mode:** the user accepts, rewords or rejects each stop, and may act on any note. Apply accepted wording the way the [card check changes a card](reference/card-check.md#when-the-card-is-the-problem): only the wording the user gives or approves, recorded in a Linear comment saying what changed, why, and that the user signed off. A rejected stop leaves the card as it is. Post any notes the user didn't act on as the one comment, then continue to step 4
+   - **Unattended mode:** post the notes as the one comment and end the run, leaving the stops for the user. A card changes only with sign-off
 
 ### 4. Load project context
 
@@ -473,7 +477,8 @@ happens first.
 - Issue ID unresolvable → stop, ask the user
 - Issue not found in Linear → stop
 - `VISION.md` missing → stop, suggest `/vision`
-- Card start check raises findings → interactive mode decides each one with the user; unattended mode stops
+- Card start check raises only notes → post them as one card comment and continue, in both modes
+- Card start check raises a stop → interactive mode decides each stop with the user; unattended mode ends the run
 - Uncommitted changes → stop, suggest `/commit`
 - On `main` with no issue branch → create branch in step 6
 - No commits ahead of `main` → stop

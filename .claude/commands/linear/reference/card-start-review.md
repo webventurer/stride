@@ -46,19 +46,42 @@ Judge the card, not the plan. Whether you would build it differently, or whether
 
 ---
 
+## Give each finding a level
+
+The level says what `/linear:start` does with the finding:
+
+| Level | What happens |
+|:------|:-------------|
+| `stop` | Work does not start until the user decides |
+| `note` | Work starts. The finding is left on the card as a comment, and the card's wording stays as it is |
+
+Ask one question: **if work started on the card as written, would the builder have to guess what done means, or would the end check be unable to give a promise a verdict that means anything?** Yes is `stop`. No is `note`.
+
+| Finding | Level |
+|:--------|:------|
+| `uncheckable` | Always `stop` — the end check would return `unclear` on it, after the code is written |
+| `contradictory` | Always `stop` — the builder would have to choose which promise to break |
+| `stale` | `stop` when a promise no longer fits. `note` when only the Vision trace no longer fits, because `/linear:finish` judges the trace again before merge |
+| `missing` | `note`, unless how the edge case is handled decides whether a stated promise is kept — then `stop`, and name that promise in `evidence` |
+
+<mark>**A note never stops the run.** When you cannot name the promise a finding puts at risk, it is a note.</mark>
+
+---
+
 ## Output contract
 
 Write one JSON object per line (JSONL) to the output path the orchestrator gives you — one line per finding, in the order the card makes the promises:
 
 ```jsonl
-{"finding": "uncheckable | contradictory | missing | stale", "line": "<the card's words, or the gap>", "evidence": "<what the table above requires>", "proposed": "<new wording, or the line to add or remove>"}
+{"finding": "uncheckable | contradictory | missing | stale", "level": "stop | note", "line": "<the card's words, or the gap>", "evidence": "<what the table above requires>", "proposed": "<new wording, or the line to add or remove>"}
 ```
 
 Rules for the file:
 
 - **Always write the file.** An empty file means the card has no findings and work starts without a prompt
 - **`evidence` and `proposed` are mandatory** on every line
-- The **chat reply is a receipt** — the file path and the count per kind (e.g. "2 findings: 1 uncheckable, 1 stale"). The findings live in the file, so the orchestrator collates from disk
+- **`level` follows the level table.**
+- The **chat reply is a receipt** — the file path and the count per level and kind (e.g. "3 findings: 1 stop (uncheckable), 2 notes (missing, stale)"). The findings live in the file, so the orchestrator collates from disk
 
 ---
 
@@ -68,6 +91,7 @@ Rules for the file:
 - Do not edit, stage or commit anything — you report, the user decides
 - Do not propose new scope; a `missing` finding names an edge case on the card's own path, never a feature
 - Do not raise a finding you cannot pin to evidence
+- Do not raise a `stop` you cannot tie to a promise the builder would have to guess at or the end check could not judge
 
 ---
 

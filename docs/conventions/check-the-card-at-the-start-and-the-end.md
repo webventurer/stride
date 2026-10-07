@@ -31,14 +31,18 @@ The tempting repair is the dangerous one. When code and card disagree, rewriting
 - **Who checks.** A fresh reviewer that reads the card, `VISION.md`, the current code and, for a card in an epic, what its finished sibling cards shipped — never the conversation that planned it
 - **What it reports.** Only problems, each naming the card's line and proposing new wording
 
-| Finding | Meaning |
-|:--------|:--------|
-| **Uncheckable** | A promise has no observable result — "works well", "is robust" |
-| **Contradictory** | Two promises cannot both hold, or the current code already makes one impossible |
-| **Missing** | The current code plainly has an edge case on the card's path that the card does not mention |
-| **Stale** | A promise or its Vision trace no longer fits, given what a sibling card shipped |
+| Finding | Meaning | Stops the run when |
+|:--------|:--------|:-------------------|
+| **Uncheckable** | A promise has no observable result — "works well", "is robust" | Always |
+| **Contradictory** | Two promises cannot both hold, or the current code already makes one impossible | Always |
+| **Missing** | The current code plainly has an edge case on the card's path that the card does not mention | How the edge case is handled decides whether a stated promise is kept |
+| **Stale** | A promise or its Vision trace no longer fits, given what a sibling card shipped | A promise no longer fits. A Vision trace alone is a note, because `/linear:finish` checks the trace again |
 
-A card with no findings starts without a prompt. With findings, the run stops before anything else happens. In interactive mode the user accepts, rewords or rejects each proposed wording; in unattended mode the run stops and leaves them for the user, because a card changes only with sign-off.
+Each finding is a **stop** or a **note**. A stop is a promise the builder would have to guess at, or that the end check couldn't judge; anything that doesn't stop the run is a note.
+
+- **No findings:** work starts without a prompt
+- **Notes only:** they're posted as one comment on the card and work starts, in both modes
+- **Any stop:** the run pauses before a branch exists. In interactive mode the user accepts, rewords or rejects each stop and the run continues; in unattended mode the run ends and leaves them for the user, because a card changes only with sign-off. Notes are shown alongside, and any not acted on go into the one comment
 
 The start check feeds the end check. Every promise that survives it can be shown kept or broken, so the verdicts at the end mean something: a kept promise was really tested, and a broken one has a real scenario.
 
