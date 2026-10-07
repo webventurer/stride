@@ -117,10 +117,12 @@ describe("card check", () => {
       "Contradictory",
       "Missing",
       "Stale",
+      "Mechanism",
     ]) {
       ok(convention.includes(`| **${finding}** |`), finding);
     }
     ok(convention.includes("Stops the run when"));
+    ok(convention.includes("before 6 October 2026"));
   });
 });
 
@@ -162,7 +164,14 @@ describe("card start check", () => {
     ok(start.includes("reference/card-check.md#when-the-card-is-the-problem"));
   });
 
-  it("reports four kinds of finding, each with a level", () => {
+  it("treats an older card's mechanism stop as a note", () => {
+    const start = read(".claude/commands/linear/start.md");
+
+    ok(start.includes("created in Linear before 2026-10-06"));
+    ok(start.includes("treat a `mechanism` stop as a note"));
+  });
+
+  it("reports five kinds of finding, each with a level", () => {
     const brief = read(
       ".claude/commands/linear/reference/card-start-review.md",
     );
@@ -172,6 +181,7 @@ describe("card start check", () => {
       "`contradictory`",
       "`missing`",
       "`stale`",
+      "`mechanism`",
     ]) {
       ok(brief.includes(finding), finding);
     }

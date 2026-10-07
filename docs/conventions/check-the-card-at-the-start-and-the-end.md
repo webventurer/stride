@@ -37,6 +37,7 @@ The tempting repair is the dangerous one. When code and card disagree, rewriting
 | **Contradictory** | Two promises cannot both hold, or the current code already makes one impossible | Always |
 | **Missing** | The current code plainly has an edge case on the card's path that the card does not mention | How the edge case is handled decides whether a stated promise is kept |
 | **Stale** | A promise or its Vision trace no longer fits, given what a sibling card shipped | A promise no longer fits. A Vision trace alone is a note, because `/linear:finish` checks the trace again |
+| **Mechanism** | A promise is met by making an edit, whether or not the result it serves holds — "move the retry logic into its own file" | The edit is the card's only statement of that result. A card created before 6 October 2026, when card language began asking for behaviour, gets a note |
 
 Each finding is a **stop** or a **note**. A stop is a promise the builder would have to guess at, or that the end check couldn't judge; anything that doesn't stop the run is a note.
 

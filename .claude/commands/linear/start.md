@@ -125,7 +125,7 @@ The card check in step 11 can only be as good as the promises it checks. Before 
 
    The epic's UUID is the `parent.id` step 1 fetched. Leave out the epic sentence for a card with no parent epic. Read the findings from the JSONL file, not the sub-agent's chat reply.
 
-2. **Read the levels.** Each finding is a `stop` or a `note`.
+2. **Read the levels.** Each finding is a `stop` or a `note`. For a card created in Linear before 2026-10-06 (the `createdAt` step 1 fetched), treat a `mechanism` stop as a note: card language asked for behaviour rather than mechanism only from that date.
 
 3. **No findings** — report `card start check: nothing to raise` and continue to step 4 without a prompt.
 
