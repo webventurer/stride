@@ -152,7 +152,7 @@ describe("card check", () => {
     ]) {
       ok(convention.includes(`| **${finding}** |`), finding);
     }
-    ok(convention.includes("Stops the run when"));
+    ok(convention.includes("| Finding | Meaning | A stop when |"));
     ok(convention.includes("before 6 October 2026"));
   });
 });
@@ -178,21 +178,29 @@ describe("card start check", () => {
     ok(start.includes("continue to step 4 without a prompt"));
   });
 
-  it("stops only for a stop and changes the card only with sign-off", () => {
+  it("fixes its own findings and asks only about the card's purpose", () => {
     const start = read(".claude/commands/linear/start.md");
+    const brief = read(
+      ".claude/commands/linear/reference/card-start-review.md",
+    );
 
     ok(
       start.includes(
         "**Notes only** — post them as one comment on the card and continue",
       ),
     );
-    ok(start.includes("**Stops** — pause here, before any branch exists"));
     ok(
       start.includes(
-        "**Unattended mode:** post the notes as the one comment and end the run",
+        "**Stops** — fix them yourself before any branch exists, in both modes",
       ),
     );
-    ok(start.includes("reference/card-check.md#when-the-card-is-the-problem"));
+    ok(start.includes("lists each change"));
+    ok(
+      start.includes(
+        "Ask the user only when a fix would change what the card is for",
+      ),
+    );
+    ok(brief.includes("you report, the orchestrator acts"));
   });
 
   it("checks the card once, not again on resuming in a worktree", () => {

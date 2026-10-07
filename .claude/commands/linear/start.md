@@ -133,9 +133,9 @@ Skip this step when the current branch is already the card's branch, as when res
 
 4. **Notes only** — post them as one comment on the card and continue to step 4 without a prompt, in both modes. Write the comment following [Linear card language](reference/card-language.md): each note's card line, what the reviewer found and its proposed wording, with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`.
 
-5. **Stops** — pause here, before any branch exists, and show each stop: its kind, the card's line, the evidence and the proposed wording. Show the notes alongside them.
-   - **Interactive mode:** the user accepts, rewords or rejects each stop, and may act on any note. Apply accepted wording the way the [card check changes a card](reference/card-check.md#when-the-card-is-the-problem): only the wording the user gives or approves, recorded in a Linear comment saying what changed, why, and that the user signed off. A rejected stop leaves the card as it is. Post any notes the user didn't act on as the one comment, then continue to step 4
-   - **Unattended mode:** post the notes as the one comment and end the run, leaving the stops for the user. A card changes only with sign-off
+5. **Stops** — fix them yourself before any branch exists, in both modes. Each stop is a promise the builder would have to guess at, so reword the card until it can be built and judged: use the reviewer's proposed wording, or your own where it fits the card better. Save the card with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`, then post one comment following [Linear card language](reference/card-language.md) that lists each change — the card line, what the reviewer found and the new wording — followed by the notes. Continue to step 4.
+
+   Ask the user only when a fix would change what the card is for — its purpose or scope, not its wording. In unattended mode, post the comment with that question and end the run.
 
 ### 4. Load project context
 
@@ -480,7 +480,7 @@ happens first.
 - Issue not found in Linear → stop
 - `VISION.md` missing → stop, suggest `/vision`
 - Card start check raises only notes → post them as one card comment and continue, in both modes
-- Card start check raises a stop → interactive mode decides each stop with the user; unattended mode ends the run
+- Card start check raises a stop → reword the card, record the changes in one comment and continue, in both modes; ask only when a fix would change the card's purpose or scope
 - Uncommitted changes → stop, suggest `/commit`
 - On `main` with no issue branch → create branch in step 6
 - No commits ahead of `main` → stop
