@@ -33,7 +33,7 @@ You **report**. You do not run `git reset`, `rebase`, `commit`, or edit history 
 
 Read before judging — it holds the canonical tests you apply:
 
-1. `.claude/docs/concepts/atomicity.md` — the removal test, the revert test, the description test, and "size is irrelevant"
+1. `.claude/stride/docs/concepts/atomicity.md` — the removal test, the revert test, the description test, and "size is irrelevant"
 
 ---
 
