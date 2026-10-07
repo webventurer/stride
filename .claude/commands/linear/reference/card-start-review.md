@@ -29,7 +29,7 @@ You **report**. You do not edit the card, the code or the Vision. Write output o
 
 ---
 
-## The four kinds of finding
+## The five kinds of finding
 
 | Finding | Use it when | `evidence` must name |
 |:--------|:------------|:---------------------|
@@ -37,12 +37,47 @@ You **report**. You do not edit the card, the code or the Vision. Write output o
 | `contradictory` | Two promises cannot both hold, or the current repository already makes a promise impossible | Both lines, or the promise and the file and line that rules it out |
 | `missing` | The current repository plainly has an edge case on the card's path that the card does not mention | The file and line where the edge case lives, and the situation that triggers it |
 | `stale` | A promise or the Vision trace no longer fits, given what a finished sibling card shipped | The sibling, what it shipped, and why the promise no longer fits |
+| `mechanism` | A promise is met by making a particular edit or using a particular mechanism, whether or not the result it serves holds — "move the retry logic into its own file", "add a page from the template", "use a lock" | The promise, and why the edit landing would read as kept even if the result failed |
 
 Every finding proposes new wording for the card in `proposed` — a rewritten line that can be shown kept or broken, or the line to add or remove. The user decides; your wording is a starting point, not a decision.
 
 <mark>**A finding without evidence is not a finding.**</mark> "Could be clearer" is not uncheckable; "the history is reliable" is, because nothing in the finished work could show it false. When you cannot name the evidence, say nothing.
 
 Judge the card, not the plan. Whether you would build it differently, or whether the work is worth doing, is out of scope; only whether its promises can be checked and still hold.
+
+### When a line is a mechanism finding
+
+Ask one question of the line: **if the edit landed and the result did not hold, would this line still read as kept?** If yes, it is a `mechanism` finding. A card written as edits is satisfied by making the edits, whether or not the result holds — see [Specify the result, not the edit](https://github.com/webventurer/stride/blob/main/docs/conventions/specify-the-result-not-the-edit.md).
+
+These are not mechanism findings:
+
+- **A fact needed to do the work.** A filename, command or setting the card names while the promise itself is still a result
+- **A detail a constraint forces.** "Runs after the save so a failure cannot stop it" names a mechanism because the order is the promise
+- **A non-binding expected shape.** A layout the card labels as a head start, not a condition of being done
+- **A mechanical card.** A rename or a formatting sweep has no observable result; a card that states its scope instead is doing the right thing
+
+---
+
+## Give each finding a level
+
+The level says what `/linear:start` does with the finding:
+
+| Level | What happens |
+|:------|:-------------|
+| `stop` | Work does not start until the user decides |
+| `note` | Work starts. The finding is left on the card as a comment, and the card's wording stays as it is |
+
+Ask one question: **if work started on the card as written, would the builder have to guess what done means, or would the end check be unable to give a promise a verdict that means anything?** Yes is `stop`. No is `note`.
+
+| Finding | Level |
+|:--------|:------|
+| `uncheckable` | Always `stop` — the end check would return `unclear` on it, after the code is written |
+| `contradictory` | Always `stop` — the builder would have to choose which promise to break |
+| `stale` | `stop` when a promise no longer fits. `note` when only the Vision trace no longer fits, because `/linear:finish` judges the trace again before merge |
+| `missing` | `note`, unless how the edge case is handled decides whether a stated promise is kept — then `stop`, and name that promise in `evidence` |
+| `mechanism` | `note` when the card states elsewhere the result the edit serves — name that line in `evidence`. `stop` when the edit is the only statement of that result |
+
+<mark>**A note never stops the run.** When you cannot name the promise a finding puts at risk, it is a note.</mark>
 
 ---
 
@@ -51,14 +86,15 @@ Judge the card, not the plan. Whether you would build it differently, or whether
 Write one JSON object per line (JSONL) to the output path the orchestrator gives you — one line per finding, in the order the card makes the promises:
 
 ```jsonl
-{"finding": "uncheckable | contradictory | missing | stale", "line": "<the card's words, or the gap>", "evidence": "<what the table above requires>", "proposed": "<new wording, or the line to add or remove>"}
+{"finding": "uncheckable | contradictory | missing | stale | mechanism", "level": "stop | note", "line": "<the card's words, or the gap>", "evidence": "<what the table above requires>", "proposed": "<new wording, or the line to add or remove>"}
 ```
 
 Rules for the file:
 
 - **Always write the file.** An empty file means the card has no findings and work starts without a prompt
 - **`evidence` and `proposed` are mandatory** on every line
-- The **chat reply is a receipt** — the file path and the count per kind (e.g. "2 findings: 1 uncheckable, 1 stale"). The findings live in the file, so the orchestrator collates from disk
+- **`level` follows the level table.**
+- The **chat reply is a receipt** — the file path and the count per level and kind (e.g. "3 findings: 1 stop (uncheckable), 2 notes (mechanism, missing)"). The findings live in the file, so the orchestrator collates from disk
 
 ---
 
@@ -68,6 +104,7 @@ Rules for the file:
 - Do not edit, stage or commit anything — you report, the user decides
 - Do not propose new scope; a `missing` finding names an edge case on the card's own path, never a feature
 - Do not raise a finding you cannot pin to evidence
+- Do not raise a `stop` you cannot tie to a promise the builder would have to guess at or the end check could not judge
 
 ---
 

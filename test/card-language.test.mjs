@@ -48,6 +48,7 @@ describe("Linear card language", () => {
       "plan-work.md",
       "quick.md",
       "setup.md",
+      "start.md",
     ]);
     for (const name of writers) {
       ok(read(name).includes("reference/card-language.md"), name);
