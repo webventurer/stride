@@ -97,6 +97,7 @@ describe("card check", () => {
 
     ok(!template.includes("Write tests first"));
     ok(template.includes('goes under "Live\ncheck" instead'));
+    ok(template.includes('belongs under "Live check" too'));
     ok(
       brief.includes('"Assumptions to confirm" and "Live check" give context'),
     );
@@ -123,7 +124,8 @@ describe("card check", () => {
         "after a fix, the next round starts again with a first reviewer",
       ),
     );
-    ok(check.includes("both reviewers find every promise **kept**"));
+    ok(check.includes("every reviewer that ran finds every promise **kept**"));
+    ok(check.includes("touches more than three files"));
     ok(brief.includes("### When you are asked to disprove a pass"));
     ok(brief.includes("look for the input or situation that would break it"));
     ok(
@@ -131,7 +133,7 @@ describe("card check", () => {
         "Never mark a promise kept because the other reviewer did",
       ),
     );
-    ok(convention.includes("no change passes on one reviewer's word"));
+    ok(convention.includes("no larger change passes on one reviewer's word"));
   });
 
   it("re-checks before merge when the branch content or the card changed", () => {
