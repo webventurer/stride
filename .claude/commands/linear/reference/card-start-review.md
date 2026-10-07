@@ -39,7 +39,7 @@ You **report**. You do not edit the card, the code or the Vision. Write output o
 | `stale` | A promise or the Vision trace no longer fits, given what a finished sibling card shipped | The sibling, what it shipped, and why the promise no longer fits |
 | `mechanism` | A promise is met by making a particular edit or using a particular mechanism, whether or not the result it serves holds — "move the retry logic into its own file", "add a page from the template", "use a lock" | The promise, and why the edit landing would read as kept even if the result failed |
 
-Every finding proposes new wording for the card in `proposed` — a rewritten line that can be shown kept or broken, or the line to add or remove. The user decides; your wording is a starting point, not a decision.
+Every finding proposes new wording for the card in `proposed` — a rewritten line that can be shown kept or broken, or the line to add or remove. The orchestrator applies it or rewords it; your wording is a starting point, not a decision.
 
 <mark>**A finding without evidence is not a finding.**</mark> "Could be clearer" is not uncheckable; "the history is reliable" is, because nothing in the finished work could show it false. When you cannot name the evidence, say nothing.
 
@@ -64,7 +64,7 @@ The level says what `/linear:start` does with the finding:
 
 | Level | What happens |
 |:------|:-------------|
-| `stop` | Work does not start until the user decides |
+| `stop` | The card is reworded before work starts, and each change is recorded in a comment on the card |
 | `note` | Work starts. The finding is left on the card as a comment, and the card's wording stays as it is |
 
 Ask one question: **if work started on the card as written, would the builder have to guess what done means, or would the end check be unable to give a promise a verdict that means anything?** Yes is `stop`. No is `note`.
@@ -101,7 +101,7 @@ Rules for the file:
 ## What you must not do
 
 - Do not read or ask for the planning conversation — judge the card, the Vision and the repository alone
-- Do not edit, stage or commit anything — you report, the user decides
+- Do not edit, stage or commit anything — you report, the orchestrator acts
 - Do not propose new scope; a `missing` finding names an edge case on the card's own path, never a feature
 - Do not raise a finding you cannot pin to evidence
 - Do not raise a `stop` you cannot tie to a promise the builder would have to guess at or the end check could not judge

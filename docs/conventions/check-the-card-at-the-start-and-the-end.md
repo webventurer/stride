@@ -31,7 +31,7 @@ The tempting repair is the dangerous one. When code and card disagree, rewriting
 - **Who checks.** A fresh reviewer that reads the card, `VISION.md`, the current code and, for a card in an epic, what its finished sibling cards shipped — never the conversation that planned it
 - **What it reports.** Only problems, each naming the card's line and proposing new wording
 
-| Finding | Meaning | Stops the run when |
+| Finding | Meaning | A stop when |
 |:--------|:--------|:-------------------|
 | **Uncheckable** | A promise has no observable result — "works well", "is robust" | Always |
 | **Contradictory** | Two promises cannot both hold, or the current code already makes one impossible | Always |
@@ -39,11 +39,11 @@ The tempting repair is the dangerous one. When code and card disagree, rewriting
 | **Stale** | A promise or its Vision trace no longer fits, given what a sibling card shipped | A promise no longer fits. A Vision trace alone is a note, because `/linear:finish` checks the trace again |
 | **Mechanism** | A promise is met by making an edit, whether or not the result it serves holds — "move the retry logic into its own file" | The edit is the card's only statement of that result. A card created before 6 October 2026, when card language began asking for behaviour, gets a note |
 
-Each finding is a **stop** or a **note**. A stop is a promise the builder would have to guess at, or that the end check couldn't judge; anything that doesn't stop the run is a note.
+Each finding is a **stop** or a **note**. A stop is a promise the builder would have to guess at, or that the end check couldn't judge; anything else is a note. The check is the agent reviewing its own card, so the agent fixes what it finds and carries on.
 
 - **No findings:** work starts without a prompt
 - **Notes only:** they're posted as one comment on the card and work starts, in both modes
-- **Any stop:** the run pauses before a branch exists. In interactive mode the user accepts, rewords or rejects each stop and the run continues; in unattended mode the run ends and leaves them for the user, because a card changes only with sign-off. Notes are shown alongside, and any not acted on go into the one comment
+- **Any stop:** before a branch exists, the agent rewords the card so each promise can be built and judged, posts one comment listing every change and the notes, and work starts, in both modes. It asks the user only when a fix would change what the card is for — its purpose or scope, not its wording
 
 The start check feeds the end check. Every promise that survives it can be shown kept or broken, so the verdicts at the end mean something: a kept promise was really tested, and a broken one has a real scenario.
 
@@ -65,8 +65,8 @@ A change merges only when both reviewers find every promise kept. Fixes and re-c
 
 ### Never quietly rewrite the card
 
-- The agent never edits a card to make a finding or a verdict go away
-- When the card itself looks wrong, the run stops and shows the promise and its verdict. The user decides whether to fix the code or change the card, in interactive and unattended mode alike
+- The agent never edits a card to make a verdict go away. At the start, before any code exists, it rewords weak promises in the open, recorded in a comment on the card; a reworded promise then cannot hide a broken one, because nothing has been built against it yet
+- When the card looks wrong at the end, the run stops and shows the promise and its verdict. The user decides whether to fix the code or change the card, in interactive and unattended mode alike
 - A changed card gets a comment on the card saying what changed, why, and that the user signed off. The check then runs again against the new wording
 
 ## Example
@@ -120,7 +120,7 @@ Vision trace: verified
 
 - `/linear:quick` work, which has no card until after it merges
 - Discovery spikes whose purpose is to learn what the result should be — there is nothing to keep yet
-- As a substitute for writing a good card. The start check flags weak promises and proposes wording; deciding what the card should promise stays with the user
+- As a substitute for writing a good card. The start check fixes weak wording; deciding what the card is for stays with the user
 
 ## Related conventions
 
