@@ -53,6 +53,10 @@ Proof is what the branch itself contains. For code, that is a test that would fa
 
 Judge the card as written. A promise the change keeps in spirit but not in letter is `broken` or `unclear`, never `kept` — deciding what the card should have said is the user's call, not yours.
 
+### When you are asked to disprove a pass
+
+Your prompt may say that another reviewer found every promise kept. Then your job is to disprove that. For each promise, look for the input or situation that would break it, and check whether the branch handles it. Never mark a promise kept because the other reviewer did.
+
 ---
 
 ## Procedure

@@ -86,6 +86,37 @@ describe("card check", () => {
     ok(check.includes("Stop after three rounds"));
   });
 
+  it("confirms a pass with a second reviewer told to disprove it", () => {
+    const check = read(".claude/commands/linear/reference/card-check.md");
+    const brief = read(
+      ".claude/commands/linear/reference/card-check-review.md",
+    );
+    const convention = read(
+      "docs/conventions/check-the-card-at-the-start-and-the-end.md",
+    );
+
+    ok(
+      check.includes(
+        "Another reviewer found every promise on this card kept — try to disprove that",
+      ),
+    );
+    ok(check.includes("without the first reviewer's verdicts"));
+    ok(
+      check.includes(
+        "after a fix, the next round starts again with a first reviewer",
+      ),
+    );
+    ok(check.includes("both reviewers find every promise **kept**"));
+    ok(brief.includes("### When you are asked to disprove a pass"));
+    ok(brief.includes("look for the input or situation that would break it"));
+    ok(
+      brief.includes(
+        "Never mark a promise kept because the other reviewer did",
+      ),
+    );
+    ok(convention.includes("no change passes on one reviewer's word"));
+  });
+
   it("re-checks before merge when the branch content or the card changed", () => {
     const check = read(".claude/commands/linear/reference/card-check.md");
 
