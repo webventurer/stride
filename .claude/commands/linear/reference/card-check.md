@@ -14,7 +14,7 @@ Commit all work on the branch with `/commit` first, then note the tree the revie
 
 Spawn a fresh sub-agent with the Task tool (`general-purpose`, model `opus`). Give it **only** the card and an output path — never your reasoning, the plan checklist or this conversation:
 
-> Read `.claude/commands/linear/reference/card-check-review.md` and follow it. Review this branch's change against `main`. The card is: `<identifier> — <title>`, described as: `<issue description>`. Write your verdicts as JSONL to `<output-path>`.
+> Read `.claude/commands/linear/reference/card-check-review.md` and follow it. Review this branch's change since it left `main`. The card is: `<identifier> — <title>`, described as: `<issue description>`. Write your verdicts as JSONL to `<output-path>`.
 
 Do not paste the diff. The reviewer runs `git diff` itself; its blindness to why the change looks the way it does is the point.
 

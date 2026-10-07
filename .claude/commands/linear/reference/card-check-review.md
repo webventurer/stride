@@ -60,11 +60,11 @@ Judge the card as written. A promise the change keeps in spirit but not in lette
 1. **Read the change.**
 
    ```bash
-   git diff main
+   git diff $(git merge-base main HEAD)
    git status --porcelain
    ```
 
-   `git diff main` covers committed and uncommitted work on the branch. It does **not** show untracked files — read every `??` path from `git status --porcelain` in full. Read any unchanged file the change depends on when a verdict turns on it.
+   Diffing from the point the branch left `main` covers committed and uncommitted work on the branch, and nothing `main` gained afterwards — so a commit that lands on `main` mid-branch never reads as this branch removing it. It does **not** show untracked files — read every `??` path from `git status --porcelain` in full. Read any unchanged file the change depends on when a verdict turns on it.
 
 2. **Read the card** you were given and list its promises.
 3. **Give each promise a verdict** with its evidence.
