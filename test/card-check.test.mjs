@@ -86,6 +86,23 @@ describe("card check", () => {
     ok(check.includes("Stop after three rounds"));
   });
 
+  it("judges only what the finished change can show", () => {
+    const template = read(
+      ".claude/commands/linear/reference/templates/story.md",
+    );
+    const brief = read(
+      ".claude/commands/linear/reference/card-check-review.md",
+    );
+    const start = read(".claude/commands/linear/start.md");
+
+    ok(!template.includes("Write tests first"));
+    ok(template.includes('goes under "Live\ncheck" instead'));
+    ok(
+      brief.includes('"Assumptions to confirm" and "Live check" give context'),
+    );
+    ok(start.includes("Write the failing tests first"));
+  });
+
   it("confirms a pass with a second reviewer told to disprove it", () => {
     const check = read(".claude/commands/linear/reference/card-check.md");
     const brief = read(

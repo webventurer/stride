@@ -140,8 +140,10 @@ when applicable.
 
 ### How to test it
 (Optional — omit for docs, config, or exploratory work)
-Write tests first. What to test: expected behaviour, edge cases,
-error conditions.
+What the finished change must show: the tests that prove the
+expected behaviour, edge cases and error conditions. A run done by
+hand, such as a live test on a throwaway card, goes under "Live
+check" instead; its result is posted on the card as a comment.
 
 ### Assumptions to confirm
 - Bullet list of ambiguities that need resolving
