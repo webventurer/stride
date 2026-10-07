@@ -119,6 +119,8 @@ If the issue has no "Why this matters" section, decide whether it qualifies for 
 
 The card check in step 11 can only be as good as the promises it checks. Before a branch exists or any code is written, a fresh reviewer reads the card the way that check will, and reports any promise that cannot be checked, contradicts something, misses an edge case the code plainly has, or no longer fits what earlier cards shipped.
 
+Skip this step when the current branch is already the card's branch, as when resuming inside a worktree: the run that created the branch checked the card first.
+
 1. **Spawn the reviewer.** Use the Task tool (`general-purpose`, model `opus`). Give it **only** the card, its parent epic when step 1 surfaced one, and an output path — never the planning conversation:
 
    > Read `.claude/commands/linear/reference/card-start-review.md` and follow it. The card is: `<identifier> — <title>`, described as: `<issue description>`. Its parent epic is `<epic-identifier>`, UUID `<epic-UUID>`. Write your findings as JSONL to `<output-path>`.

@@ -164,6 +164,16 @@ describe("card start check", () => {
     ok(start.includes("reference/card-check.md#when-the-card-is-the-problem"));
   });
 
+  it("checks the card once, not again on resuming in a worktree", () => {
+    const start = read(".claude/commands/linear/start.md");
+
+    ok(
+      start.includes(
+        "Skip this step when the current branch is already the card's branch",
+      ),
+    );
+  });
+
   it("treats an older card's mechanism stop as a note", () => {
     const start = read(".claude/commands/linear/start.md");
 

@@ -137,7 +137,7 @@ The second, flag-less `/linear:start` is the real work; the first invocation is 
 
 ### Resuming in the worktree
 
-When the user runs `/linear:start <issue-id>` (no flag) from the worktree's terminal, step 6's branch resolution finds it already on the correct branch and skips to step 7 — the flow continues from the Vision check onward exactly as an inline run would.
+When the user runs `/linear:start <issue-id>` (no flag) from the worktree's terminal, step 6's branch resolution finds it already on the correct branch and skips to step 7 — the flow continues from the Vision check onward exactly as an inline run would, except that the card check is skipped because the first run already made it.
 
 ---
 
