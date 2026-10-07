@@ -170,3 +170,14 @@ describe("card start check", () => {
     ok(brief.includes("`evidence` and `proposed` are mandatory"));
   });
 });
+
+describe("reviewer diff base", () => {
+  it("reads only what the branch changed since it left main", () => {
+    for (const brief of ["card-check-review.md", "simplify-review.md"]) {
+      const text = read(`.claude/commands/linear/reference/${brief}`);
+
+      ok(text.includes("git diff $(git merge-base main HEAD)"), brief);
+      ok(!text.includes("git diff main\n"), brief);
+    }
+  });
+});

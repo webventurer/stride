@@ -273,7 +273,7 @@ It runs before the commit and PR so accepted deletions reach the final review.
 
 1. **Spawn the reviewer.** Use the Task tool (`general-purpose`, model `opus` — the judgement is the whole value). Give it **only** the issue and an output path — never your reasoning, never this conversation:
 
-   > Read `.claude/commands/linear/reference/simplify-review.md` and follow it. Review this branch's change against `main`. The issue it must still satisfy is: `<identifier> — <title>`, described as: `<issue description>`. Write your proposals as JSONL to `<output-path>`.
+   > Read `.claude/commands/linear/reference/simplify-review.md` and follow it. Review this branch's change since it left `main`. The issue it must still satisfy is: `<identifier> — <title>`, described as: `<issue description>`. Write your proposals as JSONL to `<output-path>`.
 
    Do not paste the diff, your rationale, or the transcript. The reviewer runs `git diff` itself. Its blindness to why each piece felt necessary is the point.
 

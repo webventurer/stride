@@ -77,11 +77,11 @@ Propose removals only for what this change adds or modifies. Pre-existing code y
 1. **Read the change.**
 
    ```bash
-   git diff main
+   git diff $(git merge-base main HEAD)
    git status --porcelain
    ```
 
-   `git diff main` covers committed and uncommitted work on the branch. It does **not** show untracked files — read every `??` path from `git status --porcelain` in full.
+   Diffing from the point the branch left `main` covers committed and uncommitted work on the branch, and nothing `main` gained afterwards — so a commit that lands on `main` mid-branch never reads as this branch removing it. It does **not** show untracked files — read every `??` path from `git status --porcelain` in full.
 
 2. **Read the issue** you were given. It defines what the change must still do after your removals.
 3. **Walk each added piece** against the shapes above.
