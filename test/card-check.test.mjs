@@ -97,6 +97,7 @@ describe("card check", () => {
 
     ok(!template.includes("Write tests first"));
     ok(template.includes('goes under "Live\ncheck" instead'));
+    ok(template.includes('belongs under "Live check" too'));
     ok(
       brief.includes('"Assumptions to confirm" and "Live check" give context'),
     );

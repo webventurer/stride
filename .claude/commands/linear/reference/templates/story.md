@@ -143,7 +143,9 @@ when applicable.
 What the finished change must show: the tests that prove the
 expected behaviour, edge cases and error conditions. A run done by
 hand, such as a live test on a throwaway card, goes under "Live
-check" instead; its result is posted on the card as a comment.
+check" instead; its result is posted on the card as a comment. A
+claim only that run can prove, such as matching the real board,
+belongs under "Live check" too, not in What we'll do.
 
 ### Assumptions to confirm
 - Bullet list of ambiguities that need resolving
