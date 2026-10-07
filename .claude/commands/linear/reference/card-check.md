@@ -30,17 +30,17 @@ Read the verdicts from the JSONL file, not the sub-agent's chat reply.
 | **Unclear** | Stop and ask the user (see [When the card is the problem](#when-the-card-is-the-problem)) |
 | **Empty file** | The card makes no checkable promise. Stop and tell the user; never pass it silently |
 
-When a round finds every promise kept, a second fresh sub-agent tries to disprove it, because one reviewer's "kept" is a single opinion. Spawn it the same way, without the first reviewer's verdicts:
+When a round finds every promise kept on a change that touches more than three files (`git diff --name-only $(git merge-base main HEAD) | wc -l`), a second fresh sub-agent tries to disprove it, because on a larger change one reviewer's "kept" is a single opinion. A smaller change passes on the first reviewer. Spawn the second the same way, without the first reviewer's verdicts:
 
 > Read `.claude/commands/linear/reference/card-check-review.md` and follow it. Another reviewer found every promise on this card kept — try to disprove that. Review this branch's change since it left `main`. The card is: `<identifier> — <title>`, described as: `<issue description>`. Write your verdicts as JSONL to `<output-path>`.
 
-Act on its verdicts with the table above. A round is the first reviewer, plus the second when the first finds every promise kept; after a fix, the next round starts again with a first reviewer.
+Act on its verdicts with the table above. A round is the first reviewer, plus the second when it runs; after a fix, the next round starts again with a first reviewer.
 
 Fix every kept-unproven and broken verdict in one round, re-run the command's validation (build and tests), then run the reviewer again from step 1. **Stop after three rounds** that still leave a kept-unproven or broken verdict: show the verdicts and what was tried, and leave the decision to the user.
 
 In `/linear:finish`, also push each round's committed fix before running the reviewer again, so the pull request holds what will merge.
 
-The check passes when both reviewers find every promise **kept**.
+The check passes when every reviewer that ran finds every promise **kept**.
 
 ## When the card is the problem
 
