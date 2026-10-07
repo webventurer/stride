@@ -230,7 +230,7 @@ details.
 - Follow architecture decisions
 - Keep scope tightly limited to the issue
 - Avoid unrelated refactors
-- Add or update tests where appropriate
+- Write the failing tests first, then the code that makes them pass
 
 Keep the Vision outcome from step 2 in mind throughout. When choosing between approaches of roughly equal value, prefer the one that more directly serves the named outcome.
 

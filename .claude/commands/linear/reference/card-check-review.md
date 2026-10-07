@@ -34,7 +34,7 @@ A promise is anything the card says must be true when the work is done. Read the
 
 Split a bullet that makes two claims into two promises. Quote each promise in the card's own words, shortened only where it is long.
 
-"Why this matters", "Where things stand" and "Assumptions to confirm" give context; they make no promise of their own.
+"Why this matters", "Where things stand", "Assumptions to confirm" and "Live check" give context; they make no promise of their own.
 
 ---
 
