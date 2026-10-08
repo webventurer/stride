@@ -56,6 +56,7 @@ The pull request body carries the latest verdicts, one row per promise, so a rea
 
 Checked tree: `<the tree once the check's fixes are committed>`
 Checked card: `<card fingerprint>`
+Check cost: start <s> s, <n> stops, <n> notes · end <s> s (slowest of three), <n> findings: <n> fixed, <n> not acted on
 
 | Promise | Verdict | Evidence |
 |:--------|:--------|:---------|
@@ -65,6 +66,8 @@ Checked card: `<card fingerprint>`
 ```
 
 The tree hash names the exact content that was checked and fixed. Squashing or rewording commits keeps it; any change to the content gives a new one. Note the tree straight after committing the check's fixes, never when the record is written: a change made in between must not inherit a pass it never had.
+
+The check cost line records what both checks took and what they found, so after a run of real cards the numbers show whether each check is worth its time. Take each time from the reviewer's completion notice; for the end check, the slowest of the three. A finding is counted once, even when several reviewers raised it. `/linear:finish` replaces the end part when it runs the check again.
 
 The card fingerprint names the exact wording the change was checked against, so a promise added or reworded after the check is checked too. Compute it from the card's title and description:
 
