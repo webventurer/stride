@@ -41,6 +41,13 @@ Check for a `.stride.json` file in the repository root.
 
   Then check the repo's `.gitignore` — if `.stride.json` isn't listed, append it. The `focus` field sets the default output abstraction — `"outcome"` is the default; see [reference/output-focus.md](reference/output-focus.md) for the accepted values. The `unattended` field defaults to `false`; see [reference/unattended.md](reference/unattended.md).
 
+  Then set the chosen project's board to Manual ordering, so stride's `sortOrder` pins show from the first card (the call is idempotent):
+
+  ```bash
+  uv run .claude/tools/linear_cli.py project get "<chosen-project-name>"
+  uv run .claude/tools/linear_cli.py set-project-view-manual <project-id>
+  ```
+
 Use the resolved project name for all Linear API calls in this command.
 
 ### 1. Vision check
