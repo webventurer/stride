@@ -58,7 +58,7 @@ Check for a `.stride.json` file in the repository root.
 
   Offer two choices:
 
-  1. **Pick an existing project** — choose from the list. Save the selection to `.stride.json`.
+  1. **Pick an existing project** — choose from the list. Save the selection to `.stride.json`, then set its board to Manual ordering with `set-project-view-manual <project-id>` (idempotent), so stride's `sortOrder` pins show from the first card.
   2. **Create a new project** — follow [Create a Linear project](reference/create-project.md).
 
   Once `.stride.json` exists, check the repo's `.gitignore` — if `.stride.json` isn't listed, append it. Then route: path 1 continues to step 3 (fetch the existing project's `content`), path 2 continues to step 6 (confirm — the create-new flow already wrote `content`, so the fetch / diff / write steps are no-ops).

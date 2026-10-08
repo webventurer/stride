@@ -80,6 +80,13 @@ First, check `$ARGUMENTS` for the `--project <name>` flag.
     uv run .claude/tools/linear_cli.py project list
     ```
 
+    Then set the chosen project's board to Manual ordering, so stride's `sortOrder` pins show from the first card (the call is idempotent):
+
+    ```bash
+    uv run .claude/tools/linear_cli.py project get "<chosen-project-name>"
+    uv run .claude/tools/linear_cli.py set-project-view-manual <project-id>
+    ```
+
 **Resolve the project name** (both modes). `linear_cli.py issue create --project "<name>"` resolves the name internally on `uv run .claude/tools/linear_cli.py issue create --project "<name>"` — no UUID lookup needed. Run `uv run .claude/tools/linear_cli.py project get "<name>"` once to confirm the name resolves and capture the project UUID for any later `linear_cli.py` calls (`list-milestones`, `min-backlog-sort-order`, `create-milestone` all take it).
 
 - **Zero matches**: stop and tell the user the name doesn't resolve. Ask them to verify the spelling. Do not proceed to drafting on a typo.
