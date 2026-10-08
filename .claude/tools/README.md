@@ -67,7 +67,7 @@ Every command outputs JSON. Slash commands parse JSON; ad-hoc terminal use pipes
 
 **Teams**: `team list` · `team state -t <team>`
 
-**Projects**: `project list` · `project create -t <team> --name <name> [--description <subtitle>] [--content <body>]` · `project get <name-or-id>` (accepts either) · `project update <id> --description "..."`
+**Projects**: `project list` · `project create -t <team> --name <name> [--description <subtitle>] [--content <body>]` (board starts on Manual ordering) · `project get <name-or-id>` (accepts either) · `project update <id> --description "..."`
 
 **Labels**: `label list`
 

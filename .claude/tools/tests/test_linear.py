@@ -1412,6 +1412,7 @@ def test_project_create_expands_at_file_content(tmp_path: Path):
         patch("linear_cli.get_team", return_value={"id": "t1"}),
         patch("linear_cli.create_project", return_value="p1") as mock,
         patch("linear_cli.get_project", return_value={"id": "p1"}),
+        patch("linear_cli.set_project_view_manual", return_value=True),
     ):
         result = CliRunner().invoke(
             linear_cli.cli,
@@ -1429,6 +1430,23 @@ def test_project_create_expands_at_file_content(tmp_path: Path):
 
     assert result.exit_code == 0, result.output
     assert mock.call_args.kwargs["content"] == "# Vision: stride"
+
+
+def test_project_create_starts_board_on_manual_ordering():
+    with (
+        patch("linear_cli.bearer_token", return_value="lin_test"),
+        patch("linear_cli.get_team", return_value={"id": "t1"}),
+        patch("linear_cli.create_project", return_value="p1"),
+        patch("linear_cli.get_project", return_value={"id": "p1"}),
+        patch("linear_cli.set_project_view_manual", return_value=True) as mock,
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli,
+            ["project", "create", "-t", "WB", "--name", "X"],
+        )
+
+    assert result.exit_code == 0, result.output
+    mock.assert_called_once_with("p1")
 
 
 def test_migrate_legacy_config_emits_migrated_config_as_json():

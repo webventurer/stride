@@ -80,7 +80,7 @@ Applies to either path. These *team* board-view toggles aren't on the team API (
 
 Surface this as a closing note; setup can't do it for them.
 
-*Project* board ordering is a separate, settable concern: Manual ordering on a project's board (so a pinned epic shows on top) is set automatically on the epic path via `set-project-view-manual` — see [reference/epic-flow.md](reference/epic-flow.md). That's project-scoped, not a team toggle.
+*Project* board ordering is a separate, settable concern: every project stride creates starts on Manual ordering (`project create` sets it), and the epic path sets it again via `set-project-view-manual` for projects created elsewhere — see [reference/epic-flow.md](reference/epic-flow.md). That's project-scoped, not a team toggle.
 
 ### 7. Pin the repo to a Linear project
 

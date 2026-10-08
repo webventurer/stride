@@ -135,9 +135,9 @@ say nothing: a complete config is the common path and earns no prompt.
 
 Linear only honours a manually pinned `sortOrder` — like an epic placed at the top of its project — when the board view is sorted by **Manual**. Under Created / Priority / Updated ordering the pin is ignored and the epic won't visibly move, even though the API write succeeded.
 
-stride already sets Manual ordering on a *project's* board when it pins an epic there — automatically, via `set-project-view-manual` on the epic path (see [reference/epic-flow.md](reference/epic-flow.md)). What stays a manual UI step is the **team / work board view** you sequence day-to-day work in: Linear's API neither sets nor reports that view's sort mode, so `check` can't verify it and reminds instead:
+stride sets Manual ordering on a *project's* board automatically — when `project create` makes the project, and again via `set-project-view-manual` when it pins an epic there (see [reference/epic-flow.md](reference/epic-flow.md)). What stays a manual UI step is the **team / work board view** you sequence day-to-day work in: Linear's API neither sets nor reports that view's sort mode, so `check` can't verify it and reminds instead:
 
-> *"Can't read board sort order — if you sequence work by hand on a board view, confirm it's set to Manual, or stride's ordering looks scrambled. (Project boards pinned via the epic path are already Manual.)"*
+> *"Can't read board sort order — if you sequence work by hand on a board view, confirm it's set to Manual, or stride's ordering looks scrambled. (Project boards stride creates or pins an epic on are already Manual.)"*
 
 A health-check reminder, not a failure — it always prints, since the mode is unreadable.
 
