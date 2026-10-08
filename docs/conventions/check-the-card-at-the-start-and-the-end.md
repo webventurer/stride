@@ -50,7 +50,7 @@ The start check feeds the end check. Every promise that survives it can be shown
 ### At the end
 
 - **When it runs.** `/linear:start` runs the check after validation and the simplification review, before it opens the pull request. `/linear:finish` runs it again before merging whenever the branch's content or the card's wording has changed since the last passing check, so a fix pushed or a promise reworded after the check is checked too
-- **Who checks.** A fresh reviewer that sees only the card and the change — never the author's reasoning, the plan or the conversation.
+- **Who checks.** Three fresh reviewers at once, each seeing only the card and the change — never the author's reasoning, the plan or the conversation. Each promise takes the worst verdict any of them gives.
 - **What it returns.** Every promise on the card — each expected outcome, edge case, constraint and test scenario — with one verdict
 - **Where the result lives.** The pull request carries the verdict table, one row per promise, with fingerprints of the exact content and card wording that were checked
 
@@ -61,7 +61,7 @@ The start check feeds the end check. Every promise that survives it can be shown
 | **Broken** | A concrete scenario shows the change does not do it | The author fixes the code |
 | **Unclear** | The card's wording cannot be checked, or contradicts itself | Stop and ask the user |
 
-The check runs once. Fixes run without asking, in unattended mode too, and the pull request records each one next to its verdict, so the user's review is the second look at a fix. A card that makes no checkable promise stops the run rather than passing silently.
+The check runs once. The author checks each finding against the branch and fixes the ones that hold, without asking, in unattended mode too. The pull request records each fix, and each finding that did not hold with the reason, so the user's review is the second look. A card that makes no checkable promise stops the run rather than passing silently.
 
 ### Never quietly rewrite the card
 

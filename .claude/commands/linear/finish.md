@@ -256,7 +256,7 @@ user; unattended mode treats its machine-local setting as authority to write it.
 
 <mark>**This step runs last before the merge**</mark>, after every step that can change the branch, so the check covers exactly what merges.
 
-Follow [card check](reference/card-check.md), starting from [Before merge: is the record current?](reference/card-check.md#before-merge-is-the-record-current). When the pull request's recorded check matches the branch's current content and the card's current wording, and every verdict is Kept or Fixed, continue to step 8. Otherwise run the check once, fix what it finds, re-run validation (step 4) and record the new verdicts in the pull request before merging.
+Follow [card check](reference/card-check.md), starting from [Before merge: is the record current?](reference/card-check.md#before-merge-is-the-record-current). When the pull request's recorded check matches the branch's current content and the card's current wording, and every verdict is Kept, Fixed or Not acted on, continue to step 8. Otherwise run the check once, fix what it finds, re-run validation (step 4) and record the new verdicts in the pull request before merging.
 
 ### 8. Merge (preserve commits)
 
