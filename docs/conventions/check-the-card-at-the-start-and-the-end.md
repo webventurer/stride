@@ -2,6 +2,22 @@
 
 > The card is the agreement. Check it is a good one before the work starts, and check the work keeps it before it merges.
 
+## In plain terms
+
+Think of it like homework. The agent puts it this way:
+
+- The card is the homework question. It says what the work has to do.
+- The start check happens before any work. A helper reads the question and makes sure it's clear enough to answer. If a bit is vague, the question gets reworded first.
+- The end check happens after the work is done. Three markers read the answer and say where it misses what the question asked.
+- Then I go through what the markers said. If a marker is right, I fix the work. If I think a marker is wrong, I write "Not acted on" next to it, with my reason.
+
+**The catch: at that last step the agent marks its own homework.** It decides which of the markers' comments to set aside.
+
+- When you review the pull request yourself, you see every "Not acted on" note before the work goes in, and you can stop it.
+- In unattended mode the work goes in as soon as the tests pass. Both checks still run, but nobody reads the notes the agent set aside until afterwards. Glance at the "Not acted on" rows once a card has merged, and see whether you agree.
+
+Each pull request also records what both checks cost and found. After about ten cards, those numbers show whether each check earns its time, and whether the agent's "Not acted on" calls can be trusted.
+
 ## The check
 
 Before work starts on a card, and again before the change merges, ask:
