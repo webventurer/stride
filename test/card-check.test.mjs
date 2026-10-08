@@ -123,6 +123,18 @@ describe("card check", () => {
     );
   });
 
+  it("records what each check cost and found, so the checks can be judged on real cards", () => {
+    const check = read(".claude/commands/linear/reference/card-check.md");
+    const start = read(".claude/commands/linear/start.md");
+
+    ok(
+      check.includes(
+        "Check cost: start <s> s, <n> stops, <n> notes · end <s> s (slowest of three), <n> findings: <n> fixed, <n> not acted on",
+      ),
+    );
+    ok(start.includes("Note how long the reviewer took"));
+  });
+
   it("checks once and leaves a second look at fixes to the user", () => {
     const check = read(".claude/commands/linear/reference/card-check.md");
     const brief = read(
