@@ -22,7 +22,7 @@ You **report**. You do not edit the card, the code or the Vision. Write output o
 
 ## What you read
 
-- **The card** you were given — its title and whole description. The promises are the same ones the end check reads: each expected outcome, each scenario under "How to test it", each behaviour-changing rule or edge case under "What we'll do", each exclusion under "What we won't do", and each stated constraint
+- **The card** you were given — its title and whole description. Its promises are exactly the ones the end check reads: follow [Find the promises](card-check-review.md#find-the-promises) in the end check's brief, including what it says makes no promise
 - **`VISION.md`** — the criterion the card's "Why this matters" claims to serve
 - **The current repository** — the code, tests and documents the card's promises concern
 - **Finished sibling cards**, when you were given a parent epic. List its cards with `uv run .claude/tools/linear_cli.py list-by-parent <epic-UUID>`, using the UUID you were given, read each Done sibling with `uv run .claude/tools/linear_cli.py issue get <id>`, and see what it shipped with `git log main -i --grep=<id>`
