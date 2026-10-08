@@ -103,6 +103,26 @@ describe("card check", () => {
     ok(start.includes("Write the failing tests first"));
   });
 
+  it("runs three Sonnet reviewers with the same brief and keeps the worst verdict", () => {
+    const check = read(".claude/commands/linear/reference/card-check.md");
+
+    ok(check.includes("Spawn three fresh sub-agents at once"));
+    ok(check.includes("model `sonnet`"));
+    ok(check.includes("each with its own output path"));
+    ok(
+      check.includes(
+        "Each promise takes the worst verdict any reviewer gave it, in this order: `unclear`, `broken`, `kept-unproven`, `kept`",
+      ),
+    );
+    ok(check.includes("An unclear verdict or an empty file from any reviewer"));
+    ok(check.includes("| <the card's words> | Not acted on |"));
+    ok(
+      check.includes(
+        "Same tree, same card, every verdict Kept, Fixed or Not acted on",
+      ),
+    );
+  });
+
   it("checks once and leaves a second look at fixes to the user", () => {
     const check = read(".claude/commands/linear/reference/card-check.md");
     const brief = read(
@@ -110,7 +130,7 @@ describe("card check", () => {
     );
 
     ok(check.includes("The check runs once"));
-    ok(check.includes("do not run the reviewer again"));
+    ok(check.includes("do not run the reviewers again"));
     ok(check.includes("The pull request records each fix next to its verdict"));
     ok(!check.includes("try to disprove that"));
     ok(!brief.includes("disprove a pass"));

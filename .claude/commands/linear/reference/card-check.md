@@ -8,33 +8,35 @@ The card is the agreement about what the work will do. The simplification, atomi
 
 ---
 
-## 1. Run the reviewer
+## 1. Run the reviewers
 
-Commit all work on the branch with `/commit` first, so the reviewer reads exactly what will merge.
+Commit all work on the branch with `/commit` first, so the reviewers read exactly what will merge.
 
-Spawn a fresh sub-agent with the Task tool (`general-purpose`, model `opus`). Give it **only** the card and an output path — never your reasoning, the plan checklist or this conversation:
+Spawn three fresh sub-agents at once with the Task tool (`general-purpose`, model `sonnet`), each with its own output path. Give each **only** the card and its output path — never your reasoning, the plan checklist or this conversation:
 
 > Read `.claude/commands/linear/reference/card-check-review.md` and follow it. Review this branch's change since it left `main`. The card is: `<identifier> — <title>`, described as: `<issue description>`. Write your verdicts as JSONL to `<output-path>`.
 
-Do not paste the diff. The reviewer runs `git diff` itself; its blindness to why the change looks the way it does is the point.
+Do not paste the diff. The reviewers run `git diff` themselves; their blindness to why the change looks the way it does is the point.
 
-Read the verdicts from the JSONL file, not the sub-agent's chat reply.
+Read the verdicts from the three JSONL files, not the sub-agents' chat replies. Each promise takes the worst verdict any reviewer gave it, in this order: `unclear`, `broken`, `kept-unproven`, `kept`. A finding is any verdict other than `kept`.
 
 ## 2. Act on the verdicts
 
-The check runs once. Fix what it finds; do not run the reviewer again.
+The check runs once. Check each finding against the branch, fix the ones that hold, and do not run the reviewers again.
 
 | Verdict | What happens |
 |:--------|:-------------|
 | **Kept** | Nothing |
-| **Kept, unproven** | Add the proof the evidence names — a test, or the line that states the behaviour |
-| **Broken** | Fix the change so the scenario in the evidence works |
+| **Kept, unproven** | When the proof the evidence names is missing, add it — a test, or the line that states the behaviour. When the branch already has it, record the finding as Not acted on, naming that proof |
+| **Broken** | When the scenario in the evidence fails, fix the change so it works. When it doesn't fail, record the finding as Not acted on, with what you tried |
 | **Unclear** | Stop and ask the user (see [When the card is the problem](#when-the-card-is-the-problem)) |
 | **Empty file** | The card makes no checkable promise. Stop and tell the user; never pass it silently |
 
+An unclear verdict or an empty file from any reviewer stops for the user, whatever the other two found.
+
 After the fixes, re-run the command's validation (build and tests) and commit them with `/commit`. In `/linear:finish`, also push them, so the pull request holds what will merge. The pull request records each fix next to its verdict, so the user's review is where a second look at a fix happens.
 
-The check passes when every verdict is kept, or was kept-unproven or broken and has been fixed.
+The check passes when every promise is kept, fixed, or recorded as Not acted on with its reason.
 
 ## When the card is the problem
 
@@ -47,7 +49,7 @@ An unclear verdict, a promise the user would rather drop, or a broken verdict th
 
 ## 3. Record the result in the pull request
 
-The pull request body carries the latest verdicts, so a reader sees promise by promise what the change keeps, and `/linear:finish` can tell whether they still describe the branch:
+The pull request body carries the latest verdicts, one row per promise, so a reader sees promise by promise what the change keeps, and `/linear:finish` can tell whether they still describe the branch:
 
 ```markdown
 ## Card check
@@ -58,7 +60,8 @@ Checked card: `<card fingerprint>`
 | Promise | Verdict | Evidence |
 |:--------|:--------|:---------|
 | <the card's words> | Kept | <test or line> |
-| <the card's words> | Fixed (was broken) | <what the reviewer found, and the fix> |
+| <the card's words> | Fixed | <what the reviewer found, and the fix> |
+| <the card's words> | Not acted on | <what the reviewer found, and why it does not hold> |
 ```
 
 The tree hash names the exact content that was checked and fixed. Squashing or rewording commits keeps it; any change to the content gives a new one. Note the tree straight after committing the check's fixes, never when the record is written: a change made in between must not inherit a pass it never had.
@@ -78,5 +81,5 @@ Moving the card between board columns keeps it; any change to the title or descr
 
 `/linear:finish` merges only a branch whose current content has a passing check against the card's current wording. Read the pull request body and compare its `Checked tree:` value with `git rev-parse HEAD^{tree}`, and its `Checked card:` value with the card fingerprint computed now:
 
-- **Same tree, same card, every verdict Kept or Fixed** — the check is current. Continue to the merge
+- **Same tree, same card, every verdict Kept, Fixed or Not acted on** — the check is current. Continue to the merge
 - **Different tree, different card, no `## Card check` section, or any other verdict** — the content or the card changed since the check, or the change never passed it. Run the check once from step 1, then record the new result
