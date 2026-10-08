@@ -450,6 +450,7 @@ def project_create_cmd(
         description=description,
         content=read_text_arg(content),
     )
+    set_project_view_manual(project_id)
     echo_json(get_project(api, project_id))
 
 

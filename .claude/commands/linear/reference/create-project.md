@@ -23,7 +23,7 @@ When creating a new Linear project for a repo:
      --description "<tagline>"
    ```
 
-   Capture the project `id` and URL from the JSON response. If the create fails (for example the user lacks permission to create projects on the team), surface the error and stop — don't retry silently, and don't write `.stride.json` for a project that wasn't created.
+   The project's board starts on **Manual** ordering, so stride's `sortOrder` pins show from the first card. Capture the project `id` and URL from the JSON response. If the create fails (for example the user lacks permission to create projects on the team), surface the error and stop — don't retry silently, and don't write `.stride.json` for a project that wasn't created.
 4. If `VISION.md` exists at the repo root, seed it into the project `content`:
 
    ```bash
