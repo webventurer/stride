@@ -299,9 +299,9 @@ It runs before the commit and PR so accepted deletions reach the final review.
 
 ### 11. Card check
 
-Follow [card check](reference/card-check.md): a fresh reviewer compares the change with the card, promise by promise, and every kept-unproven or broken verdict is fixed before the pull request opens.
+Follow [card check](reference/card-check.md): a fresh reviewer compares the change with the card once, promise by promise, and every kept-unproven or broken verdict is fixed before the pull request opens.
 
-Keep the passing verdicts, and the tree they checked, for the pull request body in step 17.
+Keep the verdicts, the fixes, and the tree once the fixes are committed, for the pull request body in step 17.
 
 ### 12. Optional working-tree review
 
@@ -486,7 +486,7 @@ happens first.
 - No commits ahead of `main` → stop
 - Build fails → fix, re-validate, continue
 - Simplification reviewer proposes nothing → not an error, report and continue
-- Card check finds an unclear promise, nothing checkable, or still fails after three rounds → stop for the user, in both modes
+- Card check finds an unclear promise or nothing checkable → stop for the user, in both modes
 - PR already exists → not an error, show URL and continue
 - diffity missing or errors → skip the visual diff silently; the PR on GitHub is the diff surface, never a terminal `git diff`
 - Squash leaves the diff stat changed (file content drift) → abort the squash, restore via reflog, leave commits as-is

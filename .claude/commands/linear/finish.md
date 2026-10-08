@@ -256,7 +256,7 @@ user; unattended mode treats its machine-local setting as authority to write it.
 
 <mark>**This step runs last before the merge**</mark>, after every step that can change the branch, so the check covers exactly what merges.
 
-Follow [card check](reference/card-check.md), starting from [Before merge: is the record current?](reference/card-check.md#before-merge-is-the-record-current). When the pull request's recorded check matches the branch's current content and the card's current wording, and every verdict is Kept, continue to step 8. Otherwise run the check again, fix what it finds, re-run validation (step 4) and record the new verdicts in the pull request before merging.
+Follow [card check](reference/card-check.md), starting from [Before merge: is the record current?](reference/card-check.md#before-merge-is-the-record-current). When the pull request's recorded check matches the branch's current content and the card's current wording, and every verdict is Kept or Fixed, continue to step 8. Otherwise run the check once, fix what it finds, re-run validation (step 4) and record the new verdicts in the pull request before merging.
 
 ### 8. Merge (preserve commits)
 
@@ -434,7 +434,7 @@ Read the output focus and apply this command's format from [reference/output-foc
 - No open PR for the branch → stop; run `/linear:start` to push and open the PR
 - Uncommitted changes → stop, suggest `/commit`
 - Tests fail → stop, do not merge
-- Card check finds an unclear promise, nothing checkable, or still fails after three rounds → stop, do not merge
+- Card check finds an unclear promise or nothing checkable → stop, do not merge
 - Fixup commits present + user picks "abort" → exit cleanly, do not merge (autosquash + force-push manually, then re-run)
 - Fixup rebase conflicts → abort rebase, surface conflict, do not merge
 - Vision has no exact fit in interactive mode → exit cleanly, do not merge (re-run after committing the user-authored Vision update)

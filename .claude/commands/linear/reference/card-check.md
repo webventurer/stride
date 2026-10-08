@@ -10,7 +10,7 @@ The card is the agreement about what the work will do. The simplification, atomi
 
 ## 1. Run the reviewer
 
-Commit all work on the branch with `/commit` first, then note the tree the reviewer will read with `git rev-parse HEAD^{tree}`. A tree hash names only committed content, so this is what lets the record in step 3 say exactly what was checked.
+Commit all work on the branch with `/commit` first, so the reviewer reads exactly what will merge.
 
 Spawn a fresh sub-agent with the Task tool (`general-purpose`, model `opus`). Give it **only** the card and an output path — never your reasoning, the plan checklist or this conversation:
 
@@ -22,32 +22,26 @@ Read the verdicts from the JSONL file, not the sub-agent's chat reply.
 
 ## 2. Act on the verdicts
 
+The check runs once. Fix what it finds; do not run the reviewer again.
+
 | Verdict | What happens |
 |:--------|:-------------|
 | **Kept** | Nothing |
-| **Kept, unproven** | Add the proof the evidence names — a test, or the line that states the behaviour — then run the check again |
-| **Broken** | Fix the change so the scenario in the evidence works, then run the check again |
+| **Kept, unproven** | Add the proof the evidence names — a test, or the line that states the behaviour |
+| **Broken** | Fix the change so the scenario in the evidence works |
 | **Unclear** | Stop and ask the user (see [When the card is the problem](#when-the-card-is-the-problem)) |
 | **Empty file** | The card makes no checkable promise. Stop and tell the user; never pass it silently |
 
-When a round finds every promise kept on a change that touches more than three files (`git diff --name-only $(git merge-base main HEAD) | wc -l`), a second fresh sub-agent tries to disprove it, because on a larger change one reviewer's "kept" is a single opinion. A smaller change passes on the first reviewer. Spawn the second the same way, without the first reviewer's verdicts:
+After the fixes, re-run the command's validation (build and tests) and commit them with `/commit`. In `/linear:finish`, also push them, so the pull request holds what will merge. The pull request records each fix next to its verdict, so the user's review is where a second look at a fix happens.
 
-> Read `.claude/commands/linear/reference/card-check-review.md` and follow it. Another reviewer found every promise on this card kept — try to disprove that. Review this branch's change since it left `main`. The card is: `<identifier> — <title>`, described as: `<issue description>`. Write your verdicts as JSONL to `<output-path>`.
-
-Act on its verdicts with the table above. A round is the first reviewer, plus the second when it runs; after a fix, the next round starts again with a first reviewer.
-
-Fix every kept-unproven and broken verdict in one round, re-run the command's validation (build and tests), then run the reviewer again from step 1. **Stop after three rounds** that still leave a kept-unproven or broken verdict: show the verdicts and what was tried, and leave the decision to the user.
-
-In `/linear:finish`, also push each round's committed fix before running the reviewer again, so the pull request holds what will merge.
-
-The check passes when every reviewer that ran finds every promise **kept**.
+The check passes when every verdict is kept, or was kept-unproven or broken and has been fixed.
 
 ## When the card is the problem
 
 An unclear verdict, a promise the user would rather drop, or a broken verdict the user decides the code should not fix — each one means the card itself may be wrong. Stop in both modes and show the promise, its verdict and the evidence. The user decides:
 
 - **Fix the code** — continue from step 2 with the user's direction
-- **Change the card** — apply only wording the user gives or approves, with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`. Then record the change on the card with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`: which promise changed, from what to what, why, and that the user signed off. Write the comment following [Linear card language](card-language.md). Run the check again from step 1 against the new wording
+- **Change the card** — apply only wording the user gives or approves, with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`. Then record the change on the card with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`: which promise changed, from what to what, why, and that the user signed off. Write the comment following [Linear card language](card-language.md). Then run the check from step 1 against the new wording
 
 <mark>**A card change always stops for the user, in unattended mode too.**</mark> Unattended mode fixes code without asking; it never decides what the card should promise.
 
@@ -58,15 +52,16 @@ The pull request body carries the latest verdicts, so a reader sees promise by p
 ```markdown
 ## Card check
 
-Checked tree: `<the tree noted in step 1 of the passing round>`
+Checked tree: `<the tree once the check's fixes are committed>`
 Checked card: `<card fingerprint>`
 
 | Promise | Verdict | Evidence |
 |:--------|:--------|:---------|
 | <the card's words> | Kept | <test or line> |
+| <the card's words> | Fixed (was broken) | <what the reviewer found, and the fix> |
 ```
 
-The tree hash names the exact content that was checked. Squashing or rewording commits keeps it; any change to the content gives a new one. Record the tree from the passing round, never the tree when the record is written: a change made in between must not inherit a pass it never had.
+The tree hash names the exact content that was checked and fixed. Squashing or rewording commits keeps it; any change to the content gives a new one. Note the tree straight after committing the check's fixes, never when the record is written: a change made in between must not inherit a pass it never had.
 
 The card fingerprint names the exact wording the change was checked against, so a promise added or reworded after the check is checked too. Compute it from the card's title and description:
 
@@ -83,5 +78,5 @@ Moving the card between board columns keeps it; any change to the title or descr
 
 `/linear:finish` merges only a branch whose current content has a passing check against the card's current wording. Read the pull request body and compare its `Checked tree:` value with `git rev-parse HEAD^{tree}`, and its `Checked card:` value with the card fingerprint computed now:
 
-- **Same tree, same card, every verdict Kept** — the check is current. Continue to the merge
-- **Different tree, different card, no `## Card check` section, or any verdict not Kept** — the content or the card changed since the check, or the change never passed it. Run the check from step 1, then record the new result
+- **Same tree, same card, every verdict Kept or Fixed** — the check is current. Continue to the merge
+- **Different tree, different card, no `## Card check` section, or any other verdict** — the content or the card changed since the check, or the change never passed it. Run the check once from step 1, then record the new result
