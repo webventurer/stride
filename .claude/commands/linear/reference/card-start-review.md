@@ -33,7 +33,7 @@ You **report**. You do not edit the card, the code or the Vision. Write output o
 
 | Finding | Use it when | `evidence` must name |
 |:--------|:------------|:---------------------|
-| `uncheckable` | A promise has no observable result — "works well", "is robust", "is reliable" | Why no test or reading of the finished work could show it kept or broken |
+| `uncheckable` | A promise has no observable result — "works well", "is robust", "is reliable" — or only a run against a real service could show it, such as "the API accepts this filter", and it sits outside "Live check" | Why no test or reading of the finished work could show it kept or broken. For a claim only a real run can prove, `proposed` moves it under "Live check" |
 | `contradictory` | Two promises cannot both hold, or the current repository already makes a promise impossible | Both lines, or the promise and the file and line that rules it out |
 | `missing` | The current repository plainly has an edge case on the card's path that the card does not mention | The file and line where the edge case lives, and the situation that triggers it |
 | `stale` | A promise or the Vision trace no longer fits, given what a finished sibling card shipped | The sibling, what it shipped, and why the promise no longer fits |
