@@ -13,7 +13,7 @@
     "tidy": "pnpm fix && uvx ruff format .claude && uvx ruff check --fix .claude",
     "test": "pnpm test:node && pnpm test:py",
     "test:node": "node --test test/*.test.mjs",
-    "test:py": "uv run --with pytest --with click --with requests pytest .claude/tools/tests/"
+    "test:py": "uv run --with pytest --with click --with python-dotenv --with requests pytest .claude/tools/tests/"
   },
   "bin": {
     "stride": "./bin/install.mjs",
