@@ -80,7 +80,7 @@ Applies to either path. These *team* board-view toggles aren't on the team API (
 
 Surface this as a closing note; setup can't do it for them.
 
-*Project* board ordering is a separate, settable concern: every project stride creates starts on Manual ordering (`project create` sets it), and the epic path sets it again via `set-project-view-manual` for projects created elsewhere — see [reference/epic-flow.md](reference/epic-flow.md). That's project-scoped, not a team toggle.
+*Project* board ordering is a separate, settable concern: the pinned project's board is set to Manual ordering — by `project create` for a new project, and by step 7 for one the repo is already pinned to. The epic path sets it again via `set-project-view-manual`, in case the view was changed by hand — see [reference/epic-flow.md](reference/epic-flow.md). That's project-scoped, not a team toggle.
 
 ### 7. Pin the repo to a Linear project
 
@@ -106,7 +106,14 @@ Setup is the single place config defaults are *authored* — no delivery command
 
 Then check for `.stride.json` at the repo root:
 
-- **Present** → the repo is pinned (already, or just migrated), and its config defaults are materialised; skip silently. Re-running setup never re-creates a project.
+- **Present** → the repo is pinned (already, or just migrated), and its config defaults are materialised. Set the pinned project's board to Manual ordering, so stride's `sortOrder` pins show from the first card — resolve its id with `project get`, then:
+
+  ```bash
+  uv run .claude/tools/linear_cli.py project get "<project from .stride.json>"
+  uv run .claude/tools/linear_cli.py set-project-view-manual <project-id>
+  ```
+
+  The call is idempotent, so re-running setup is safe. Setup never re-creates a project.
 - **Missing** → the repo is genuinely unpinned. Ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.stride.json` (`project`, `api_key_env`, `focus`, and `unattended`), and updates `.gitignore`.
 
 ### 8. Summary
@@ -132,6 +139,6 @@ Then check for `.stride.json` at the repo root:
   Fix: drag "In Review" and "Waiting" before "Done" in Linear's board settings.
   ```
 
-- **project**: if a project was created, report its name and URL, and that `.stride.json` was pinned (and added to `.gitignore` when it wasn't already listed). If a legacy `.linear_project` was **migrated**, report the existing project it reused and that `.linear_project` was replaced by `.stride.json` — no new project created. If `.stride.json` was already present, say nothing — the repo was already pinned.
+- **project**: if a project was created, report its name and URL, and that `.stride.json` was pinned (and added to `.gitignore` when it wasn't already listed). If a legacy `.linear_project` was **migrated**, report the existing project it reused and that `.linear_project` was replaced by `.stride.json` — no new project created. If `.stride.json` was already present, report only that the project's board is set to Manual ordering.
 
 Re-running is always safe: an empty team converges to in-sync; a populated team is only ever reported on; an already-pinned (or legacy-pinned) repo skips project creation.
