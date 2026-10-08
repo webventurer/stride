@@ -25,9 +25,13 @@ N sub-issues, worked one at a time — interactive mode reviews and /finishes ea
 Starting with the first unfinished one: <SUB-X>. Say stop to bail out.
 ```
 
-**Manual-ordering reminder — once, here.** The disclosed order reflects `sortOrder`, but Linear only shows that order on the board when the view is set to **Manual**. If the board order doesn't match the disclosure, surface once:
+**Set Manual ordering — once, here.** The disclosed order reflects `sortOrder`, but Linear only shows that order on the board when the project's view is on **Manual** ordering. Set it on the epic's project, so the board matches the disclosure:
 
-> *"Linear only honours manual position when the board view is set to Manual ordering — `sortOrder` is ignored otherwise. Switch the view to Manual so the epic's position shows?"*
+```bash
+uv run .claude/tools/linear_cli.py set-project-view-manual <project-UUID>
+```
+
+The call is idempotent. If it fails (older API, missing key), fall back to a one-line reminder: *"Switch the project's board view to Manual ordering — `sortOrder` is ignored otherwise, so the board won't match this order until you do."*
 
 ## E2. Work the next unfinished sub-issue
 
