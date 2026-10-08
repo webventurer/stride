@@ -193,6 +193,15 @@ describe("card check", () => {
 });
 
 describe("card start check", () => {
+  it("reads promises from the same definition the end check uses", () => {
+    const start = read(
+      ".claude/commands/linear/reference/card-start-review.md",
+    );
+
+    ok(start.includes("card-check-review.md#find-the-promises"));
+    ok(!start.includes('each scenario under "How to test it"'));
+  });
+
   it("runs in /linear:start after the Vision check and before any branch or code", () => {
     const start = read(".claude/commands/linear/start.md");
 
