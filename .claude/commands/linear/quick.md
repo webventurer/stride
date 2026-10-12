@@ -59,13 +59,13 @@ Read `VISION.md` from the repo root. If missing, stop and suggest `/vision` (sam
 
 ### 2. Find the change
 
-Run `git status -sb` and `git log main..HEAD --oneline`. Two paths:
+Run `git status -sb` and `git log main..HEAD --oneline`. On `main`, first run the [clean start](reference/clean-start.md) check: uncommitted changes or unpushed commits that aren't the change you were asked to ship settle on `main` before the branch exists. Then two paths:
 
 - **Retrospective** (you made the change first): the working tree has uncommitted changes, or the current branch already has commits ahead of `main`. Use them. If the changes are uncommitted **on `main`**, create `quick/<slug>` and commit them with `/commit` first (never ship from `main`). If they're already on a feature branch, stay on it.
 - **Describe-then-build** (clean tree, description given): create the branch and implement in step 3.
 
 ```bash
-git checkout main && git checkout -b quick/<slug>
+git switch -c quick/<slug> origin/main
 ```
 
 Derive `<slug>` from the description, or from the diff in the retrospective path.

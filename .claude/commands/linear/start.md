@@ -154,7 +154,7 @@ git fetch --prune
 git branch -a
 ```
 
-If there are uncommitted changes, warn and stop — suggest `/commit`.
+Then run the [clean start](reference/clean-start.md) check: anything uncommitted or unpushed on `main` that this card doesn't describe settles on `main` before a branch exists.
 
 Never work directly on `main`. If the current branch is `main`, proceed to step 6 to create or switch to a feature branch.
 
@@ -171,10 +171,10 @@ If already on the correct branch (resuming inside a worktree set up earlier with
 
 **If `--worktree` was passed**, don't create the branch inline — the worktree creates it. Skip the inline checkout; the worktree setup after step 7 handles branch creation (see [worktree setup](reference/worktree.md#setup)).
 
-Otherwise, create the branch inline:
+Otherwise, create the branch inline from the remote's `main` ([clean start](reference/clean-start.md#branch-from-the-remote)):
 
 ```bash
-git checkout -b <branch>
+git switch -c <branch> origin/main
 ```
 
 Continue to step 7.
