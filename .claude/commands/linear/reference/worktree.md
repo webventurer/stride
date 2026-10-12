@@ -23,7 +23,7 @@ issue; for an issue in review or done, work in its existing checkout instead.
 
 ### Create the worktree
 
-The branch is created **by the worktree**, not inline — so step 6's inline `git checkout -b` is skipped when `--worktree` is passed (see start.md step 6).
+The branch is created **by the worktree**, not inline — so step 6's inline `git switch -c` is skipped when `--worktree` is passed (see start.md step 6).
 
 Resolve the path from the repo name and issue ID:
 
@@ -36,7 +36,7 @@ For example, repo `lander` + issue `PG-210` → `../lander-pg-210`.
 Create the worktree on the issue's branch (from Linear's `gitBranchName`):
 
 ```bash
-git worktree add ../<repo-dirname>-<issue-id-lowercase> -b <gitBranchName>
+git worktree add ../<repo-dirname>-<issue-id-lowercase> -b <gitBranchName> origin/main
 ```
 
 If the branch already exists (a remote branch, or one created earlier), drop the `-b`:
