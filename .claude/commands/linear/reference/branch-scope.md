@@ -13,11 +13,14 @@
 
 ## Judge each commit
 
-List the commits the branch adds:
+List the commits the branch adds, measured against `main` on the remote:
 
 ```bash
-git log main..HEAD --format='%h %s'
+git fetch
+git log origin/main..HEAD --format='%h %s'
 ```
+
+<mark>**Compare against `origin/main`, never local `main`.**</mark> A commit made on local `main` and never pushed sits under every branch cut from it, and `main..HEAD` hides it — so it rides into the PR unseen. Measured against the remote, it shows up and is judged like any other commit.
 
 Read each commit's subject and diff (`git show <sha>`). A commit belongs when removing it would leave the purpose incomplete. That is the [coherence test](../../../skills/commit/SKILL.md#the-coherence-test) applied to the branch instead of the commit.
 
@@ -36,6 +39,7 @@ The destination follows [PR vs direct commit](pr-vs-direct-commit.md): documenta
    ```bash
    git switch main && git pull --ff-only
    git cherry-pick <sha> && git push              # straight to main
+   # already on local main but unpushed: skip the cherry-pick, just git push
    # or: git switch -c <type>/<slug> && git cherry-pick <sha> && git push -u origin <type>/<slug>
    git switch <branch>
    ```
@@ -43,11 +47,11 @@ The destination follows [PR vs direct commit](pr-vs-direct-commit.md): documenta
 2. Drop it from the branch, without an editor:
 
    ```bash
-   GIT_SEQUENCE_EDITOR="sed -i.bak '/^pick <short-sha> /d'" git rebase -i "$(git merge-base main HEAD)"
+   GIT_SEQUENCE_EDITOR="sed -i.bak '/^pick <short-sha> /d'" git rebase -i "$(git merge-base origin/main HEAD)"
    git push --force-with-lease
    ```
 
-3. Confirm `git log main..HEAD` now lists only commits that serve the purpose.
+3. Confirm `git log origin/main..HEAD` now lists only commits that serve the purpose.
 
 A rebase conflict or a refused lease is a hard stop: abort the rebase (`git rebase --abort`), report it and do not merge.
 

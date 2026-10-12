@@ -136,7 +136,7 @@ Autosquash them now before merging? (y / n / abort)
 
 ### 5b. Check every commit belongs to this card
 
-Follow [branch scope](reference/branch-scope.md): judge each commit in `git log main..HEAD` against the card's purpose from step 1, and move any commit that serves something else to `main` or its own branch before merging. Continue to step 6 once every remaining commit belongs.
+Follow [branch scope](reference/branch-scope.md): judge each commit in `git log origin/main..HEAD` against the card's purpose from step 1, and move any commit that serves something else to `main` or its own branch before merging. Continue to step 6 once every remaining commit belongs.
 
 ### 6. Confirm Vision outcome (before merge)
 
