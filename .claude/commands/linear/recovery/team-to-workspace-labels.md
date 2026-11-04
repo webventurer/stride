@@ -4,27 +4,22 @@
 >
 > **Why it can't just update**: `IssueLabelUpdateInput` has no `teamId` field — a label's team scope is pinned at creation. Promoting team→workspace is always delete-and-recreate, never an update. (The label's `name` *is* updatable, though — that's what the populated path below exploits.)
 
-The CLI doesn't expose delete / rename / team-scoped-list, so the steps below drop to the Linear API directly. Run each GraphQL operation through `linear.py`'s helper, authenticated with the affected workspace's key:
+The CLI doesn't expose delete / rename / team-scoped-list, so the steps below drop to the Linear API directly. Run each GraphQL operation through the recovery script, authenticated with the affected workspace's key. Pass the operation inline:
 
 ```bash
-LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run python -c '
-import sys; sys.path.insert(0, ".claude/tools")
-from linear import graphql_data
-print(graphql_data("""<QUERY OR MUTATION>""", {}))'
+LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/label_recovery.py graphql '<QUERY OR MUTATION>'
 ```
+
+It prints what Linear returns.
 
 <mark>**Always run the tagged-issue check (step 2) before deleting anything.** Deleting a label untags every issue that uses it. The fast path is only safe when the count is zero.</mark>
 
 ## 1. Find the team-scoped duplicates
 
-`list_labels` returns every label including team-scoped ones (the `label list` CLI command filters to workspace-only, so it can't see these):
+The `label list` CLI command filters to workspace-only labels, so it can't see these. The recovery script lists the team-scoped ones, one per line as `<id> | <name> | <colour>`:
 
 ```bash
-LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run python -c '
-import sys; sys.path.insert(0, ".claude/tools")
-from linear import list_labels, bearer_token
-team = [l for l in list_labels(bearer_token()) if l.get("team")]
-for l in team: print(l["id"], "|", l["name"], "|", l["color"])'
+LINEAR_API_KEY="$LINEAR_<WORKSPACE>_API_KEY" uv run .claude/tools/label_recovery.py team-labels
 ```
 
 Each row is a team-scoped label blocking its workspace twin. Note the legacy rename: stride's old **`Issue`** label is today's **`Story`** (shared colour `#4cb782`) — treat a team-scoped `Issue` as the `Story` you're migrating to.
