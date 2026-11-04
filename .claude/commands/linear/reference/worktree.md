@@ -96,23 +96,29 @@ linked into the worktree."* The new session reads its local `.stride.json`
 normally. On each read, `unattended: true` and `false` reflect the shared
 file's current value; the usual validation and merge checks still apply.
 
-### Symlink the venv (Python projects)
+### Link what stride installed
 
-A fresh worktree has no `.venv`, so `cd`-ing in and running anything Python fails with `command not found`. If the parent repo root has a virtualenv, link it in so the stream can run immediately.
+Stride's install is gitignored, so a fresh worktree has none of it: no `/linear:*` commands, no `linear_cli.py`, no `/commit` skill, no hooks. Without them the handoff's `/linear:start` doesn't resolve. Link each missing path in from the parent instead, so the worktree runs the same stride the parent does.
 
-After `git worktree add` succeeds:
+The paths linked are:
 
-1. Look for a venv at the parent repo root — check `.venv` first, then `venv`.
-2. If one is found and the worktree has no matching directory or symlink, link it:
+- **Every path in the stride section of the parent's `.gitignore`**, between the `# >>> stride` and `# <<< stride <<<` markers. This includes stride's Codex files, such as `.codex/skills/` and `.codex/hooks.json`.
+- **`.claude/settings.local.json`**, where stride's hooks are configured.
+- **The parent's venv**, `.venv` or `venv`, so Python runs straight away in the worktree.
 
-   ```bash
-   ln -s <parent-repo>/.venv <worktree>/.venv
-   ```
+A path is linked only when the parent has it and the worktree doesn't. A path the branch tracks, or one linked earlier, is left alone. Each link is added to the repository's shared `info/exclude` without a trailing slash, because git matches a trailing-slash ignore line such as `.claude/tools/` only against a real folder, never against a link. Without that line every linked folder would show in `git status` as untracked.
 
-3. If none is found, **skip silently** — no message, no action. This is the path for Node, Rails, Go, and any non-Python project.
-4. When a symlink is created, print one line so the user knows: *"Shared venv from `<parent>/.venv` linked into the worktree."*
+After the settings are shared, run the linking script with the two absolute paths from above, and show its output to the user:
 
-Scope: the common `.venv` / `venv` layout only. Skip Poetry / Pipenv / Conda (their envs live outside the repo) and bespoke names — those users link manually. No Windows symlink support yet. The linked venv's `VIRTUAL_ENV` resolves to the parent path (cosmetic — binaries and packages still work), and a worktree always shares the parent's interpreter, so it never runs a different Python than its parent.
+```bash
+"$main_repo/.claude/tools/link_stride_install.sh" "$main_repo" "$worktree"
+```
+
+It prints one line naming what it linked. When nothing was linked, it prints nothing. That's the case for a repo with no stride section and no venv.
+
+<mark>**A linked file is the parent's file.**</mark> Editing a linked skill, command or tool inside the worktree edits the parent's copy, and the change shows in every worktree at once. Those paths aren't the branch's to change. To change stride itself, edit it in the parent or reinstall.
+
+Scope: the venv link covers the common `.venv` / `venv` layout only. Poetry, Pipenv and Conda keep their environments outside the repo. No Windows symlink support yet. A linked venv's `VIRTUAL_ENV` points at the parent path, which is cosmetic, and the worktree always runs the parent's Python.
 
 ### Print the handoff and exit
 
