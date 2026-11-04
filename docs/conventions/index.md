@@ -13,6 +13,7 @@ The first four shape change: make the next change easier, declare the result and
 | **Keep every restatement true** | A rule stated twice is a fact with copies, and copies drift | [keep-every-restatement-true](keep-every-restatement-true.md) |
 | **Read the set as one document** | Read every document together after a change; contradictions are findings | [read-the-set-as-one-document](read-the-set-as-one-document.md) |
 | **Ask for the disproof** | State the hypothesis, then ask for it to be broken | [ask-for-the-disproof](ask-for-the-disproof.md) |
+| **Keep logic out of markdown** | A command file says when to run code; branches, loops, exit-code checks and inline code live in a script a test can run | [keep-logic-out-of-markdown](keep-logic-out-of-markdown.md) |
 | **Check the card at the start and the end** | A reviewer who never saw the reasoning checks the card's promises can be tested before work starts, and are kept before merge; the card never bends to fit the code | [check-the-card-at-the-start-and-the-end](check-the-card-at-the-start-and-the-end.md) |
 
 New conventions copy [template.md](template.md).
