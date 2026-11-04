@@ -91,7 +91,12 @@ ACTION:
 4. Define what we won't do — scope exclusions, only if
    genuinely useful
 5. Define the expected outcome — observable results that prove
-   it's done, plus measurable metrics if applicable
+   it's done, plus measurable metrics if applicable. Every line
+   the end check counts as a promise, here and in steps 3, 4
+   and 6, passes two tests: someone holding the finished change
+   can answer it yes or no, and the answer is no if the change
+   was made but doesn't work. Rewrite or move a line that fails,
+   following the table in `reference/card-language.md`
 6. Describe how to test it — expected behaviour, edge cases,
    error conditions (omit for docs, config, or exploratory work)
 7. Flag any ambiguities or assumptions that need confirming
@@ -184,55 +189,48 @@ are right there in the issue.
 
 ## Example issue
 
-> **Verify new issue template format renders correctly**
+> **Refuse a sign-up email that has no @ sign**
 
 ### Why this matters
 *Sets the stakes — why this work is worth doing now.*
 
-*"Issue titles read as stakeholder outcomes, not implementation
-steps"*
+*"New users finish sign-up on their first try"*
 
-Every issue we create uses this template. If the format is
-broken, every issue in the backlog is harder to read — and the
-stakeholder-readable shape we're committing to in the Vision
-gets undermined at the first hop.
+A typo in the email address today creates an account nobody
+can log in to, and the user only finds out when the welcome
+email never arrives.
 
 ### Where things stand
 *Current state — the gap, limitation, or opportunity.*
 
-The issue template has new conversational headings but
-no one has checked whether they render correctly in
-Linear's markdown.
+The sign-up form accepts any text in the email field and
+creates the account straight away.
 
 ### What we'll do
 *Concrete deliverables — what ships when this closes.*
 
-Confirm the new issue template renders correctly in Linear.
-- Create a single placeholder issue using the new template
-  format
-- Visual check that all sections render as expected
+When the email field has no @ sign, the form refuses to submit
+and shows "Enter an email address with an @ sign" under the
+field. Example: "ana.example.com" is refused; "ana@example.com"
+creates the account.
 
 ### What we won't do
 *Draws the line so scope doesn't creep.*
 
-No changes to the template based on this issue — just
-validation.
+- Won't check that the email address exists or can receive mail
 
 ### Expected outcome
 *Observable proof it's done — what a reviewer should see.*
-- Issue appears in Linear with all sections visible and
-  correctly formatted
-- "Why this matters" section appears first, before
-  "Where things stand"
-- All headings render as distinct sections with no overlap
+- Submitting "ana.example.com" creates no account and shows
+  "Enter an email address with an @ sign" under the field
+- Submitting "ana@example.com" creates the account
 
 ### How to test it
 *How to verify the outcome is real.*
 
-Visual inspection in Linear — open the issue and confirm each
-heading renders as a separate section with correct hierarchy.
+A form test submits each of the two addresses above and checks
+the account count and the message shown.
 
 ### Assumptions to confirm
 *Unknowns that could change the plan.*
-- Linear renders h3 markdown headings consistently across
-  views (board, detail, sidebar)
+- An @ sign is enough of a check to catch most typos

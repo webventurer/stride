@@ -37,6 +37,25 @@ Follow [principles over rules](../../../stride/docs/principles/principles-over-r
 
 Before saving, check: could a 16-year-old use this card to predict what happens in a new example? If they can only repeat the goal or list the settings, rewrite the explanation first. Then check each paragraph: does it say what the caller observes, or how the code achieves it? Move or cut the how unless a constraint forces it.
 
+## Every promise can be marked right or wrong
+
+The end check judges every line it counts as a promise ([Find the promises](card-check-review.md#find-the-promises)). Each of those lines must pass two tests:
+
+1. Someone holding the finished change can answer it yes or no.
+2. The answer is no if the change was made but doesn't work.
+
+A line that fails test 2 is an edit when it describes something the change does. It is not a promise at all when it is true or false whatever the change does, such as a fact about today, an opinion or a guess.
+
+| The line | What to do with it | Example |
+|:--|:--|:--|
+| Passes both tests | Keep it | "A search for each old name finds nothing" |
+| A vague quality, a process or a risk | Rewrite it as the result it stands for | "The work runs through `/script`" becomes the result `/script` protects, or goes when the card already promises it. "Risk: narrowing a catch can let an error through" becomes "each error the old catch handled is still handled" |
+| An opinion or a guess | Move it to "Assumptions to confirm" | "A reviewer may prefer another name" |
+| A fact about how things are today | Move it to "Where things stand" | "The brief says nothing about other checks" |
+| An edit, which passes test 1 but not test 2 | Rewrite it as the result the edit is for | "Add a row to the table" becomes what a reader of the table now finds |
+
+The [card start check](card-start-review.md) applies the same two tests before work starts.
+
 ## Where it applies
 
 Apply this rule whenever a `/linear:*` command writes a card title, description, or comment, whether the card is new or already exists. It does not bulk-rewrite old cards, and it does not apply to state-only moves or attachment-only changes because those operations write no prose.

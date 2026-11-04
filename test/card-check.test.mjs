@@ -264,6 +264,19 @@ describe("card start check", () => {
     ok(start.includes("treat a `mechanism` stop as a note"));
   });
 
+  it("judges a promise by the same two tests when a card is written and when work starts", () => {
+    for (const path of [
+      ".claude/commands/linear/reference/card-language.md",
+      ".claude/commands/linear/reference/templates/story.md",
+      ".claude/commands/linear/reference/card-start-review.md",
+    ]) {
+      const text = read(path).replace(/\s+/g, " ");
+
+      ok(text.includes("can answer it yes or no"), path);
+      ok(text.includes("the change was made but doesn't work"), path);
+    }
+  });
+
   it("reports five kinds of finding, each with a level", () => {
     const brief = read(
       ".claude/commands/linear/reference/card-start-review.md",

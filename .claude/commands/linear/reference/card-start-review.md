@@ -29,15 +29,22 @@ You **report**. You do not edit the card, the code or the Vision. Write output o
 
 ---
 
+## The two tests every promise must pass
+
+1. Someone holding the finished change can answer it yes or no.
+2. The answer is no if the change was made but doesn't work.
+
+A line that fails test 2 is a `mechanism` finding when it describes something the change does, such as an edit. It is `uncheckable` when it is true or false whatever the change does, such as a fact about today, an opinion or a guess. [Linear card language](card-language.md#every-promise-can-be-marked-right-or-wrong) gives card writers the same two tests.
+
 ## The five kinds of finding
 
 | Finding | Use it when | `evidence` must name |
 |:--------|:------------|:---------------------|
-| `uncheckable` | A promise has no observable result — "works well", "is robust", "is reliable" — or only a run against a real service could show it, such as "the API accepts this filter", and it sits outside "Live check" | Why no test or reading of the finished work could show it kept or broken. For a claim only a real run can prove, `proposed` moves it under "Live check" |
+| `uncheckable` | A promise fails test 1 — a vague quality such as "works well" or "is robust", a process line, a risk rating — or fails test 2 while being true or false whatever the change does — an opinion, a guess, a fact about today. Also a claim only a run against a real service could show, such as "the API accepts this filter", that sits outside "Live check" | Which test the line fails, and why. For a claim only a real run can prove, `proposed` moves it under "Live check" |
 | `contradictory` | Two promises cannot both hold, or the current repository already makes a promise impossible | Both lines, or the promise and the file and line that rules it out |
 | `missing` | The current repository plainly has an edge case on the card's path that the card does not mention | The file and line where the edge case lives, and the situation that triggers it |
 | `stale` | A promise or the Vision trace no longer fits, given what a finished sibling card shipped | The sibling, what it shipped, and why the promise no longer fits |
-| `mechanism` | A promise is met by making a particular edit or using a particular mechanism, whether or not the result it serves holds — "move the retry logic into its own file", "add a page from the template", "use a lock" | The promise, and why the edit landing would read as kept even if the result failed |
+| `mechanism` | A promise fails test 2 by describing something the change does: it is met by making a particular edit or using a particular mechanism, whether or not the result it serves holds — "move the retry logic into its own file", "add a page from the template", "use a lock" | The promise, and why the edit landing would read as kept even if the result failed |
 
 Every finding proposes new wording for the card in `proposed` — a rewritten line that can be shown kept or broken, or the line to add or remove. The orchestrator applies it or rewords it; your wording is a starting point, not a decision.
 
@@ -45,9 +52,20 @@ Every finding proposes new wording for the card in `proposed` — a rewritten li
 
 Judge the card, not the plan. Whether you would build it differently, or whether the work is worth doing, is out of scope; only whether its promises can be checked and still hold.
 
+### Worked examples of uncheckable lines
+
+Each line below sits where the end check counts it as a promise, so each is an `uncheckable` stop:
+
+| Line | Where | Test it fails | `proposed` |
+|:--|:--|:--|:--|
+| "The work runs through `/script`, so its workflow and checks apply to every changed file" | What we'll do | 1: no change can show a workflow was followed | The result `/script` protects, such as "no changed file catches a bare `Exception` without a reason", or remove the line when the card already promises that result |
+| "Risk: Medium: narrowing a catch can let an error through that used to be handled" | Expected outcome | 1: it rates what could go wrong without promising it doesn't | The risk not happening: "each error the old catch handled is still handled" |
+| "A reviewer may prefer another name" | Expected outcome | 2: it is true or false whatever the change does | Move it to "Assumptions to confirm" |
+| "The brief says nothing about other checks" | Expected outcome | 2: it describes today, so it reads the same whether or not the change works | Move it to "Where things stand" |
+
 ### When a line is a mechanism finding
 
-Ask one question of the line: **if the edit landed and the result did not hold, would this line still read as kept?** If yes, it is a `mechanism` finding. A card written as edits is satisfied by making the edits, whether or not the result holds — see [Specify the result, not the edit](https://github.com/webventurer/stride/blob/main/docs/conventions/specify-the-result-not-the-edit.md).
+Ask one question of the line: **if the edit landed and the result did not hold, would this line still read as kept?** If yes, and the line describes something the change does, it is a `mechanism` finding: "Add a row to the table" is one. A line that would read as kept whatever the change does, such as a fact about today, is `uncheckable` instead. A card written as edits is satisfied by making the edits, whether or not the result holds — see [Specify the result, not the edit](https://github.com/webventurer/stride/blob/main/docs/conventions/specify-the-result-not-the-edit.md).
 
 These are not mechanism findings:
 
