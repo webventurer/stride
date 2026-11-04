@@ -1,28 +1,30 @@
-"""Exercise the worktree guide's shell block and the real config reader."""
+"""Exercise the worktree settings script and the real config reader."""
 
 import json
-import os
-import re
 import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import linear  # noqa: E402
 
+SHARE_SETTINGS_SCRIPT = Path(__file__).resolve().parents[1] / (
+    "share_stride_settings.sh"
+)
 
-def test_shared_worktree_settings(tmp_path, monkeypatch):
+
+def test_shared_worktree_settings(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
     repo = Path(__file__).resolve().parents[3]
-    guide = (repo / ".claude/commands/linear/reference/worktree.md").read_text()
-    section = guide.split("### Share Stride settings\n", 1)[1].split("### ", 1)[
-        0
-    ]
-    script = re.search(r"```bash\n(.*?)```", section, re.S).group(1)
     main = tmp_path / "main checkout"
     worktree = tmp_path / "first worktree"
     sibling = tmp_path / "second worktree"
 
-    def git(cwd, *args):
+    def git(cwd: Path, *args: str) -> str:
         return subprocess.run(
             ["git", "-C", str(cwd), *args],
             check=True,
@@ -46,17 +48,17 @@ def test_shared_worktree_settings(tmp_path, monkeypatch):
         "unattended": True,
     }
 
-    def link(destination=worktree):
+    def run_share_settings_script(
+        destination: Path = worktree,
+    ) -> subprocess.CompletedProcess:
         return subprocess.run(
-            ["bash", "-c", script],
-            env={
-                **os.environ,
-                "main_repo": str(main),
-                "worktree": str(destination),
-            },
+            [str(SHARE_SETTINGS_SCRIPT), str(main), str(destination)],
             capture_output=True,
             text=True,
-        ).returncode
+        )
+
+    def link(destination: Path = worktree) -> int:
+        return run_share_settings_script(destination).returncode
 
     for content in [None, "invalid json", "[]"]:
         if content is not None:
@@ -80,7 +82,9 @@ def test_shared_worktree_settings(tmp_path, monkeypatch):
 
     target.unlink()
     target.write_text("keep my settings")
-    assert link() != 0 and target.read_text() == "keep my settings"
+    taken = run_share_settings_script()
+    assert taken.returncode != 0 and target.read_text() == "keep my settings"
+    assert f"Existing .stride.json in {worktree}" in taken.stderr
     target.unlink()
     target.mkdir()
     assert link() != 0 and list(target.iterdir()) == []
@@ -98,7 +102,9 @@ def test_shared_worktree_settings(tmp_path, monkeypatch):
     target.unlink()
 
     git(main, "add", "-f", ".stride.json")
-    assert link() != 0 and not target.is_symlink()
+    tracked = run_share_settings_script()
+    assert tracked.returncode != 0 and not target.is_symlink()
+    assert f"Tracked .stride.json in {main}" in tracked.stderr
     git(main, "update-index", "--force-remove", ".stride.json")
     assert link() == 0
     git(worktree, "add", "-f", ".stride.json")

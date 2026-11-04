@@ -63,27 +63,13 @@ If the source is missing, unreadable, invalid or tracked, stop before the
 handoff and report the reason. Use `/linear:setup` for missing configuration
 or repair the existing file; never invent unattended approval.
 
-Run this block only after those checks pass:
+Run the settings script only after those checks pass:
 
 ```bash
-jq -e 'type == "object"' "$main_repo/.stride.json" >/dev/null || exit 1
-for settings_repo in "$main_repo" "$worktree"; do
-  if git -C "$settings_repo" ls-files --error-unmatch .stride.json >/dev/null 2>&1; then
-    printf 'Tracked .stride.json in %s; stop and remove it from version control.\n' "$settings_repo" >&2
-    exit 1
-  fi
-  git -C "$settings_repo" check-ignore -q .stride.json || exit 1
-done
-if [ -L "$worktree/.stride.json" ] && [ "$worktree/.stride.json" -ef "$main_repo/.stride.json" ]; then
-  : # Already linked to the shared settings.
-elif [ -e "$worktree/.stride.json" ] || [ -L "$worktree/.stride.json" ]; then
-  printf 'Existing .stride.json in %s; preserve it and resolve the conflict.\n' "$worktree" >&2
-  exit 1
-else
-  ln -s "$main_repo/.stride.json" "$worktree/.stride.json" || exit 1
-fi
-test -r "$worktree/.stride.json" && test "$worktree/.stride.json" -ef "$main_repo/.stride.json"
+"$main_repo/.claude/tools/share_stride_settings.sh" "$main_repo" "$worktree"
 ```
+
+It exits zero once `.stride.json` in the worktree is a link to the main checkout's copy, whether it made the link or the link was already there. For a tracked file it prints "Tracked .stride.json in <path>", and for a taken path "Existing .stride.json in <path>". On a non-zero exit, stop before the handoff.
 
 If either path is not ignored, add `.stride.json` to the appropriate local
 Git exclude file before retrying. If a different file, directory or link
