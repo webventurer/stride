@@ -139,13 +139,13 @@ The mechanics `/linear:finish` follows (step 9) when the issue was worked in a w
 
 ### Remove the worktree
 
-Remove the worktree **before** deleting its branch — git refuses to delete a branch a worktree has checked out. Use the same **absolute** worktree path Setup used (`<abs-parent>/<repo-dirname>-<issue-id-lowercase>`).
+Remove the worktree **before** deleting its branch — git refuses to delete a branch a worktree has checked out. Find it by the branch it has checked out, not by rebuilding a path, so a worktree made beside the repo as `../<repo>-<issue-id>` by an older stride is removed too:
 
 ```bash
-git -C <main-repo-path> worktree remove <worktree-path>
+"<main-repo-path>/.claude/tools/remove_card_worktree.sh" "<main-repo-path>" <gitBranchName>
 ```
 
-If the worktree directory does not exist, skip silently. If `git worktree remove` fails due to untracked files, use `--force`.
+It prints the path it removed, which names the tab to close below. It forces the removal. When the worktree's folder was deleted by hand, it prunes git's record instead, so the branch can still be deleted. When no worktree has the branch, it prints nothing: skip the tab step.
 
 Removing a worktree removes its `.stride.json` link, not the shared source.
 Never follow the link to delete the main checkout's settings.
