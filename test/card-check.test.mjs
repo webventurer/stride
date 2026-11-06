@@ -103,9 +103,20 @@ describe("card check", () => {
     ok(start.includes("Write the failing tests first"));
   });
 
-  it("runs three Sonnet reviewers with the same brief and keeps the worst verdict", () => {
+  it("runs three Sonnet reviewers, each through its own lens, and keeps the worst verdict", () => {
     const check = read(".claude/commands/linear/reference/card-check.md");
+    const brief = read(
+      ".claude/commands/linear/reference/card-check-review.md",
+    );
+    const lenses = ["Promise by promise", "Try to break it", "Prove it"];
 
+    for (const lens of lenses) {
+      ok(check.includes(`"${lens}"`), lens);
+      ok(brief.includes(`### ${lens}`), lens);
+    }
+    ok(check.includes("Your lens is <"));
+    ok(brief.includes("Every lens keeps the read-only rule"));
+    ok(brief.includes("only from the sections [Find the promises]"));
     ok(check.includes("Spawn three fresh sub-agents at once"));
     ok(check.includes("model `sonnet`"));
     ok(check.includes("each with its own output path"));
