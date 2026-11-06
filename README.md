@@ -26,6 +26,8 @@ Everything installs as plain text into your `.claude/` directory — markdown sk
 
 **`/clear-speak`** — Plain-language rewriting for anything the agent writes. Point it at a doc, a command file, an issue draft, a commit message, or a README paragraph and it replaces jargon with words a non-engineer can follow first time. `/linear:plan-work` and `/linear:finish` link to it as stride's standard for what counts as jargon, so issue titles and Vision-trace explanations stay readable.
 
+**`/parallel-sessions`** — Runs independent jobs, such as several Linear cards, as parallel Claude Code sessions, a set number at a time. Each session works in its own worktree and commits only its own work; the coordinator checks each branch against `main` before merging it, and brings you only the decisions that are yours to make.
+
 ## The loop
 
 The skills aren't independent — each one feeds the next.

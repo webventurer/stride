@@ -17,9 +17,13 @@ your-project/
     │   │   └── WORKFLOW.md  # Multi-pass execution sequence
     │   ├── craft/           # /craft skill
     │   │   └── SKILL.md     # CRAFT prompt framework
-    │   └── clear-speak/     # /clear-speak skill
-    │       ├── SKILL.md     # The plain-language test and rewrites
-    │       └── WORKFLOW.md  # Spot the jargon, swap it, check it
+    │   ├── clear-speak/     # /clear-speak skill
+    │   │   ├── SKILL.md     # The plain-language test and rewrites
+    │   │   └── WORKFLOW.md  # Spot the jargon, swap it, check it
+    │   └── parallel-sessions/ # /parallel-sessions skill
+    │       ├── SKILL.md     # The coordinator's process
+    │       ├── BRIEF.md     # The brief each job session follows
+    │       └── scripts/     # The slot store and run measurements
     ├── commands/
     │   └── linear/          # /linear:* commands
     │       ├── start.md     # Implement an issue

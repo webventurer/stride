@@ -19,6 +19,11 @@ export const SHIPPED_SKILLS = [
     blurb: "plain-language rewrite skill",
     usage: "rewrite jargon into plain language",
   },
+  {
+    name: "parallel-sessions",
+    blurb: "parallel card sessions skill",
+    usage: "run independent cards as parallel sessions",
+  },
 ];
 
 export const SKILL_NAMES = SHIPPED_SKILLS.map((skill) => skill.name);
