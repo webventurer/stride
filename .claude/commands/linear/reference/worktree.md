@@ -10,7 +10,7 @@
 
 The mechanics `/linear:start` follows when `--worktree` is passed. Step numbers refer to `/linear:start`'s steps.
 
-> **Resolve every path here to an absolute path.** The handoff's `cd` runs in a fresh terminal tab whose working directory you don't control, and the venv symlink's target must resolve from inside the worktree — relative paths break both. Compute the worktree path once as absolute (e.g. `/Users/you/projects/<repo-dirname>-<issue-id-lowercase>`) and use that everywhere below.
+> **Resolve every path here to an absolute path.** The handoff's `cd` runs in a fresh terminal tab whose working directory you don't control, and the venv symlink's target must resolve from inside the worktree — relative paths break both. Compute the worktree path once as absolute (e.g. `/Users/you/projects/lander/.claude/worktrees/pg-210`) and use that everywhere below.
 
 ### Guard the state
 
@@ -25,24 +25,26 @@ issue; for an issue in review or done, work in its existing checkout instead.
 
 The branch is created **by the worktree**, not inline — so step 6's inline `git switch -c` is skipped when `--worktree` is passed (see start.md step 6).
 
-Resolve the path from the repo name and issue ID:
+Every worktree goes in the main checkout's `.claude/worktrees/` folder, named by the lowercase issue ID. Repo `lander` and issue `PG-210` give `lander/.claude/worktrees/pg-210`. The Claude Code app keeps its session worktrees in the same folder, so there is one place to look for unmerged work.
 
-```
-../<repo-dirname>-<issue-id-lowercase>
-```
-
-For example, repo `lander` + issue `PG-210` → `../lander-pg-210`.
-
-Create the worktree on the issue's branch (from Linear's `gitBranchName`):
+Resolve `main_repo` from the first worktree in `git worktree list --porcelain`, then get the path:
 
 ```bash
-git worktree add ../<repo-dirname>-<issue-id-lowercase> -b <gitBranchName> origin/main
+"$main_repo/.claude/tools/card_worktree_path.sh" "$main_repo" <issue-id>
+```
+
+It prints the absolute worktree path. It first checks that git ignores `.claude/worktrees/` in the main checkout, from `.gitignore` or `.git/info/exclude`, so the worktree never shows in the main checkout's `git status` or its linters. When the folder isn't ignored, it exits non-zero and names the line to add to `.gitignore`. Stop and show that message: create nothing. Installing stride adds the line when its `.gitignore` prompt is answered yes.
+
+Create the worktree at that path on the issue's branch (from Linear's `gitBranchName`):
+
+```bash
+git worktree add <worktree-path> -b <gitBranchName> origin/main
 ```
 
 If the branch already exists (a remote branch, or one created earlier), drop the `-b`:
 
 ```bash
-git worktree add ../<repo-dirname>-<issue-id-lowercase> <gitBranchName>
+git worktree add <worktree-path> <gitBranchName>
 ```
 
 ### Share Stride settings
@@ -52,9 +54,9 @@ the worktree, link `.stride.json` before printing the handoff. A link keeps
 project, authentication selection, focus and unattended mode in sync; editing
 settings through either checkout changes the shared file.
 
-Resolve `main_repo` from the first worktree in `git worktree list --porcelain`
-(not the current directory, which may itself be a linked worktree). Set
-`worktree` to the new worktree's absolute path. Quote both paths.
+Use `main_repo` from the step above, not the current directory, which may
+itself be a linked worktree. Set `worktree` to the new worktree's absolute path.
+Quote both paths.
 
 Before linking, apply the [machine-local check](unattended.md#read-the-mode)
 to the source, including any symlink targets. Confirm its fields are valid
@@ -92,7 +94,7 @@ The paths linked are:
 - **`.claude/settings.local.json`**, where stride's hooks are configured.
 - **The parent's venv**, `.venv` or `venv`, so Python runs straight away in the worktree.
 
-A path is linked only when the parent has it and the worktree doesn't. A path the branch tracks, or one linked earlier, is left alone. Each link is added to the repository's shared `info/exclude` without a trailing slash, because git matches a trailing-slash ignore line such as `.claude/tools/` only against a real folder, never against a link. Without that line every linked folder would show in `git status` as untracked.
+A path is linked only when the parent has it and the worktree doesn't. A path the branch tracks, or one linked earlier, is left alone. `.claude/worktrees` is never linked, even though stride's section lists it: the worktree sits inside that folder, so a link would point back at itself and its siblings. Each link is added to the repository's shared `info/exclude` without a trailing slash, because git matches a trailing-slash ignore line such as `.claude/tools/` only against a real folder, never against a link. Without that line every linked folder would show in `git status` as untracked.
 
 After the settings are shared, run the linking script with the two absolute paths from above, and show its output to the user:
 
@@ -139,13 +141,13 @@ The mechanics `/linear:finish` follows (step 9) when the issue was worked in a w
 
 ### Remove the worktree
 
-Remove the worktree **before** deleting its branch — git refuses to delete a branch a worktree has checked out. Use the same **absolute** worktree path Setup used (`<abs-parent>/<repo-dirname>-<issue-id-lowercase>`).
+Remove the worktree **before** deleting its branch — git refuses to delete a branch a worktree has checked out. Find it by the branch it has checked out, not by rebuilding a path, so a worktree made beside the repo as `../<repo>-<issue-id>` by an older stride is removed too:
 
 ```bash
-git -C <main-repo-path> worktree remove <worktree-path>
+"<main-repo-path>/.claude/tools/remove_card_worktree.sh" "<main-repo-path>" <gitBranchName>
 ```
 
-If the worktree directory does not exist, skip silently. If `git worktree remove` fails due to untracked files, use `--force`.
+It prints the path it removed, which names the tab to close below. It forces the removal. When the worktree's folder was deleted by hand, it prunes git's record instead, so the branch can still be deleted. When no worktree has the branch, it prints nothing: skip the tab step.
 
 Removing a worktree removes its `.stride.json` link, not the shared source.
 Never follow the link to delete the main checkout's settings.

@@ -110,7 +110,7 @@ Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). Every draft's 
 
 In `--research` mode, explores the codebase and Linear first, then adds code examples (showing how similar patterns are already implemented) and acceptance criteria (observable outcomes, not implementation steps).
 
-The `--worktree` flag is the place to opt into an isolated workspace — after the issue is created, the command sets up a git worktree at `../<repo-dirname>-<issue-id-lowercase>`, opens VS Code there, and hands off to a new Claude Code session. `/linear:start` runs inline by default; if you want a worktree, decide at planning time, not start time.
+The `--worktree` flag is the place to opt into an isolated workspace — after the issue is created, the command sets up a git worktree at `.claude/worktrees/<issue-id-lowercase>` inside the repo, and hands off to a new Claude Code session. `/linear:start` runs inline by default; if you want a worktree, decide at planning time, not start time.
 
 **Story is the default; epic when warranted.** Most descriptions are story-sized — one deliverable that ships as one PR — so `/linear:plan-work` skips the sizing question and proceeds straight to drafting.
 

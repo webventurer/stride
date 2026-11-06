@@ -129,6 +129,36 @@ describe("install footprint", () => {
     );
   });
 
+  it("ignores .claude/worktrees/ once, however often stride installs", () => {
+    seedFixture();
+    runInstall({ gitignore: "y" });
+    runInstall({ gitignore: "y" });
+
+    const gitignore = readFileSync(join(fixtureRoot, ".gitignore"), "utf8");
+    strictEqual(gitignore.match(/^\.claude\/worktrees\/$/gm)?.length, 1);
+  });
+
+  it("leaves .claude/worktrees/ out when the .gitignore prompt is declined", () => {
+    seedFixture();
+    runInstall({ gitignore: "n" });
+
+    const gitignore = readFileSync(join(fixtureRoot, ".gitignore"), "utf8");
+    strictEqual(gitignore.includes(".claude/worktrees/"), false);
+  });
+
+  it("adds no second .claude/worktrees/ when the repo already ignores it", () => {
+    seedFixture();
+    writeFileSync(
+      join(fixtureRoot, ".gitignore"),
+      "node_modules\n.claude/worktrees/\n",
+    );
+
+    runInstall({ gitignore: "y" });
+
+    const gitignore = readFileSync(join(fixtureRoot, ".gitignore"), "utf8");
+    strictEqual(gitignore.match(/^\.claude\/worktrees\/$/gm)?.length, 1);
+  });
+
   it("preserves existing .gitignore entries when adding the stride section", () => {
     seedFixture();
     runInstall({ gitignore: "y" });

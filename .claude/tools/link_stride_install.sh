@@ -18,6 +18,7 @@ require_args() {
 # --- Constants ---
 
 EXTRA_PATHS=(.claude/settings.local.json .venv venv)
+WORKTREES_DIR=.claude/worktrees
 
 # --- Functions ---
 
@@ -47,6 +48,7 @@ link_missing_paths() {
   local path
   for path in $(stride_section_paths) "${EXTRA_PATHS[@]}"; do
     path="${path%/}"
+    [ "$path" = "$WORKTREES_DIR" ] && continue
     if is_missing_from_worktree "$path"; then link_path "$path"; fi
   done
 }
