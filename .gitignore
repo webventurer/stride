@@ -21,3 +21,6 @@ uv.lock
 
 # Codex skills (symlinked by codefu)
 .codex/skills/
+
+# worktrees (stride and the Claude Code app)
+.claude/worktrees/

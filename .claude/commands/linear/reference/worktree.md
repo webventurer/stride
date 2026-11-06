@@ -10,7 +10,7 @@
 
 The mechanics `/linear:start` follows when `--worktree` is passed. Step numbers refer to `/linear:start`'s steps.
 
-> **Resolve every path here to an absolute path.** The handoff's `cd` runs in a fresh terminal tab whose working directory you don't control, and the venv symlink's target must resolve from inside the worktree — relative paths break both. Compute the worktree path once as absolute (e.g. `/Users/you/projects/<repo-dirname>-<issue-id-lowercase>`) and use that everywhere below.
+> **Resolve every path here to an absolute path.** The handoff's `cd` runs in a fresh terminal tab whose working directory you don't control, and the venv symlink's target must resolve from inside the worktree — relative paths break both. Compute the worktree path once as absolute (e.g. `/Users/you/projects/lander/.claude/worktrees/pg-210`) and use that everywhere below.
 
 ### Guard the state
 
@@ -25,24 +25,26 @@ issue; for an issue in review or done, work in its existing checkout instead.
 
 The branch is created **by the worktree**, not inline — so step 6's inline `git switch -c` is skipped when `--worktree` is passed (see start.md step 6).
 
-Resolve the path from the repo name and issue ID:
+Every worktree goes in the main checkout's `.claude/worktrees/` folder, named by the lowercase issue ID. Repo `lander` and issue `PG-210` give `lander/.claude/worktrees/pg-210`. The Claude Code app keeps its session worktrees in the same folder, so there is one place to look for unmerged work.
 
-```
-../<repo-dirname>-<issue-id-lowercase>
-```
-
-For example, repo `lander` + issue `PG-210` → `../lander-pg-210`.
-
-Create the worktree on the issue's branch (from Linear's `gitBranchName`):
+Resolve `main_repo` from the first worktree in `git worktree list --porcelain`, then get the path:
 
 ```bash
-git worktree add ../<repo-dirname>-<issue-id-lowercase> -b <gitBranchName> origin/main
+"$main_repo/.claude/tools/card_worktree_path.sh" "$main_repo" <issue-id>
+```
+
+It prints the absolute worktree path. It first checks that git ignores `.claude/worktrees/` in the main checkout, from `.gitignore` or `.git/info/exclude`, so the worktree never shows in the main checkout's `git status` or its linters. When the folder isn't ignored, it exits non-zero and names the line to add to `.gitignore`. Stop and show that message: create nothing. Installing stride adds the line when its `.gitignore` prompt is answered yes.
+
+Create the worktree at that path on the issue's branch (from Linear's `gitBranchName`):
+
+```bash
+git worktree add <worktree-path> -b <gitBranchName> origin/main
 ```
 
 If the branch already exists (a remote branch, or one created earlier), drop the `-b`:
 
 ```bash
-git worktree add ../<repo-dirname>-<issue-id-lowercase> <gitBranchName>
+git worktree add <worktree-path> <gitBranchName>
 ```
 
 ### Share Stride settings
@@ -52,9 +54,9 @@ the worktree, link `.stride.json` before printing the handoff. A link keeps
 project, authentication selection, focus and unattended mode in sync; editing
 settings through either checkout changes the shared file.
 
-Resolve `main_repo` from the first worktree in `git worktree list --porcelain`
-(not the current directory, which may itself be a linked worktree). Set
-`worktree` to the new worktree's absolute path. Quote both paths.
+Use `main_repo` from the step above, not the current directory, which may
+itself be a linked worktree. Set `worktree` to the new worktree's absolute path.
+Quote both paths.
 
 Before linking, apply the [machine-local check](unattended.md#read-the-mode)
 to the source, including any symlink targets. Confirm its fields are valid

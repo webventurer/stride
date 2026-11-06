@@ -1,4 +1,4 @@
-import { ok, strictEqual } from "node:assert";
+import { ok, strictEqual, throws } from "node:assert";
 import { execFileSync } from "node:child_process";
 import {
   existsSync,
@@ -14,6 +14,7 @@ import { afterEach, beforeEach, describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const tools = join(dirname(fileURLToPath(import.meta.url)), "../.claude/tools");
+const pathScript = join(tools, "card_worktree_path.sh");
 const removeScript = join(tools, "remove_card_worktree.sh");
 
 function git(cwd, ...args) {
@@ -48,6 +49,42 @@ describe("worktree place", () => {
 
   afterEach(() => {
     rmSync(base, { recursive: true, force: true });
+  });
+
+  describe("setup path", () => {
+    it("puts the worktree in .claude/worktrees, hidden from the main checkout", () => {
+      makeRepo(mainRepo, ".claude/worktrees/\n");
+
+      const path = run(pathScript, mainRepo, "WB-1").trim();
+      git(mainRepo, "worktree", "add", "-q", path, "-b", "wb-1");
+      writeFileSync(join(path, "unmerged.py"), "x = 1\n");
+
+      strictEqual(path, join(mainRepo, ".claude/worktrees/wb-1"));
+      strictEqual(git(mainRepo, "status", "--porcelain"), "");
+      strictEqual(
+        git(mainRepo, "ls-files", "--others", "--exclude-standard"),
+        "",
+      );
+    });
+
+    it("counts an ignore in .git/info/exclude", () => {
+      makeRepo(mainRepo, "node_modules/\n");
+      writeFileSync(join(mainRepo, ".git/info/exclude"), "/.claude/worktrees\n");
+
+      const path = run(pathScript, mainRepo, "WB-1").trim();
+
+      strictEqual(path, join(mainRepo, ".claude/worktrees/wb-1"));
+    });
+
+    it("stops with the line to add when the folder isn't ignored", () => {
+      makeRepo(mainRepo, "node_modules/\n");
+
+      throws(
+        () => run(pathScript, mainRepo, "WB-1"),
+        (error) => error.stderr.includes(".claude/worktrees/"),
+      );
+      ok(!existsSync(join(mainRepo, ".claude/worktrees")));
+    });
   });
 
   describe("teardown", () => {
