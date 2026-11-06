@@ -101,6 +101,43 @@ describe("install footprint", () => {
     strictEqual(existsSync(join(claudeDir, "tools/openrouter_cli.py")), true);
   });
 
+  it("installs /parallel-sessions without its tests", () => {
+    seedFixture();
+    runInstall();
+
+    const skill = join(fixtureRoot, ".claude/skills/parallel-sessions");
+    for (const file of [
+      "SKILL.md",
+      "BRIEF.md",
+      "reference/chain-of-command.md",
+      "reference/chain-of-command.pdf",
+      "reference/chain-of-command-config.md",
+      "reference/model-costs.md",
+      "reference/testing-the-chain-of-command.md",
+      "scripts/slots.py",
+      "scripts/measure_run.py",
+    ]) {
+      strictEqual(existsSync(join(skill, file)), true, file);
+    }
+    strictEqual(existsSync(join(skill, "scripts/tests")), false);
+  });
+
+  it("installs /parallel-sessions naming no codefu page, every link opening", () => {
+    seedFixture();
+    runInstall();
+
+    const skill = join(fixtureRoot, ".claude/skills/parallel-sessions");
+    for (const file of walk(skill).filter((path) => path.endsWith(".md"))) {
+      const text = readFileSync(join(skill, file), "utf8");
+      strictEqual(/codefu/i.test(text), false, `${file} names codefu`);
+      for (const [, target] of text.matchAll(/\]\(([^)#\s]+)/g)) {
+        if (target.startsWith("http")) continue;
+        const resolved = join(skill, dirname(file), target);
+        strictEqual(existsSync(resolved), true, `${file} -> ${target}`);
+      }
+    }
+  });
+
   it("does not ship stride's own test files", () => {
     seedFixture();
     runInstall();

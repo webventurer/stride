@@ -14,6 +14,7 @@ export default defineConfig({
         { text: '/linear', link: '/skills/linear' },
         { text: '/craft', link: '/skills/craft' },
         { text: '/clear-speak', link: '/skills/clear-speak' },
+        { text: '/parallel-sessions', link: '/skills/parallel-sessions' },
       ]},
       { text: 'GitHub', link: 'https://github.com/webventurer/stride' },
     ],
@@ -37,6 +38,7 @@ export default defineConfig({
           { text: '/linear — Linear workflow', link: '/skills/linear' },
           { text: '/craft — Prompt generation', link: '/skills/craft' },
           { text: '/clear-speak — Plain language', link: '/skills/clear-speak' },
+          { text: '/parallel-sessions — Cards at once', link: '/skills/parallel-sessions' },
         ],
       },
       {

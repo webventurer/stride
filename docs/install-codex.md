@@ -43,7 +43,7 @@ Codex has no namespaced slash commands, so `/linear:start` is reachable as a ski
 $linear-start WB-123
 ```
 
-Each command becomes a skill named `linear-<command>`, and the four shipped skills — `commit`, `craft`, `vision`, `clear-speak` — keep their names. Type `$` in Codex to see them, or `/skills` to browse.
+Each command becomes a skill named `linear-<command>`, and the five shipped skills — `commit`, `craft`, `vision`, `clear-speak`, `parallel-sessions` — keep their names. Type `$` in Codex to see them, or `/skills` to browse.
 
 The generated skill points at the command file under `.claude/commands/linear/` rather than copying it, so there is one place a command is authored and the two tools cannot drift.
 
