@@ -68,6 +68,28 @@ Example: the card promises "the syntax tree of every changed file is the same be
 
 ---
 
+## Read through your lens
+
+Three reviewers check every card, and the orchestrator tells each one which lens is theirs. Each lens looks a different way, so together they cover the card three ways rather than one way three times. Whatever your lens, you list every promise, give each one verdict from the table above, and write the same output.
+
+### Promise by promise
+
+For each promise, find the line in the change that keeps it, or the gap where it should be.
+
+### Try to break it
+
+For each promise, look for the input, state or edge case the card names or plainly implies, and work through it against the change. Look for a promise that holds in the common case and fails in another: a case the card lists that the change doesn't handle, an example that contradicts its own rule, a copy of a rule that no longer matches the original.
+
+### Prove it
+
+For each promise, find the evidence that shows it kept. Run the [read-only check](#run-a-read-only-check) that would show it, or name the check that would; for a promise a test proves, name that test.
+
+Example: given a card promising "a failing test anywhere fails `make test`", Try to break it looks for a test the target would skip, and Prove it backs a kept verdict with a read-only check, such as reading the `test` target in the Makefile.
+
+<mark>**Every lens keeps the read-only rule.**</mark> None runs the build or tests, edits a file or changes the branch, and every lens takes its promises only from the sections [Find the promises](#find-the-promises) names, so none gives a verdict on a "Live check" or "Assumptions to confirm" line.
+
+---
+
 ## Procedure
 
 1. **Read the change.**
@@ -80,7 +102,7 @@ Example: the card promises "the syntax tree of every changed file is the same be
    Diffing from the point the branch left `main` covers committed and uncommitted work on the branch, and nothing `main` gained afterwards — so a commit that lands on `main` mid-branch never reads as this branch removing it. It does **not** show untracked files — read every `??` path from `git status --porcelain` in full. Read any unchanged file the change depends on when a verdict turns on it.
 
 2. **Read the card** you were given and list its promises.
-3. **Give each promise a verdict** with its evidence. Run a [read-only check](#run-a-read-only-check) for any promise that needs one.
+3. **Give each promise a verdict** with its evidence, looking [through your lens](#read-through-your-lens). Run a [read-only check](#run-a-read-only-check) for any promise that needs one.
 
 ---
 
