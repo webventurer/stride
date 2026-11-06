@@ -180,11 +180,7 @@ A claim is a single atomic add in the store, so when several sessions claim at t
 
 ## Tests
 
-```bash
-cd .claude/skills/parallel-sessions/scripts
-PYTHONPATH=. uv run --no-project --with diskcache --with click \
-  python -m unittest tests/test_slots.py
-```
+The tests for `slots.py` and `measure_run.py` live in stride's own repository, beside the skill's source, and run with `pnpm test:py` there. An install leaves them out.
 
 ---
 
