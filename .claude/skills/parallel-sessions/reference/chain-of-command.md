@@ -35,7 +35,7 @@ A soldier doesn't ring the general, and the general isn't consulted about the co
 
 **The commander-in-chief decides what the campaign is for and leaves how to fight it to the ranks.** Purpose and scope are the user's, so the general passes them up rather than answering them.
 
-**A snag that recurs goes up once, as a fix to the process.** When the same problem turns up on job after job, the captain stops working around it and brings it up with a worked before and after; the fix lands in the work, the written record, and the tool that let it through. See [learn from the run](../../../../docs/patterns/ai/learn-from-the-run.md).
+**A snag that recurs goes up once, as a fix to the process.** When the same problem turns up on job after job, the captain stops working around it and brings it up with a worked before and after; the fix lands in the work, the written record, and the tool that let it through. The pattern behind this is called learning from the run.
 
 ## Inspectors check the work from outside the chain
 

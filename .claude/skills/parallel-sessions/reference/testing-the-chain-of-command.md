@@ -4,7 +4,7 @@
 
 ## What the tests found: questions reach the right rank, and soldiers run on Sonnet at high
 
-Both tests ran on 2026-11-06 through [`/sealed-relay`](../../sealed-relay/SKILL.md), on cases written by a fresh session the coordinator never read. They found three things:
+Both tests ran on 2026-11-06 through a sealed relay, on cases written by a fresh session the coordinator never read. They found three things:
 
 - **Questions reach the right rank.** In every measured run, each question was settled at its rank or lower, the general was called before any question reached the user, and no card waiting on the user's answer was merged into the shared code (`main`) with a guessed value in its place, such as a made-up interest rate.
 - **Soldiers run on Sonnet at high effort for planned work.** In fifteen runs on three cards, every setting above Sonnet at medium scored the same quality within chance, and Sonnet at high used the least. Sonnet at medium scored lower on one card in every run.
@@ -25,9 +25,9 @@ The tests vary the soldier's effort first, because a batch runs more soldiers th
 
 Three existing patterns shape how the tests find the sweet spot:
 
-- **[Split-test the world](../../../../docs/patterns/ai/split-test-the-world.md):** run every setting on the same work, rather than reasoning about which would win.
-- **[Predict, then probe](../../../../docs/patterns/ai/predict-then-probe.md):** write the pass marks, the checks that decide whether a run passed, and the decision rule before the first run, so the results can't be read to fit what was already believed.
-- **[Sealed relay](../../../../docs/patterns/ai/sealed-relay.md):** run each round through [`/sealed-relay`](../../sealed-relay/SKILL.md), so a fresh writer builds the cases and checker, a fresh judge rules on each failure, and whoever fixes the skill never marks its own homework.
+- **Split-test the world:** run every setting on the same work, rather than reasoning about which would win.
+- **Predict, then probe:** write the pass marks, the checks that decide whether a run passed, and the decision rule before the first run, so the results can't be read to fit what was already believed.
+- **Sealed relay:** run each round as a sealed relay, so a fresh writer builds the cases and checker, a fresh judge rules on each failure, and whoever fixes the skill never marks its own homework.
 
 ## 🚨 Quick reference
 

@@ -105,8 +105,12 @@ As you start each session, note its name from `ListAgents`, which is how you mes
 When this session can't start side sessions, start each job as a background `claude -p` session instead. It claims a slot, runs its brief and messages you like a side session, and it ends when this session ends, so keep this session open until the batch is done.
 
 1. **Make each job's checkout.** In worktree mode, find the main checkout from git, as the parent of `$(git rev-parse --git-common-dir)`, the way the slot store does, so a coordinator running inside a worktree doesn't nest new ones in its own. Make sure the main checkout ignores `.claude/worktrees/`, adding `/.claude/worktrees` to the shared exclude file (`$(git rev-parse --git-common-dir)/info/exclude`) when it doesn't, then add one worktree per job from `origin/main` at `.claude/worktrees/<holder name>` in the main checkout, beside the app's own session worktrees. In shared checkout mode, every session runs in the main checkout; skip to step 4.
-2. **Link in what git doesn't carry.** A new worktree has no git-ignored files, so the commands, tools and settings the job's skills read are missing. List the main checkout's ignored paths with `git ls-files --others --ignored --exclude-standard --directory`, and link into the worktree, when the worktree lacks it, each one under `.claude/`, each ignored file at the root of the checkout (such as a project settings file) and a virtual environment folder if there is one. Leave caches, build output, dependency folders and `.claude/worktrees` itself out.
-3. **Hide the links from git.** An ignore line ending in `/` matches only a real folder, never a link to one, so add each linked path without the trailing `/` to the shared exclude file, `$(git rev-parse --git-common-dir)/info/exclude`, when it isn't there. Then check `git status --porcelain` prints nothing in each worktree, and nothing new in the main checkout.
+2. **Link in what git doesn't carry.** A new worktree has no git-ignored files, so the commands, tools and settings the job's skills read are missing. Run stride's linking script for each worktree, with both paths absolute:
+
+   ```bash
+   "<main checkout>/.claude/tools/link_stride_install.sh" "<main checkout>" "<worktree>"
+   ```
+3. **Check git sees nothing new.** `git status --porcelain` prints nothing in each worktree, and nothing new in the main checkout.
 4. **Start every session in one turn,** each in the background in its job's checkout, on its model and effort with the advisor off and billed to the user's plan, as [the chain of command config](reference/chain-of-command-config.md) sets out, with its log in `work/logs/`:
 
    ```bash
@@ -188,8 +192,7 @@ PYTHONPATH=. uv run --no-project --with diskcache --with click \
 
 | Doc | Relationship |
 |:----|:-------------|
-| [Claude Code sessions run in their own worktrees](../../../docs/patterns/git/claude-sessions-in-worktrees.md) | How worktree mode keeps each job's files apart |
-| [commit](../commit/SKILL.md) | The commit route a job session uses in a repo with codefu's hooks |
+| [commit](../commit/SKILL.md) | The commit route a job session uses |
 | [A batch runs on a chain of command](reference/chain-of-command.md) | Which rank and model does what in a batch, and which decisions reach the user |
 | [Each rank's model, effort and advisor setting](reference/chain-of-command-config.md) | The settings each rank runs on, the flags that apply them, and how to read a soldier's cost |
 | [Two tests find each rank's sweet spot and keep the user out of the weeds](reference/testing-the-chain-of-command.md) | How questions are tested to stop at the right rank, and how the soldier's sweet-spot effort is found |

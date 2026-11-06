@@ -54,6 +54,6 @@ The coordinator may send you back to fix what merging your work with the others 
 
 > For the coordinator: copy the route for the batch's mode into step 3, then delete this section, so the job session sees only its own route.
 
-**Shared checkout:** other sessions stage files in the same checkout, so commit by naming your paths: a commit given paths after `--` takes only those paths and leaves everything else staged. In a repo with codefu's hooks, follow the `/commit` skill and end its commit command with `-- <your paths>`. Look only at your own paths, and never run a command that stages or unstages the whole checkout (`git add -A`, `git reset`): those touch other sessions' work. If the commit fails because another session holds git's lock (`index.lock`), wait a few seconds and try again until it lands.
+**Shared checkout:** other sessions stage files in the same checkout, so commit by naming your paths: a commit given paths after `--` takes only those paths and leaves everything else staged. Follow the `/commit` skill and end its commit command with `-- <your paths>`. Look only at your own paths, and never run a command that stages or unstages the whole checkout (`git add -A`, `git reset`): those touch other sessions' work. If the commit fails because another session holds git's lock (`index.lock`), wait a few seconds and try again until it lands.
 
 **One worktree per job:** commit your paths on this session's branch with the `/commit` skill. The coordinator merges the branch into `main`; if it sends you back, fix the problem on the same branch.
