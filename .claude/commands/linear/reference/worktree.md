@@ -92,7 +92,7 @@ The paths linked are:
 - **`.claude/settings.local.json`**, where stride's hooks are configured.
 - **The parent's venv**, `.venv` or `venv`, so Python runs straight away in the worktree.
 
-A path is linked only when the parent has it and the worktree doesn't. A path the branch tracks, or one linked earlier, is left alone. Each link is added to the repository's shared `info/exclude` without a trailing slash, because git matches a trailing-slash ignore line such as `.claude/tools/` only against a real folder, never against a link. Without that line every linked folder would show in `git status` as untracked.
+A path is linked only when the parent has it and the worktree doesn't. A path the branch tracks, or one linked earlier, is left alone. `.claude/worktrees` is never linked, even though stride's section lists it: the worktree sits inside that folder, so a link would point back at itself and its siblings. Each link is added to the repository's shared `info/exclude` without a trailing slash, because git matches a trailing-slash ignore line such as `.claude/tools/` only against a real folder, never against a link. Without that line every linked folder would show in `git status` as untracked.
 
 After the settings are shared, run the linking script with the two absolute paths from above, and show its output to the user:
 

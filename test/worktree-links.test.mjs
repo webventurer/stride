@@ -1,6 +1,7 @@
 import { deepStrictEqual, ok, strictEqual } from "node:assert";
 import { execFileSync } from "node:child_process";
 import {
+  existsSync,
   lstatSync,
   mkdirSync,
   mkdtempSync,
@@ -108,6 +109,22 @@ describe("worktree linking step", () => {
       join(mainRepo, ".claude/tools"),
     );
     strictEqual(git(inside, "status", "--porcelain"), "");
+  });
+
+  it("never links .claude/worktrees back into a worktree", () => {
+    const section = strideSection.replace(
+      ".claude/tools/",
+      ".claude/tools/\n.claude/worktrees/",
+    );
+    makeRepo(mainRepo, `${section}\n`);
+    writeFile(mainRepo, ".claude/tools/linear_cli.py");
+    const inside = join(mainRepo, ".claude/worktrees/wb-1");
+    git(mainRepo, "worktree", "add", "-q", inside, "-b", "wb-1");
+
+    runLinking(mainRepo, inside);
+
+    ok(!existsSync(join(inside, ".claude/worktrees")));
+    ok(lstatSync(join(inside, ".claude/tools")).isSymbolicLink());
   });
 
   it("leaves a path the branch tracks alone", () => {

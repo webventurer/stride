@@ -117,6 +117,8 @@ const HOOKS = [
   ".claude/hooks/userpromptsubmit/inject_design_principles.sh",
 ];
 
+const WORKTREES_DIR = ".claude/worktrees/";
+
 const AGENTS = {
   claude: { root: ".claude", generates: [] },
   codex,
@@ -340,10 +342,12 @@ function logAvailableSkills() {
   );
 }
 
-function gitignoreEntries(agents) {
+function gitignoreEntries(agents, outsideSection) {
   const entries = DIRS.filter((d) => d !== ".claude/hooks").map((d) => `${d}/`);
   const generated = agents.flatMap((name) => AGENTS[name].generates);
-  return [...entries, ...generated, ...HOOKS].sort();
+  const listed = new Set(outsideSection.split("\n").map((line) => line.trim()));
+  const worktrees = listed.has(WORKTREES_DIR) ? [] : [WORKTREES_DIR];
+  return [...entries, ...generated, ...HOOKS, ...worktrees].sort();
 }
 
 async function confirmGitignoreWrite() {
@@ -356,7 +360,8 @@ function writeGitignoreSection(agents) {
   const existing = existsSync(path) ? readFileSync(path, "utf8") : "";
   const stripped = removeSection(existing);
   const prefix = stripped ? `${stripped.trimEnd()}\n\n` : "";
-  writeFileSync(path, `${prefix}${buildSection(gitignoreEntries(agents))}\n`);
+  const section = buildSection(gitignoreEntries(agents, stripped));
+  writeFileSync(path, `${prefix}${section}\n`);
 }
 
 async function configureGitignore(agents) {
