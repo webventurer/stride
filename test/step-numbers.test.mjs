@@ -1,5 +1,6 @@
 import { deepStrictEqual } from "node:assert";
-import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
 import { describe, it } from "node:test";
@@ -10,9 +11,10 @@ const commandsDir = join(strideRoot, ".claude/commands");
 const skillsDir = join(strideRoot, ".claude/skills");
 
 const markdownFilesUnder = (dir) =>
-  readdirSync(dir, { recursive: true })
+  execFileSync("git", ["ls-files", "--", dir], { cwd: strideRoot, encoding: "utf8" })
+    .split("\n")
     .filter((path) => path.endsWith(".md"))
-    .map((path) => join(dir, path));
+    .map((path) => join(strideRoot, path));
 
 const letteredStepHeading = /^#{1,6} (?:Step )?(\d+)[a-zA-Z]\b/;
 const plainStepHeading = /^#{1,6} (?:Step )?(\d+)(?![a-zA-Z\d])/;
