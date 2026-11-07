@@ -55,7 +55,7 @@ def run_framework(base: int):
 
 def choose_template() -> str:
     print_menu()
-    return template_for(click.prompt(">"))
+    return framework_template(click.prompt(">"))
 
 
 def print_menu():
@@ -64,7 +64,7 @@ def print_menu():
     click.echo("Which framework are you running?\n" + "\n".join(options))
 
 
-def template_for(choice: str) -> str:
+def framework_template(choice: str) -> str:
     if choice == "6":
         return click.prompt("Command (use {port})")
     if choice not in FRAMEWORKS:

@@ -812,7 +812,7 @@ def set_project_view_manual(project_id: str) -> bool:
         "viewPreferencesCreate(input: $input) { success } }"
     )
     view = {
-        "id": view_pref_id_for(project_id),
+        "id": project_view_pref_id(project_id),
         "type": "organization",
         "viewType": "project",
         "projectId": project_id,
@@ -823,7 +823,7 @@ def set_project_view_manual(project_id: str) -> bool:
     ]
 
 
-def view_pref_id_for(project_id: str) -> str:
+def project_view_pref_id(project_id: str) -> str:
     seed = f"stride:project-view-manual:{project_id}".encode()
     bits = bytearray(hashlib.sha256(seed).digest()[:16])
     bits[6] = (
@@ -966,16 +966,16 @@ def orderable_sequence(states: dict) -> list:
     ]
 
 
-def rank_of(state: dict) -> tuple:
+def state_rank(state: dict) -> tuple:
     return (TYPE_SEQUENCE.index(state["type"]), state["position"])
 
 
 def board_order(board: list) -> list:
-    return [s["name"] for s in sorted(board, key=rank_of)]
+    return [s["name"] for s in sorted(board, key=state_rank)]
 
 
 def positioned_in_order(target: list, board: list) -> bool:
-    ranks = {s["name"]: rank_of(s) for s in board}
+    ranks = {s["name"]: state_rank(s) for s in board}
     return sorted(target, key=lambda n: ranks.get(n, (0, 0.0))) == target
 
 

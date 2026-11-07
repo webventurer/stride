@@ -11,7 +11,7 @@ HOOKS_DIR = Path(__file__).resolve().parent.parent.parent / "hooks"
 sys.path.insert(0, str(HOOKS_DIR))
 
 from check_commit_widths import (  # noqa: E402
-    message_in,
+    commit_message,
     overlong_prose,
     width_violations,
 )
@@ -55,32 +55,32 @@ def test_overlong_prose_flags_long_line_with_spaces():
     assert overlong_prose("a " + "b" * 80) is True
 
 
-def test_message_in_joins_multiple_m_values_with_blank_lines():
+def test_commit_message_joins_multiple_m_values_with_blank_lines():
     args = ["--args", "--allow-empty", "-m", "feat: Subject", "-m", "Body text"]
 
-    assert message_in(args) == "feat: Subject\n\nBody text"
+    assert commit_message(args) == "feat: Subject\n\nBody text"
 
 
-def test_message_in_reads_file_for_dash_capital_f(tmp_path: Path):
+def test_commit_message_reads_file_for_dash_capital_f(tmp_path: Path):
     body = tmp_path / "msg.txt"
     body.write_text("feat: Subject\n\nBody from file")
 
     assert (
-        message_in(["--args", "-F", str(body)])
+        commit_message(["--args", "-F", str(body)])
         == "feat: Subject\n\nBody from file"
     )
 
 
-def test_message_in_empty_when_args_carry_no_message():
-    assert message_in(["--args", "--amend", "--no-edit"]) == ""
+def test_commit_message_empty_when_args_carry_no_message():
+    assert commit_message(["--args", "--amend", "--no-edit"]) == ""
 
 
-def test_message_in_empty_for_fixup_flag():
-    assert message_in(["--args", "--allow-empty", "--fixup=abc123"]) == ""
+def test_commit_message_empty_for_fixup_flag():
+    assert commit_message(["--args", "--allow-empty", "--fixup=abc123"]) == ""
 
 
-def test_message_in_empty_for_missing_file():
-    assert message_in(["--args", "-F", "/nonexistent/msg.txt"]) == ""
+def test_commit_message_empty_for_missing_file():
+    assert commit_message(["--args", "-F", "/nonexistent/msg.txt"]) == ""
 
 
 def test_width_violations_exempts_git_generated_subjects():

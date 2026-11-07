@@ -70,6 +70,7 @@ from linear import (  # noqa: E402
     order_states,
     project_config,
     project_content,
+    project_view_pref_id,
     provision_labels,
     provision_states,
     raise_for_graphql_errors,
@@ -86,7 +87,6 @@ from linear import (  # noqa: E402
     update_issue,
     update_milestone_description,
     update_project_content,
-    view_pref_id_for,
     whoami,
 )
 
@@ -571,7 +571,7 @@ def test_set_project_view_manual_sends_org_project_ordering():
     assert result is True
     assert sent_variables(mock) == {
         "input": {
-            "id": view_pref_id_for("proj-1"),
+            "id": project_view_pref_id("proj-1"),
             "type": "organization",
             "viewType": "project",
             "projectId": "proj-1",
@@ -581,11 +581,11 @@ def test_set_project_view_manual_sends_org_project_ordering():
     assert "viewPreferencesCreate" in sent_query(mock)
 
 
-def test_view_pref_id_for_is_stable_per_project_and_v4_shaped():
-    first = view_pref_id_for("proj-1")
+def test_project_view_pref_id_is_stable_per_project_and_v4_shaped():
+    first = project_view_pref_id("proj-1")
 
-    assert first == view_pref_id_for("proj-1")
-    assert view_pref_id_for("proj-2") != first
+    assert first == project_view_pref_id("proj-1")
+    assert project_view_pref_id("proj-2") != first
     assert uuid.UUID(first).version == 4
 
 

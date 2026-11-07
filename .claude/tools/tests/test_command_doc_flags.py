@@ -86,7 +86,7 @@ def command_path(segment: str) -> tuple | None:
     return tuple(words[:2]) if words[0] in GROUPS else (words[0],)
 
 
-def drift_in(path: Path) -> list:
+def doc_flag_drift(path: Path) -> list:
     findings = []
     for segment in invocation_segments(path.read_text()):
         cmd = command_path(segment)
@@ -105,7 +105,9 @@ def drift_in(path: Path) -> list:
 
 def test_command_docs_reference_only_real_cli_flags():
     drift = [
-        f for md in sorted(COMMANDS_DIR.rglob("*.md")) for f in drift_in(md)
+        f
+        for md in sorted(COMMANDS_DIR.rglob("*.md"))
+        for f in doc_flag_drift(md)
     ]
     assert not drift, (
         "Doc-vs-CLI drift — docs reference flags/subcommands the CLI lacks:\n"

@@ -83,7 +83,7 @@ from start_choice import (  # noqa: E402
 from todo_batch import cards_of_epic, considered_cards  # noqa: E402
 from todo_order import (  # noqa: E402
     cards_in_work_order,
-    epics_in,
+    epic_cards,
     new_sort_orders,
 )
 
@@ -196,7 +196,7 @@ def set_sort_order_cmd(issue_id: str, sort_order: float):
 def order_todo_cmd(project: str, dry_run: bool):
     cards = list_todo_cards(project)
     ordered = cards_in_work_order(cards)
-    orders = new_sort_orders(ordered, epics_in(cards))
+    orders = new_sort_orders(ordered, epic_cards(cards))
     if not dry_run:
         write_todo_order(project, ordered, orders)
     echo_json([order_line(card, orders) for card in ordered])
