@@ -29,6 +29,7 @@ function inOrder(text, markers) {
 }
 
 const skill = read(".claude/skills/parallel-sessions/SKILL.md");
+const brief = read(".claude/skills/parallel-sessions/BRIEF.md");
 
 describe("a /parallel-sessions job running a stride card", () => {
   it("gets the main checkout's .stride.json in the worktree the skill makes", () => {
@@ -82,5 +83,41 @@ describe("a /parallel-sessions job running a stride card", () => {
     } finally {
       rmSync(base, { recursive: true, force: true });
     }
+  });
+
+  it("stops at its pull request, whatever unattended says", () => {
+    const start = read(".claude/commands/linear/start.md");
+
+    ok(
+      inOrder(start, [
+        "### 19. Review",
+        "When this card runs as a `/parallel-sessions` job",
+        "whatever `unattended` says",
+      ]),
+    );
+    ok(brief.includes("`/linear:start` stops once the pull request is open"));
+  });
+
+  it("merges one card at a time, when the coordinator says", () => {
+    ok(skill.includes("one card at a time"));
+    ok(skill.includes("only once the job reports that its merge has landed"));
+    ok(skill.includes("tell its session to run `/linear:finish`"));
+    ok(
+      brief.includes(
+        "Keep your slot, renewing it at each interval, until `/linear:finish` is done",
+      ),
+    );
+  });
+
+  it("leaves the job's worktree and local branch for the coordinator to remove", () => {
+    const finish = read(".claude/commands/linear/finish.md");
+
+    ok(finish.includes("As a `/parallel-sessions` job, skip this step"));
+    ok(
+      finish.includes(
+        "As a `/parallel-sessions` job, delete only the remote branch",
+      ),
+    );
+    ok(brief.includes("Message the coordinator that the card has merged"));
   });
 });
