@@ -154,7 +154,7 @@ If the list is empty: "Backlog is empty — nothing to recommend."
 
 #### Put Todo in the order stride will work it
 
-Todo's order on the board is the order work happens, so next-steps writes it, by rule rather than judgement: priority first, Urgent to Low and then No priority; equal priorities keep their current order; a card never sits above the Todo card it's waiting on, read from Linear's "blocked by" links; `Epic: ` cards keep their place. Show the order first:
+Todo's order on the board is the order work happens, so next-steps writes it, by rule rather than judgement: priority first, Urgent to Low and then No priority; equal priorities keep their current order; a card never sits above the Todo card it's waiting on, read from Linear's "blocked by" links; `Epic: ` cards keep their place, and every work card sits below every epic. Show the order first:
 
 ```bash
 uv run .claude/tools/linear_cli.py order-todo --project "<project>" --dry-run

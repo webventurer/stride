@@ -3,7 +3,8 @@
 Cards run by priority, Urgent first and No priority last, and keep their
 current board order within a priority. A card never sits above the Todo card
 it's waiting on, and a blocker outside Todo changes nothing. Epic cards are
-left out, so they keep their place.
+left out of the order, so they keep their place, and every work card is given
+a place below the highest epic.
 
 The order comes from a rule, not judgement, so two runs over the same board
 give the same order. `linear_cli.py order-todo` reads the board and writes it.
@@ -14,8 +15,16 @@ EPIC_PREFIX = "Epic: "
 SORT_ORDER_GAP = 0.01
 
 
+def is_epic(card: dict) -> bool:
+    return card["title"].startswith(EPIC_PREFIX)
+
+
+def epics_in(cards: list[dict]) -> list[dict]:
+    return [c for c in cards if is_epic(c)]
+
+
 def cards_in_work_order(cards: list[dict]) -> list[dict]:
-    work = [c for c in cards if not c["title"].startswith(EPIC_PREFIX)]
+    work = [c for c in cards if not is_epic(c)]
     on_board = sorted(work, key=lambda c: c["sortOrder"])
     return cards_below_their_blockers(sorted(on_board, key=priority_rank))
 
@@ -59,12 +68,17 @@ def is_unblocked(
     }
 
 
-def new_sort_orders(ordered: list[dict]) -> dict[str, float]:
-    slots = rising(sorted(c["sortOrder"] for c in ordered))
+def new_sort_orders(ordered: list[dict], epics: list[dict]) -> dict[str, float]:
+    slots = rising(sorted(c["sortOrder"] for c in ordered), below_epics(epics))
     return {c["identifier"]: slot for c, slot in zip(ordered, slots)}
 
 
-def rising(slots: list[float]) -> list[float]:
-    for i in range(1, len(slots)):
-        slots[i] = max(slots[i], slots[i - 1] + SORT_ORDER_GAP)
+def below_epics(epics: list[dict]) -> float:
+    return max((e["sortOrder"] for e in epics), default=float("-inf"))
+
+
+def rising(slots: list[float], above: float) -> list[float]:
+    previous = above
+    for i, slot in enumerate(slots):
+        slots[i] = previous = max(slot, previous + SORT_ORDER_GAP)
     return slots

@@ -79,7 +79,11 @@ from start_choice import (  # noqa: E402
     start_choice,
 )
 from todo_batch import considered_cards  # noqa: E402
-from todo_order import cards_in_work_order, new_sort_orders  # noqa: E402
+from todo_order import (  # noqa: E402
+    cards_in_work_order,
+    epics_in,
+    new_sort_orders,
+)
 
 
 @click.group()
@@ -188,8 +192,9 @@ def set_sort_order_cmd(issue_id: str, sort_order: float):
 @click.option("--project", required=True)
 @click.option("--dry-run", is_flag=True, help="Print the order only")
 def order_todo_cmd(project: str, dry_run: bool):
-    ordered = cards_in_work_order(list_todo_cards(project))
-    orders = new_sort_orders(ordered)
+    cards = list_todo_cards(project)
+    ordered = cards_in_work_order(cards)
+    orders = new_sort_orders(ordered, epics_in(cards))
     if not dry_run:
         write_todo_order(project, ordered, orders)
     echo_json([order_line(card, orders) for card in ordered])
