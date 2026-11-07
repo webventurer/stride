@@ -47,7 +47,9 @@ BRIEF_SEARCH_LENGTH = 300
 EDIT_TOOLS = {"Edit", "Write", "NotebookEdit"}
 ASK_TOOL = "AskUserQuestion"
 START_COMMAND = "linear:start"
-MERGE_COMMAND = re.compile(r"(?:^|&&|;|\n)\s*gh pr merge\b")
+MERGE_COMMAND = re.compile(
+    r"\s*(?:cd\s+(?:\"[^\"]*\"|'[^']*'|[^\s&;]+)\s*&&\s*)?gh pr merge\b"
+)
 AUTOMATED_PREFIXES = (
     "[SYSTEM NOTIFICATION",
     "<task-notification",
@@ -268,7 +270,7 @@ def merge_span(events: list[dict]) -> tuple[int, int] | None:
     for index, event in enumerate(events):
         for call in tool_uses(event):
             command = call.get("input", {}).get("command", "")
-            if call["name"] == "Bash" and MERGE_COMMAND.search(command):
+            if call["name"] == "Bash" and MERGE_COMMAND.match(command):
                 result = result_index(events, index, call["id"])
                 if result is not None:
                     return index, result
