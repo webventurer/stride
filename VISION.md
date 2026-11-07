@@ -2,6 +2,17 @@
 
 > Apply guardrails, not walls. Encourage discipline but don't obstruct flow.
 
+## The principle
+
+**Speed up whenever you can, but never at the cost of quality. Scheduling is stride's job, not yours. Every finished card teaches the next ones.**
+
+In practice that means four things:
+
+- **Fast:** cards that don't depend on each other run side by side, and a card waiting on another holds back until that card is done.
+- **Quality:** a card in a batch gets every check it would get on its own.
+- **No scheduling for you:** you decide what goes in Todo. Stride decides the order and how many run at once.
+- **Agile:** take a small step, see what it taught you, and change the plan before the next step.
+
 ## What it delivers
 
 Manage your own dev team on a Kanban board so everything's visible — except the team is AI.
@@ -42,6 +53,8 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] The common path through every `/linear:*` command runs without prompts; interruptions appear only when stride detects friction worth the user's judgement
 - [ ] You can review your working changes at any point without leaving the flow — `/linear:start` surfaces the diff at its review step, and (with diffity installed) `/diffity-diff` opens a visual diff on demand
 - [ ] Parallel work streams run without leaving the editor — `--worktree` prepares a worktree you open as a terminal in the current VS Code window, so multiple cards run side by side without alt-tabbing between windows
+- [ ] The cards you move to Todo reach Done as fast as they can without lowering quality, and you never schedule them: `/linear:start` orders them, runs the independent ones side by side up to the number `parallel-sessions` sets in `.stride.json`, holds back any card that waits on another, and every card still passes every check it would get on its own
+- [ ] Every finished card teaches the cards still to come: before the next card starts, what the last one's checks found is read, and any card in Todo that the lesson changes is reworded first, with a comment saying what changed and why. Take a small step, learn from it, apply the learning, then take the next step
 - [ ] Every multi-step stride interaction discloses its scope upfront — number of steps, time estimate, escape hatch — so the user is never trapped in an open-ended sequence
 - [ ] When you list the commits this branch is adding, the story reads naturally to a non-engineer scanning top-to-bottom (`git log main..HEAD --oneline` to check)
 - [ ] Every Linear card can be understood by someone who does not know stride's commands or code — its title names a stakeholder outcome, while its description and updates use concrete, everyday words
@@ -69,7 +82,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 
 ## What it won't do
 
-- **Not a project orchestrator.** stride manages stories, not multi-sprint roadmaps. Autonomous loops and vision-refinement cycles belong in a separate tool
+- **Not a project orchestrator.** You decide what work exists and which cards go in Todo; stride ships the cards in Todo, in the best order it can find, and never adds cards to the board or decides by itself what to work on. Multi-sprint roadmaps and planning loops belong in a separate tool
 - **Not a vibe-coding accelerator.** stride adds friction up front for compounding returns by day 30+
 - **Not installed globally.** Everything lives in the consumer's repo — `.claude/` plus whatever per-tool footprint is generated beside it — no machine-wide state
 - **Not lock-in.** Read the markdown, change it, fork it, remove it
