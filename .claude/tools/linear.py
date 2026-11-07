@@ -697,6 +697,26 @@ def min_backlog_sort_order(project_id: str) -> float | None:
     return min(orders) if orders else None
 
 
+def list_todo_cards(project: str) -> list[dict]:
+    fields = f"id identifier title priority sortOrder {BLOCKER_FIELDS}"
+    query = (
+        "query($project: String!) { issues(filter: { project: { name: "
+        '{ eq: $project } } state: { name: { eq: "Todo" } } }, first: 250) '
+        f"{{ nodes {{ {fields} }} }} }}"
+    )
+    nodes = graphql_data(query, {"project": project})["issues"]["nodes"]
+    return [node | {"blockers": blocker_identifiers(node)} for node in nodes]
+
+
+def write_todo_order(
+    project: str, ordered_cards: list[dict], sort_orders: dict
+):
+    set_project_view_manual(resolve_project_id(bearer_token(), project))
+    for card in ordered_cards:
+        if card["sortOrder"] != sort_orders[card["identifier"]]:
+            set_sort_order(card["id"], sort_orders[card["identifier"]])
+
+
 def set_sort_order(issue_id: str, sort_order: float) -> bool:
     query = (
         "mutation($id: String!, $order: Float!) { "

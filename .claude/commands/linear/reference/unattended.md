@@ -68,7 +68,8 @@ In unattended mode:
 - Apply reversible or deterministic choices whose outcome is already specified
 - Follow each delivery command's unattended Vision-evolution path when no
   Success criterion plainly fits
-- Keep read-only commands read-only
+- Keep read-only commands read-only; `/linear:next-steps` writes only Todo's
+  order
 - Continue a delivery flow only after its validation and repository checks pass
 
 Vision fit follows the delivery command. Interactive mode stops for the user's

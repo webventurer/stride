@@ -48,6 +48,7 @@ from linear import (  # noqa: E402
     list_projects,
     list_team_states,
     list_teams,
+    list_todo_cards,
     milestone_open_issues,
     min_backlog_sort_order,
     project_content,
@@ -67,7 +68,9 @@ from linear import (  # noqa: E402
     update_project_content,
     whoami,
     workspace_labels,
+    write_todo_order,
 )
+from todo_order import cards_in_work_order, new_sort_orders  # noqa: E402
 
 
 @click.group()
@@ -170,6 +173,24 @@ def min_backlog_sort_order_cmd(project_id: str):
 @click.option("--sort-order", type=float, required=True)
 def set_sort_order_cmd(issue_id: str, sort_order: float):
     echo_json(set_sort_order(issue_id, sort_order))
+
+
+@cli.command("order-todo")
+@click.option("--project", required=True)
+@click.option("--dry-run", is_flag=True, help="Print the order only")
+def order_todo_cmd(project: str, dry_run: bool):
+    ordered = cards_in_work_order(list_todo_cards(project))
+    orders = new_sort_orders(ordered)
+    if not dry_run:
+        write_todo_order(project, ordered, orders)
+    echo_json([order_line(card, orders) for card in ordered])
+
+
+def order_line(card: dict, orders: dict) -> dict:
+    fields = ["identifier", "title", "priority", "blockers"]
+    return {f: card[f] for f in fields} | {
+        "sortOrder": orders[card["identifier"]]
+    }
 
 
 @cli.command("set-project-view-manual")

@@ -47,7 +47,8 @@ describe("unattended Linear flow", () => {
     const setup = read(".claude/commands/linear/setup.md");
     const vision = read(".claude/commands/linear/update-vision.md");
     ok(plan.includes("scope shape is not safe to guess"));
-    ok(next.includes("a read-only command\nnever starts mutating work"));
+    ok(next.includes("next-steps never starts\nwork automatically"));
+    ok(next.includes("order-todo --project"));
     ok(setup.includes("stops rather than guessing"));
     ok(vision.includes("immediately in unattended mode"));
   });
