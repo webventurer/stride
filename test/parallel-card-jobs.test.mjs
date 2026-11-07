@@ -136,7 +136,6 @@ describe("a /parallel-sessions job running a stride card", () => {
         "When `/linear:start` runs next-steps because no card was named, skip this step",
       ),
     );
-    ok(brief.includes("message the coordinator with the question instead"));
     ok(
       skill.includes(
         "reports a question instead of a pull request leaves its card out",
@@ -187,6 +186,46 @@ describe("a /parallel-sessions job running a stride card", () => {
         "never in one long sleep",
         "told to carry on after your session exited, claim a slot first",
       ]),
+    );
+  });
+});
+
+describe("a card job with a question only the user can answer", () => {
+  it("posts it on the card, tells the coordinator the card stopped and ends without waiting", () => {
+    ok(
+      inOrder(brief, [
+        "You have a question only the user can answer",
+        "post the question on the card as a comment",
+        "whatever `unattended` says",
+        "naming the card and saying the question is on the card",
+        "without the question's text",
+        "Release your slot and end your turn at once",
+        "without waiting for a reply",
+      ]),
+    );
+    ok(
+      brief.includes(
+        "at a question only the user can answer, the question goes on the card",
+      ),
+    );
+    ok(!brief.includes("message the coordinator with the question instead"));
+  });
+
+  it("still asks the coordinator about the other jobs, and waits for the reply", () => {
+    ok(
+      inOrder(brief, [
+        "a question about how the job fits with the other jobs in the batch",
+        "the mission or the other jobs already answer",
+        "ask it, then wait for the reply",
+      ]),
+    );
+  });
+
+  it("is the one wait on the coordinator that a card job skips", () => {
+    ok(
+      brief.includes(
+        "A card job that has posted its question on the card ends its turn at once",
+      ),
     );
   });
 });
