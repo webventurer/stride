@@ -190,3 +190,17 @@ describe("a /parallel-sessions job running a stride card", () => {
     );
   });
 });
+
+describe("the coordinator's steps for a batch of stride cards", () => {
+  const step5 = skill.slice(
+    skill.indexOf("### 5. Watch and check"),
+    skill.indexOf("### 6. Report"),
+  );
+
+  it("names the card in a card job's brief and checks the pull request's files against it", () => {
+    ok(skill.includes("names the card in place of a path list"));
+    ok(brief.includes("**Scope:**"));
+    ok(step5.includes("gh pr diff <number> --name-only"));
+    ok(step5.includes("the card's \"What we'll do\" doesn't call for"));
+  });
+});

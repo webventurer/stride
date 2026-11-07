@@ -12,6 +12,8 @@ You are one job in a batch of parallel sessions. Do this one job, commit only it
 
 **Paths you may write:** `<every path, listed>` — write nothing else.
 
+> For the coordinator: a job running a stride card has no path list. Replace the line above with **Scope:** `<the card's identifier and title>` — the files the card's "What we'll do" calls for. The coordinator checks the pull request's files against the card. Delete this note once the brief is filled in.
+
 **Holder name:** `<job name, unique in the batch>`
 
 **Slot options:** `<--limit N, plus --store <absolute path> and --expiry <seconds> when the batch sets them>`

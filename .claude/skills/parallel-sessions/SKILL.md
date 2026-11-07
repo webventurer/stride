@@ -81,6 +81,8 @@ When `/linear:start` runs a batch of cards, it settles the six values itself and
 
 Copy [BRIEF.md](BRIEF.md) once per job and fill it in: the mission, word for word, the job, the exact paths it may write, the holder name (the job's name, unique in the batch), the slot store, the limit, the commit route for the mode and the coordinator's session name, this session's name as `ListAgents` gives it. Name every path up front: the coordinator checks each commit against them.
 
+A job running a stride card is the exception: its brief names the card in place of a path list, because the card's own "What we'll do" says what the job may change, and a card often mentions files it doesn't change. Everything below that checks paths against the brief, the commit check in step 5 and the report in step 6, applies to jobs that aren't a stride card; a card job's files are checked as step 5 sets out.
+
 A question you can already see in a job, such as a choice that turns on another job, is cheapest settled in its brief. Settle it only with an answer that keeps every part of the mission: a default that would break one part, such as pounds for a branch that sells in euros, is not settled. Take it to `/advisor`, then to the user if the advisor can't settle it.
 
 The slot store defaults to `work/slots` under the main checkout. The script finds that folder from git even inside a worktree, so every session reaches the same store. Give `--store` an absolute path only to use a different one.
@@ -149,7 +151,7 @@ When a job's session exits holding a slot, release its slot at once with `slots.
 
 Each session messages you when its work is ready, when it hits an error it can't fix, and when it has a question about its job's purpose or scope. As each job's work is ready:
 
-- Check its commit holds only the paths its brief named (`git show --stat <commit>`), and report any that doesn't
+- For a job that isn't a stride card, check its commit holds only the paths its brief named (`git show --stat <commit>`), and report any that doesn't. For a stride card's job, list the pull request's files with `gh pr diff <number> --name-only` and report to the user any file the card's "What we'll do" doesn't call for, before you tell the job to run `/linear:finish`
 - In worktree mode, before each merge after the first, build the code as it will look merged with `main` and run the project's checks and tests on it. Cards in one batch start from the same `main`, so each one's checks ran without the others' changes
 - If that fails, send the failure back to the job's session rather than fixing it yourself, so the session that wrote the code fixes it and its own checks cover the fix
 - If the job's session has already exited, resume it in its worktree with the message (`claude -p --resume <session-id>` for a `claude -p` session, with the environment, model, effort and permission options it started with, the ID taken from its log's `session_id`, and its log in `work/logs/<holder name>.resume-<n>.jsonl`). The message tells it to claim a slot before it carries on, and you resume an exited job only when `slots.py status` shows a free slot. Until one is free, give the go to a card whose job holds a slot, so each merge frees one, and no job waits for a slot that only its own merge could free
@@ -165,7 +167,7 @@ The question reaches the user with none of the context the batch has built up, s
 
 ### 6. Report
 
-Tell the user which jobs committed, which ended without a commit (a session that died, or a job that failed), and any commit that touched a path outside its brief. Leave `work/progress.md` showing each job's final state.
+Tell the user which jobs committed, which ended without a commit (a session that died, or a job that failed), and any commit from a job that is not a stride card that touched a path outside its brief. Leave `work/progress.md` showing each job's final state.
 
 **Report once every job is merged or waiting on the user and every session has exited,** then end the session. Put any question for the user last, after the report and the progress file's path, so the question is the last thing the session says. A notice that arrives after the question, such as a session exiting or a background task finishing, changes nothing the user needs: handle it without a word to the user, and if you must reply, end on the question again. A `claude -p` coordinator exits when its final turn ends with nothing left running.
 
