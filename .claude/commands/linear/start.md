@@ -144,9 +144,17 @@ Skip this step when the current branch is already the card's branch, as when res
    git fetch origin main
    ```
 
-2. **Spawn three reviewers at once.** Use the Task tool (`general-purpose`, model `sonnet`, effort `high`), one per lens from the brief's [Read through your lens](reference/card-start-review.md#read-through-your-lens): the first "Promise by promise", the second "Try to break it", the third "Prove it". Give each **only** the card, its lens, its parent epic when step 1 surfaced one, and its own output path — never the planning conversation:
+2. **Spawn three reviewers at once.** Use the Task tool (`general-purpose`, model `sonnet`, effort `high`), one per lens from the brief's [Read through your lens](reference/card-start-review.md#read-through-your-lens): the first "Promise by promise", the second "Try to break it", the third "Prove it". Give each **only** the card's title and file, its lens, its parent epic when step 1 surfaced one, and its own output path — never the planning conversation.
 
-   > Read `.claude/commands/linear/reference/card-start-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. The card is: `<identifier> — <title>`, described as: `<issue description>`. Its parent epic is `<epic-identifier>`, UUID `<epic-UUID>`. Write your findings as JSONL to `<output-path>`.
+   Save the card to the file first. It holds the card's description exactly as the card holds it, so no reviewer reads a copy retyped into a prompt. It sits outside the worktree and its path holds the card's identifier, so cards running side by side never share one:
+
+   ```bash
+   mkdir -p /tmp/<identifier> && uv run .claude/tools/linear_cli.py issue get <issue-id> | jq -r .description > /tmp/<identifier>/card.md
+   ```
+
+   Then give each reviewer:
+
+   > Read `.claude/commands/linear/reference/card-start-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. The card is: `<identifier> — <title>`. Read its exact description from `/tmp/<identifier>/card.md`. Its parent epic is `<epic-identifier>`, UUID `<epic-UUID>`. Write your findings as JSONL to `<output-path>`.
 
    Sonnet at high effort is the setting [chain-of-command config](../../skills/parallel-sessions/reference/chain-of-command-config.md#sonnet-at-high-effort-is-the-soldiers-sweet-spot) found as good as every higher setting while using fewer tokens than any of them. It was measured on implementation jobs, not on reviews.
 
@@ -302,9 +310,17 @@ Step 8's YAGNI gate and footprint audit are the **forward pass** — prevention,
 
 It runs before the commit and PR so accepted deletions reach the final review.
 
-1. **Spawn the reviewer.** Use the Task tool (`general-purpose`, model `sonnet`, effort `high`). Give it **only** the issue and an output path — never your reasoning, never this conversation:
+1. **Spawn the reviewer.** Use the Task tool (`general-purpose`, model `sonnet`, effort `high`). Give it **only** the issue's title and file and an output path — never your reasoning, never this conversation.
 
-   > Read `.claude/commands/linear/reference/simplify-review.md` and follow it. Review this branch's change since it left `main`. The issue it must still satisfy is: `<identifier> — <title>`, described as: `<issue description>`. Write your proposals as JSONL to `<output-path>`.
+   Step 3 may have reworded the card, so save it again first, exactly as the card now holds it:
+
+   ```bash
+   mkdir -p /tmp/<identifier> && uv run .claude/tools/linear_cli.py issue get <issue-id> | jq -r .description > /tmp/<identifier>/card.md
+   ```
+
+   Then give the reviewer:
+
+   > Read `.claude/commands/linear/reference/simplify-review.md` and follow it. Review this branch's change since it left `main`. The issue it must still satisfy is: `<identifier> — <title>`. Read its exact description from `/tmp/<identifier>/card.md`. Write your proposals as JSONL to `<output-path>`.
 
    Sonnet at high effort is the setting [chain-of-command config](../../skills/parallel-sessions/reference/chain-of-command-config.md#sonnet-at-high-effort-is-the-soldiers-sweet-spot) found as good as every higher setting while using fewer tokens than any of them. It was measured on implementation jobs, not on reviews.
 

@@ -12,9 +12,17 @@ The card is the agreement about what the work will do. The simplification, atomi
 
 Commit all work on the branch with `/commit` first, so the reviewers read exactly what will merge.
 
-Spawn three fresh sub-agents at once with the Task tool (`general-purpose`, model `sonnet`, effort `high`), each with its own output path and its own lens from the brief's [Read through your lens](card-check-review.md#read-through-your-lens): the first "Promise by promise", the second "Try to break it", the third "Prove it". Give each **only** the card, its lens and its output path — never your reasoning, the plan checklist or this conversation:
+Spawn three fresh sub-agents at once with the Task tool (`general-purpose`, model `sonnet`, effort `high`), each with its own output path and its own lens from the brief's [Read through your lens](card-check-review.md#read-through-your-lens): the first "Promise by promise", the second "Try to break it", the third "Prove it". Give each **only** the card's title and file, its lens and its output path — never your reasoning, the plan checklist or this conversation.
 
-> Read `.claude/commands/linear/reference/card-check-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. Review this branch's change since it left `main`. The card is: `<identifier> — <title>`, described as: `<issue description>`. Write your verdicts as JSONL to `<output-path>`.
+Save the card to the file first, exactly as the card holds it now: the card may have been reworded since an earlier check, and `/linear:finish` runs this check in a session that never saved one. The file sits outside the worktree, so it never dirties the tree the reviewers read, and its path holds the card's identifier, so cards running side by side never share one:
+
+```bash
+mkdir -p /tmp/<identifier> && uv run .claude/tools/linear_cli.py issue get <issue-id> | jq -r .description > /tmp/<identifier>/card.md
+```
+
+Then give each reviewer:
+
+> Read `.claude/commands/linear/reference/card-check-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. Review this branch's change since it left `main`. The card is: `<identifier> — <title>`. Read its exact description from `/tmp/<identifier>/card.md`. Write your verdicts as JSONL to `<output-path>`.
 
 Sonnet at high effort is the setting [chain-of-command config](../../../skills/parallel-sessions/reference/chain-of-command-config.md#sonnet-at-high-effort-is-the-soldiers-sweet-spot) found as good as every higher setting while using fewer tokens than any of them. It was measured on implementation jobs, not on reviews.
 
