@@ -117,7 +117,7 @@ If the issue has no "Why this matters" section, decide whether it qualifies for 
 
 ### 3. Check the card
 
-The card check in step 11 can only be as good as the promises it checks. Before a branch exists or any code is written, a fresh reviewer reads the card the way that check will, and reports any promise that cannot be checked, contradicts something, misses an edge case the code plainly has, or no longer fits what earlier cards shipped.
+The card check in step 11 can only be as good as the promises it checks. Before a branch exists or any code is written, a fresh reviewer reads the card the way that check will, and reports any promise that cannot be checked, contradicts something, misses an edge case the code plainly has, or no longer fits what has changed since the card was written: what earlier cards shipped, commits that reached `main` and comments on open sibling cards. [agility](reference/agility.md) says why the check looks at what has changed.
 
 Skip this step when the current branch is already the card's branch, as when resuming inside a worktree: the run that created the branch checked the card first.
 

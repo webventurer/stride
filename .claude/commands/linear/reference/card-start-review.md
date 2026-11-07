@@ -26,6 +26,15 @@ You **report**. You do not edit the card, the code or the Vision. Write output o
 - **`VISION.md`** — the criterion the card's "Why this matters" claims to serve
 - **The current repository** — the code, tests and documents the card's promises concern
 - **Finished sibling cards**, when you were given a parent epic. List its cards with `uv run .claude/tools/linear_cli.py list-by-parent <epic-UUID>`, using the UUID you were given, read each Done sibling with `uv run .claude/tools/linear_cli.py issue get <id>`, and see what it shipped with `git log main -i --grep=<id>`
+- **What changed since the card's description last changed.** [Agility](agility.md) says why. Get that time with `uv run .claude/tools/linear_cli.py issue description-changed-at <card-id>`: the last change to the description, or when the card was created if it never changed. A move between columns, a new place in the column or a new link doesn't move it. Then read:
+  - **Commits that reached `main` since that time**, whichever card they came from, if any. This lists them by when GitHub received them, not the date each commit carries, so a commit made earlier but pushed or merged later is still read, and it fetches `main` first:
+
+    ```bash
+    .claude/tools/main_changes_since.sh <time>
+    ```
+
+    Read each one listed with `git show --stat <sha>`, and a merge's own commits with `git log --oneline <sha>^1..<sha>`.
+  - **Comments on the epic's open sibling cards made since that time**, when you were given a parent epic: `uv run .claude/tools/linear_cli.py comment list <id>` for each sibling still open, neither Done nor Cancelled
 
 ---
 
@@ -43,7 +52,7 @@ A line that fails test 2 is a `mechanism` finding when it describes something th
 | `uncheckable` | A promise fails test 1 — a vague quality such as "works well" or "is robust", a process line, a risk rating — or fails test 2 while being true or false whatever the change does — an opinion, a guess, a fact about today. Also a claim only a run against a real service could show, such as "the API accepts this filter", that sits outside "Live check" | Which test the line fails, and why. For a claim only a real run can prove, `proposed` moves it under "Live check" |
 | `contradictory` | Two promises cannot both hold, or the current repository already makes a promise impossible | Both lines, or the promise and the file and line that rules it out |
 | `missing` | The current repository plainly has an edge case on the card's path that the card does not mention | The file and line where the edge case lives, and the situation that triggers it |
-| `stale` | A promise or the Vision trace no longer fits, given what a finished sibling card shipped | The sibling, what it shipped, and why the promise no longer fits |
+| `stale` | A promise or the Vision trace no longer fits, given what a finished sibling card shipped, a commit that reached `main` since the card's description last changed, or a comment on an open sibling card since then | The sibling, commit or comment, what it changed, and why the promise no longer fits |
 | `mechanism` | A promise fails test 2 by describing something the change does: it is met by making a particular edit or using a particular mechanism, whether or not the result it serves holds — "move the retry logic into its own file", "add a page from the template", "use a lock" | The promise, and why the edit landing would read as kept even if the result failed |
 
 Every finding proposes new wording for the card in `proposed` — a rewritten line that can be shown kept or broken, or the line to add or remove. The orchestrator applies it or rewords it; your wording is a starting point, not a decision.

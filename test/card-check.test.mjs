@@ -258,6 +258,21 @@ describe("card start check", () => {
     ok(brief.includes("you report, the orchestrator acts"));
   });
 
+  it("reads what changed since the card's description last changed", () => {
+    const start = read(".claude/commands/linear/start.md");
+    const brief = read(
+      ".claude/commands/linear/reference/card-start-review.md",
+    );
+    const agility = read(".claude/commands/linear/reference/agility.md");
+
+    ok(brief.includes("issue description-changed-at <card-id>"));
+    ok(brief.includes(".claude/tools/main_changes_since.sh <time>"));
+    ok(brief.includes("made since that time"));
+    ok(brief.includes("[Agility](agility.md)"));
+    ok(start.includes("[agility](reference/agility.md)"));
+    ok(agility.includes("A plan is a map, not a contract"));
+  });
+
   it("checks the card once, not again on resuming in a worktree", () => {
     const start = read(".claude/commands/linear/start.md");
 
