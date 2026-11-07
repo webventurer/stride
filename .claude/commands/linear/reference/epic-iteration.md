@@ -2,7 +2,7 @@
 
 > The path `/linear:start` follows when its argument is an epic rather than a story. The decision — single story by default, iterate when the argument is an epic — stays in `start.md` (step 1); this file holds the execution mechanics so the command stays scannable. Step numbers below refer to `/linear:start`'s steps.
 
-> When the argument is an epic and the branch is `main`, `/linear:start` runs the epic's sub-issues in Todo as a batch ([below](#batch-on-main)). On any other branch it works them one at a time. Interactive mode pauses at every PR; [unattended mode](unattended.md) finishes a passing story and continues. An epic has no code of its own — its work lives in its stories.
+> When the argument is an epic and the branch is `main`, `/linear:start` runs the epic's sub-issues in Todo as a batch ([below](#batch-on-main)); unattended mode runs on batch after batch until none of them can start. On any other branch it works them one at a time. Interactive mode pauses at every PR; [unattended mode](unattended.md) finishes a passing story and continues. An epic has no code of its own — its work lives in its stories.
 
 ---
 
@@ -16,14 +16,32 @@ uv run .claude/tools/linear_cli.py start-choice --project "<project>" --branch m
 
 Follow its answer:
 
-- **`batch`** — run the cards through `/parallel-sessions`, settling its settings as `/linear:start` does for a batch on `main`. Interactive mode shows the batch and waits for the user's "go"; unattended mode gives the skill its "go" itself. Then stop: one batch, in both modes. Running on through the epic's later batches is not part of this route, so the user runs `/linear:start <epic>` again
-- **`single`** — work that card as `/linear:start <card>` does
-- **`blocked`** — show each sub-issue's reason and stop, starting nothing
-- **`empty`** — say no sub-issue of the epic is in Todo and stop
+- **`batch`** — run the cards through `/parallel-sessions`, settling its settings as `/linear:start` does for a batch on `main`. Interactive mode shows the batch and waits for the user's "go", then stops after the one batch, so the user runs `/linear:start <epic>` again for the next. Unattended mode gives the skill its "go" itself and runs on, as [below](#unattended-mode-runs-on-until-the-epics-cards-are-done) sets out
+- **`single`** — interactive mode works that card as `/linear:start <card>` does, and the run ends when its pull request is merged. Unattended mode runs it as a batch of one, so a failure ends that card's job and not the run, and the run goes on
+- **`blocked`** — show each sub-issue's reason and stop, starting nothing. Ending an unattended run, it opens the final report below
+- **`empty`** — say no sub-issue of the epic is in Todo and stop. Ending an unattended run, it opens the final report below
 
 `linear_cli.py next-batch --project "<project>" --epic "<epic-identifier>"` shows every sub-issue it looked at and why each one is out.
 
-On `main`, E1 to E4 are not entered in either mode, even for a `single` card: when that card's pull request is merged, the run ends. On any other branch, work the sub-issues one at a time, as E1 to E4 say.
+On `main`, E1 to E4 are not entered in either mode. On any other branch, work the sub-issues one at a time, as E1 to E4 say.
+
+### Unattended mode runs on until the epic's cards are done
+
+The run is the [Todo run](todo-run.md), with each round asking stride about the epic's cards only. The run keeps its list of started cards as the Todo run does, and each round asks:
+
+```bash
+uv run .claude/tools/linear_cli.py start-choice --project "<project>" --branch main --epic "<epic-identifier>" --started <card> --started <card>
+```
+
+After each batch's report, the run asks again. It ends on `blocked` or `empty`: no card of the epic left in Todo can start. A card outside the epic is never started, and a blocker outside the epic is never started either, so a card it blocks waits. Failed cards, held questions and lessons are handled as the Todo run sets them out.
+
+The run's last message lists the epic's cards that were in Todo when it began:
+
+- **Done:** each card that merged.
+- **Failed:** each card that failed, with the check that failed or the decision it needs.
+- **Waiting:** each card still in Todo that isn't listed as failed, with the reason `start-choice` gave.
+
+The Todo run's lessons and questions follow, questions last.
 
 ## E1. Enumerate and disclose upfront
 

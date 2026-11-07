@@ -1812,7 +1812,10 @@ def sub_issue(identifier: str, epic: str, open_blockers: list | None = None):
     }
 
 
-def start_choice_for_epic(cards: list[dict], size: int = 3) -> dict:
+def start_choice_for_epic(
+    cards: list[dict], size: int = 3, started: tuple[str, ...] = ()
+) -> dict:
+    started_args = [arg for card in started for arg in ("--started", card)]
     with (
         patch(
             "linear.project_config", return_value={"parallel-sessions": size}
@@ -1829,6 +1832,7 @@ def start_choice_for_epic(cards: list[dict], size: int = 3) -> dict:
                 "main",
                 "--epic",
                 "wb-1",
+                *started_args,
             ],
         )
 
@@ -1876,6 +1880,57 @@ def test_start_choice_for_an_epic_with_nothing_in_todo_is_empty():
     cards = [sub_issue("X1", "WB-2")]
 
     assert start_choice_for_epic(cards) == {"action": "empty"}
+
+
+# ---- WB-979: a named epic's run asks again after each batch ----
+
+
+def test_start_choice_for_an_epic_names_the_next_batch_past_started_cards():
+    cards = [
+        sub_issue("X1", "WB-2"),
+        sub_issue("A", "WB-1"),
+        sub_issue("B", "WB-1"),
+        sub_issue("C", "WB-1"),
+        sub_issue("D", "WB-1"),
+    ]
+
+    assert start_choice_for_epic(cards, size=2, started=("A", "B")) == {
+        "action": "batch",
+        "cards": ["C", "D"],
+    }
+
+
+def test_start_choice_for_an_epic_never_names_a_card_of_another_epic():
+    cards = [
+        sub_issue("X1", "WB-2"),
+        sub_issue("A", "WB-1"),
+        sub_issue("B", "WB-1"),
+    ]
+
+    assert start_choice_for_epic(cards, started=("A", "B")) == {
+        "action": "blocked",
+        "reasons": {
+            "A": "started earlier in this run and stopped in Todo",
+            "B": "started earlier in this run and stopped in Todo",
+        },
+    }
+
+
+def test_start_choice_for_an_epic_is_empty_once_its_cards_have_left_todo():
+    cards = [sub_issue("X1", "WB-2")]
+
+    assert start_choice_for_epic(cards, started=("A", "B")) == {
+        "action": "empty"
+    }
+
+
+def test_start_choice_for_an_epic_runs_a_card_freed_by_a_merged_blocker_alone():
+    cards = [sub_issue("B", "WB-1"), sub_issue("X1", "WB-2")]
+
+    assert start_choice_for_epic(cards, started=("A",)) == {
+        "action": "single",
+        "card": "B",
+    }
 
 
 def test_next_batch_for_an_epic_shows_only_its_cards():
