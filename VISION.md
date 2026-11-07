@@ -42,7 +42,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] When new work strains against older criteria, the Vision can be updated to reflect what was learned — `VISION.md` evolves with the work, not separately from it
 - [ ] Work is filed against a criterion it plainly serves. When the closest one only fits if you stretch what it says, the loop stops and says so before merging, instead of picking the nearest and calling it verified
 - [ ] What a reader is told stride installs matches what it installs — every shipped skill and command is described where a reader looks, and the counts agree across the README, the docs site and the installer's own output
-- [ ] The code examples stride installs into a repo teach what that repo's own standards ask — an installed doc's example follows the house rules of the tools that consume it, so an agent learning from stride never picks up the opposite of what the repo enforces
+- [ ] Example code in the docs stride installs follows the same style as stride's own code, so an agent learning from either sees one way of writing it
 - [ ] You can improve stride through using it — friction hit while working *in* the project can be surfaced, fixed, and used *on* the project within the same session, so the tool compounds
 - [ ] Every commit on a stride-managed branch passes multi-pass atomicity — no monolithic commits, every message explains *why*
 - [ ] What ships is the simplest thing that works — before you review a change, a reviewer that never saw the reasoning reads it cold and names what can be deleted, so scaffolding that felt necessary while writing it never reaches `main`
