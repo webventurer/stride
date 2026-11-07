@@ -130,6 +130,7 @@ Rules for the file:
 ## What you must not do
 
 - Do not read or ask for the planning conversation; judge the card, the Vision and the repository alone
+- Do not search outside the repository: open a path the card or the orchestrator names directly, find any other file with `git ls-files --cached --others --exclude-standard` or `git grep --untracked`, which both include files the change added but hasn't committed, and never start a search from `/` or the home folder. A search of the whole disk runs until the command time limit stops it
 - Do not edit, stage or commit anything, the card, the code or the Vision included: you report, the orchestrator acts. Write output only
 - Do not propose new scope; a `missing` finding names an edge case on the card's own path, never a feature
 - Do not raise a finding you cannot pin to evidence

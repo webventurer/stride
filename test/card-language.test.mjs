@@ -33,7 +33,7 @@ describe("Linear card language", () => {
         "../../../skills/clear-speak/writing/george-orwell-rules-for-writing.md",
       ),
     );
-    ok(reference.includes("filenames"));
+    ok(reference.includes("file paths"));
     ok(reference.includes("constraints"));
     ok(reference.includes("edge cases"));
     ok(reference.includes("acceptance criteria"));

@@ -481,3 +481,23 @@ describe("the simplification reviewer's setting", () => {
     ok(existsSync(join(strideRoot, ".claude/commands/linear", link[1])), link[1]);
   });
 });
+
+describe("where reviewers look for files", () => {
+  const briefs = ["card-start-review.md", "card-check-review.md", "simplify-review.md"];
+
+  for (const brief of briefs) {
+    it(`keeps the ${brief} reviewer's searches inside the repository`, () => {
+      const text = read(`.claude/commands/linear/reference/${brief}`);
+
+      ok(text.includes("git ls-files --cached --others --exclude-standard"), brief);
+      ok(text.includes("git grep --untracked"), brief);
+      ok(text.includes("never start a search from `/` or the home folder"), brief);
+    });
+  }
+
+  it("tells card writers to name a file by its path from the repository root", () => {
+    const language = read(".claude/commands/linear/reference/card-language.md");
+
+    ok(language.includes("exact file paths from the repository root"));
+  });
+});

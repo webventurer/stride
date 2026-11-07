@@ -12,7 +12,7 @@ Within `clear-speak`, pay particular attention to [George Orwell's rules for wri
 
 Keep every technical fact needed to do the work correctly, including:
 
-- exact filenames and commands
+- exact file paths from the repository root, so a reviewer opens a file without searching for it, and exact commands
 - constraints and decisions already made
 - edge cases and failure behaviour
 - acceptance criteria and checks that prove the work is done
