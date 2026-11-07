@@ -1664,3 +1664,55 @@ def test_next_batch_takes_a_card_whose_only_blocker_is_done():
     assert json.loads(result.output) == [
         {"identifier": "WB-2", "title": "Two", "in_batch": True, "reason": None}
     ]
+
+
+# ---- WB-940: a card's start check sees what changed since it was written ----
+
+
+def card_history(*changes: tuple[str, bool]) -> dict:
+    nodes = [
+        {"createdAt": at, "updatedDescription": described}
+        for at, described in changes
+    ]
+    return {
+        "issue": {
+            "createdAt": "2026-11-01T09:00:00.000Z",
+            "history": {"nodes": nodes},
+        }
+    }
+
+
+def test_get_description_changed_at_is_the_last_description_change():
+    data = card_history(
+        ("2026-11-02T10:00:00.000Z", True),
+        ("2026-11-04T10:00:00.000Z", True),
+        ("2026-11-05T10:00:00.000Z", False),
+    )
+    env, post = with_env_and_mock(data)
+    with env, post:
+        changed = linear.get_description_changed_at("WB-9")
+
+    assert changed == "2026-11-04T10:00:00.000Z"
+
+
+def test_get_description_changed_at_is_creation_when_never_edited():
+    data = card_history(("2026-11-05T10:00:00.000Z", False))
+    env, post = with_env_and_mock(data)
+    with env, post:
+        assert (
+            linear.get_description_changed_at("WB-9")
+            == "2026-11-01T09:00:00.000Z"
+        )
+
+
+def test_issue_description_changed_at_prints_the_time():
+    with patch(
+        "linear_cli.get_description_changed_at",
+        return_value="2026-11-04T10:00:00.000Z",
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli, ["issue", "description-changed-at", "WB-9"]
+        )
+
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output) == "2026-11-04T10:00:00.000Z"

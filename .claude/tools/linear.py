@@ -684,6 +684,20 @@ def get_issue_blockers(identifier: str) -> list[str]:
     return blocker_identifiers(graphql_data(query, {"id": identifier})["issue"])
 
 
+def get_description_changed_at(identifier: str) -> str:
+    query = (
+        "query($id: String!) { issue(id: $id) { createdAt "
+        "history(first: 250) { nodes { createdAt updatedDescription } } } }"
+    )
+    issue = graphql_data(query, {"id": identifier})["issue"]
+    change_times = [
+        h["createdAt"]
+        for h in issue["history"]["nodes"]
+        if h["updatedDescription"]
+    ]
+    return max(change_times, default=issue["createdAt"])
+
+
 def add_blocker(blocked: str, blocker: str) -> bool:
     query = (
         "mutation($blocker: String!, $blocked: String!) { issueRelationCreate("
