@@ -10,17 +10,27 @@ batch.
 With an epic named, only that epic's sub-issues are looked at, so the batch
 fills from them however many other cards sit above them in Todo.
 
-A card's files are the backticked names ending in a file extension in its
-"What we'll do" section, compared by file name. The batch is a best guess:
-two cards can still clash in a file neither names.
+A card's files are the backticked names ending in a file extension anywhere
+in its description, a command after the name in the same backticks allowed,
+except in "Why this matters", "What we won't do" and "Live check", plus the
+file behind each `/command` or `/skill` named in "What we'll do". Two files are
+the same file when one path ends with the other on a folder boundary. The
+batch is a best guess: two cards can still clash in a file neither mentions.
 """
 
 import re
+from pathlib import Path
 
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 WHAT_WE_WILL_DO_RE = re.compile(
     r"### What we[’']ll do\n(.*?)(?=\n### |\Z)", re.S
 )
-FILE_NAME_RE = re.compile(r"`([^`\s]*\.[A-Za-z][A-Za-z0-9]*)`")
+ASIDE_SECTIONS_RE = re.compile(
+    r"^### (?:Why this matters|What we won[’']t do|Live check)\n.*?(?=^### |\Z)",
+    re.M | re.S,
+)
+FILE_NAME_RE = re.compile(r"`([^`\s]*\.[A-Za-z][A-Za-z0-9]*)(?:\s[^`]*)?`")
+SLASH_NAME_RE = re.compile(r"`/([\w-]+)(?::([\w-]+))?(?:\s[^`]*)?`")
 
 
 def cards_of_epic(ordered_cards: list[dict], epic: str) -> list[dict]:
@@ -58,16 +68,42 @@ def reason_left_out(
 
 def shared_file_reason(card: dict, batch: list[dict]) -> str | None:
     files = card_files(card)
-    clash = next((c for c in batch if files & card_files(c)), None)
-    if not clash:
-        return None
-    shared = ", ".join(
-        f"`{name}`" for name in sorted(files & card_files(clash))
+    for other in batch:
+        shared = shared_files(files, card_files(other))
+        if shared:
+            names = ", ".join(f"`{name}`" for name in shared)
+            return f"shares {names} with {other['identifier']}"
+    return None
+
+
+def shared_files(files: set[str], other_files: set[str]) -> list[str]:
+    return sorted(
+        {
+            min(file, other, key=len)
+            for file in files
+            for other in other_files
+            if same_file(file, other)
+        }
     )
-    return f"shares {shared} with {clash['identifier']}"
+
+
+def same_file(a: str, b: str) -> bool:
+    return a == b or a.endswith("/" + b) or b.endswith("/" + a)
 
 
 def card_files(card: dict) -> set[str]:
-    section = WHAT_WE_WILL_DO_RE.search(card["description"] or "")
-    names = FILE_NAME_RE.findall(section.group(1)) if section else []
-    return {name.rsplit("/", 1)[-1] for name in names}
+    description = card["description"] or ""
+    named = FILE_NAME_RE.findall(ASIDE_SECTIONS_RE.sub("", description))
+    section = WHAT_WE_WILL_DO_RE.search(description)
+    commands = SLASH_NAME_RE.findall(section.group(1)) if section else []
+    mapped = (command_file(*command) for command in commands)
+    return set(named) | {path for path in mapped if path}
+
+
+def command_file(first: str, second: str) -> str | None:
+    path = (
+        f".claude/commands/{first}/{second}.md"
+        if second
+        else f".claude/skills/{first}/SKILL.md"
+    )
+    return path if (REPO_ROOT / path).is_file() else None
