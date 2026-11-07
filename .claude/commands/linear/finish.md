@@ -305,7 +305,11 @@ uv run .claude/tools/linear_cli.py issue update <issue-id> --state Done
 
 Only set Done status. Skip if already Done. Never set any other status.
 
-### 11. Check milestone completion
+### 11. Carry the lesson to Todo
+
+Before the next card starts, carry what this card's checks found to the cards still in Todo. Follow [carry lessons](reference/carry-lessons.md). Carry the one-line result into the summary in step 15.
+
+### 12. Check milestone completion
 
 Skip this step if the issue had no milestone.
 
@@ -333,7 +337,7 @@ Completed: <YYYY-MM-DD> — all stories Done.
 
 If the user declines, leave the milestone untouched.
 
-### 12. Check parent-issue epic completion
+### 13. Check parent-issue epic completion
 
 Skip this step if the issue had no `parentId`, or if the parent's title doesn't start with `Epic: ` (the parent is a regular sub-issue parent, not a stride epic).
 
@@ -363,7 +367,7 @@ uv run .claude/tools/linear_cli.py issue update <parent-id> --state Done
 
 If the user declines, leave the epic untouched.
 
-### 13. Sync Vision if it changed
+### 14. Sync Vision if it changed
 
 Detect whether the merged PR's diff included `VISION.md`:
 
@@ -394,7 +398,7 @@ Then:
    uv run .claude/tools/linear_cli.py get-project-content <project-id>
    ```
 4. Compare both fields against `VISION.md` (after trimming surrounding whitespace). Linear normalises markdown on save (e.g. `-` list markers become `*`), so treat normalisation-only differences as in sync. The subtitle is the tagline vs the current `description`; skip the subtitle if VISION.md has no opening blockquote (never blank an existing one).
-   - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 14.
+   - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 15.
    - **Either differs**: show what will change (content diff and/or old→new subtitle). In unattended mode continue to the writes; in interactive mode ask:
 
      ```
@@ -406,11 +410,11 @@ Then:
    uv run .claude/tools/linear_cli.py update-project-content <project-id> --content @VISION.md
    uv run .claude/tools/linear_cli.py project update <project-id> --description "<tagline-from-step-3>"
    ```
-   On `n`: skip the writes and continue to step 14.
+   On `n`: skip the writes and continue to step 15.
 
-If any step in the sync flow fails (`.stride.json` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 14. The issue is already Done from step 10 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
+If any step in the sync flow fails (`.stride.json` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 15. The issue is already Done from step 10 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
 
-Track the outcome for the summary in step 14:
+Track the outcome for the summary in step 15:
 
 | State | When |
 |:------|:-----|
@@ -420,7 +424,7 @@ Track the outcome for the summary in step 14:
 | `failed: <reason>` | Sync attempted but errored |
 | *(omitted)* | `VISION.md` was not in the merged diff |
 
-### 14. Summary
+### 15. Summary
 
 Read the output focus and apply this command's format from [reference/output-focus.md](reference/output-focus.md).
 
@@ -439,6 +443,7 @@ Read the output focus and apply this command's format from [reference/output-foc
 - Fixup rebase conflicts → abort rebase, surface conflict, do not merge
 - Vision has no exact fit in interactive mode → exit cleanly, do not merge (re-run after committing the user-authored Vision update)
 - Vision has no exact fit in unattended mode → warn, add and commit the closest durable Success criterion, re-check, then continue
+- A lesson would change a Todo card's purpose → post the question on that card; interactive mode asks the user there and then, unattended mode finishes the remaining steps and stops before the next card starts
 - Branch not fully merged → stop, warn (never force-delete)
 - Local branch already deleted → skip silently
 - Remote branch already deleted → skip silently
