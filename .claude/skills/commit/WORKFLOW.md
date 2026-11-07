@@ -72,7 +72,7 @@ check_markdown_links.py      → Excludes hooks directories from link checking
 
 This prevents concept-level grouping ("they're both about X") from overriding file-level independence. Write the sentences first, then let the sentences decide.
 
-### Step 2b: Shared-file bleed check
+### Step 3: Shared-file bleed check
 
 <mark>**If a file appears in multiple commit groups, it contains two concerns. Do not commit the whole file with either group.**</mark>
 
@@ -95,7 +95,7 @@ After grouping, scan for files that serve more than one commit. Common examples:
 
 When no file appears in multiple commit groups, report **"No shared-file bleed"** and move on.
 
-### Step 3: Count the commits
+### Step 4: Count the commits
 
 Ask: could any subset of these changes be reverted independently and still make sense?
 
@@ -116,7 +116,7 @@ Check the [common AI atomicity mistakes](SKILL.md#common-ai-atomicity-mistakes) 
 - Multiple unrelated bug fixes
 - New file creation + existing file modifications for different purposes
 
-### Step 4: Run the tests before you commit
+### Step 5: Run the tests before you commit
 
 <mark>**Run the repo's test command once, now — before you stage anything. Don't run it again between commits: the files on disk don't change as you commit, so every extra run tests exactly the same thing.**</mark>
 
@@ -232,7 +232,7 @@ If the commit fails because hooks fix files:
 **Goal**: Last sanity check before the commit lands.
 
 - [ ] Does this commit represent one complete idea?
-- [ ] Did the tests pass before you started committing? (Pass 0 [Step 4](#step-4-run-the-tests-before-you-commit))
+- [ ] Did the tests pass before you started committing? (Pass 0 [Step 5](#step-5-run-the-tests-before-you-commit))
 - [ ] Re-read the commit message — does it tell a complete story?
 - [ ] Check the diff one more time — are all changes intentional?
 - [ ] Can this be reverted independently?
