@@ -203,6 +203,59 @@ describe("card check", () => {
   });
 });
 
+describe("carrying a merged card's lesson to Todo", () => {
+  it("runs in /linear:finish after Done and before the milestone check", () => {
+    const finish = read(".claude/commands/linear/finish.md");
+
+    ok(
+      inOrder(finish, [
+        "### 10. Update Linear → done",
+        "### 11. Carry the lesson to Todo",
+        "reference/carry-lessons.md",
+        "### 12. Check milestone completion",
+      ]),
+    );
+  });
+
+  it("rewords with old and new lines, asks on purpose, and says when there's nothing", () => {
+    const brief = read(".claude/commands/linear/reference/carry-lessons.md");
+    const unattended = read(".claude/commands/linear/reference/unattended.md");
+
+    ok(brief.includes("Old line:"));
+    ok(brief.includes("New line:"));
+    ok(brief.includes("no lesson for Todo"));
+    ok(brief.includes("the run stops before the next card starts"));
+    ok(unattended.includes("A lesson question open on a card in Todo"));
+    ok(brief.includes("read it from its record alone"));
+    ok(brief.includes("whose verdict is Fixed or Not acted on, as one rule"));
+    ok(brief.includes('order-todo --project "<project>" --dry-run'));
+    ok(
+      brief.includes(
+        "never adds or removes a card, or moves one between columns",
+      ),
+    );
+  });
+
+  it("keeps a card with an open lesson question from being built", () => {
+    const start = read(".claude/commands/linear/start.md");
+    const brief = read(".claude/commands/linear/reference/carry-lessons.md");
+    const focus = read(".claude/commands/linear/reference/output-focus.md");
+
+    ok(brief.includes("**Lesson question from <merged card>**"));
+    ok(
+      start.includes(
+        "no later comment starts `Answer:`, stop before anything else",
+      ),
+    );
+    ok(
+      start.includes(
+        "Other comments posted after the question, including stride's own, don't answer it",
+      ),
+    );
+    ok(focus.includes("Lessons: <cards reworded"));
+  });
+});
+
 describe("card start check", () => {
   it("reads promises from the same definition the end check uses", () => {
     const start = read(

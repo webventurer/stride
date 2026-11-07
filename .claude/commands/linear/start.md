@@ -48,6 +48,8 @@ Extract from the issue JSON: identifier, title, description, state, labels, `git
 
 Extract from comments: decisions and context added after the description was written.
 
+If a comment is a **Lesson question from** another card, posted by [carry lessons](reference/carry-lessons.md) because a lesson would change what this card is for, and no later comment starts `Answer:`, stop before anything else. Interactive mode shows the question, asks the user, and posts their reply as a comment starting `Answer:`; unattended mode ends the run, and the user replies on the card with a comment starting `Answer:`. Other comments posted after the question, including stride's own, don't answer it.
+
 If the issue is attached to a project milestone, surface it before continuing: `This story is part of *[Milestone name]*`. One line — just enough context that the user knows which milestone the work is feeding.
 
 If the issue has a parent, fetch the parent via `uv run .claude/tools/linear_cli.py issue get <parent-id>` and check its title. If the title starts with `Epic: `, surface the parent-issue epic before continuing: `This story is a sub-issue of *[Epic title]* (status: [Parent status])`. Same shape as the milestone surface — one line of umbrella context. If the parent's title doesn't start with `Epic: `, the story is just a sub-issue of another issue (not a stride epic) — skip the surface silently.

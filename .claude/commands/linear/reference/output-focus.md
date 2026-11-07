@@ -121,7 +121,7 @@ worth flagging, The torch).
 
 ---
 
-### `/linear:finish` step 14 (summary)
+### `/linear:finish` step 15 (summary)
 
 **Outcome mode:**
 
@@ -138,6 +138,7 @@ PR: <url>
 Build: passed
 [Milestone: <name> — complete / <n> remaining — if applicable]
 [Epic: <name> — Done / <n> sub-issues remaining — if applicable]
+Lessons: <cards reworded, each with its lesson / questions posted / no lesson for Todo>
 [Vision sync: applied / declined / already in sync — if VISION.md touched]
 ```
 
