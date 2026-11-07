@@ -10,7 +10,12 @@ from pathlib import Path
 TOOLS_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(TOOLS_DIR))
 
-from todo_batch import card_files, considered_cards  # noqa: E402
+from todo_batch import (  # noqa: E402
+    card_files,
+    cards_of_epic,
+    considered_cards,
+)
+from todo_order import cards_in_work_order  # noqa: E402
 
 
 def card(
@@ -114,3 +119,87 @@ def test_card_files_reads_extensions_with_digits_but_not_numbers():
 
 def test_card_files_is_empty_without_a_description():
     assert card_files({"description": None}) == set()
+
+
+def epic_card(
+    identifier: str,
+    epic: str | None,
+    sort_order: float,
+    priority: int = 3,
+    open_blockers: tuple[str, ...] = (),
+) -> dict:
+    return card(identifier, open_blockers=open_blockers) | {
+        "parent": {"identifier": epic} if epic else None,
+        "priority": priority,
+        "sortOrder": sort_order,
+        "blockers": list(open_blockers),
+    }
+
+
+def epic_batch(cards: list[dict], epic: str, size: int) -> list[dict]:
+    ordered = cards_in_work_order(cards)
+    return considered_cards(cards_of_epic(ordered, epic), size)
+
+
+def test_cards_of_epic_keeps_only_that_epics_sub_issues():
+    cards = [
+        epic_card("A", "WB-1", 1),
+        epic_card("B", "WB-2", 2),
+        epic_card("C", None, 3),
+    ]
+
+    assert [c["identifier"] for c in cards_of_epic(cards, "WB-1")] == ["A"]
+
+
+def test_epic_batch_fills_the_limit_from_the_epic_when_other_cards_sit_above():
+    cards = [
+        epic_card("X1", "WB-2", 1),
+        epic_card("X2", "WB-2", 2),
+        epic_card("A", "WB-1", 3),
+        epic_card("B", "WB-1", 4),
+        epic_card("C", "WB-1", 5),
+    ]
+
+    assert [c["identifier"] for c in epic_batch(cards, "WB-1", 2)] == [
+        "A",
+        "B",
+    ]
+
+
+def test_epic_batch_puts_a_higher_priority_card_first_whatever_its_board_place():
+    cards = [
+        epic_card("A", "WB-1", 1, priority=3),
+        epic_card("B", "WB-1", 2, priority=1),
+    ]
+
+    assert [c["identifier"] for c in epic_batch(cards, "WB-1", 2)] == [
+        "B",
+        "A",
+    ]
+
+
+def test_epic_batch_leaves_out_a_card_blocked_by_a_card_of_another_epic():
+    cards = [
+        epic_card("A", "WB-1", 1, open_blockers=("WB-99",)),
+        epic_card("B", "WB-1", 2),
+    ]
+
+    assert reasons(epic_batch(cards, "WB-1", 3)) == {
+        "A": "blocked by WB-99",
+        "B": None,
+    }
+
+
+def test_epic_batch_ignores_a_shared_file_with_a_card_of_another_epic():
+    cards = [
+        epic_card("X", "WB-2", 1) | card("X", ("report.py",)),
+        epic_card("A", "WB-1", 2) | card("A", ("report.py",)),
+    ]
+
+    assert reasons(epic_batch(cards, "WB-1", 3)) == {"A": None}
+
+
+def test_epic_batch_is_empty_when_the_epic_has_nothing_in_todo():
+    cards = [epic_card("X", "WB-2", 1)]
+
+    assert epic_batch(cards, "WB-1", 3) == []

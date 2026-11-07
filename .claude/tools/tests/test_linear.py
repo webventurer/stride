@@ -506,6 +506,24 @@ def test_todo_cards_carries_open_blockers_and_description():
     assert " description " in sent_query(mock)
 
 
+def test_todo_cards_carries_each_cards_parent():
+    node = {
+        "id": "u1",
+        "identifier": "WB-9",
+        "title": "Nine",
+        "priority": 2,
+        "sortOrder": 5.0,
+        "parent": {"identifier": "WB-935"},
+        "inverseRelations": relation_nodes(),
+    }
+    env, post = with_env_and_mock({"issues": {"nodes": [node]}})
+    with env, post as mock:
+        cards = linear.list_todo_cards("Stride")
+
+    assert cards[0]["parent"] == {"identifier": "WB-935"}
+    assert "parent { identifier }" in sent_query(mock)
+
+
 def test_write_todo_order_sets_manual_view_then_changed_orders():
     ordered = [
         {"id": "u1", "identifier": "A", "sortOrder": 10.0},
@@ -1773,3 +1791,92 @@ def test_start_choice_resumes_the_first_branch_card_linear_knows():
         )
 
     assert json.loads(result.output) == {"action": "resume", "card": "WB-945"}
+
+
+# ---- WB-973: /linear:start on an epic batches only that epic's cards ----
+
+
+def sub_issue(identifier: str, epic: str, open_blockers: list | None = None):
+    return todo_card(identifier, open_blockers or []) | {
+        "parent": {"identifier": epic}
+    }
+
+
+def start_choice_for_epic(cards: list[dict], size: int = 3) -> dict:
+    with (
+        patch(
+            "linear.project_config", return_value={"parallel-sessions": size}
+        ),
+        patch("linear_cli.list_todo_cards", return_value=cards),
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli,
+            [
+                "start-choice",
+                "--project",
+                "Stride",
+                "--branch",
+                "main",
+                "--epic",
+                "wb-1",
+            ],
+        )
+
+    assert result.exit_code == 0, result.output
+    return json.loads(result.output)
+
+
+def test_start_choice_for_an_epic_batches_only_its_cards_up_to_the_limit():
+    cards = [
+        sub_issue("X1", "WB-2"),
+        sub_issue("A", "WB-1"),
+        sub_issue("B", "WB-1"),
+        sub_issue("C", "WB-1"),
+    ]
+
+    assert start_choice_for_epic(cards, size=2) == {
+        "action": "batch",
+        "cards": ["A", "B"],
+    }
+
+
+def test_start_choice_for_an_epic_runs_its_one_able_card_alone():
+    cards = [
+        sub_issue("X1", "WB-2"),
+        sub_issue("A", "WB-1"),
+        sub_issue("B", "WB-1", ["WB-9"]),
+    ]
+
+    assert start_choice_for_epic(cards) == {"action": "single", "card": "A"}
+
+
+def test_start_choice_for_an_epic_lists_each_reason_when_all_are_blocked():
+    cards = [
+        sub_issue("A", "WB-1", ["WB-8"]),
+        sub_issue("B", "WB-1", ["WB-9"]),
+    ]
+
+    assert start_choice_for_epic(cards) == {
+        "action": "blocked",
+        "reasons": {"A": "blocked by WB-8", "B": "blocked by WB-9"},
+    }
+
+
+def test_start_choice_for_an_epic_with_nothing_in_todo_is_empty():
+    cards = [sub_issue("X1", "WB-2")]
+
+    assert start_choice_for_epic(cards) == {"action": "empty"}
+
+
+def test_next_batch_for_an_epic_shows_only_its_cards():
+    cards = [sub_issue("X1", "WB-2"), sub_issue("A", "WB-1")]
+    with (
+        patch("linear.project_config", return_value={"parallel-sessions": 3}),
+        patch("linear_cli.list_todo_cards", return_value=cards),
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli,
+            ["next-batch", "--project", "Stride", "--epic", "WB-1"],
+        )
+
+    assert [c["identifier"] for c in json.loads(result.output)] == ["A"]

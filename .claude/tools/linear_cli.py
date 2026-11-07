@@ -78,7 +78,7 @@ from start_choice import (  # noqa: E402
     branch_card_ids,
     start_choice,
 )
-from todo_batch import considered_cards  # noqa: E402
+from todo_batch import cards_of_epic, considered_cards  # noqa: E402
 from todo_order import cards_in_work_order, new_sort_orders  # noqa: E402
 
 
@@ -204,10 +204,10 @@ def order_line(card: dict, orders: dict) -> dict:
 
 @cli.command("next-batch")
 @click.option("--project", required=True)
-def next_batch_cmd(project: str):
-    size = batch_size()
-    ordered = cards_in_work_order(list_todo_cards(project))
-    echo_json([considered_line(c) for c in considered_cards(ordered, size)])
+@click.option("--epic", default=None, help="Only this epic's sub-issues")
+def next_batch_cmd(project: str, epic: str | None):
+    considered = list_considered_todo_cards(project, epic)
+    echo_json([considered_line(c) for c in considered])
 
 
 def batch_size() -> int:
@@ -229,9 +229,12 @@ def considered_line(card: dict) -> dict:
 @cli.command("start-choice")
 @click.option("--project", required=True)
 @click.option("--branch", required=True, help="The current git branch")
-def start_choice_cmd(project: str, branch: str):
+@click.option("--epic", default=None, help="Only this epic's sub-issues")
+def start_choice_cmd(project: str, branch: str, epic: str | None):
     considered = (
-        list_considered_todo_cards(project) if branch == MAIN_BRANCH else []
+        list_considered_todo_cards(project, epic)
+        if branch == MAIN_BRANCH
+        else []
     )
     echo_json(known_card_choice(branch, start_choice(branch, considered)))
 
@@ -251,9 +254,12 @@ def card_exists(identifier: str) -> bool:
     return True
 
 
-def list_considered_todo_cards(project: str) -> list[dict]:
+def list_considered_todo_cards(project: str, epic: str | None) -> list[dict]:
     size = batch_size()
-    return considered_cards(cards_in_work_order(list_todo_cards(project)), size)
+    ordered = cards_in_work_order(list_todo_cards(project))
+    if epic:
+        ordered = cards_of_epic(ordered, epic.upper())
+    return considered_cards(ordered, size)
 
 
 @cli.command("set-project-view-manual")

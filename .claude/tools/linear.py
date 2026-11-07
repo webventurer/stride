@@ -726,7 +726,8 @@ def min_backlog_sort_order(project_id: str) -> float | None:
 
 def list_todo_cards(project: str) -> list[dict]:
     fields = (
-        f"id identifier title description priority sortOrder {BLOCKER_FIELDS}"
+        "id identifier title description priority sortOrder "
+        f"parent {{ identifier }} {BLOCKER_FIELDS}"
     )
     query = (
         "query($project: String!) { issues(filter: { project: { name: "
