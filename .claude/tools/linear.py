@@ -656,14 +656,27 @@ def update_project_content(project_id: str, content: str) -> bool:
 
 # ---- Blockers: Linear's "blocked by" links ----
 
-BLOCKER_FIELDS = "inverseRelations { nodes { type issue { identifier } } }"
+BLOCKER_FIELDS = (
+    "inverseRelations { nodes { type issue { identifier state { type } } } }"
+)
+DONE_STATE_TYPE = "completed"
 
 
 def blocker_identifiers(node: dict) -> list[str]:
-    relations = node["inverseRelations"]["nodes"]
+    return [b["identifier"] for b in blocking_issues(node)]
+
+
+def open_blocker_identifiers(node: dict) -> list[str]:
     return [
-        r["issue"]["identifier"] for r in relations if r["type"] == "blocks"
+        b["identifier"]
+        for b in blocking_issues(node)
+        if b["state"]["type"] != DONE_STATE_TYPE
     ]
+
+
+def blocking_issues(node: dict) -> list[dict]:
+    relations = node["inverseRelations"]["nodes"]
+    return [r["issue"] for r in relations if r["type"] == "blocks"]
 
 
 def get_issue_blockers(identifier: str) -> list[str]:
@@ -698,14 +711,23 @@ def min_backlog_sort_order(project_id: str) -> float | None:
 
 
 def list_todo_cards(project: str) -> list[dict]:
-    fields = f"id identifier title priority sortOrder {BLOCKER_FIELDS}"
+    fields = (
+        f"id identifier title description priority sortOrder {BLOCKER_FIELDS}"
+    )
     query = (
         "query($project: String!) { issues(filter: { project: { name: "
         '{ eq: $project } } state: { name: { eq: "Todo" } } }, first: 250) '
         f"{{ nodes {{ {fields} }} }} }}"
     )
     nodes = graphql_data(query, {"project": project})["issues"]["nodes"]
-    return [node | {"blockers": blocker_identifiers(node)} for node in nodes]
+    return [
+        node
+        | {
+            "blockers": blocker_identifiers(node),
+            "open_blockers": open_blocker_identifiers(node),
+        }
+        for node in nodes
+    ]
 
 
 def write_todo_order(

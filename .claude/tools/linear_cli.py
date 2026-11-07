@@ -28,6 +28,7 @@ from legacy import (  # noqa: E402
     migrate_from_legacy,
 )
 from linear import (  # noqa: E402
+    LinearError,
     add_blocker,
     bearer_token,
     create_attachment,
@@ -51,6 +52,7 @@ from linear import (  # noqa: E402
     list_todo_cards,
     milestone_open_issues,
     min_backlog_sort_order,
+    parallel_session_limit,
     project_content,
     provision_labels,
     provision_states,
@@ -70,6 +72,7 @@ from linear import (  # noqa: E402
     workspace_labels,
     write_todo_order,
 )
+from todo_batch import considered_cards  # noqa: E402
 from todo_order import cards_in_work_order, new_sort_orders  # noqa: E402
 
 
@@ -190,6 +193,30 @@ def order_line(card: dict, orders: dict) -> dict:
     fields = ["identifier", "title", "priority", "blockers"]
     return {f: card[f] for f in fields} | {
         "sortOrder": orders[card["identifier"]]
+    }
+
+
+@cli.command("next-batch")
+@click.option("--project", required=True)
+def next_batch_cmd(project: str):
+    size = batch_size()
+    ordered = cards_in_work_order(list_todo_cards(project))
+    echo_json([considered_line(c) for c in considered_cards(ordered, size)])
+
+
+def batch_size() -> int:
+    try:
+        return parallel_session_limit()
+    except LinearError as error:
+        raise click.ClickException(str(error)) from error
+
+
+def considered_line(card: dict) -> dict:
+    return {
+        "identifier": card["identifier"],
+        "title": card["title"],
+        "in_batch": card["reason"] is None,
+        "reason": card["reason"],
     }
 
 

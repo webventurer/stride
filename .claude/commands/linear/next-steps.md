@@ -162,6 +162,19 @@ uv run .claude/tools/linear_cli.py order-todo --project "<project>" --dry-run
 
 Interactive mode shows that order and asks once: **"Write this order to Todo on the board? (y/n)"**. Unattended mode writes it. To write it, run the same command without `--dry-run`: it sets the project's board view to Manual, so the order shows, then rewrites only the Todo cards whose place changed. It changes nothing else on the board. Vision alignment still shapes the recommendations below; it doesn't decide board order.
 
+#### Pick the next batch
+
+Cards that don't depend on each other can run side by side, so next-steps names the next batch. It works down Todo in the order above, adding each card that passes two rules, until the batch holds the `parallel-sessions` number from `.stride.json` or Todo runs out:
+
+- **Blockers:** a card is out while any card blocking it is not Done, wherever that blocker sits. A blocker that is Done doesn't count.
+- **Files:** a card is out when it shares a file with a card already in the batch. A card's files are the backticked names ending in a file extension, such as `next-steps.md`, in its "What we'll do" section.
+
+```bash
+uv run .claude/tools/linear_cli.py next-batch --project "<project>"
+```
+
+Show each card it considered, in or out, with the reason it gives, such as "blocked by WB-12" or "shares `report.py` with WB-14". Call the batch a best guess: two cards can still clash in a file neither names. When the command stops with the `parallel-sessions` setting's message instead, show that message in place of a batch. Next-steps doesn't run the batch.
+
 ### 7. Recommend next actions
 
 Apply the priority ordering: build failure > PRs needing fix > in-progress > PRs needing review > approved PRs to merge > backlog.
