@@ -58,6 +58,7 @@ from linear import (  # noqa: E402
     provision_labels,
     provision_states,
     read_text_arg,
+    remove_blocker,
     resolve_project_id,
     resolve_state_for_issue,
     resolve_workspace_labels,
@@ -379,6 +380,15 @@ def issue_description_changed_at_cmd(identifier: str):
 @click.option("--by", "blocker", required=True, help="The blocking card")
 def issue_block_cmd(identifier: str, blocker: str):
     echo_json(add_blocker(identifier, blocker))
+
+
+@issue_group.command("unblock")
+@click.argument("identifier")
+@click.option("--by", "blocker", required=True, help="The blocking card")
+def issue_unblock_cmd(identifier: str, blocker: str):
+    if not remove_blocker(identifier, blocker):
+        raise click.ClickException(f"{blocker} does not block {identifier}")
+    echo_json({"identifier": identifier, "unblocked_from": blocker})
 
 
 @issue_group.command("create")

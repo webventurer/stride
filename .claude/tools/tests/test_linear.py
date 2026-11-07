@@ -1360,6 +1360,87 @@ def test_update_issue_clears_the_parent_with_a_null_parent_id():
     assert sent_variables(mock)["input"] == {"parentId": None}
 
 
+def blocker_relations(*relations: tuple[str, str, str]) -> MagicMock:
+    nodes = [
+        {"id": rid, "type": kind, "issue": {"identifier": ident}}
+        for rid, kind, ident in relations
+    ]
+    return ok_response({"issue": {"inverseRelations": {"nodes": nodes}}})
+
+
+def relation_deleted() -> MagicMock:
+    return ok_response({"issueRelationDelete": {"success": True}})
+
+
+def test_remove_blocker_deletes_only_the_relation_from_that_blocker():
+    lookup = blocker_relations(
+        ("r1", "blocks", "WB-1"), ("r2", "blocks", "WB-3")
+    )
+    with (
+        patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}),
+        patch(
+            "linear.requests.post", side_effect=[lookup, relation_deleted()]
+        ) as mock,
+    ):
+        assert linear.remove_blocker("WB-2", "WB-1") is True
+
+    assert mock.call_count == 2
+    assert sent_variables(mock) == {"id": "r1"}
+    assert "issueRelationDelete" in sent_query(mock)
+
+
+@pytest.mark.parametrize(
+    "relations",
+    [
+        [],
+        [("r1", "related", "WB-1")],
+        [("r1", "blocks", "WB-3")],
+    ],
+    ids=["no link", "only related", "other blocker only"],
+)
+def test_remove_blocker_changes_nothing_when_the_card_is_not_a_blocker(
+    relations,
+):
+    with (
+        patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}),
+        patch(
+            "linear.requests.post", return_value=blocker_relations(*relations)
+        ) as mock,
+    ):
+        assert linear.remove_blocker("WB-2", "WB-1") is False
+
+    assert mock.call_count == 1
+
+
+def test_remove_blocker_ignores_a_block_that_runs_the_other_way():
+    # WB-2 blocks WB-1: the link sits on WB-2's outgoing relations, so
+    # unblocking WB-2 from WB-1 must find nothing in its inverse relations.
+    outgoing = {"nodes": [{"id": "r1", "type": "blocks"}]}
+    lookup = ok_response(
+        {"issue": {"relations": outgoing, "inverseRelations": {"nodes": []}}}
+    )
+    with (
+        patch.dict("os.environ", {"LINEAR_API_KEY": "lin_test"}),
+        patch("linear.requests.post", return_value=lookup) as mock,
+    ):
+        assert linear.remove_blocker("WB-2", "WB-1") is False
+
+    assert mock.call_count == 1
+    assert "inverseRelations" in sent_query(mock)
+
+
+def test_issue_unblock_says_so_when_the_card_does_not_block():
+    with (
+        patch("linear_cli.remove_blocker", return_value=False),
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli, ["issue", "unblock", "WB-2", "--by", "WB-1"]
+        )
+
+    assert result.exit_code != 0
+    assert "WB-1 does not block WB-2" in result.output
+
+
 def test_issue_update_no_parent_clears_the_parent():
     with (
         patch("linear_cli.bearer_token", return_value="lin_test"),

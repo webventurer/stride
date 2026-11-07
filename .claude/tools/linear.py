@@ -726,6 +726,30 @@ def add_blocker(blocked: str, blocker: str) -> bool:
     return graphql_data(query, variables)["issueRelationCreate"]["success"]
 
 
+def remove_blocker(blocked: str, blocker: str) -> bool:
+    lookup = (
+        "query($id: String!) { issue(id: $id) { "
+        "inverseRelations { nodes { id type issue { identifier } } } } }"
+    )
+    relations = graphql_data(lookup, {"id": blocked})["issue"][
+        "inverseRelations"
+    ]["nodes"]
+    for relation in relations:
+        identifier = relation["issue"]["identifier"]
+        if (
+            relation["type"] == "blocks"
+            and identifier.casefold() == blocker.casefold()
+        ):
+            delete = (
+                "mutation($id: String!) { "
+                "issueRelationDelete(id: $id) { success } }"
+            )
+            return graphql_data(delete, {"id": relation["id"]})[
+                "issueRelationDelete"
+            ]["success"]
+    return False
+
+
 # ---- Board order ----
 
 
