@@ -40,7 +40,7 @@ The check runs once. Check each finding against the branch, fix the ones that ho
 | **Kept, unproven** | When the proof the evidence names is missing, add it — a test, or the line that states the behaviour. When the branch already has it, record the finding as Not acted on, naming that proof |
 | **Broken** | When the scenario in the evidence fails, fix the change so it works. When it doesn't fail, record the finding as Not acted on, with what you tried |
 | **Unclear** | Stop and ask the user (see [When the card is the problem](#when-the-card-is-the-problem)) |
-| **Empty file** | The card makes no checkable promise. Stop and tell the user; never pass it silently |
+| **Empty file** | The card makes no checkable promise. Stop and ask the user (see [When the card is the problem](#when-the-card-is-the-problem)); never pass it silently |
 
 An unclear verdict or an empty file from any reviewer stops for the user, whatever the other two found.
 
@@ -50,10 +50,47 @@ The check passes when every promise is kept, fixed, or recorded as Not acted on 
 
 ## When the card is the problem
 
-An unclear verdict, a promise the user would rather drop, or a broken verdict the user decides the code should not fix — each one means the card itself may be wrong. Stop in both modes and show the promise, its verdict and the evidence. The user decides:
+An unclear verdict, an empty file, a promise the user would rather drop, or a broken verdict the user decides the code should not fix — each one means the card itself may be wrong. Stop in both modes and ask the user in the shape below.
 
-- **Fix the code** — continue from step 2 with the user's direction
-- **Change the card** — apply only wording the user gives or approves, with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`. Then record the change on the card with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`: which promise changed, from what to what, why, and that the user signed off. Write the comment following [Linear card language](card-language.md). Then run the check from step 1 against the new wording
+### How to ask
+
+Ask in these four parts and nothing more:
+
+1. **The problem**, in one line of everyday words.
+2. **The rules** that matter, as two or three short numbered lines.
+3. **One fix**, quoted, ready to approve. Never a menu of options.
+4. **What stays the same**, then a yes or no question.
+
+Around the shape:
+
+- **One finding per question.** The question holds only the finding that needs the user's decision. A finding the check fixes itself stays out of it.
+- **The card's words, not the reviewers' labels.** Quote the card's own words where the question needs them.
+- **Several promises stop the check together:** ask about them one at a time, each in this shape, and ask the next only after the first is answered, and before the check runs again.
+- **The card makes no promise the check can judge:** the problem line says so, the rules are what the card does say, and the quoted fix is one promise to add.
+- **The user answers no:** ask for their own wording in one line and use that. Don't offer a second fix.
+- **The user wants the code fixed, not the card:** they can say so at any time. The question doesn't list it as a second option.
+
+The question that settled the shape, on WB-938, word for word:
+
+> The card says a waiting card "never moves up". That's slightly wrong.
+>
+> The code sorts Todo with two rules:
+>
+> 1. **Important cards go higher.**
+> 2. **A card can't sit above the card it's waiting on.**
+>
+> Rule 1 can still move a waiting card up if it's important. So "never moves up" is false, and the reviewers caught it.
+>
+> **Fix:** cut that phrase and say only what's true:
+>
+> > "A card never sits above the card it's waiting on."
+>
+> The code stays as it is; only the card's words change. OK to use that?
+
+### What the answer does
+
+- **Yes** — apply only the wording the user gives or approves, with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`. Then record the change on the card with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`: which promise changed, from what to what, why, and that the user signed off. Write the comment following [Linear card language](card-language.md). Then run the check from step 1 against the new wording
+- **Fix the code instead** — continue from step 2 with the user's direction
 
 <mark>**A card change always stops for the user, in unattended mode too.**</mark> Unattended mode fixes code without asking; it never decides what the card should promise.
 

@@ -82,7 +82,7 @@ The check runs once. The author checks each finding against the branch and fixes
 ### Never quietly rewrite the card
 
 - The agent never edits a card to make a verdict go away. At the start, before any code exists, it rewords weak promises in the open, recorded in a comment on the card; a reworded promise then cannot hide a broken one, because nothing has been built against it yet
-- When the card looks wrong at the end, the run stops and shows the promise and its verdict. The user decides whether to fix the code or change the card, in interactive and unattended mode alike
+- When the card looks wrong at the end, the run stops and asks the user in a few plain lines: the problem, the rules that matter, one quoted fix and a yes or no question. The user decides whether to fix the code or change the card, in interactive and unattended mode alike
 - A changed card gets a comment on the card saying what changed, why, and that the user signed off. The check then runs again against the new wording
 
 ## Example
