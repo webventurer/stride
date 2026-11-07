@@ -43,11 +43,11 @@ describe("card check", () => {
     );
     ok(
       inOrder(finish, [
-        "### 5b.",
-        "### 6. Confirm Vision outcome",
-        "### 7. Check the change against its card",
+        "### 6. Check every commit belongs",
+        "### 7. Confirm Vision outcome",
+        "### 8. Check the change against its card",
         "reference/card-check.md",
-        "### 8. Merge",
+        "### 9. Merge",
       ]),
     );
   });
@@ -209,10 +209,10 @@ describe("carrying a merged card's lesson to Todo", () => {
 
     ok(
       inOrder(finish, [
-        "### 10. Update Linear → done",
-        "### 11. Carry the lesson to Todo",
+        "### 11. Update Linear → done",
+        "### 12. Carry the lesson to Todo",
         "reference/carry-lessons.md",
-        "### 12. Check milestone completion",
+        "### 13. Check milestone completion",
       ]),
     );
   });
