@@ -49,6 +49,9 @@ describe("unattended Linear flow", () => {
     ok(plan.includes("scope shape is not safe to guess"));
     ok(next.includes("next-steps never starts\nwork automatically"));
     ok(next.includes("order-todo --project"));
+    ok(next.includes("next-batch --project"));
+    ok(next.includes("Next-steps doesn't run the batch."));
+    ok(next.includes("Call the batch a best guess"));
     ok(setup.includes("stops rather than guessing"));
     ok(vision.includes("immediately in unattended mode"));
   });

@@ -431,9 +431,15 @@ def test_min_backlog_sort_order_returns_none_when_empty():
         assert min_backlog_sort_order("proj-1") is None
 
 
-def relation_nodes(*pairs: tuple[str, str]) -> dict:
+def relation_nodes(*relations: tuple[str, ...]) -> dict:
     nodes = [
-        {"type": kind, "issue": {"identifier": ident}} for kind, ident in pairs
+        {
+            "type": kind,
+            "issue": {"identifier": ident, "state": {"type": state_type}},
+        }
+        for kind, ident, state_type, *_ in [
+            (*r, "unstarted") for r in relations
+        ]
     ]
     return {"nodes": nodes}
 
@@ -476,6 +482,28 @@ def test_todo_cards_carries_each_cards_blockers():
 
     assert cards[0]["blockers"] == ["WB-1"]
     assert 'name: { eq: "Todo" }' in sent_query(mock)
+
+
+def test_todo_cards_carries_open_blockers_and_description():
+    relations = relation_nodes(
+        ("blocks", "WB-1", "completed"), ("blocks", "WB-2", "started")
+    )
+    node = {
+        "id": "u1",
+        "identifier": "WB-9",
+        "title": "Nine",
+        "description": "### What we'll do",
+        "priority": 2,
+        "sortOrder": 5.0,
+        "inverseRelations": relations,
+    }
+    env, post = with_env_and_mock({"issues": {"nodes": [node]}})
+    with env, post as mock:
+        cards = linear.list_todo_cards("Stride")
+
+    assert cards[0]["open_blockers"] == ["WB-2"]
+    assert cards[0]["blockers"] == ["WB-1", "WB-2"]
+    assert " description " in sent_query(mock)
 
 
 def test_write_todo_order_sets_manual_view_then_changed_orders():
@@ -1547,3 +1575,92 @@ def test_migrate_legacy_config_emits_migrated_config_as_json():
 
     assert result.exit_code == 0, result.output
     assert json.loads(result.output) == config
+
+
+# ---- WB-939: next-steps picks the cards that can run at once ----
+
+
+def todo_card(identifier: str, open_blockers: list[str]) -> dict:
+    return {
+        "identifier": identifier,
+        "title": f"Card {identifier}",
+        "description": "",
+        "priority": 0,
+        "sortOrder": 1.0,
+        "blockers": open_blockers,
+        "open_blockers": open_blockers,
+    }
+
+
+def test_next_batch_prints_each_considered_card_in_or_out():
+    cards = [todo_card("A", []), todo_card("B", ["WB-1"])]
+    with (
+        patch("linear.project_config", return_value={"parallel-sessions": 2}),
+        patch("linear_cli.list_todo_cards", return_value=cards),
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli, ["next-batch", "--project", "Stride"]
+        )
+
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output) == [
+        {
+            "identifier": "A",
+            "title": "Card A",
+            "in_batch": True,
+            "reason": None,
+        },
+        {
+            "identifier": "B",
+            "title": "Card B",
+            "in_batch": False,
+            "reason": "blocked by WB-1",
+        },
+    ]
+
+
+def test_next_batch_shows_the_settings_message_for_a_refused_value():
+    with patch("linear.project_config", return_value={"parallel-sessions": 0}):
+        result = CliRunner().invoke(
+            linear_cli.cli, ["next-batch", "--project", "Stride"]
+        )
+
+    assert result.exit_code != 0
+    assert '"parallel-sessions" must be a whole number' in result.output
+
+
+def test_next_batch_takes_a_card_whose_only_blocker_is_done():
+    nodes = [
+        {
+            "id": "u0",
+            "identifier": "WB-1",
+            "title": "Epic: Something",
+            "description": "",
+            "priority": 0,
+            "sortOrder": 0.0,
+            "inverseRelations": relation_nodes(),
+        },
+        {
+            "id": "u2",
+            "identifier": "WB-2",
+            "title": "Two",
+            "description": "",
+            "priority": 0,
+            "sortOrder": 1.0,
+            "inverseRelations": relation_nodes(("blocks", "WB-9", "completed")),
+        },
+    ]
+    env, post = with_env_and_mock({"issues": {"nodes": nodes}})
+    with (
+        env,
+        post,
+        patch("linear.project_config", return_value={"parallel-sessions": 3}),
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli, ["next-batch", "--project", "Stride"]
+        )
+
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output) == [
+        {"identifier": "WB-2", "title": "Two", "in_batch": True, "reason": None}
+    ]
