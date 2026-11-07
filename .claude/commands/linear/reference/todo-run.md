@@ -22,6 +22,10 @@ Start the list empty. After each batch, add every card in it, whether or not it 
 
 The reasons the run reports are the ones `start-choice` prints for a card that is out: a blocker that isn't Done, a lesson question with no answer, or a card the run already started.
 
+## A card that is already done
+
+A card that ended in Canceled at its start check had nothing left to build. A card that ended in Canceled leaves the batch, merges nothing and is not a failure, and the rest of the batch carries on. Its job reports that the card is Canceled in place of a pull request's URL.
+
 ## A card that fails or needs a decision
 
 The card stays out of Done and out of every later batch. Post its reason on the card as a comment, unless its job already did: the check that failed, or the decision it needs. The rest of its batch still merges, and the run carries on with the cards that don't depend on it. A card that waits on a failed card stays in Todo with `blocked by <card>` until its blocker is Done, which in this run it never is.
@@ -37,6 +41,7 @@ A question is posted on its card as a comment as it arises, whether a job's star
 The run's last message to the user lists, in this order:
 
 - **Done:** each card that merged.
+- **Canceled:** each card that ended in Canceled because its work was already done, with the reason in its comment.
 - **Failed:** each card that failed, with the check that failed or the decision it needs.
 - **Waiting:** each card still in Todo that isn't listed as failed, with the reason `start-choice` gave.
 - **Lessons:** for each merged card, the lesson it carried and the cards it reworded, or "no lesson for Todo", read from its `/linear:finish` summary.

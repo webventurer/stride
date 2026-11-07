@@ -167,7 +167,7 @@ describe("a /parallel-sessions job running a stride card", () => {
         "When a job's session exits holding a slot, release its slot at once",
         "An idle notice releases nothing",
         "exited, waiting to be resumed",
-        "a job already marked merged or failed keeps that state",
+        "a job already marked merged, failed or canceled keeps that state",
         "tells it to claim a slot before it carries on",
         "resume an exited job only when `slots.py status` shows a free slot",
         "give the go to a card whose job holds a slot",

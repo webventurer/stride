@@ -10,7 +10,7 @@ The person who planned the card knows what each promise was meant to say, so a v
 
 ## The one job
 
-Answer one question: **can every promise on this card be checked, and should it still be made?**
+Answer one question: **can every promise on this card be checked, should it still be made, and is it already kept?**
 
 ## What you read
 
@@ -53,17 +53,20 @@ For each promise, look in the current code, commands and skills for the situatio
 
 For each promise, work out what would prove it at the end — a test, a line, or the card's live check — and whether anything stops that proof: another line on the card, such as its "What we won't do" or its live check, what finished sibling cards shipped, or what has changed since the card's description last changed.
 
-## The five kinds of finding
+## The six kinds of finding
 
 | Finding | Use it when | `evidence` must name |
 |:--------|:------------|:---------------------|
+| `done` | Every promise that describes a result on `main` is already kept by what is on `main`, through another card or a direct commit | For each promise, the commit, card or file that keeps it. Write at most one `done` line, and none when any such promise is still to do |
 | `uncheckable` | A promise fails test 1 — a vague quality such as "works well" or "is robust", a process line, a risk rating — or fails test 2 while being true or false whatever the change does — an opinion, a guess, a fact about today. Also a claim only a run against a real service could show, such as "the API accepts this filter", that sits outside "Live check" | Which test the line fails, and why. For a claim only a real run can prove, `proposed` moves it under "Live check" |
 | `contradictory` | Two promises cannot both hold, or the current repository already makes a promise impossible | Both lines, or the promise and the file and line that rules it out |
 | `missing` | The current repository plainly has an edge case on the card's path that the card does not mention | The file and line where the edge case lives, and the situation that triggers it |
 | `stale` | A promise or the Vision trace no longer fits, given what a finished sibling card shipped, a commit that reached `main` since the card's description last changed, or a comment on an open sibling card since then | The sibling, commit or comment, what it changed, and why the promise no longer fits |
 | `mechanism` | A promise fails test 2 by describing something the change does: it is met by making a particular edit or using a particular mechanism, whether or not the result it serves holds — "move the retry logic into its own file", "add a page from the template", "use a lock" | The promise, and why the edit landing would read as kept even if the result failed |
 
-Every finding proposes new wording for the card in `proposed`: a rewritten line that can be shown kept or broken, or the line to add or remove. The orchestrator applies it or rewords it; your wording is a starting point, not a decision.
+Only promises about a result on `main` count towards `done`: a "What we won't do" line, a "How to test it" line and the "Live check" neither count nor stop a `done` finding, because each is true or untestable on `main` before any work. A card with no promise about a result on `main` gets no `done` finding. A card that is only partly done gets no `done` finding either: report each promise that no longer fits as `stale`.
+
+Every other finding proposes new wording for the card in `proposed`: a rewritten line that can be shown kept or broken, or the line to add or remove. A `done` finding's `proposed` is the words "cancel the card". The orchestrator applies or rewords the others; your wording is a starting point, not a decision.
 
 <mark>**A finding without evidence is not a finding.**</mark> "Could be clearer" is not uncheckable; "the history is reliable" is, because nothing in the finished work could show it false. When you cannot name the evidence, say nothing.
 
@@ -106,6 +109,7 @@ Ask one question: **if work started on the card as written, would the builder ha
 |:--------|:------|
 | `uncheckable` | Always `stop`: the end check would return `unclear` on it, after the code is written |
 | `contradictory` | Always `stop`: the builder would have to choose which promise to break |
+| `done` | Always `stop`: the card is cancelled when all three reviewers report it, and is reworded or built as it stands when they don't, so write it only when you are sure |
 | `stale` | `stop` when a promise no longer fits. `note` when only the Vision trace no longer fits, because `/linear:finish` judges the trace again before merge |
 | `missing` | `note`, unless how the edge case is handled decides whether a stated promise is kept; then `stop`, and name that promise in `evidence` |
 | `mechanism` | `note` when the card states elsewhere the result the edit serves, naming that line in `evidence`. `stop` when the edit is the only statement of that result |
@@ -117,7 +121,7 @@ Ask one question: **if work started on the card as written, would the builder ha
 Write one JSON object per line (JSONL) to the output path the orchestrator gives you, one line per finding, in the order the card makes the promises:
 
 ```jsonl
-{"finding": "uncheckable | contradictory | missing | stale | mechanism", "level": "stop | note", "line": "<the card's words, or the gap>", "evidence": "<what the table above requires>", "proposed": "<new wording, or the line to add or remove>"}
+{"finding": "done | uncheckable | contradictory | missing | stale | mechanism", "level": "stop | note", "line": "<the card's words, or the gap>", "evidence": "<what the table above requires>", "proposed": "<new wording, or the line to add or remove>"}
 ```
 
 Rules for the file:
