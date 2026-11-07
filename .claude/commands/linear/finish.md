@@ -286,11 +286,13 @@ git -C <main-repo-path> checkout main && git -C <main-repo-path> pull
 
 **Step 9b — Tear down the worktree (if one was used):**
 
-Follow [worktree teardown](reference/worktree.md#teardown) — it removes the worktree and guides the user to close its tab in the current VS Code window. Do this **before** deleting the branch (git won't delete a branch a worktree has checked out). For an inline run with no worktree, it skips silently.
+As a `/parallel-sessions` job, skip this step: the session is still running in the worktree, and the coordinator removes it once the session exits.
+
+Otherwise, follow [worktree teardown](reference/worktree.md#teardown) — it removes the worktree and guides the user to close its tab in the current VS Code window. Do this **before** deleting the branch (git won't delete a branch a worktree has checked out). For an inline run with no worktree, it skips silently.
 
 **Step 9c — Delete branches:**
 
-Now that any worktree is gone, the branch can be deleted:
+Now that any worktree is gone, the branch can be deleted. As a `/parallel-sessions` job, delete only the remote branch: the worktree still has the local one checked out, and the coordinator deletes it when it removes the worktree.
 
 - **Local**: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently
 - **Remote**: `git -C <main-repo-path> push origin --delete <gitBranchName>` — if already deleted (GitHub may auto-delete), skip silently

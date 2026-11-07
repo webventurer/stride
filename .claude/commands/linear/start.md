@@ -425,6 +425,8 @@ Only after the PR is confirmed created or already exists. Skip if the issue is a
 
 ### 19. Review
 
+When this card runs as a `/parallel-sessions` job, as its brief says, stop here whatever `unattended` says: message the coordinator with the pull request's URL, and run `/linear:finish` only when the coordinator tells you to. The coordinator checks each card combined with `main` before it merges.
+
 If unattended mode is active, do not launch diffity or ask for approval. Show
 the commit list and the plain-English handoff below, then run `/linear:finish`
 inline. If finish reaches any hard stop from

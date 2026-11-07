@@ -110,6 +110,14 @@ When this session can't start side sessions, start each job as a background `cla
    ```bash
    "<main checkout>/.claude/tools/link_stride_install.sh" "<main checkout>" "<worktree>"
    ```
+
+   When the main checkout has a `.stride.json`, the worktree needs it too: it holds the Linear project, its key and the `unattended` setting a stride card's job reads. Share it the way `/linear:start --worktree` does:
+
+   ```bash
+   "<main checkout>/.claude/tools/share_stride_settings.sh" "<main checkout>" "<worktree>"
+   ```
+
+   If it exits non-zero, report it and don't start that job: without the settings, the job's first Linear call fails.
 3. **Check git sees nothing new.** `git status --porcelain` prints nothing in each worktree, and nothing new in the main checkout.
 4. **Start every session in one turn,** each in the background in its job's checkout, on its model and effort with the advisor off and billed to the user's plan, as [the chain of command config](reference/chain-of-command-config.md) sets out, with its log in `work/logs/`:
 
@@ -140,8 +148,9 @@ Each session messages you when its work is ready, when it hits an error it can't
 - In worktree mode, before each merge after the first, build the code as it will look merged with `main` and run the project's checks and tests on it. Cards in one batch start from the same `main`, so each one's checks ran without the others' changes
 - If that fails, send the failure back to the job's session rather than fixing it yourself, so the session that wrote the code fixes it and its own checks cover the fix
 - If the job's session has already exited, resume it in its worktree with the message (`claude -p --resume <session-id>` for a `claude -p` session, with the environment, model, effort and permission options it started with, the ID taken from its log's `session_id`, and its log in `work/logs/<holder name>.resume-<n>.jsonl`)
-- Once it passes, merge its branch into `main` in worktree mode; in either mode, then tell the session its work is done
-- Archive the session, or remove its worktree, only once it has exited
+- For a job that isn't a stride card, once it passes, merge its branch into `main` in worktree mode; in either mode, then tell the session its work is done
+- **A job running a stride card** opens a pull request instead of leaving a branch for you to merge, and its own `/linear:finish` does the merge, so the card's merge checks still run. Take these jobs one card at a time: build its branch merged with `main` as it stands now and run the checks on it, then tell its session to run `/linear:finish`. Check the next card's branch only once the job reports that its merge has landed, so no two cards are checked against the same `main`
+- Archive the session, or remove its worktree, only once it has exited. For a stride card's job, delete its local branch with the worktree: its `/linear:finish` deleted only the remote one
 
 Before you put any question to the user, call `/advisor` and record what it said. Ask the user only what the advisor can't advise on: a job's purpose or scope, or something only the user knows. Name which of the three the question is; if it is none of them, such as a choice between two designs, take the advisor's recommendation instead of asking. See [the chain of command](reference/chain-of-command.md).
 
