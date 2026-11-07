@@ -1,1 +1,0 @@
-Test card g ran.
