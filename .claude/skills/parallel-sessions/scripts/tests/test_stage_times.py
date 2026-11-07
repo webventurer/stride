@@ -320,6 +320,42 @@ class RecorderTest(unittest.TestCase):
 
         self.assertEqual([r.seconds for r in self.rows("Merge")], [4])
 
+    def merge_rows_for(self, command: str) -> list:
+        write_jsonl(
+            self.folder / "s1.jsonl",
+            [
+                user_text(0, "Run /linear:finish WB-970"),
+                tool_use(5, "Bash", "m-1", command=command),
+                tool_result(9, "m-1"),
+            ],
+        )
+        return self.rows("Merge")
+
+    def test_a_merge_run_with_a_quoted_directory_change_is_a_merge(self):
+        rows = self.merge_rows_for('cd "/path with spaces" && gh pr merge 5')
+
+        self.assertEqual([r.seconds for r in rows], [4])
+
+    def test_a_merge_followed_by_a_pipe_and_a_command_is_still_a_merge(self):
+        command = (
+            'gh pr merge 268 --merge --subject "Merge branch \'x\'" --body ""'
+            " 2>&1 | tail -3; gh pr view 268"
+        )
+
+        self.assertEqual([r.seconds for r in self.merge_rows_for(command)], [4])
+
+    def test_a_merge_mentioned_on_a_later_line_is_not_a_merge(self):
+        command = "cat <<'EOF'\nsome text\ngh pr merge 5\nEOF"
+
+        self.assertEqual(self.merge_rows_for(command), [])
+
+    def test_a_merge_mentioned_after_and_mid_line_is_not_a_merge(self):
+        command = (
+            "python - <<'EOF'\ncommand = \"cd repo && gh pr merge 5\"\nEOF"
+        )
+
+        self.assertEqual(self.merge_rows_for(command), [])
+
     def test_the_window_starts_at_linear_start_not_an_earlier_mention(self):
         write_jsonl(
             self.folder / "s1.jsonl",
