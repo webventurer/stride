@@ -244,6 +244,7 @@ def update_issue(
     state_id: str | None = None,
     label_ids: list | None = None,
     parent_id: str | None = None,
+    clear_parent: bool = False,
     priority: int | None = None,
 ) -> dict:
     input_data = {}
@@ -257,6 +258,8 @@ def update_issue(
         input_data["labelIds"] = label_ids
     if parent_id is not None:
         input_data["parentId"] = parent_id
+    if clear_parent:
+        input_data["parentId"] = None
     if priority is not None:
         input_data["priority"] = priority
     data = graphql(
@@ -721,6 +724,30 @@ def add_blocker(blocked: str, blocker: str) -> bool:
     )
     variables = {"blocker": blocker, "blocked": blocked}
     return graphql_data(query, variables)["issueRelationCreate"]["success"]
+
+
+def remove_blocker(blocked: str, blocker: str) -> bool:
+    lookup = (
+        "query($id: String!) { issue(id: $id) { "
+        "inverseRelations { nodes { id type issue { identifier } } } } }"
+    )
+    relations = graphql_data(lookup, {"id": blocked})["issue"][
+        "inverseRelations"
+    ]["nodes"]
+    for relation in relations:
+        identifier = relation["issue"]["identifier"]
+        if (
+            relation["type"] == "blocks"
+            and identifier.casefold() == blocker.casefold()
+        ):
+            delete = (
+                "mutation($id: String!) { "
+                "issueRelationDelete(id: $id) { success } }"
+            )
+            return graphql_data(delete, {"id": relation["id"]})[
+                "issueRelationDelete"
+            ]["success"]
+    return False
 
 
 # ---- Board order ----
