@@ -12,9 +12,11 @@ The card is the agreement about what the work will do. The simplification, atomi
 
 Commit all work on the branch with `/commit` first, so the reviewers read exactly what will merge.
 
-Spawn three fresh sub-agents at once with the Task tool (`general-purpose`, model `sonnet`), each with its own output path and its own lens from the brief's [Read through your lens](card-check-review.md#read-through-your-lens): the first "Promise by promise", the second "Try to break it", the third "Prove it". Give each **only** the card, its lens and its output path — never your reasoning, the plan checklist or this conversation:
+Spawn three fresh sub-agents at once with the Task tool (`general-purpose`, model `sonnet`, effort `high`), each with its own output path and its own lens from the brief's [Read through your lens](card-check-review.md#read-through-your-lens): the first "Promise by promise", the second "Try to break it", the third "Prove it". Give each **only** the card, its lens and its output path — never your reasoning, the plan checklist or this conversation:
 
 > Read `.claude/commands/linear/reference/card-check-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. Review this branch's change since it left `main`. The card is: `<identifier> — <title>`, described as: `<issue description>`. Write your verdicts as JSONL to `<output-path>`.
+
+Sonnet at high effort is the setting [chain-of-command config](../../../skills/parallel-sessions/reference/chain-of-command-config.md#sonnet-at-high-effort-is-the-soldiers-sweet-spot) found as good as every higher setting while using fewer tokens than any of them. It was measured on implementation jobs, not on reviews.
 
 Do not paste the diff. The reviewers run `git diff` themselves; their blindness to why the change looks the way it does is the point.
 

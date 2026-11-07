@@ -144,9 +144,11 @@ Skip this step when the current branch is already the card's branch, as when res
    git fetch origin main
    ```
 
-2. **Spawn three reviewers at once.** Use the Task tool (`general-purpose`, model `sonnet`), one per lens from the brief's [Read through your lens](reference/card-start-review.md#read-through-your-lens): the first "Promise by promise", the second "Try to break it", the third "Prove it". Give each **only** the card, its lens, its parent epic when step 1 surfaced one, and its own output path — never the planning conversation:
+2. **Spawn three reviewers at once.** Use the Task tool (`general-purpose`, model `sonnet`, effort `high`), one per lens from the brief's [Read through your lens](reference/card-start-review.md#read-through-your-lens): the first "Promise by promise", the second "Try to break it", the third "Prove it". Give each **only** the card, its lens, its parent epic when step 1 surfaced one, and its own output path — never the planning conversation:
 
    > Read `.claude/commands/linear/reference/card-start-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. The card is: `<identifier> — <title>`, described as: `<issue description>`. Its parent epic is `<epic-identifier>`, UUID `<epic-UUID>`. Write your findings as JSONL to `<output-path>`.
+
+   Sonnet at high effort is the setting [chain-of-command config](../../skills/parallel-sessions/reference/chain-of-command-config.md#sonnet-at-high-effort-is-the-soldiers-sweet-spot) found as good as every higher setting while using fewer tokens than any of them. It was measured on implementation jobs, not on reviews.
 
    The epic's UUID is the `parent.id` step 1 fetched. Leave out the epic sentence for a card with no parent epic. Read the findings from the JSONL files, not the sub-agents' chat replies. A reviewer that leaves no findings file is run once more; if it leaves none again, stop for the user. Only a file that exists and is empty means that lens found nothing.
 
