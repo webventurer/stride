@@ -121,7 +121,7 @@ worth flagging, The torch).
 
 ---
 
-### `/linear:finish` step 16 (summary)
+### `/linear:finish` step 17 (summary)
 
 **Outcome mode:**
 

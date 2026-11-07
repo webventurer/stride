@@ -64,7 +64,7 @@ If the list is empty, stop:
 
 > *"No open PR for this branch — `/linear:finish` has nothing to merge. Run `/linear:start <issue-id>` to push and open the PR first."*
 
-Capture the PR `number`, `url`, and `mergeable` for the merge in step 8. This gate is the single PR precondition — later steps assume the PR exists and never re-stop on it.
+Capture the PR `number`, `url`, and `mergeable` for the merge in step 9. This gate is the single PR precondition — later steps assume the PR exists and never re-stop on it.
 
 ### 3. Check repo state
 
@@ -78,7 +78,7 @@ Run the project's required checks, build command (e.g. `pnpm build`) and tests l
 
 If anything fails, stop — do not merge. Show what failed.
 
-### 5a. Check for pending fixup commits
+### 5. Check for pending fixup commits
 
 Before the merge, scan the branch for `fixup!` commits. These are journey-shaped commits meant to fold into an earlier target via `git rebase --autosquash` — if they land on `main` verbatim, the log fills with `fixup! feat: ...` subjects whose bodies don't explain why each change exists. That breaks the Vision criterion: *"Every commit on a stride-managed branch passes multi-pass atomicity — no monolithic commits, every message explains why."*
 
@@ -88,11 +88,11 @@ Count them:
 pending=$(git log main..HEAD --format=%s | grep -c '^fixup!')
 ```
 
-If `pending` is zero, skip silently and continue to step 5b.
+If `pending` is zero, skip silently and continue to step 6.
 
 In unattended mode, autosquash the fixups with the commands below and
 force-push with `--force-with-lease`. Rebase conflicts or a refused lease are
-hard stops. Continue to step 5b after a successful push.
+hard stops. Continue to step 6 after a successful push.
 
 The remaining choices in this step are the interactive path.
 
@@ -115,9 +115,9 @@ Autosquash them now before merging? (y / n / abort)
   git push --force-with-lease
   ```
 
-  `--force-with-lease` refuses if the remote tip has moved since the last fetch, so it can't silently overwrite someone else's push. Continue to step 5b with the rewritten history.
+  `--force-with-lease` refuses if the remote tip has moved since the last fetch, so it can't silently overwrite someone else's push. Continue to step 6 with the rewritten history.
 
-- **n** → continue to step 5b as-is. The user has explicitly chosen to merge the fixups verbatim. The drift is named on the issue (via the prompt the user just saw), not silently shipped.
+- **n** → continue to step 6 as-is. The user has explicitly chosen to merge the fixups verbatim. The drift is named on the issue (via the prompt the user just saw), not silently shipped.
 
 - **abort** → exit cleanly. Tell the user:
 
@@ -134,15 +134,15 @@ Autosquash them now before merging? (y / n / abort)
 - Rebase conflicts → abort the rebase (`git rebase --abort`), surface the conflict, tell the user to resolve manually and re-run.
 - `--force-with-lease` refused → the remote moved between fetch and push. Fetch, re-run.
 
-### 5b. Check every commit belongs to this card
+### 6. Check every commit belongs to this card
 
-Follow [branch scope](reference/branch-scope.md): judge each commit in `git log origin/main..HEAD` against the card's purpose from step 1, and move any commit that serves something else to `main` or its own branch before merging. Continue to step 6 once every remaining commit belongs.
+Follow [branch scope](reference/branch-scope.md): judge each commit in `git log origin/main..HEAD` against the card's purpose from step 1, and move any commit that serves something else to `main` or its own branch before merging. Continue to step 7 once every remaining commit belongs.
 
-### 6. Confirm Vision outcome (before merge)
+### 7. Confirm Vision outcome (before merge)
 
 <mark>**This step fires *before* the merge.**</mark> When trace drift is caught here, the catch is still actionable — the criterion can ride alongside its originating feature on the same branch, instead of needing a follow-up `VISION.md` PR.
 
-If the issue has no "Why this matters" section (legacy soft path from `/linear:start`), skip silently and continue to step 7.
+If the issue has no "Why this matters" section (legacy soft path from `/linear:start`), skip silently and continue to step 8.
 
 Otherwise, before drafting any Linear comment in this step, read [Linear card
 language](reference/card-language.md).
@@ -157,7 +157,7 @@ Read the commit subjects against the Success criteria and apply the [*revise, do
 
 #### Match — silent confirmation
 
-The issue's stated trace matches the agent's best-fit criterion *and* the fit is unambiguous. Surface a single line and continue to step 7:
+The issue's stated trace matches the agent's best-fit criterion *and* the fit is unambiguous. Surface a single line and continue to step 8:
 
 ```
 Trace verified against "<criterion>" — proceeding to the card check.
@@ -198,8 +198,8 @@ A worked before/after:
 
 Same content, ten times the readability.
 
-- **stated**: the agent was overconfident; user override stands. Continue to step 7.
-- **alternative**: post a one-line Linear comment via `uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."` naming the agent's drift catch and the user-picked criterion. Continue to step 7. The drift is named on the issue; the body isn't auto-rewritten.
+- **stated**: the agent was overconfident; user override stands. Continue to step 8.
+- **alternative**: post a one-line Linear comment via `uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."` naming the agent's drift catch and the user-picked criterion. Continue to step 8. The drift is named on the issue; the body isn't auto-rewritten.
 - **neither**: drop into the no-exact-fit path below.
 
 In unattended mode, post the same one-line comment naming the clean alternative
@@ -252,13 +252,13 @@ verified reference. A missing criterion rides alongside its originating feature
 instead of needing a separate PR. Interactive mode leaves the wording to the
 user; unattended mode treats its machine-local setting as authority to write it.
 
-### 7. Check the change against its card
+### 8. Check the change against its card
 
 <mark>**This step runs last before the merge**</mark>, after every step that can change the branch, so the check covers exactly what merges.
 
-Follow [card check](reference/card-check.md), starting from [Before merge: is the record current?](reference/card-check.md#before-merge-is-the-record-current). When the pull request's recorded check matches the branch's current content and the card's current wording, and every verdict is Kept, Fixed or Not acted on, continue to step 8. Otherwise run the check once, fix what it finds, re-run validation (step 4) and record the new verdicts in the pull request before merging.
+Follow [card check](reference/card-check.md), starting from [Before merge: is the record current?](reference/card-check.md#before-merge-is-the-record-current). When the pull request's recorded check matches the branch's current content and the card's current wording, and every verdict is Kept, Fixed or Not acted on, continue to step 9. Otherwise run the check once, fix what it finds, re-run validation (step 4) and record the new verdicts in the pull request before merging.
 
-### 8. Merge (preserve commits)
+### 9. Merge (preserve commits)
 
 Merge with `--merge` to preserve the atomic commits from the branch. The merge commit gets the default subject only — no body. The individual commits on the branch already explain what was built and why; duplicating that in the merge commit just creates drift between the two messages.
 
@@ -268,7 +268,7 @@ gh pr merge <number> --merge --subject "Merge branch '<gitBranchName>'" --body "
 
 Pass `--body ""` explicitly so `gh` does not fall back to the PR description.
 
-### 9. Clean up branches, remove worktree, close the worktree tab
+### 10. Clean up branches, remove worktree, close the worktree tab
 
 Detect the main repo path. Run `git worktree list` — the first entry is the main repo:
 
@@ -278,7 +278,7 @@ git worktree list
 
 **All git commands must use `git -C <main-repo-path>`** to avoid depending on the worktree directory.
 
-**Step 9a — Switch to main and fast-forward it:**
+**Step 10a — Switch to main and fast-forward it:**
 
 ```bash
 git -C <main-repo-path> checkout main && git -C <main-repo-path> pull --ff-only
@@ -286,7 +286,7 @@ git -C <main-repo-path> checkout main && git -C <main-repo-path> pull --ff-only
 
 `--ff-only` moves `main` to GitHub's or changes nothing. Never rebase or merge the main checkout here: a rebase replays any stray local commit unasked, and a clash would leave the shared checkout half-way through a rebase for every job behind it.
 
-When the checkout or the pull refuses, the pull request has already merged, so the refusal doesn't undo it or stop the finish: leave the main checkout as it is, carry on with the remaining steps, and report the refusal at the top of step 16's summary. Quote git's own error line and the output of:
+When the checkout or the pull refuses, the pull request has already merged, so the refusal doesn't undo it or stop the finish: leave the main checkout as it is, carry on with the remaining steps, and report the refusal at the top of step 17's summary. Quote git's own error line and the output of:
 
 ```bash
 git -C <main-repo-path> log origin/main..main
@@ -294,20 +294,20 @@ git -C <main-repo-path> log origin/main..main
 
 An empty log means no local commits are in the way, so the cause is something else, such as a failed checkout or no network; git's error line says which. The user or the coordinator decides what to do with the main checkout. As a `/parallel-sessions` job, include the refusal in the message to the coordinator that the card has merged.
 
-**Step 9b — Tear down the worktree (if one was used):**
+**Step 10b — Tear down the worktree (if one was used):**
 
 As a `/parallel-sessions` job, skip this step: the session is still running in the worktree, and the coordinator removes it once the session exits.
 
 Otherwise, follow [worktree teardown](reference/worktree.md#teardown) — it removes the worktree and guides the user to close its tab in the current VS Code window. Do this **before** deleting the branch (git won't delete a branch a worktree has checked out). For an inline run with no worktree, it skips silently.
 
-**Step 9c — Delete branches:**
+**Step 10c — Delete branches:**
 
 Now that any worktree is gone, the branch can be deleted. As a `/parallel-sessions` job, delete only the remote branch: the worktree still has the local one checked out, and the coordinator deletes it when it removes the worktree.
 
-- **Local**: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently. When step 9a's pull was refused, the main checkout lacks the merge commit and `-d` can say the branch isn't fully merged: skip the local deletion, say so in the summary, and carry on
+- **Local**: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently. When step 10a's pull was refused, the main checkout lacks the merge commit and `-d` can say the branch isn't fully merged: skip the local deletion, say so in the summary, and carry on
 - **Remote**: `git -C <main-repo-path> push origin --delete <gitBranchName>` — if already deleted (GitHub may auto-delete), skip silently
 
-### 10. Update Linear → done
+### 11. Update Linear → done
 
 Move the issue to **Done**:
 
@@ -317,11 +317,11 @@ uv run .claude/tools/linear_cli.py issue update <issue-id> --state Done
 
 Only set Done status. Skip if already Done. Never set any other status.
 
-### 11. Carry the lesson to Todo
+### 12. Carry the lesson to Todo
 
-Before the next card starts, carry what this card's checks found to the cards still in Todo. Follow [carry lessons](reference/carry-lessons.md). Carry the one-line result into the summary in step 16.
+Before the next card starts, carry what this card's checks found to the cards still in Todo. Follow [carry lessons](reference/carry-lessons.md). Carry the one-line result into the summary in step 17.
 
-### 12. Check milestone completion
+### 13. Check milestone completion
 
 Skip this step if the issue had no milestone.
 
@@ -349,7 +349,7 @@ Completed: <YYYY-MM-DD> — all stories Done.
 
 If the user declines, leave the milestone untouched.
 
-### 13. Check parent-issue epic completion
+### 14. Check parent-issue epic completion
 
 Skip this step if the issue had no `parentId`, or if the parent's title doesn't start with `Epic: ` (the parent is a regular sub-issue parent, not a stride epic).
 
@@ -379,7 +379,7 @@ uv run .claude/tools/linear_cli.py issue update <parent-id> --state Done
 
 If the user declines, leave the epic untouched.
 
-### 14. Sync Vision if it changed
+### 15. Sync Vision if it changed
 
 Detect whether the merged PR's diff included `VISION.md`:
 
@@ -410,7 +410,7 @@ Then:
    uv run .claude/tools/linear_cli.py get-project-content <project-id>
    ```
 4. Compare both fields against `VISION.md` (after trimming surrounding whitespace). Linear normalises markdown on save (e.g. `-` list markers become `*`), so treat normalisation-only differences as in sync. The subtitle is the tagline vs the current `description`; skip the subtitle if VISION.md has no opening blockquote (never blank an existing one).
-   - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 16.
+   - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 17.
    - **Either differs**: show what will change (content diff and/or old→new subtitle). In unattended mode continue to the writes; in interactive mode ask:
 
      ```
@@ -422,11 +422,11 @@ Then:
    uv run .claude/tools/linear_cli.py update-project-content <project-id> --content @VISION.md
    uv run .claude/tools/linear_cli.py project update <project-id> --description "<tagline-from-step-3>"
    ```
-   On `n`: skip the writes and continue to step 16.
+   On `n`: skip the writes and continue to step 17.
 
-If any step in the sync flow fails (`.stride.json` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 16. The issue is already Done from step 10 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
+If any step in the sync flow fails (`.stride.json` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 17. The issue is already Done from step 11 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
 
-Track the outcome for the summary in step 16:
+Track the outcome for the summary in step 17:
 
 | State | When |
 |:------|:-----|
@@ -436,17 +436,17 @@ Track the outcome for the summary in step 16:
 | `failed: <reason>` | Sync attempted but errored |
 | *(omitted)* | `VISION.md` was not in the merged diff |
 
-### 15. Record the card's stage times
+### 16. Record the card's stage times
 
-Record how long each stage of the card took, from the session logs Claude Code already saved. Run it from the main repo, and give it the directory this session started in, not the current one, which step 9 may have removed:
+Record how long each stage of the card took, from the session logs Claude Code already saved. Run it from the main repo, and give it the directory this session started in, not the current one, which step 10 may have removed:
 
 ```bash
 uv run <main-repo-path>/.claude/skills/parallel-sessions/scripts/stage_times.py --checkout <main-repo-path> record <issue-id> --working-dir <directory this session started in>
 ```
 
-The card is already merged and Done, so nothing here stops the finish. A card whose logs are missing or can't be read records nothing, and the command says so in one line. Whatever it prints or fails with, carry on to step 16.
+The card is already merged and Done, so nothing here stops the finish. A card whose logs are missing or can't be read records nothing, and the command says so in one line. Whatever it prints or fails with, carry on to step 17.
 
-### 16. Summary
+### 17. Summary
 
 Read the output focus and apply this command's format from [reference/output-focus.md](reference/output-focus.md).
 
@@ -461,7 +461,7 @@ Read the output focus and apply this command's format from [reference/output-foc
 - Uncommitted changes → stop, suggest `/commit`
 - Tests fail → stop, do not merge
 - Recording the stage times fails or finds no log → carry on; the card has already merged
-- `pull --ff-only` refuses in step 9a → leave the main checkout as it is, finish the remaining steps, report the refusal and `git log origin/main..main` in the summary
+- `pull --ff-only` refuses in step 10a → leave the main checkout as it is, finish the remaining steps, report the refusal and `git log origin/main..main` in the summary
 - Card check finds an unclear promise or nothing checkable → stop, do not merge
 - Fixup commits present + user picks "abort" → exit cleanly, do not merge (autosquash + force-push manually, then re-run)
 - Fixup rebase conflicts → abort rebase, surface conflict, do not merge

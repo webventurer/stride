@@ -1,6 +1,6 @@
 # Card check
 
-> Checks a finished change against its card, promise by promise, before it merges. Run by [`/linear:start`](../start.md) step 11 before the pull request opens, and by [`/linear:finish`](../finish.md) step 7 before the merge. Both modes follow it; [unattended mode](unattended.md) changes nothing here.
+> Checks a finished change against its card, promise by promise, before it merges. Run by [`/linear:start`](../start.md) step 11 before the pull request opens, and by [`/linear:finish`](../finish.md) step 8 before the merge. Both modes follow it; [unattended mode](unattended.md) changes nothing here.
 
 The card is the agreement about what the work will do. The simplification, atomicity and Vision reviews each ask a different question, so a change can pass them all and still miss a promise. This check asks the one they don't: **does the change do what the card said?**
 

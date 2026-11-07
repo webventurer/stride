@@ -10,7 +10,7 @@ Start the list empty. After each batch, add every card in it, whether or not it 
 
 ## Each round
 
-1. Run `/linear:next-steps`, the first step of `/linear:start` with no card named. It orders Todo again, and so applies what the merged cards taught: `/linear:finish` step 11 has already reworded the cards the lessons change.
+1. Run `/linear:next-steps`, the first step of `/linear:start` with no card named. It orders Todo again, and so applies what the merged cards taught: `/linear:finish` step 12 has already reworded the cards the lessons change.
 2. Ask stride what to do, giving it every card on the list:
 
    ```bash

@@ -22,7 +22,7 @@ The pattern fires at three distinct gates. Same move at each:
 |:--|:--|:--|
 | **[`/linear:plan-work`](/skills/linear#linear-plan-work) step 1 — Decision rules** | At draft time, the issue's *"Why this matters"* can't trace to any existing criterion | Prompt the user: add a new criterion to `VISION.md` (re-run `/vision` to evolve it), or drop the issue as out of scope |
 | **[`/linear:quick`](/skills/linear#linear-quick) step 6 — trace Vision** | Before merge, no criterion plainly fits the completed change | Explain the thin fit. Interactive mode stops for an update-or-add choice; unattended mode adds and commits the closest durable criterion, re-checks, and continues |
-| **[`/linear:finish`](/skills/linear#linear-finish) step 6 — confirm Vision outcome** | Before merge, the issue's stated trace is strained and no other criterion plainly fits | Post the gap to the issue. Interactive mode stops for an update-or-add choice; unattended mode adds and commits the closest durable criterion, re-checks, and continues |
+| **[`/linear:finish`](/skills/linear#linear-finish) step 7 — confirm Vision outcome** | Before merge, the issue's stated trace is strained and no other criterion plainly fits | Post the gap to the issue. Interactive mode stops for an update-or-add choice; unattended mode adds and commits the closest durable criterion, re-checks, and continues |
 
 The upfront gate is the cheap catch. The merge-time gates are the backup — they fire when the strain wasn't visible until after the work was built. All three end in the same move: evolve the Vision on the branch.
 
@@ -37,7 +37,7 @@ The amendable catch collapses that into one branch:
 | Trace drift caught after merge — file a follow-up issue | Trace drift caught before merge — pause, amend, resume |
 | Follow-up PR adds the criterion in isolation | Same PR carries the criterion *and* the work that revealed it |
 | `git log` shows the criterion arriving for no obvious reason | `git log` shows the criterion arriving on the same branch as its motivation |
-| Linear sync to project description happens in a separate cycle | `/linear:finish` step 8d syncs `VISION.md` to Linear in the same flow |
+| Linear sync to project description happens in a separate cycle | `/linear:finish` step 15 syncs `VISION.md` to Linear in the same flow |
 
 The Vision changes only when the work pushes against it — and when it changes, the evidence is right there in the branch.
 

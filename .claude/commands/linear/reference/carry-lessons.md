@@ -1,6 +1,6 @@
 # Carry lessons
 
-> **What this is**: how [`/linear:finish`](../finish.md) step 11 carries what a merged card's checks found to the cards still in Todo, before the next card starts. It is the "learn, apply, then take the next step" part of the agile loop that [agility](agility.md) describes.
+> **What this is**: how [`/linear:finish`](../finish.md) step 12 carries what a merged card's checks found to the cards still in Todo, before the next card starts. It is the "learn, apply, then take the next step" part of the agile loop that [agility](agility.md) describes.
 
 <mark>**Every finished card teaches the cards still to come.**</mark> A card's checks find things the next cards need to know: a promise shape that keeps coming back unproven, a rule that clashed with the card, a test only a run can show. Once stride runs Todo by itself, nothing carries that lesson unless this step does.
 

@@ -10,9 +10,9 @@ const finish = readFileSync(
   "utf8",
 );
 
-const step9a = finish.slice(
-  finish.indexOf("**Step 9a"),
-  finish.indexOf("**Step 9b"),
+const step10a = finish.slice(
+  finish.indexOf("**Step 10a"),
+  finish.indexOf("**Step 10b"),
 );
 
 describe("/linear:finish updating the main checkout", () => {
@@ -26,12 +26,12 @@ describe("/linear:finish updating the main checkout", () => {
     }
   });
 
-  it("pulls in step 9a with --ff-only on the main checkout", () => {
-    ok(step9a.includes("git -C <main-repo-path> pull --ff-only"));
+  it("pulls in step 10a with --ff-only on the main checkout", () => {
+    ok(step10a.includes("git -C <main-repo-path> pull --ff-only"));
   });
 
-  it("reports a refused pull in step 9a with the local commits", () => {
-    ok(step9a.includes("git -C <main-repo-path> log origin/main..main"));
-    ok(/refus/i.test(step9a));
+  it("reports a refused pull in step 10a with the local commits", () => {
+    ok(step10a.includes("git -C <main-repo-path> log origin/main..main"));
+    ok(/refus/i.test(step10a));
   });
 });
