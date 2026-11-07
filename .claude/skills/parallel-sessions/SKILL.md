@@ -93,6 +93,7 @@ The slot store defaults to `work/slots` under the main checkout. The script find
 | `work/briefs/<holder name>.md` | Each job's brief |
 | `work/logs/<holder name>.jsonl` | Each session's log, with its errors in `<holder name>.err` and a resumed session's log in `<holder name>.resume-<n>.jsonl` |
 | `work/slots/` | The slot store |
+| `work/stage-times/` | The record of how long each stage of each merged card took, written by [`scripts/stage_times.py`](scripts/stage_times.py); `uv run .claude/skills/parallel-sessions/scripts/stage_times.py report` shows where the time goes |
 
 Add `/work` to the shared exclude file, `$(git rev-parse --git-common-dir)/info/exclude`, so git never sees it. Write the progress file before starting any session, with every job waiting for a slot, and update a job's row each time its state changes: working, sent back, ready, "exited, waiting to be resumed", merged, waiting on the user, or failed. It is what the user opens to see the batch, and what a new coordinator reads to pick the batch up.
 
@@ -193,7 +194,7 @@ A claim is a single atomic add in the store, so when several sessions claim at t
 
 ## Tests
 
-The tests for `slots.py` and `measure_run.py` live in stride's own repository, beside the skill's source, and run with `pnpm test:py` there. An install leaves them out.
+The tests for `slots.py`, `measure_run.py` and `stage_times.py` live in stride's own repository, beside the skill's source, and run with `pnpm test:py` there. An install leaves them out.
 
 ---
 

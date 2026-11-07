@@ -309,7 +309,7 @@ Only set Done status. Skip if already Done. Never set any other status.
 
 ### 11. Carry the lesson to Todo
 
-Before the next card starts, carry what this card's checks found to the cards still in Todo. Follow [carry lessons](reference/carry-lessons.md). Carry the one-line result into the summary in step 15.
+Before the next card starts, carry what this card's checks found to the cards still in Todo. Follow [carry lessons](reference/carry-lessons.md). Carry the one-line result into the summary in step 16.
 
 ### 12. Check milestone completion
 
@@ -400,7 +400,7 @@ Then:
    uv run .claude/tools/linear_cli.py get-project-content <project-id>
    ```
 4. Compare both fields against `VISION.md` (after trimming surrounding whitespace). Linear normalises markdown on save (e.g. `-` list markers become `*`), so treat normalisation-only differences as in sync. The subtitle is the tagline vs the current `description`; skip the subtitle if VISION.md has no opening blockquote (never blank an existing one).
-   - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 15.
+   - **Both match**: report *"Linear already matches VISION.md (content + subtitle) — no update needed"* and continue to step 16.
    - **Either differs**: show what will change (content diff and/or old→new subtitle). In unattended mode continue to the writes; in interactive mode ask:
 
      ```
@@ -412,11 +412,11 @@ Then:
    uv run .claude/tools/linear_cli.py update-project-content <project-id> --content @VISION.md
    uv run .claude/tools/linear_cli.py project update <project-id> --description "<tagline-from-step-3>"
    ```
-   On `n`: skip the writes and continue to step 15.
+   On `n`: skip the writes and continue to step 16.
 
-If any step in the sync flow fails (`.stride.json` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 15. The issue is already Done from step 10 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
+If any step in the sync flow fails (`.stride.json` missing, project not found, `update-project-content` / `project update` errors), surface the failure clearly and continue to step 16. The issue is already Done from step 10 — sync failure is non-fatal and recoverable via the standalone `/linear:update-vision` command later.
 
-Track the outcome for the summary in step 15:
+Track the outcome for the summary in step 16:
 
 | State | When |
 |:------|:-----|
@@ -426,7 +426,17 @@ Track the outcome for the summary in step 15:
 | `failed: <reason>` | Sync attempted but errored |
 | *(omitted)* | `VISION.md` was not in the merged diff |
 
-### 15. Summary
+### 15. Record the card's stage times
+
+Record how long each stage of the card took, from the session logs Claude Code already saved. Run it from the main repo, and give it the directory this session started in, not the current one, which step 9 may have removed:
+
+```bash
+uv run <main-repo-path>/.claude/skills/parallel-sessions/scripts/stage_times.py --checkout <main-repo-path> record <issue-id> --working-dir <directory this session started in>
+```
+
+The card is already merged and Done, so nothing here stops the finish. A card whose logs are missing or can't be read records nothing, and the command says so in one line. Whatever it prints or fails with, carry on to step 16.
+
+### 16. Summary
 
 Read the output focus and apply this command's format from [reference/output-focus.md](reference/output-focus.md).
 
@@ -440,6 +450,7 @@ Read the output focus and apply this command's format from [reference/output-foc
 - No open PR for the branch → stop; run `/linear:start` to push and open the PR
 - Uncommitted changes → stop, suggest `/commit`
 - Tests fail → stop, do not merge
+- Recording the stage times fails or finds no log → carry on; the card has already merged
 - Card check finds an unclear promise or nothing checkable → stop, do not merge
 - Fixup commits present + user picks "abort" → exit cleanly, do not merge (autosquash + force-push manually, then re-run)
 - Fixup rebase conflicts → abort rebase, surface conflict, do not merge

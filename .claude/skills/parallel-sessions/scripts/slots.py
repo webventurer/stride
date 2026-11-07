@@ -97,10 +97,14 @@ def slot_key(slot: int) -> str:
 
 
 def shared_store_path(checkout: Path) -> Path:
+    return main_checkout_path(checkout) / STORE_FOLDER
+
+
+def main_checkout_path(checkout: Path) -> Path:
     common = read_git_output(
         checkout, "rev-parse", "--path-format=absolute", "--git-common-dir"
     )
-    return Path(common).resolve().parent / STORE_FOLDER
+    return Path(common).resolve().parent
 
 
 def read_git_output(directory: Path, *arguments: str) -> str:
