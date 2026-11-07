@@ -110,6 +110,14 @@ When this session can't start side sessions, start each job as a background `cla
    ```bash
    "<main checkout>/.claude/tools/link_stride_install.sh" "<main checkout>" "<worktree>"
    ```
+
+   When the main checkout has a `.stride.json`, the worktree needs it too: it holds the Linear project, its key and the `unattended` setting a stride card's job reads. Share it the way `/linear:start --worktree` does:
+
+   ```bash
+   "<main checkout>/.claude/tools/share_stride_settings.sh" "<main checkout>" "<worktree>"
+   ```
+
+   If it exits non-zero, report it and don't start that job: without the settings, the job's first Linear call fails.
 3. **Check git sees nothing new.** `git status --porcelain` prints nothing in each worktree, and nothing new in the main checkout.
 4. **Start every session in one turn,** each in the background in its job's checkout, on its model and effort with the advisor off and billed to the user's plan, as [the chain of command config](reference/chain-of-command-config.md) sets out, with its log in `work/logs/`:
 
