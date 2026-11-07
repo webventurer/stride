@@ -7,7 +7,8 @@ description: Recommend what to work on next, ranked against the project Vision.
 Review what's happening and recommend what to work on next.
 
 Read [unattended mode](reference/unattended.md) before the first optional
-prompt. Unattended mode ranks all work and remains read-only.
+prompt. Unattended mode ranks all work and writes Todo's order; it changes
+nothing else.
 
 ## Decision rules
 
@@ -151,6 +152,16 @@ Show as a table per epic/milestone (or one combined table when no epics or miles
 
 If the list is empty: "Backlog is empty — nothing to recommend."
 
+#### Put Todo in the order stride will work it
+
+Todo's order on the board is the order work happens, so next-steps writes it, by rule rather than judgement: priority first, Urgent to Low and then No priority; equal priorities keep their current order; a card never sits above the Todo card it's waiting on, read from Linear's "blocked by" links; `Epic: ` cards keep their place. Show the order first:
+
+```bash
+uv run .claude/tools/linear_cli.py order-todo --project "<project>" --dry-run
+```
+
+Interactive mode shows that order and asks once: **"Write this order to Todo on the board? (y/n)"**. Unattended mode writes it. To write it, run the same command without `--dry-run`: it sets the project's board view to Manual, so the order shows, then rewrites only the Todo cards whose place changed. It changes nothing else on the board. Vision alignment still shapes the recommendations below; it doesn't decide board order.
+
 ### 7. Recommend next actions
 
 Apply the priority ordering: build failure > PRs needing fix > in-progress > PRs needing review > approved PRs to merge > backlog.
@@ -166,5 +177,5 @@ If a candidate doesn't cleanly trace to any Success criterion, surface that hone
 ### 8. Offer to start
 
 Interactive mode asks: "Want me to start one of these? I can run `/start <ID>`
-for you." Unattended mode ends after the recommendations; a read-only command
-never starts mutating work automatically.
+for you." Unattended mode ends after the recommendations; next-steps never starts
+work automatically.

@@ -28,6 +28,7 @@ from legacy import (  # noqa: E402
     migrate_from_legacy,
 )
 from linear import (  # noqa: E402
+    add_blocker,
     bearer_token,
     create_attachment,
     create_comment,
@@ -35,6 +36,7 @@ from linear import (  # noqa: E402
     create_milestone,
     create_project,
     get_issue,
+    get_issue_blockers,
     get_project,
     get_team,
     label_drift,
@@ -46,6 +48,7 @@ from linear import (  # noqa: E402
     list_projects,
     list_team_states,
     list_teams,
+    list_todo_cards,
     milestone_open_issues,
     min_backlog_sort_order,
     project_content,
@@ -65,7 +68,9 @@ from linear import (  # noqa: E402
     update_project_content,
     whoami,
     workspace_labels,
+    write_todo_order,
 )
+from todo_order import cards_in_work_order, new_sort_orders  # noqa: E402
 
 
 @click.group()
@@ -170,6 +175,24 @@ def set_sort_order_cmd(issue_id: str, sort_order: float):
     echo_json(set_sort_order(issue_id, sort_order))
 
 
+@cli.command("order-todo")
+@click.option("--project", required=True)
+@click.option("--dry-run", is_flag=True, help="Print the order only")
+def order_todo_cmd(project: str, dry_run: bool):
+    ordered = cards_in_work_order(list_todo_cards(project))
+    orders = new_sort_orders(ordered)
+    if not dry_run:
+        write_todo_order(project, ordered, orders)
+    echo_json([order_line(card, orders) for card in ordered])
+
+
+def order_line(card: dict, orders: dict) -> dict:
+    fields = ["identifier", "title", "priority", "blockers"]
+    return {f: card[f] for f in fields} | {
+        "sortOrder": orders[card["identifier"]]
+    }
+
+
 @cli.command("set-project-view-manual")
 @click.argument("project_id")
 def set_project_view_manual_cmd(project_id: str):
@@ -248,6 +271,19 @@ def issue_get_cmd(identifier: str):
     if not issue:
         raise click.ClickException(f"Issue not found: {identifier}")
     echo_json(issue)
+
+
+@issue_group.command("blockers")
+@click.argument("identifier")
+def issue_blockers_cmd(identifier: str):
+    echo_json(get_issue_blockers(identifier))
+
+
+@issue_group.command("block")
+@click.argument("identifier")
+@click.option("--by", "blocker", required=True, help="The blocking card")
+def issue_block_cmd(identifier: str, blocker: str):
+    echo_json(add_blocker(identifier, blocker))
 
 
 @issue_group.command("create")

@@ -431,6 +431,70 @@ def test_min_backlog_sort_order_returns_none_when_empty():
         assert min_backlog_sort_order("proj-1") is None
 
 
+def relation_nodes(*pairs: tuple[str, str]) -> dict:
+    nodes = [
+        {"type": kind, "issue": {"identifier": ident}} for kind, ident in pairs
+    ]
+    return {"nodes": nodes}
+
+
+def test_issue_blockers_lists_only_blocking_relations():
+    data = {
+        "issue": {
+            "inverseRelations": relation_nodes(
+                ("blocks", "WB-1"), ("related", "WB-2"), ("blocks", "WB-3")
+            )
+        }
+    }
+    env, post = with_env_and_mock(data)
+    with env, post:
+        assert linear.get_issue_blockers("WB-9") == ["WB-1", "WB-3"]
+
+
+def test_add_blocker_creates_a_blocks_relation_from_the_blocker():
+    data = {"issueRelationCreate": {"success": True}}
+    env, post = with_env_and_mock(data)
+    with env, post as mock:
+        assert linear.add_blocker("WB-9", "WB-1") is True
+
+    assert sent_variables(mock) == {"blocker": "WB-1", "blocked": "WB-9"}
+    assert "type: blocks" in sent_query(mock)
+
+
+def test_todo_cards_carries_each_cards_blockers():
+    node = {
+        "id": "u1",
+        "identifier": "WB-9",
+        "title": "Nine",
+        "priority": 2,
+        "sortOrder": 5.0,
+        "inverseRelations": relation_nodes(("blocks", "WB-1")),
+    }
+    env, post = with_env_and_mock({"issues": {"nodes": [node]}})
+    with env, post as mock:
+        cards = linear.list_todo_cards("Stride")
+
+    assert cards[0]["blockers"] == ["WB-1"]
+    assert 'name: { eq: "Todo" }' in sent_query(mock)
+
+
+def test_write_todo_order_sets_manual_view_then_changed_orders():
+    ordered = [
+        {"id": "u1", "identifier": "A", "sortOrder": 10.0},
+        {"id": "u2", "identifier": "B", "sortOrder": 30.0},
+    ]
+    with (
+        patch("linear.resolve_project_id", return_value="p1"),
+        patch("linear.bearer_token", return_value="lin_test"),
+        patch("linear.set_project_view_manual") as manual,
+        patch("linear.set_sort_order") as write,
+    ):
+        linear.write_todo_order("Stride", ordered, {"A": 10.0, "B": 20.0})
+
+    manual.assert_called_once_with("p1")
+    write.assert_called_once_with("u2", 20.0)
+
+
 def test_set_sort_order_passes_float_and_returns_success():
     data = {"issueUpdate": {"success": True}}
     env, post = with_env_and_mock(data)

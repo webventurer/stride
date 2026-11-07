@@ -654,6 +654,33 @@ def update_project_content(project_id: str, content: str) -> bool:
     return data["projectUpdate"]["success"]
 
 
+# ---- Blockers: Linear's "blocked by" links ----
+
+BLOCKER_FIELDS = "inverseRelations { nodes { type issue { identifier } } }"
+
+
+def blocker_identifiers(node: dict) -> list[str]:
+    relations = node["inverseRelations"]["nodes"]
+    return [
+        r["issue"]["identifier"] for r in relations if r["type"] == "blocks"
+    ]
+
+
+def get_issue_blockers(identifier: str) -> list[str]:
+    query = f"query($id: String!) {{ issue(id: $id) {{ {BLOCKER_FIELDS} }} }}"
+    return blocker_identifiers(graphql_data(query, {"id": identifier})["issue"])
+
+
+def add_blocker(blocked: str, blocker: str) -> bool:
+    query = (
+        "mutation($blocker: String!, $blocked: String!) { issueRelationCreate("
+        "input: { issueId: $blocker, relatedIssueId: $blocked, type: blocks }"
+        ") { success } }"
+    )
+    variables = {"blocker": blocker, "blocked": blocked}
+    return graphql_data(query, variables)["issueRelationCreate"]["success"]
+
+
 # ---- Board order ----
 
 
@@ -668,6 +695,26 @@ def min_backlog_sort_order(project_id: str) -> float | None:
     ]
     orders = [n["sortOrder"] for n in nodes if n["sortOrder"] is not None]
     return min(orders) if orders else None
+
+
+def list_todo_cards(project: str) -> list[dict]:
+    fields = f"id identifier title priority sortOrder {BLOCKER_FIELDS}"
+    query = (
+        "query($project: String!) { issues(filter: { project: { name: "
+        '{ eq: $project } } state: { name: { eq: "Todo" } } }, first: 250) '
+        f"{{ nodes {{ {fields} }} }} }}"
+    )
+    nodes = graphql_data(query, {"project": project})["issues"]["nodes"]
+    return [node | {"blockers": blocker_identifiers(node)} for node in nodes]
+
+
+def write_todo_order(
+    project: str, ordered_cards: list[dict], sort_orders: dict
+):
+    set_project_view_manual(resolve_project_id(bearer_token(), project))
+    for card in ordered_cards:
+        if card["sortOrder"] != sort_orders[card["identifier"]]:
+            set_sort_order(card["id"], sort_orders[card["identifier"]])
 
 
 def set_sort_order(issue_id: str, sort_order: float) -> bool:
