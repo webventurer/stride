@@ -1,5 +1,7 @@
-import { ok } from "node:assert";
-import { readFileSync } from "node:fs";
+import { deepStrictEqual, ok } from "node:assert";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -43,5 +45,28 @@ describe("config defaults", () => {
     const policy = read(".claude/commands/linear/reference/unattended.md");
 
     ok(policy.includes("`/linear:check` reports the field"));
+  });
+
+  it("reports a default missing only when its key is absent", () => {
+    const check = read(".claude/commands/linear/check.md");
+    const filter = check.match(/^jq -r '(\["focus".*)' \.stride\.json$/m)[1];
+    const missingIn = (config) => {
+      const file = join(mkdtempSync(join(tmpdir(), "stride-check-")), ".stride.json");
+      writeFileSync(file, JSON.stringify(config));
+      return execFileSync("jq", ["-r", filter, file], { encoding: "utf8" })
+        .split("\n")
+        .filter(Boolean);
+    };
+
+    deepStrictEqual(
+      missingIn({ focus: "outcome", unattended: false, "parallel-sessions": 3 }),
+      [],
+    );
+    deepStrictEqual(
+      missingIn({ focus: "outcome", unattended: false, "parallel-sessions": null }),
+      [],
+    );
+    deepStrictEqual(missingIn({ focus: "outcome", "parallel-sessions": 3 }), ["unattended"]);
+    deepStrictEqual(missingIn({ project: "X" }), ["focus", "unattended", "parallel-sessions"]);
   });
 });
