@@ -252,3 +252,37 @@ describe("the coordinator's steps for a batch of stride cards", () => {
     }
   });
 });
+
+describe("an unattended run through Todo", () => {
+  const todoRun = read(".claude/commands/linear/reference/todo-run.md");
+  const start = read(".claude/commands/linear/start.md");
+
+  it("is the route /linear:start takes after a batch when unattended", () => {
+    ok(start.includes("[Todo run](reference/todo-run.md)"));
+    ok(!start.includes("running on through Todo is a later story"));
+  });
+
+  it("asks stride for the next batch with every card it has started", () => {
+    ok(todoRun.includes("start-choice --project"));
+    ok(todoRun.includes("--started <card>"));
+    ok(todoRun.includes("as a batch of one"));
+  });
+
+  it("holds every question for one message at the end of the run", () => {
+    ok(todoRun.includes("No batch's report puts a question to the user"));
+    ok(skill.includes("no batch's report puts a question to the user"));
+    ok(skill.includes("put no question to the user mid-run"));
+  });
+
+  it("names the failed cards and each lesson in the final report", () => {
+    ok(
+      inOrder(todoRun, [
+        "**Done:**",
+        "**Failed:**",
+        "**Waiting:**",
+        "**Lessons:**",
+        "**Questions:**",
+      ]),
+    );
+  });
+});

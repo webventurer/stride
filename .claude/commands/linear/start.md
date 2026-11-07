@@ -20,10 +20,10 @@ uv run .claude/tools/linear_cli.py start-choice --project "<project>" --branch "
 
 - **`resume`** — the branch name holds a card ID Linear knows, in either case (`wb-945` or `WB-945`): work that card
 - **`ask`** — any other branch but `main`, or a branch whose card ID Linear doesn't know: ask the user which card
-- **`batch`** — on `main`, two or more cards from the top of Todo can run at once: the batch next-steps named. Run them with `/parallel-sessions`, settling its six settings for it: the mission is the cards' own descriptions, the job is `/linear:start <card>`, the items are the batch, how many at once is `parallel-sessions` from `.stride.json`, the mode is one worktree per job, and the model is the skill's suggestion. Interactive mode shows the batch and waits for the user's "go"; unattended mode gives the skill its "go" itself. Then stop: running on through Todo is a later story
-- **`single`** — on `main`, one card can run: work it as `/linear:start <card>` does
-- **`blocked`** — Todo holds cards but none can start: show each card's reason and stop, starting nothing
-- **`empty`** — Todo is empty: say so and stop
+- **`batch`** — on `main`, two or more cards from the top of Todo can run at once: the batch next-steps named. Run them with `/parallel-sessions`, settling its six settings for it: the mission is the cards' own descriptions, the job is `/linear:start <card>`, the items are the batch, how many at once is `parallel-sessions` from `.stride.json`, the mode is one worktree per job, and the model is the skill's suggestion. Interactive mode shows the batch and waits for the user's "go", then stops after the one batch; unattended mode gives the skill its "go" itself, then runs on through Todo as [Todo run](reference/todo-run.md) sets out
+- **`single`** — on `main`, one card can run: work it as `/linear:start <card>` does. In unattended mode with no card named it runs as a batch of one, as [Todo run](reference/todo-run.md) sets out
+- **`blocked`** — Todo holds cards but none can start: show each card's reason and stop, starting nothing. Ending a [Todo run](reference/todo-run.md), it is the run's final report
+- **`empty`** — Todo is empty: say so and stop. Ending a [Todo run](reference/todo-run.md), it is the run's final report
 
 A `parallel-sessions` value the setting refuses makes the command print the setting's message instead: show it and stop.
 
@@ -63,7 +63,7 @@ Extract from the issue JSON: identifier, title, description, state, labels, `git
 
 Extract from comments: decisions and context added after the description was written.
 
-If a comment is a **Lesson question from** another card, posted by [carry lessons](reference/carry-lessons.md) because a lesson would change what this card is for, and no later comment starts `Answer:`, stop before anything else. Interactive mode shows the question, asks the user, and posts their reply as a comment starting `Answer:`; unattended mode ends the run, and the user replies on the card with a comment starting `Answer:`. Other comments posted after the question, including stride's own, don't answer it.
+If a comment is a **Lesson question from** another card, posted by [carry lessons](reference/carry-lessons.md) because a lesson would change what this card is for, and no later comment starts `Answer:`, stop before anything else. Interactive mode shows the question, asks the user, and posts their reply as a comment starting `Answer:`; unattended mode ends the run of a card started by name (a run through Todo leaves such a card out of every batch, so it never starts it), and the user replies on the card with a comment starting `Answer:`. Other comments posted after the question, including stride's own, don't answer it.
 
 If the issue is attached to a project milestone, surface it before continuing: `This story is part of *[Milestone name]*`. One line — just enough context that the user knows which milestone the work is feeding.
 
