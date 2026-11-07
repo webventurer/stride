@@ -203,4 +203,15 @@ describe("the coordinator's steps for a batch of stride cards", () => {
     ok(step5.includes("gh pr diff <number> --name-only"));
     ok(step5.includes("the card's \"What we'll do\" doesn't call for"));
   });
+
+  it("builds the combined check in a scratch worktree with the install linked and settings shared", () => {
+    ok(
+      inOrder(step5, [
+        "scratch worktree",
+        "link_stride_install.sh",
+        "share_stride_settings.sh",
+        "don't run the check",
+      ]),
+    );
+  });
 });
