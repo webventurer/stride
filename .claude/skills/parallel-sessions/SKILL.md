@@ -145,7 +145,7 @@ uv run --no-project --with diskcache --with click \
   python .claude/skills/parallel-sessions/scripts/slots.py --limit 3 status
 ```
 
-When a job's session exits holding a slot, release its slot at once with `slots.py release <holder>`, before anything else, so the next waiting job can claim it. An idle notice releases nothing: a job that is only idle is still waiting for its go and keeps its slot. Then set the job's row in `work/progress.md` to "exited, waiting to be resumed"; a job already marked merged or failed keeps that state.
+When a job's session exits holding a slot, release its slot at once with `slots.py release <holder>`, before anything else, so the next waiting job can claim it. An idle notice releases nothing: a job that is only idle is still waiting for its go and keeps its slot. Whether or not it still held a slot, when a job's session exits before its card has merged, set the job's row in `work/progress.md` to "exited, waiting to be resumed"; a job already marked merged or failed keeps that state.
 
 Each session messages you when its work is ready, when it hits an error it can't fix, and when it has a question about its job's purpose or scope. As each job's work is ready:
 
