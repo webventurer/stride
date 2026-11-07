@@ -431,6 +431,30 @@ describe("card start check", () => {
   });
 });
 
+describe("reviewers never change the branch", () => {
+  const briefs = ["card-start-review.md", "card-check-review.md", "simplify-review.md"];
+
+  for (const brief of briefs) {
+    it(`forbids ${brief}'s reviewer every command that moves the branch`, () => {
+      const text = read(`.claude/commands/linear/reference/${brief}`);
+
+      ok(
+        text.includes("no `git checkout`, `git switch`, `git stash` or `git reset`"),
+        brief,
+      );
+    });
+  }
+
+  for (const brief of ["card-start-review.md", "simplify-review.md"]) {
+    it(`points ${brief}'s reviewer at the read-only base version of a file`, () => {
+      const text = read(`.claude/commands/linear/reference/${brief}`);
+
+      ok(text.includes("`git show $(git merge-base main HEAD):<file>`"), brief);
+      ok(text.includes("`git restore`"), brief);
+    });
+  }
+});
+
 describe("reviewer diff base", () => {
   it("reads only what the branch changed since it left main", () => {
     for (const brief of ["card-check-review.md", "simplify-review.md"]) {

@@ -111,6 +111,7 @@ Rules for the file:
 - Do not read or ask for the author's rationale — judge the diff and the issue alone
 - Do not search outside the repository: open a path the card or the orchestrator names directly, find any other file with `git ls-files --cached --others --exclude-standard` or `git grep --untracked`, which both include files the change added but hasn't committed, and never start a search from `/` or the home folder. A search of the whole disk runs until the command time limit stops it
 - Do not edit, stage, or commit anything — you report, the author acts
+- Do not change the branch, the working tree, the index or the stash list: no `git checkout`, `git switch`, `git stash` or `git reset`, and no other command that changes them, such as `git restore`, `git clean`, `git merge`, `git rebase`, `git cherry-pick`, `git apply` or `git pull`. Read the base version of a file with `git show $(git merge-base main HEAD):<file>` instead
 - Do not propose additions, renames, or restructuring — this pass removes
 - Do not raise a proposal you cannot pin to a concrete consequence — when in doubt, say nothing
 
