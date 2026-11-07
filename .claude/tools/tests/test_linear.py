@@ -25,6 +25,16 @@ sys.path.insert(0, str(TOOLS_DIR))
 
 import linear  # noqa: E402
 import linear_cli  # noqa: E402
+
+REAL_WAITS_FOR_ANSWER = linear_cli.waits_for_answer
+
+
+@pytest.fixture(autouse=True)
+def no_card_waits_on_an_answer():
+    with patch("linear_cli.waits_for_answer", return_value=False):
+        yield
+
+
 from linear import (  # noqa: E402
     LinearError,
     bearer_token,
@@ -1880,3 +1890,156 @@ def test_next_batch_for_an_epic_shows_only_its_cards():
         )
 
     assert [c["identifier"] for c in json.loads(result.output)] == ["A"]
+
+
+# ---- WB-943: /linear:start works through Todo until it's empty ----
+
+
+def comment(body: str, created_at: str) -> dict:
+    return {"body": body, "createdAt": created_at}
+
+
+def test_waits_on_answer_while_a_lesson_question_has_no_answer():
+    comments = [
+        comment("**Lesson question from WB-5**\n\nShould this change?", "T1"),
+        comment("Lesson from WB-6: reworded a line.", "T2"),
+    ]
+
+    assert linear.waits_on_answer(comments) is True
+
+
+def test_waits_on_answer_ends_when_a_later_comment_starts_with_answer():
+    comments = [
+        comment("**Lesson question from WB-5**\n\nShould this change?", "T1"),
+        comment("Answer: yes, change it.", "T2"),
+    ]
+
+    assert linear.waits_on_answer(comments) is False
+
+
+def test_waits_on_answer_ignores_an_answer_posted_before_the_question():
+    comments = [
+        comment("Answer: yes.", "T1"),
+        comment("**Lesson question from WB-5**\n\nShould this change?", "T2"),
+    ]
+
+    assert linear.waits_on_answer(comments) is True
+
+
+def test_waits_on_answer_is_false_for_a_card_with_no_question():
+    assert linear.waits_on_answer([comment("Just a note", "T1")]) is False
+    assert linear.waits_on_answer([]) is False
+
+
+def blocked_by(state_type: str) -> dict:
+    relation = {
+        "type": "blocks",
+        "issue": {"identifier": "WB-9", "state": {"type": state_type}},
+    }
+    return {"inverseRelations": {"nodes": [relation]}}
+
+
+@pytest.mark.parametrize("state_type", ["backlog", "canceled", "started"])
+def test_a_blocker_that_is_not_done_stays_open(state_type):
+    node = blocked_by(state_type)
+
+    assert linear.open_blocker_identifiers(node) == ["WB-9"]
+
+
+def test_a_blocker_that_is_done_is_not_open():
+    assert linear.open_blocker_identifiers(blocked_by("completed")) == []
+
+
+def run_next_batch(cards: list[dict], waiting: set[str]) -> list:
+    with (
+        patch("linear.project_config", return_value={"parallel-sessions": 3}),
+        patch("linear_cli.list_todo_cards", return_value=cards),
+        patch(
+            "linear_cli.waits_for_answer",
+            side_effect=lambda card: card["identifier"] in waiting,
+        ),
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli, ["next-batch", "--project", "Stride"]
+        )
+
+    assert result.exit_code == 0, result.output
+    return json.loads(result.output)
+
+
+def test_next_batch_leaves_out_a_card_waiting_on_an_answer():
+    cards = [todo_card("A", []), todo_card("B", [])]
+
+    lines = run_next_batch(cards, {"A"})
+
+    assert [(c["identifier"], c["in_batch"]) for c in lines] == [
+        ("A", False),
+        ("B", True),
+    ]
+    assert lines[0]["reason"] == "waits for an answer to a lesson question"
+
+
+def test_start_choice_leaves_out_every_started_card_still_in_todo():
+    cards = [todo_card("WB-1", []), todo_card("WB-2", [])]
+
+    choice = start_choice_on_main(cards, set(), "--started", "wb-1")
+
+    assert choice == {"action": "single", "card": "WB-2"}
+
+
+def start_choice_on_main(cards: list[dict], waiting: set[str], *args: str):
+    with (
+        patch("linear.project_config", return_value={"parallel-sessions": 3}),
+        patch("linear_cli.list_todo_cards", return_value=cards),
+        patch(
+            "linear_cli.waits_for_answer",
+            side_effect=lambda card: card["identifier"] in waiting,
+        ),
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli,
+            ["start-choice", "--project", "S", "--branch", "main", *args],
+        )
+
+    assert result.exit_code == 0, result.output
+    return json.loads(result.output)
+
+
+def test_start_choice_runs_the_only_card_able_to_start_when_a_question_waits():
+    cards = [todo_card("A", []), todo_card("B", [])]
+
+    assert start_choice_on_main(cards, {"A"}) == {
+        "action": "single",
+        "card": "B",
+    }
+
+
+def test_start_choice_ends_with_each_reason_when_only_waiting_cards_remain():
+    cards = [
+        todo_card("WB-1", []),
+        todo_card("WB-2", []),
+        todo_card("C", ["X"]),
+    ]
+
+    choice = start_choice_on_main(cards, {"WB-2"}, "--started", "WB-1")
+
+    assert choice == {
+        "action": "blocked",
+        "reasons": {
+            "WB-1": "started earlier in this run and stopped in Todo",
+            "WB-2": "waits for an answer to a lesson question",
+            "C": "blocked by X",
+        },
+    }
+
+
+def test_waits_for_answer_reads_the_cards_own_comments():
+    comments = [comment("**Lesson question from WB-5**\n\nOK?", "T1")]
+    with (
+        patch("linear_cli.bearer_token", return_value="key"),
+        patch("linear_cli.list_comments", return_value=comments) as listing,
+    ):
+        waiting = REAL_WAITS_FOR_ANSWER({"identifier": "WB-7"})
+
+    assert waiting is True
+    listing.assert_called_once_with("key", "WB-7")

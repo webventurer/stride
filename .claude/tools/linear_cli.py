@@ -69,6 +69,7 @@ from linear import (  # noqa: E402
     update_milestone_description,
     update_project,
     update_project_content,
+    waits_on_answer,
     whoami,
     workspace_labels,
     write_todo_order,
@@ -211,7 +212,7 @@ def order_line(card: dict, orders: dict) -> dict:
 @click.option("--project", required=True)
 @click.option("--epic", default=None, help="Only this epic's sub-issues")
 def next_batch_cmd(project: str, epic: str | None):
-    considered = list_considered_todo_cards(project, epic)
+    considered = list_considered_todo_cards(project, epic, ())
     echo_json([considered_line(c) for c in considered])
 
 
@@ -235,9 +236,16 @@ def considered_line(card: dict) -> dict:
 @click.option("--project", required=True)
 @click.option("--branch", required=True, help="The current git branch")
 @click.option("--epic", default=None, help="Only this epic's sub-issues")
-def start_choice_cmd(project: str, branch: str, epic: str | None):
+@click.option(
+    "--started",
+    multiple=True,
+    help="A card this run already started; left out while in Todo",
+)
+def start_choice_cmd(
+    project: str, branch: str, epic: str | None, started: tuple[str, ...]
+):
     considered = (
-        list_considered_todo_cards(project, epic)
+        list_considered_todo_cards(project, epic, started)
         if branch == MAIN_BRANCH
         else []
     )
@@ -259,12 +267,19 @@ def card_exists(identifier: str) -> bool:
     return True
 
 
-def list_considered_todo_cards(project: str, epic: str | None) -> list[dict]:
+def list_considered_todo_cards(
+    project: str, epic: str | None, started: tuple[str, ...]
+) -> list[dict]:
     size = batch_size()
     ordered = cards_in_work_order(list_todo_cards(project))
     if epic:
         ordered = cards_of_epic(ordered, epic.upper())
-    return considered_cards(ordered, size)
+    asked = [c | {"waits_on_answer": waits_for_answer(c)} for c in ordered]
+    return considered_cards(asked, size, frozenset(s.upper() for s in started))
+
+
+def waits_for_answer(card: dict) -> bool:
+    return waits_on_answer(list_comments(bearer_token(), card["identifier"]))
 
 
 @cli.command("set-project-view-manual")

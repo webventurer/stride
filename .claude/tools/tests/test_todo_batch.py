@@ -22,6 +22,7 @@ def card(
     identifier: str,
     files: tuple[str, ...] = (),
     open_blockers: tuple[str, ...] = (),
+    waits_on_answer: bool = False,
 ) -> dict:
     named = ", ".join(f"`{name}`" for name in files)
     return {
@@ -29,6 +30,7 @@ def card(
         "title": f"Card {identifier}",
         "description": f"### What we'll do\n\nChange {named}.\n",
         "open_blockers": list(open_blockers),
+        "waits_on_answer": waits_on_answer,
     }
 
 
@@ -55,6 +57,34 @@ def test_considered_cards_leaves_out_the_lower_card_sharing_a_file():
         "B": None,
         "D": "shares `report.py` with B",
     }
+
+
+def test_considered_cards_leaves_out_a_card_waiting_on_an_answer():
+    cards = [card("A", waits_on_answer=True), card("B")]
+
+    assert reasons(considered_cards(cards, 3)) == {
+        "A": "waits for an answer to a lesson question",
+        "B": None,
+    }
+
+
+def test_considered_cards_leaves_out_a_card_the_run_already_started():
+    cards = [card("A"), card("B")]
+
+    assert reasons(considered_cards(cards, 3, frozenset({"A"}))) == {
+        "A": "started earlier in this run and stopped in Todo",
+        "B": None,
+    }
+
+
+def test_considered_cards_does_not_count_a_left_out_card_in_the_batch():
+    cards = [card("A", waits_on_answer=True), card("B"), card("C")]
+
+    in_batch = [
+        c["identifier"] for c in considered_cards(cards, 2) if not c["reason"]
+    ]
+
+    assert in_batch == ["B", "C"]
 
 
 def test_considered_cards_stops_when_the_batch_is_full():

@@ -679,6 +679,21 @@ def blocking_issues(node: dict) -> list[dict]:
     return [r["issue"] for r in relations if r["type"] == "blocks"]
 
 
+LESSON_QUESTION_HEAD = "**Lesson question from"
+ANSWER_HEAD = "Answer:"
+
+
+def waits_on_answer(comments: list[dict]) -> bool:
+    waiting = False
+    for comment in sorted(comments, key=lambda c: c["createdAt"]):
+        body = comment["body"].lstrip()
+        if body.startswith(LESSON_QUESTION_HEAD):
+            waiting = True
+        elif body.startswith(ANSWER_HEAD):
+            waiting = False
+    return waiting
+
+
 def get_issue_blockers(identifier: str) -> list[str]:
     query = f"query($id: String!) {{ issue(id: $id) {{ {BLOCKER_FIELDS} }} }}"
     return blocker_identifiers(graphql_data(query, {"id": identifier})["issue"])
