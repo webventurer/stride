@@ -73,6 +73,11 @@ from linear import (  # noqa: E402
     workspace_labels,
     write_todo_order,
 )
+from start_choice import (  # noqa: E402
+    MAIN_BRANCH,
+    branch_card_ids,
+    start_choice,
+)
 from todo_batch import considered_cards  # noqa: E402
 from todo_order import cards_in_work_order, new_sort_orders  # noqa: E402
 
@@ -219,6 +224,36 @@ def considered_line(card: dict) -> dict:
         "in_batch": card["reason"] is None,
         "reason": card["reason"],
     }
+
+
+@cli.command("start-choice")
+@click.option("--project", required=True)
+@click.option("--branch", required=True, help="The current git branch")
+def start_choice_cmd(project: str, branch: str):
+    considered = (
+        list_considered_todo_cards(project) if branch == MAIN_BRANCH else []
+    )
+    echo_json(known_card_choice(branch, start_choice(branch, considered)))
+
+
+def known_card_choice(branch: str, choice: dict) -> dict:
+    if choice["action"] != "resume":
+        return choice
+    known = next((c for c in branch_card_ids(branch) if card_exists(c)), None)
+    return {"action": "resume", "card": known} if known else {"action": "ask"}
+
+
+def card_exists(identifier: str) -> bool:
+    try:
+        get_issue(bearer_token(), identifier)
+    except LinearError:
+        return False
+    return True
+
+
+def list_considered_todo_cards(project: str) -> list[dict]:
+    size = batch_size()
+    return considered_cards(cards_in_work_order(list_todo_cards(project)), size)
 
 
 @cli.command("set-project-view-manual")

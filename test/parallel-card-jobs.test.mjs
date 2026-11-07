@@ -120,4 +120,45 @@ describe("a /parallel-sessions job running a stride card", () => {
     );
     ok(brief.includes("Message the coordinator that the card has merged"));
   });
+
+  it("runs the next batch from Todo when /linear:start names no card", () => {
+    const start = read(".claude/commands/linear/start.md");
+
+    ok(start.includes("linear_cli.py start-choice --project"));
+    ok(
+      inOrder(start, [
+        "run [`/linear:next-steps`](next-steps.md) first",
+        "linear_cli.py start-choice --project",
+      ]),
+    );
+    ok(
+      read(".claude/commands/linear/next-steps.md").includes(
+        "When `/linear:start` runs next-steps because no card was named, skip this step",
+      ),
+    );
+    ok(brief.includes("message the coordinator with the question instead"));
+    ok(
+      skill.includes(
+        "reports a question instead of a pull request leaves its card out",
+      ),
+    );
+    for (const action of [
+      "`resume`",
+      "`ask`",
+      "`batch`",
+      "`single`",
+      "`blocked`",
+      "`empty`",
+    ]) {
+      ok(start.includes(action), action);
+    }
+    ok(start.includes('gives the skill its "go" itself'));
+    ok(start.includes("As a `/parallel-sessions` job, run this step anyway"));
+  });
+
+  it("lets /linear:start settle a card batch and, unattended, give the go", () => {
+    ok(skill.includes("When `/linear:start` runs a batch of cards"));
+    ok(skill.includes("always as background `claude -p` sessions"));
+    ok(skill.includes("once the user has approved its pull request"));
+  });
 });

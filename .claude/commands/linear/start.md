@@ -10,7 +10,22 @@ Accepts a story ID or an epic ID: `/start PG-205`. An epic argument triggers **[
 
 Pass `--worktree` to set up the issue in an isolated git worktree and hand off to a new terminal tab in your current VS Code window, instead of working inline — see **[worktree setup](reference/worktree.md#setup)**.
 
-If no argument is given, infer the issue ID from the current branch name (extract the `[A-Z]+-\d+` pattern, e.g. `PG-205`). If neither works, ask the user.
+If no argument is given and the current branch is `main`, run [`/linear:next-steps`](next-steps.md) first: it writes Todo's order to the board, in the order stride will work it, and names the next batch. Skip its own offer to start a card; `/linear:start` acts on the batch instead.
+
+Then, on any branch, ask stride what to do and follow its answer:
+
+```bash
+uv run .claude/tools/linear_cli.py start-choice --project "<project>" --branch "$(git branch --show-current)"
+```
+
+- **`resume`** — the branch name holds a card ID Linear knows, in either case (`wb-945` or `WB-945`): work that card
+- **`ask`** — any other branch but `main`, or a branch whose card ID Linear doesn't know: ask the user which card
+- **`batch`** — on `main`, two or more cards from the top of Todo can run at once: the batch next-steps named. Run them with `/parallel-sessions`, settling its six settings for it: the mission is the cards' own descriptions, the job is `/linear:start <card>`, the items are the batch, how many at once is `parallel-sessions` from `.stride.json`, the mode is one worktree per job, and the model is the skill's suggestion. Interactive mode shows the batch and waits for the user's "go"; unattended mode gives the skill its "go" itself. Then stop: running on through Todo is a later story
+- **`single`** — on `main`, one card can run: work it as `/linear:start <card>` does
+- **`blocked`** — Todo holds cards but none can start: show each card's reason and stop, starting nothing
+- **`empty`** — Todo is empty: say so and stop
+
+A `parallel-sessions` value the setting refuses makes the command print the setting's message instead: show it and stop.
 
 Workflow: `/plan-work` → `/start` (includes terminal review) → `/fix` (if GitHub review feedback) → `/finish`
 
@@ -121,7 +136,7 @@ If the issue has no "Why this matters" section, decide whether it qualifies for 
 
 The card check in step 11 can only be as good as the promises it checks. Before a branch exists or any code is written, three fresh reviewers read the card the way that check will, each through its own lens, and report any promise that cannot be checked, contradicts something, misses an edge case the code plainly has, or no longer fits what has changed since the card was written: what earlier cards shipped, commits that reached `main` and comments on open sibling cards. [agility](reference/agility.md) says why the check looks at what has changed.
 
-Skip this step when the current branch is already the card's branch, as when resuming inside a worktree: the run that created the branch checked the card first.
+Skip this step when the current branch is already the card's branch, as when resuming inside a worktree: the run that created the branch checked the card first. As a `/parallel-sessions` job, run this step anyway: the skill made the worktree and its branch, and nothing has checked the card yet.
 
 1. **Fetch `main` once,** so the three reviewers read it as it is on GitHub without fetching it together and colliding:
 

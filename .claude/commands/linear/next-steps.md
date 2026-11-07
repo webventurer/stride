@@ -192,3 +192,5 @@ If a candidate doesn't cleanly trace to any Success criterion, surface that hone
 Interactive mode asks: "Want me to start one of these? I can run `/start <ID>`
 for you." Unattended mode ends after the recommendations; next-steps never starts
 work automatically.
+
+When `/linear:start` runs next-steps because no card was named, skip this step: `/linear:start` acts on the batch next-steps named.

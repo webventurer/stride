@@ -1716,3 +1716,60 @@ def test_issue_description_changed_at_prints_the_time():
 
     assert result.exit_code == 0, result.output
     assert json.loads(result.output) == "2026-11-04T10:00:00.000Z"
+
+
+# ---- WB-942: /linear:start with no card runs the next batch from Todo ----
+
+
+def test_start_choice_on_main_runs_the_cards_next_batch_picks():
+    cards = [todo_card("A", []), todo_card("B", []), todo_card("C", ["WB-1"])]
+    with (
+        patch("linear.project_config", return_value={"parallel-sessions": 3}),
+        patch("linear_cli.list_todo_cards", return_value=cards),
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli,
+            ["start-choice", "--project", "Stride", "--branch", "main"],
+        )
+
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output) == {"action": "batch", "cards": ["A", "B"]}
+
+
+def test_start_choice_on_a_card_branch_reads_no_todo():
+    with (
+        patch("linear_cli.list_todo_cards") as todo,
+        patch("linear_cli.get_issue", return_value={"identifier": "WB-7"}),
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli,
+            ["start-choice", "--project", "Stride", "--branch", "me/wb-7-x"],
+        )
+
+    assert json.loads(result.output) == {"action": "resume", "card": "WB-7"}
+    todo.assert_not_called()
+
+
+def test_start_choice_asks_when_the_branch_card_is_not_in_linear():
+    with patch("linear_cli.get_issue", side_effect=LinearError("not found")):
+        result = CliRunner().invoke(
+            linear_cli.cli,
+            ["start-choice", "--project", "Stride", "--branch", "me/utf-8-fix"],
+        )
+
+    assert json.loads(result.output) == {"action": "ask"}
+
+
+def test_start_choice_resumes_the_first_branch_card_linear_knows():
+    def issue(_token: str, identifier: str) -> dict:
+        if identifier == "UTF-8":
+            raise LinearError("not found")
+        return {"identifier": identifier}
+
+    with patch("linear_cli.get_issue", side_effect=issue):
+        result = CliRunner().invoke(
+            linear_cli.cli,
+            ["start-choice", "--project", "S", "--branch", "me/utf-8-wb-945"],
+        )
+
+    assert json.loads(result.output) == {"action": "resume", "card": "WB-945"}
