@@ -190,3 +190,65 @@ describe("a /parallel-sessions job running a stride card", () => {
     );
   });
 });
+
+describe("the coordinator's steps for a batch of stride cards", () => {
+  const step5 = skill.slice(
+    skill.indexOf("### 5. Watch and check"),
+    skill.indexOf("### 6. Report"),
+  );
+  const referenceFiles = [
+    "chain-of-command.md",
+    "chain-of-command-config.md",
+    "testing-the-chain-of-command.md",
+  ].map((name) => read(`.claude/skills/parallel-sessions/reference/${name}`));
+
+  it("names the card in a card job's brief and checks the pull request's files against it", () => {
+    ok(skill.includes("names the card in place of a path list"));
+    ok(brief.includes("**Scope:**"));
+    ok(step5.includes("gh pr diff <number> --name-only"));
+    ok(step5.includes("the card's \"What we'll do\" doesn't call for"));
+  });
+
+  it("builds the combined check in a scratch worktree with the install linked and settings shared", () => {
+    ok(
+      inOrder(step5, [
+        "scratch worktree",
+        "link_stride_install.sh",
+        "share_stride_settings.sh",
+        "don't run the check",
+      ]),
+    );
+  });
+
+  it("keeps each batch in its own folder under work/runs", () => {
+    ok(skill.includes("`work/runs/<batch>/`"));
+    ok(skill.includes("YYYY-MM-DD-HHMMSS"));
+    ok(skill.includes("never reuses a folder that exists"));
+    for (const text of [skill, brief, ...referenceFiles]) {
+      ok(!/work\/(logs|briefs)\//.test(text));
+      ok(!text.includes("work/progress.md"));
+    }
+  });
+
+  it("has the card that merges second merge main in before it gets the go", () => {
+    ok(
+      inOrder(step5, [
+        "also changed",
+        "merge `main` into its branch",
+        "fix any clash keeping both cards' lines",
+        "rerun its checks",
+        "give the go only after",
+      ]),
+    );
+    ok(step5.includes("you ask the user, because which card's wording wins"));
+  });
+
+  it("removes a job's worktree with git worktree remove and never --force", () => {
+    ok(step5.includes("`git worktree remove <path>`"));
+    ok(step5.includes("git -C <path> status --porcelain"));
+    ok(step5.includes("not to use `remove_card_worktree.sh`"));
+    for (const text of [skill, brief, ...referenceFiles]) {
+      ok(!/worktree remove[^`\n]*--force/.test(text));
+    }
+  });
+});

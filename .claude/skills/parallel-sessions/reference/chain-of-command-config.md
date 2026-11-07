@@ -20,8 +20,8 @@ cd <checkout> && env -u ANTHROPIC_API_KEY CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 \
   claude -p "$(cat <brief>)" \
   --model sonnet --effort high \
   --dangerously-skip-permissions --output-format stream-json \
-  --verbose > <main checkout>/work/logs/<holder name>.jsonl \
-  2> <main checkout>/work/logs/<holder name>.err
+  --verbose > <main checkout>/work/runs/<batch>/logs/<holder name>.jsonl \
+  2> <main checkout>/work/runs/<batch>/logs/<holder name>.err
 ```
 
 `CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1` switches the advisor off for that session alone. Without it the soldier inherits `advisorModel` from the user's settings, and Sonnet 5.5 accepts Fable as an advisor, so the soldier consults Fable directly and pays Fable's rates. `env -u ANTHROPIC_API_KEY` removes an API key the shell has loaded, such as one a project's `.envrc` reads from `~/.env`. Without it the session bills the key at API rates instead of logging in through the user's Claude plan. Resume a soldier with the same environment, model and effort.

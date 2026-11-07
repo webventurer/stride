@@ -124,7 +124,7 @@ Test 1 ran on the background `claude -p` route on 2026-11-06. The side-session r
 - The batch's mission goes into every brief, and an answer settled in a brief keeps the whole mission
 - The coordinator names the kind of question before asking the user, and takes the general's advice on any other kind
 - A card waiting on the user's answer isn't merged with a guessed value in its place: it stays on its branch until the user answers
-- A batch keeps its state in `work/`: a progress file, every session's log, the briefs and the slot store
+- A batch keeps its state in `work/`: a folder for each batch under `work/runs/` holding its progress file, every session's log and the briefs, and the slot store beside it
 - The coordinator reports once every job is settled and every session has exited, puts the question last, and ends
 
 **Still open:**

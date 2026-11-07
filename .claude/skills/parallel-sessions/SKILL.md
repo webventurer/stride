@@ -81,21 +81,24 @@ When `/linear:start` runs a batch of cards, it settles the six values itself and
 
 Copy [BRIEF.md](BRIEF.md) once per job and fill it in: the mission, word for word, the job, the exact paths it may write, the holder name (the job's name, unique in the batch), the slot store, the limit, the commit route for the mode and the coordinator's session name, this session's name as `ListAgents` gives it. Name every path up front: the coordinator checks each commit against them.
 
+A job running a stride card is the exception: its brief names the card in place of a path list, because the card's own "What we'll do" says what the job may change, and a card often mentions files it doesn't change. Everything below that checks paths against the brief, the commit check in step 5 and the report in step 6, applies to jobs that aren't a stride card; a card job's files are checked as step 5 sets out.
+
 A question you can already see in a job, such as a choice that turns on another job, is cheapest settled in its brief. Settle it only with an answer that keeps every part of the mission: a default that would break one part, such as pounds for a branch that sells in euros, is not settled. Take it to `/advisor`, then to the user if the advisor can't settle it.
 
 The slot store defaults to `work/slots` under the main checkout. The script finds that folder from git even inside a worktree, so every session reaches the same store. Give `--store` an absolute path only to use a different one.
 
-**Everything the batch keeps lives in one folder, `work/` under the main checkout,** so the user and any coordinator find it in one place:
+**Everything the batch keeps lives under `work/` in the main checkout,** so the user and any coordinator find it in one place. Each batch has its own folder, `work/runs/<batch>/`, where `<batch>` is the time the batch's "go" was given, as `YYYY-MM-DD-HHMMSS`. The coordinator makes the folder at the "go" and never reuses a folder that exists, so a later batch never overwrites an earlier one.
 
 | Path | Holds |
 |:-----|:------|
-| `work/progress.md` | One row per job: holder name, model, branch, log path and state |
-| `work/briefs/<holder name>.md` | Each job's brief |
-| `work/logs/<holder name>.jsonl` | Each session's log, with its errors in `<holder name>.err` and a resumed session's log in `<holder name>.resume-<n>.jsonl` |
-| `work/slots/` | The slot store |
+| `work/runs/<batch>/progress.md` | One row per job: holder name, model, branch, log path and state |
+| `work/runs/<batch>/briefs/<holder name>.md` | Each job's brief |
+| `work/runs/<batch>/logs/<holder name>.jsonl` | Each session's log, with its errors in `<holder name>.err` and a resumed session's log in `<holder name>.resume-<n>.jsonl` |
+| `work/runs/<batch>/slots.txt` | Each `slots.py status` reading the coordinator takes, with the time of each |
+| `work/slots/` | The slot store, shared by every batch so one limit holds for all |
 | `work/stage-times/` | The record of how long each stage of each merged card took, written by [`scripts/stage_times.py`](scripts/stage_times.py); `uv run .claude/skills/parallel-sessions/scripts/stage_times.py report` shows where the time goes |
 
-Add `/work` to the shared exclude file, `$(git rev-parse --git-common-dir)/info/exclude`, so git never sees it. Write the progress file before starting any session, with every job waiting for a slot, and update a job's row each time its state changes: working, sent back, ready, "exited, waiting to be resumed", merged, waiting on the user, or failed. It is what the user opens to see the batch, and what a new coordinator reads to pick the batch up.
+Add `/work` to the shared exclude file, `$(git rev-parse --git-common-dir)/info/exclude`, so git never sees it. Write the progress file before starting any session, with every job waiting for a slot, and update a job's row each time its state changes: working, sent back, ready, "exited, waiting to be resumed", merged, waiting on the user, or failed. It is what the user opens to see the batch, and what a new coordinator reads to pick the batch up: a new coordinator takes the newest folder under `work/runs/`.
 
 ### 4. Start every session in one turn
 
@@ -122,40 +125,40 @@ When this session can't start side sessions, start each job as a background `cla
 
    If it exits non-zero, report it and don't start that job: without the settings, the job's first Linear call fails.
 3. **Check git sees nothing new.** `git status --porcelain` prints nothing in each worktree, and nothing new in the main checkout.
-4. **Start every session in one turn,** each in the background in its job's checkout, on its model and effort with the advisor off and billed to the user's plan, as [the chain of command config](reference/chain-of-command-config.md) sets out, with its log in `work/logs/`:
+4. **Start every session in one turn,** each in the background in its job's checkout, on its model and effort with the advisor off and billed to the user's plan, as [the chain of command config](reference/chain-of-command-config.md) sets out, with its log in `work/runs/<batch>/logs/`:
 
    ```bash
    cd <checkout> && env -u ANTHROPIC_API_KEY CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 \
      claude -p "$(cat <brief>)" \
      --model <model> --effort <effort> \
      --dangerously-skip-permissions --output-format stream-json \
-     --verbose > <main checkout>/work/logs/<holder name>.jsonl \
-     2> <main checkout>/work/logs/<holder name>.err
+     --verbose > <main checkout>/work/runs/<batch>/logs/<holder name>.jsonl \
+     2> <main checkout>/work/runs/<batch>/logs/<holder name>.err
    ```
 
    Every line of the log is JSON carrying the session's ID as `session_id`, which is what resumes it; errors go to the separate `.err` file so they don't break the JSON. Each session shows up in `ListAgents` under a name taken from its checkout's folder: note it and ask for its idle notice, as for a side session.
-5. **Give the user the progress file's full path,** since these sessions don't appear in the app's sidebar; the logs are beside it in `work/logs/`.
+5. **Give the user the progress file's full path,** since these sessions don't appear in the app's sidebar; the logs are beside it in `work/runs/<batch>/logs/`.
 
 ### 5. Watch and check
 
-While sessions run, `status` shows who holds each slot:
+While sessions run, `status` shows who holds each slot. Append each reading, with the time you took it, to `work/runs/<batch>/slots.txt`:
 
 ```bash
 uv run --no-project --with diskcache --with click \
   python .claude/skills/parallel-sessions/scripts/slots.py --limit 3 status
 ```
 
-When a job's session exits holding a slot, release its slot at once with `slots.py release <holder>`, before anything else, so the next waiting job can claim it. An idle notice releases nothing: a job that is only idle is still waiting for its go and keeps its slot. Whether or not it still held a slot, when a job's session exits before its card has merged, set the job's row in `work/progress.md` to "exited, waiting to be resumed"; a job already marked merged or failed keeps that state.
+When a job's session exits holding a slot, release its slot at once with `slots.py release <holder>`, before anything else, so the next waiting job can claim it. An idle notice releases nothing: a job that is only idle is still waiting for its go and keeps its slot. Whether or not it still held a slot, when a job's session exits before its card has merged, set the job's row in `work/runs/<batch>/progress.md` to "exited, waiting to be resumed"; a job already marked merged or failed keeps that state.
 
 Each session messages you when its work is ready, when it hits an error it can't fix, and when it has a question about its job's purpose or scope. As each job's work is ready:
 
-- Check its commit holds only the paths its brief named (`git show --stat <commit>`), and report any that doesn't
-- In worktree mode, before each merge after the first, build the code as it will look merged with `main` and run the project's checks and tests on it. Cards in one batch start from the same `main`, so each one's checks ran without the others' changes
+- For a job that isn't a stride card, check its commit holds only the paths its brief named (`git show --stat <commit>`), and report any that doesn't. For a stride card's job, list the pull request's files with `gh pr diff <number> --name-only` and report to the user any file the card's "What we'll do" doesn't call for, before you tell the job to run `/linear:finish`
+- In worktree mode, before each merge after the first, build the code as it will look merged with `main` in a scratch worktree and run the project's checks and tests on it. Cards in one batch start from the same `main`, so each one's checks ran without the others' changes. A fresh worktree has no git-ignored files, so link stride's install into the scratch worktree with `link_stride_install.sh` and, when the main checkout has a `.stride.json`, share it with `share_stride_settings.sh`, both as in step 4. If either exits non-zero, report it and don't run the check: the failure would be the missing settings, not the code. Remove the scratch worktree afterwards the way a job's worktree is removed, below
 - If that fails, send the failure back to the job's session rather than fixing it yourself, so the session that wrote the code fixes it and its own checks cover the fix
-- If the job's session has already exited, resume it in its worktree with the message (`claude -p --resume <session-id>` for a `claude -p` session, with the environment, model, effort and permission options it started with, the ID taken from its log's `session_id`, and its log in `work/logs/<holder name>.resume-<n>.jsonl`). The message tells it to claim a slot before it carries on, and you resume an exited job only when `slots.py status` shows a free slot. Until one is free, give the go to a card whose job holds a slot, so each merge frees one, and no job waits for a slot that only its own merge could free
+- If the job's session has already exited, resume it in its worktree with the message (`claude -p --resume <session-id>` for a `claude -p` session, with the environment, model, effort and permission options it started with, the ID taken from its log's `session_id`, and its log in `work/runs/<batch>/logs/<holder name>.resume-<n>.jsonl`). The message tells it to claim a slot before it carries on, and you resume an exited job only when `slots.py status` shows a free slot. Until one is free, give the go to a card whose job holds a slot, so each merge frees one, and no job waits for a slot that only its own merge could free
 - For a job that isn't a stride card, once it passes, merge its branch into `main` in worktree mode; in either mode, then tell the session its work is done
-- **A job running a stride card** opens a pull request instead of leaving a branch for you to merge, and its own `/linear:finish` does the merge, so the card's merge checks still run. Take these jobs one card at a time: build its branch merged with `main` as it stands now and run the checks on it, then tell its session to run `/linear:finish`, in interactive mode only once the user has approved its pull request. Check the next card's branch only once the job reports that its merge has landed, so no two cards are checked against the same `main`. A card job that reports a question instead of a pull request leaves its card out of the batch: report the question to the user and merge the rest
-- Remove a job's worktree and archive its session only after that job's exit notice has arrived: a session removed while it winds down is killed, as WB-964's was. For a stride card's job, delete its local branch with the worktree: its `/linear:finish` deleted only the remote one
+- **A job running a stride card** opens a pull request instead of leaving a branch for you to merge, and its own `/linear:finish` does the merge, so the card's merge checks still run. Take these jobs one card at a time: build its branch merged with `main` as it stands now and run the checks on it, then tell its session to run `/linear:finish`, in interactive mode only once the user has approved its pull request. Check the next card's branch only once the job reports that its merge has landed, so no two cards are checked against the same `main`. When a card's pull request changes a file that an already-merged card of the batch also changed, tell the job session of the card that merges second to merge `main` into its branch, fix any clash keeping both cards' lines, rerun its checks and message you again; you give the go only after that message. When both cards changed the same line, the session asks you, and you ask the user, because which card's wording wins is a choice only the user can make. A card job that reports a question instead of a pull request leaves its card out of the batch: report the question to the user and merge the rest
+- Remove a job's worktree and archive its session only after that job's exit notice has arrived: a session removed while it winds down is killed, as WB-964's was. Remove the worktree with `git worktree remove <path>`, which refuses when anything in it is uncommitted. When git refuses, leave the worktree where it is, list what is uncommitted with `git -C <path> status --porcelain` in your report to the user, and remove nothing until the user says. Take care not to use `remove_card_worktree.sh` for a job's worktree: it forces the removal. For a stride card's job, delete its local branch with the worktree: its `/linear:finish` deleted only the remote one
 
 Before you put any question to the user, call `/advisor` and record what it said. Ask the user only what the advisor can't advise on: a job's purpose or scope, or something only the user knows. Name which of the three the question is; if it is none of them, such as a choice between two designs, take the advisor's recommendation instead of asking. See [the chain of command](reference/chain-of-command.md).
 
@@ -165,7 +168,7 @@ The question reaches the user with none of the context the batch has built up, s
 
 ### 6. Report
 
-Tell the user which jobs committed, which ended without a commit (a session that died, or a job that failed), and any commit that touched a path outside its brief. Leave `work/progress.md` showing each job's final state.
+Tell the user which jobs committed, which ended without a commit (a session that died, or a job that failed), and any commit from a job that is not a stride card that touched a path outside its brief. Leave `work/runs/<batch>/progress.md` showing each job's final state.
 
 **Report once every job is merged or waiting on the user and every session has exited,** then end the session. Put any question for the user last, after the report and the progress file's path, so the question is the last thing the session says. A notice that arrives after the question, such as a session exiting or a background task finishing, changes nothing the user needs: handle it without a word to the user, and if you must reply, end on the question again. A `claude -p` coordinator exits when its final turn ends with nothing left running.
 

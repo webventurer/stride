@@ -43,7 +43,7 @@ The reviewers aren't a rank: they check the work against the card and report, an
 
 ## The captain is the one rank that can't fail
 
-The soldiers run as child processes of the captain's session, so they end when it ends. Their pushed work survives on their branches, `claude -p --resume` restarts them, and the batch's state lives in its progress file, `work/progress.md`, which a new captain can pick up.
+The soldiers run as child processes of the captain's session, so they end when it ends. Their pushed work survives on their branches, `claude -p --resume` restarts them, and the batch's state lives in its progress file, `work/runs/<batch>/progress.md`, which a new captain can pick up.
 
 ## A worked example: three cards from the board to Done
 
