@@ -94,6 +94,7 @@ The slot store defaults to `work/slots` under the main checkout. The script find
 | `work/runs/<batch>/progress.md` | One row per job: holder name, model, branch, log path and state |
 | `work/runs/<batch>/briefs/<holder name>.md` | Each job's brief |
 | `work/runs/<batch>/logs/<holder name>.jsonl` | Each session's log, with its errors in `<holder name>.err` and a resumed session's log in `<holder name>.resume-<n>.jsonl` |
+| `work/runs/<batch>/slots.txt` | Each `slots.py status` reading the coordinator takes, with the time of each |
 | `work/slots/` | The slot store, shared by every batch so one limit holds for all |
 | `work/stage-times/` | The record of how long each stage of each merged card took, written by [`scripts/stage_times.py`](scripts/stage_times.py); `uv run .claude/skills/parallel-sessions/scripts/stage_times.py report` shows where the time goes |
 
@@ -140,7 +141,7 @@ When this session can't start side sessions, start each job as a background `cla
 
 ### 5. Watch and check
 
-While sessions run, `status` shows who holds each slot:
+While sessions run, `status` shows who holds each slot. Append each reading, with the time you took it, to `work/runs/<batch>/slots.txt`:
 
 ```bash
 uv run --no-project --with diskcache --with click \
