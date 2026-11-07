@@ -162,7 +162,7 @@ describe("a /parallel-sessions job running a stride card", () => {
     ok(skill.includes("once the user has approved its pull request"));
   });
 
-  it("frees an exited job's slot at once", () => {
+  it("frees an exited job's slot and keeps its worktree until the exit notice", () => {
     ok(
       inOrder(skill, [
         "When a job's session exits holding a slot, release its slot at once",
@@ -172,6 +172,7 @@ describe("a /parallel-sessions job running a stride card", () => {
         "tells it to claim a slot before it carries on",
         "resume an exited job only when `slots.py status` shows a free slot",
         "give the go to a card whose job holds a slot",
+        "Remove a job's worktree and archive its session only after that job's exit notice has arrived",
       ]),
     );
   });
