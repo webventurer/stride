@@ -278,11 +278,21 @@ git worktree list
 
 **All git commands must use `git -C <main-repo-path>`** to avoid depending on the worktree directory.
 
-**Step 9a — Switch to main and pull:**
+**Step 9a — Switch to main and fast-forward it:**
 
 ```bash
-git -C <main-repo-path> checkout main && git -C <main-repo-path> pull
+git -C <main-repo-path> checkout main && git -C <main-repo-path> pull --ff-only
 ```
+
+`--ff-only` moves `main` to GitHub's or changes nothing. Never rebase or merge the main checkout here: a rebase replays any stray local commit unasked, and a clash would leave the shared checkout half-way through a rebase for every job behind it.
+
+When the checkout or the pull refuses, the pull request has already merged, so the refusal doesn't undo it or stop the finish: leave the main checkout as it is, carry on with the remaining steps, and report the refusal at the top of step 16's summary. Quote git's own error line and the output of:
+
+```bash
+git -C <main-repo-path> log origin/main..main
+```
+
+An empty log means no local commits are in the way, so the cause is something else, such as a failed checkout or no network; git's error line says which. The user or the coordinator decides what to do with the main checkout. As a `/parallel-sessions` job, include the refusal in the message to the coordinator that the card has merged.
 
 **Step 9b — Tear down the worktree (if one was used):**
 
@@ -294,7 +304,7 @@ Otherwise, follow [worktree teardown](reference/worktree.md#teardown) — it rem
 
 Now that any worktree is gone, the branch can be deleted. As a `/parallel-sessions` job, delete only the remote branch: the worktree still has the local one checked out, and the coordinator deletes it when it removes the worktree.
 
-- **Local**: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently
+- **Local**: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently. When step 9a's pull was refused, the main checkout lacks the merge commit and `-d` can say the branch isn't fully merged: skip the local deletion, say so in the summary, and carry on
 - **Remote**: `git -C <main-repo-path> push origin --delete <gitBranchName>` — if already deleted (GitHub may auto-delete), skip silently
 
 ### 10. Update Linear → done
@@ -451,6 +461,7 @@ Read the output focus and apply this command's format from [reference/output-foc
 - Uncommitted changes → stop, suggest `/commit`
 - Tests fail → stop, do not merge
 - Recording the stage times fails or finds no log → carry on; the card has already merged
+- `pull --ff-only` refuses in step 9a → leave the main checkout as it is, finish the remaining steps, report the refusal and `git log origin/main..main` in the summary
 - Card check finds an unclear promise or nothing checkable → stop, do not merge
 - Fixup commits present + user picks "abort" → exit cleanly, do not merge (autosquash + force-push manually, then re-run)
 - Fixup rebase conflicts → abort rebase, surface conflict, do not merge
