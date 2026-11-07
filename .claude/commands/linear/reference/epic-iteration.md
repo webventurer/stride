@@ -23,7 +23,7 @@ Follow its answer:
 
 `linear_cli.py next-batch --project "<project>" --epic "<epic-identifier>"` shows every sub-issue it looked at and why each one is out.
 
-On any other branch, work the sub-issues one at a time, as E1 to E4 say.
+On `main`, E1 to E4 are not entered in either mode, even for a `single` card: when that card's pull request is merged, the run ends. On any other branch, work the sub-issues one at a time, as E1 to E4 say.
 
 ## E1. Enumerate and disclose upfront
 
