@@ -2,8 +2,10 @@
 
 It works down Todo in the order `todo_order` gives, adding each card that
 passes two rules, until the batch holds `parallel-sessions` cards or Todo
-runs out. A card is out while any card blocking it is not Done, and out when
-it shares a file with a card already in the batch.
+runs out. A card is out while any card blocking it is not Done, out while a
+lesson question on it has no answer, out when a run has already started it and
+it is still in Todo, and out when it shares a file with a card already in the
+batch.
 
 With an epic named, only that epic's sub-issues are looked at, so the batch
 fills from them however many other cards sit above them in Todo.
@@ -29,19 +31,28 @@ def cards_of_epic(ordered_cards: list[dict], epic: str) -> list[dict]:
     ]
 
 
-def considered_cards(ordered_cards: list[dict], size: int) -> list[dict]:
+def considered_cards(
+    ordered_cards: list[dict], size: int, started: frozenset[str] = frozenset()
+) -> list[dict]:
     considered: list[dict] = []
     for card in ordered_cards:
         batch = [c for c in considered if not c["reason"]]
         if len(batch) == size:
             break
-        considered.append(card | {"reason": reason_left_out(card, batch)})
+        reason = reason_left_out(card, batch, started)
+        considered.append(card | {"reason": reason})
     return considered
 
 
-def reason_left_out(card: dict, batch: list[dict]) -> str | None:
+def reason_left_out(
+    card: dict, batch: list[dict], started: frozenset[str]
+) -> str | None:
     if card["open_blockers"]:
         return "blocked by " + ", ".join(card["open_blockers"])
+    if card["waits_on_answer"]:
+        return "waits for an answer to a lesson question"
+    if card["identifier"] in started:
+        return "started earlier in this run and stopped in Todo"
     return shared_file_reason(card, batch)
 
 

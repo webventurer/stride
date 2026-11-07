@@ -224,8 +224,18 @@ describe("carrying a merged card's lesson to Todo", () => {
     ok(brief.includes("Old line:"));
     ok(brief.includes("New line:"));
     ok(brief.includes("no lesson for Todo"));
-    ok(brief.includes("the run stops before the next card starts"));
-    ok(unattended.includes("A lesson question open on a card in Todo"));
+    ok(
+      brief.includes(
+        "A run through Todo leaves only that card out of its later batches",
+      ),
+    );
+    ok(unattended.includes("A lesson question open on a card started by name"));
+    ok(unattended.includes("A run through Todo doesn't stop for it"));
+    ok(
+      brief.includes(
+        "A card started by name stops there, before the next card starts",
+      ),
+    );
     ok(brief.includes("read it from its record alone"));
     ok(brief.includes("whose verdict is Fixed or Not acted on, as one rule"));
     ok(brief.includes('order-todo --project "<project>" --dry-run'));

@@ -467,7 +467,7 @@ Read the output focus and apply this command's format from [reference/output-foc
 - Fixup rebase conflicts → abort rebase, surface conflict, do not merge
 - Vision has no exact fit in interactive mode → exit cleanly, do not merge (re-run after committing the user-authored Vision update)
 - Vision has no exact fit in unattended mode → warn, add and commit the closest durable Success criterion, re-check, then continue
-- A lesson would change a Todo card's purpose → post the question on that card; interactive mode asks the user there and then, unattended mode finishes the remaining steps and stops before the next card starts
+- A lesson would change a Todo card's purpose → post the question on that card; interactive mode asks the user there and then, unattended mode finishes the remaining steps and reports the question; a card started by name stops there before the next card starts, and a run through Todo leaves only that card out of its later batches
 - Branch not fully merged → stop, warn (never force-delete)
 - Local branch already deleted → skip silently
 - Remote branch already deleted → skip silently
