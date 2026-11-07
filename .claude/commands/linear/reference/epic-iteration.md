@@ -2,9 +2,28 @@
 
 > The path `/linear:start` follows when its argument is an epic rather than a story. The decision — single story by default, iterate when the argument is an epic — stays in `start.md` (step 1); this file holds the execution mechanics so the command stays scannable. Step numbers below refer to `/linear:start`'s steps.
 
-> When the argument is an epic, `/linear:start` works its sub-issues one at a time. Interactive mode pauses at every PR; [unattended mode](unattended.md) finishes a passing story and continues. An epic has no code of its own — its work lives in its stories.
+> When the argument is an epic and the branch is `main`, `/linear:start` runs the epic's sub-issues in Todo as a batch ([below](#batch-on-main)). On any other branch it works them one at a time. Interactive mode pauses at every PR; [unattended mode](unattended.md) finishes a passing story and continues. An epic has no code of its own — its work lives in its stories.
 
 ---
+
+## Batch on `main`
+
+On `main`, ask stride what to do with the epic's cards, the way [`/linear:start`](../start.md) does with no card named, but only the epic's sub-issues in Todo:
+
+```bash
+uv run .claude/tools/linear_cli.py start-choice --project "<project>" --branch main --epic "<epic-identifier>"
+```
+
+Follow its answer:
+
+- **`batch`** — run the cards through `/parallel-sessions`, settling its settings as `/linear:start` does for a batch on `main`. Interactive mode shows the batch and waits for the user's "go"; unattended mode gives the skill its "go" itself. Then stop: one batch, in both modes. Running on through the epic's later batches is not part of this route, so the user runs `/linear:start <epic>` again
+- **`single`** — work that card as `/linear:start <card>` does
+- **`blocked`** — show each sub-issue's reason and stop, starting nothing
+- **`empty`** — say no sub-issue of the epic is in Todo and stop
+
+`linear_cli.py next-batch --project "<project>" --epic "<epic-identifier>"` shows every sub-issue it looked at and why each one is out.
+
+On `main`, E1 to E4 are not entered in either mode, even for a `single` card: when that card's pull request is merged, the run ends. On any other branch, work the sub-issues one at a time, as E1 to E4 say.
 
 ## E1. Enumerate and disclose upfront
 

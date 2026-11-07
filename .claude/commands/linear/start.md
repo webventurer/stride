@@ -6,7 +6,7 @@ description: Implement a Linear issue — branch, code, validate, review, open a
 
 Implement, validate, and open a PR in one headless flow.
 
-Accepts a story ID or an epic ID: `/start PG-205`. An epic argument triggers **[epic iteration](reference/epic-iteration.md)** — its sub-issues are worked one at a time, with interactive mode pausing at each PR.
+Accepts a story ID or an epic ID: `/start PG-205`. An epic argument triggers **[epic iteration](reference/epic-iteration.md)** — on `main` its sub-issues in Todo run as a batch the way `/linear:start` with no card runs Todo; on any other branch they are worked one at a time, with interactive mode pausing at each PR.
 
 Pass `--worktree` to set up the issue in an isolated git worktree and hand off to a new terminal tab in your current VS Code window, instead of working inline — see **[worktree setup](reference/worktree.md#setup)**.
 
@@ -75,7 +75,7 @@ If the issue is assigned to someone other than the current user, interactive
 mode warns and asks whether to proceed. Unattended mode stops rather than acting
 for another assignee.
 
-**If the argument is itself an epic** — its title starts `Epic: `, or `uv run .claude/tools/linear_cli.py list-by-parent <issue-UUID>` returns sub-issues — don't treat it as a single story. Follow [reference/epic-iteration.md](reference/epic-iteration.md) instead; it drives the numbered steps below once per sub-issue, pausing at each PR.
+**If the argument is itself an epic** — its title starts `Epic: `, or `uv run .claude/tools/linear_cli.py list-by-parent <issue-UUID>` returns sub-issues — don't treat it as a single story. Follow [reference/epic-iteration.md](reference/epic-iteration.md) instead; on `main` it asks stride for the epic's batch, and on any other branch it drives the numbered steps below once per sub-issue, pausing at each PR.
 
 ### 2. Vision check
 

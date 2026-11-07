@@ -5,6 +5,9 @@ passes two rules, until the batch holds `parallel-sessions` cards or Todo
 runs out. A card is out while any card blocking it is not Done, and out when
 it shares a file with a card already in the batch.
 
+With an epic named, only that epic's sub-issues are looked at, so the batch
+fills from them however many other cards sit above them in Todo.
+
 A card's files are the backticked names ending in a file extension in its
 "What we'll do" section, compared by file name. The batch is a best guess:
 two cards can still clash in a file neither names.
@@ -16,6 +19,14 @@ WHAT_WE_WILL_DO_RE = re.compile(
     r"### What we[’']ll do\n(.*?)(?=\n### |\Z)", re.S
 )
 FILE_NAME_RE = re.compile(r"`([^`\s]*\.[A-Za-z][A-Za-z0-9]*)`")
+
+
+def cards_of_epic(ordered_cards: list[dict], epic: str) -> list[dict]:
+    return [
+        c
+        for c in ordered_cards
+        if (c["parent"] or {}).get("identifier") == epic
+    ]
 
 
 def considered_cards(ordered_cards: list[dict], size: int) -> list[dict]:
