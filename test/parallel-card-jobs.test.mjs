@@ -229,4 +229,17 @@ describe("the coordinator's steps for a batch of stride cards", () => {
       ok(!text.includes("work/progress.md"));
     }
   });
+
+  it("has the card that merges second merge main in before it gets the go", () => {
+    ok(
+      inOrder(step5, [
+        "also changed",
+        "merge `main` into its branch",
+        "fix any clash keeping both cards' lines",
+        "rerun its checks",
+        "give the go only after",
+      ]),
+    );
+    ok(step5.includes("you ask the user, because which card's wording wins"));
+  });
 });
