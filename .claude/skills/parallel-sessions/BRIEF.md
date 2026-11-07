@@ -32,6 +32,12 @@ Bring every question to the coordinator, not to `/advisor`: the coordinator know
 
 The coordinator may send you back to fix what merging your work with the others exposes: claim a slot again, fix it with your commit route, and message again when it's ready.
 
+## Keep your turn open while you wait
+
+A `claude -p` session ends when its turn ends, and an ended session can't renew or release its slot, so keep your turn open for every wait on the coordinator: the reply to a question, the go to run `/linear:finish`, and the "work is done" message after you've reported, renewing your slot at each interval while you hold one; once step 4 has released it, keep your turn open without it. Never end your turn with a status report while you wait. Wait in steps of no more than 60 seconds, a wake-up or a short check, renewing your slot when it is due, and never in one long sleep: a session can't read a message while a command is running, so a long sleep holds up the coordinator's go.
+
+If you're told to carry on after your session exited, claim a slot first, as step 1 says, and don't carry on until you hold one.
+
 ## Steps
 
 1. **Claim a slot.** Run:

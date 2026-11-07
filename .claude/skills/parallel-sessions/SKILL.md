@@ -29,7 +29,7 @@ description: Run a batch of independent jobs (captures, transcripts, reviews, au
 
 ## Quick reference
 
-<mark>**Settle the batch and wait for "go", start every session in one turn, and let the slot store hold the limit.**</mark> A session that can't claim a slot waits and retries; a session that dies has its claim lapse, so the batch never jams.
+<mark>**Settle the batch and wait for "go", start every session in one turn, and let the slot store hold the limit.**</mark> A session that can't claim a slot waits and retries; the coordinator releases the slot of a session that exits, and a claim that is never renewed lapses as the backstop, so the batch never jams.
 
 | Piece | What it does |
 |:------|:-------------|
@@ -94,7 +94,7 @@ The slot store defaults to `work/slots` under the main checkout. The script find
 | `work/logs/<holder name>.jsonl` | Each session's log, with its errors in `<holder name>.err` and a resumed session's log in `<holder name>.resume-<n>.jsonl` |
 | `work/slots/` | The slot store |
 
-Add `/work` to the shared exclude file, `$(git rev-parse --git-common-dir)/info/exclude`, so git never sees it. Write the progress file before starting any session, with every job waiting for a slot, and update a job's row each time its state changes: working, sent back, ready, merged, waiting on the user, or failed. It is what the user opens to see the batch, and what a new coordinator reads to pick the batch up.
+Add `/work` to the shared exclude file, `$(git rev-parse --git-common-dir)/info/exclude`, so git never sees it. Write the progress file before starting any session, with every job waiting for a slot, and update a job's row each time its state changes: working, sent back, ready, "exited, waiting to be resumed", merged, waiting on the user, or failed. It is what the user opens to see the batch, and what a new coordinator reads to pick the batch up.
 
 ### 4. Start every session in one turn
 
@@ -144,12 +144,14 @@ uv run --no-project --with diskcache --with click \
   python .claude/skills/parallel-sessions/scripts/slots.py --limit 3 status
 ```
 
+When a job's session exits holding a slot, release its slot at once with `slots.py release <holder>`, before anything else, so the next waiting job can claim it. An idle notice releases nothing: a job that is only idle is still waiting for its go and keeps its slot. Then set the job's row in `work/progress.md` to "exited, waiting to be resumed"; a job already marked merged or failed keeps that state.
+
 Each session messages you when its work is ready, when it hits an error it can't fix, and when it has a question about its job's purpose or scope. As each job's work is ready:
 
 - Check its commit holds only the paths its brief named (`git show --stat <commit>`), and report any that doesn't
 - In worktree mode, before each merge after the first, build the code as it will look merged with `main` and run the project's checks and tests on it. Cards in one batch start from the same `main`, so each one's checks ran without the others' changes
 - If that fails, send the failure back to the job's session rather than fixing it yourself, so the session that wrote the code fixes it and its own checks cover the fix
-- If the job's session has already exited, resume it in its worktree with the message (`claude -p --resume <session-id>` for a `claude -p` session, with the environment, model, effort and permission options it started with, the ID taken from its log's `session_id`, and its log in `work/logs/<holder name>.resume-<n>.jsonl`)
+- If the job's session has already exited, resume it in its worktree with the message (`claude -p --resume <session-id>` for a `claude -p` session, with the environment, model, effort and permission options it started with, the ID taken from its log's `session_id`, and its log in `work/logs/<holder name>.resume-<n>.jsonl`). The message tells it to claim a slot before it carries on, and you resume an exited job only when `slots.py status` shows a free slot. Until one is free, give the go to a card whose job holds a slot, so each merge frees one, and no job waits for a slot that only its own merge could free
 - For a job that isn't a stride card, once it passes, merge its branch into `main` in worktree mode; in either mode, then tell the session its work is done
 - **A job running a stride card** opens a pull request instead of leaving a branch for you to merge, and its own `/linear:finish` does the merge, so the card's merge checks still run. Take these jobs one card at a time: build its branch merged with `main` as it stands now and run the checks on it, then tell its session to run `/linear:finish`, in interactive mode only once the user has approved its pull request. Check the next card's branch only once the job reports that its merge has landed, so no two cards are checked against the same `main`. A card job that reports a question instead of a pull request leaves its card out of the batch: report the question to the user and merge the rest
 - Archive the session, or remove its worktree, only once it has exited. For a stride card's job, delete its local branch with the worktree: its `/linear:finish` deleted only the remote one
