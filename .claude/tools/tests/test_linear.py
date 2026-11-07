@@ -1349,6 +1349,49 @@ def test_update_issue_omits_fields_not_passed():
     assert sent_variables(mock)["input"] == {"stateId": "s-doing"}
 
 
+# ---- WB-977: clear a parent, remove a blocked-by link ----
+
+
+def test_update_issue_clears_the_parent_with_a_null_parent_id():
+    data = {"issueUpdate": {"issue": {"id": "i1", "parent": None}}}
+    with patch("linear.requests.post", return_value=ok_response(data)) as mock:
+        update_issue("lin_test", "i1", clear_parent=True)
+
+    assert sent_variables(mock)["input"] == {"parentId": None}
+
+
+def test_issue_update_no_parent_clears_the_parent():
+    with (
+        patch("linear_cli.bearer_token", return_value="lin_test"),
+        patch("linear_cli.get_issue", return_value={"id": "issue-uuid"}),
+        patch(
+            "linear_cli.update_issue", return_value={"id": "issue-uuid"}
+        ) as mock,
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli, ["issue", "update", "WB-1", "--no-parent"]
+        )
+
+    assert result.exit_code == 0, result.output
+    assert mock.call_args.kwargs["clear_parent"] is True
+
+
+def test_issue_update_refuses_parent_together_with_no_parent():
+    with (
+        patch("linear_cli.bearer_token", return_value="lin_test"),
+        patch("linear_cli.get_issue", return_value={"id": "issue-uuid"}),
+        patch("linear_cli.update_issue") as mock,
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli,
+            ["issue", "update", "WB-1", "--parent", "WB-2", "--no-parent"],
+        )
+
+    assert result.exit_code != 0
+    assert "--parent and --no-parent" in result.output
+    mock.assert_not_called()
+
+
 # ---- WB-546: .stride.json config parser + bearer-token fallback ----
 
 

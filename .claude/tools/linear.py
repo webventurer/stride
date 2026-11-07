@@ -244,6 +244,7 @@ def update_issue(
     state_id: str | None = None,
     label_ids: list | None = None,
     parent_id: str | None = None,
+    clear_parent: bool = False,
     priority: int | None = None,
 ) -> dict:
     input_data = {}
@@ -257,6 +258,8 @@ def update_issue(
         input_data["labelIds"] = label_ids
     if parent_id is not None:
         input_data["parentId"] = parent_id
+    if clear_parent:
+        input_data["parentId"] = None
     if priority is not None:
         input_data["priority"] = priority
     data = graphql(

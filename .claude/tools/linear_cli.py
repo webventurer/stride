@@ -457,6 +457,12 @@ def issue_create_cmd(
     default=None,
     help="Parent issue identifier",
 )
+@click.option(
+    "--no-parent",
+    "no_parent",
+    is_flag=True,
+    help="Clear the card's parent",
+)
 @click.option("--title", default=None)
 @click.option(
     "--description",
@@ -471,11 +477,16 @@ def issue_update_cmd(
     identifier: str,
     state_name: str | None,
     parent_identifier: str | None,
+    no_parent: bool,
     title: str | None,
     description: str | None,
     labels: str | None,
     priority: int | None,
 ):
+    if parent_identifier and no_parent:
+        raise click.ClickException(
+            "--parent and --no-parent cannot be used together"
+        )
     api = bearer_token()
     issue_uuid = get_issue(api, identifier)["id"]
     echo_json(
@@ -487,6 +498,7 @@ def issue_update_cmd(
             priority=priority,
             state_id=state_id_for_update(api, identifier, state_name),
             parent_id=parent_id_or_none(api, parent_identifier),
+            clear_parent=no_parent,
             label_ids=label_ids_for_update(api, labels),
         )
     )
