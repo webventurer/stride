@@ -7,7 +7,7 @@
 Think of it like homework. The agent puts it this way:
 
 - The card is the homework question. It says what the work has to do.
-- The start check happens before any work. A helper reads the question and makes sure it's clear enough to answer. If a bit is vague, the question gets reworded first.
+- The start check happens before any work. Three helpers read the question at once, each looking a different way, and make sure it's clear enough to answer. If a bit is vague, the question gets reworded first.
 - The end check happens after the work is done. Three markers read the answer and say where it misses what the question asked.
 - Then I go through what the markers said. If a marker is right, I fix the work. If I think a marker is wrong, I write "Not acted on" next to it, with my reason.
 
@@ -44,7 +44,7 @@ The tempting repair is the dangerous one. When code and card disagree, rewriting
 ### At the start
 
 - **When it runs.** `/linear:start` runs it right after the Vision check, before a branch exists or any code is written — for each card as it is started, never for a whole epic at once, so a later card is checked against what the earlier ones actually shipped
-- **Who checks.** A fresh reviewer that reads the card, `VISION.md`, the current code and, for a card in an epic, what its finished sibling cards shipped — never the conversation that planned it
+- **Who checks.** Three fresh reviewers at once, each through its own lens — Promise by promise, Try to break it and Prove it — reading the card, `VISION.md`, the current code and, for a card in an epic, what its finished sibling cards shipped and what changed since the card was written; never the conversation that planned it. Their findings are read as one list
 - **What it reports.** Only problems, each naming the card's line and proposing new wording
 
 | Finding | Meaning | A stop when |

@@ -119,23 +119,29 @@ If the issue has no "Why this matters" section, decide whether it qualifies for 
 
 ### 3. Check the card
 
-The card check in step 11 can only be as good as the promises it checks. Before a branch exists or any code is written, a fresh reviewer reads the card the way that check will, and reports any promise that cannot be checked, contradicts something, misses an edge case the code plainly has, or no longer fits what has changed since the card was written: what earlier cards shipped, commits that reached `main` and comments on open sibling cards. [agility](reference/agility.md) says why the check looks at what has changed.
+The card check in step 11 can only be as good as the promises it checks. Before a branch exists or any code is written, three fresh reviewers read the card the way that check will, each through its own lens, and report any promise that cannot be checked, contradicts something, misses an edge case the code plainly has, or no longer fits what has changed since the card was written: what earlier cards shipped, commits that reached `main` and comments on open sibling cards. [agility](reference/agility.md) says why the check looks at what has changed.
 
 Skip this step when the current branch is already the card's branch, as when resuming inside a worktree: the run that created the branch checked the card first.
 
-1. **Spawn the reviewer.** Use the Task tool (`general-purpose`, model `opus`). Give it **only** the card, its parent epic when step 1 surfaced one, and an output path — never the planning conversation:
+1. **Fetch `main` once,** so the three reviewers read it as it is on GitHub without fetching it together and colliding:
 
-   > Read `.claude/commands/linear/reference/card-start-review.md` and follow it. The card is: `<identifier> — <title>`, described as: `<issue description>`. Its parent epic is `<epic-identifier>`, UUID `<epic-UUID>`. Write your findings as JSONL to `<output-path>`.
+   ```bash
+   git fetch origin main
+   ```
 
-   The epic's UUID is the `parent.id` step 1 fetched. Leave out the epic sentence for a card with no parent epic. Read the findings from the JSONL file, not the sub-agent's chat reply.
+2. **Spawn three reviewers at once.** Use the Task tool (`general-purpose`, model `sonnet`), one per lens from the brief's [Read through your lens](reference/card-start-review.md#read-through-your-lens): the first "Promise by promise", the second "Try to break it", the third "Prove it". Give each **only** the card, its lens, its parent epic when step 1 surfaced one, and its own output path — never the planning conversation:
 
-2. **Read the levels.** Note how long the reviewer took, from its completion notice, and how many stops and notes it raised; the pull request's card check record carries them (step 17). Each finding is a `stop` or a `note`. For a card created in Linear before 2026-10-06 (the `createdAt` step 1 fetched), treat a `mechanism` stop as a note: card language asked for behaviour rather than mechanism only from that date.
+   > Read `.claude/commands/linear/reference/card-start-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. The card is: `<identifier> — <title>`, described as: `<issue description>`. Its parent epic is `<epic-identifier>`, UUID `<epic-UUID>`. Write your findings as JSONL to `<output-path>`.
 
-3. **No findings** — report `card start check: nothing to raise` and continue to step 4 without a prompt.
+   The epic's UUID is the `parent.id` step 1 fetched. Leave out the epic sentence for a card with no parent epic. Read the findings from the JSONL files, not the sub-agents' chat replies. A reviewer that leaves no findings file is run once more; if it leaves none again, stop for the user. Only a file that exists and is empty means that lens found nothing.
 
-4. **Notes only** — post them as one comment on the card and continue to step 4 without a prompt, in both modes. Write the comment following [Linear card language](reference/card-language.md): each note's card line, what the reviewer found and its proposed wording, with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`.
+3. **Read the levels.** Each finding is a `stop` or a `note`. For a card created in Linear before 2026-10-06 (the `createdAt` step 1 fetched), treat a `mechanism` stop as a note: card language asked for behaviour rather than mechanism only from that date. Then read the three files as one list: findings that quote the same card line, or name the same gap, count as one finding at the stricter level, and are fixed or posted once. Note how long the check took, the slowest of the three reviewers' completion notices, and how many stops and notes the list holds; the pull request's card check record carries them (step 17).
 
-5. **Stops** — fix them yourself before any branch exists, in both modes. Each stop is a promise the builder would have to guess at, so reword the card until it can be built and judged: use the reviewer's proposed wording, or your own where it fits the card better. Save the card with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`, then post one comment following [Linear card language](reference/card-language.md) that lists each change — the card line, what the reviewer found and the new wording — followed by the notes. Continue to step 4.
+4. **No findings** — report `card start check: nothing to raise` and continue to step 4, Load project context, without a prompt.
+
+5. **Notes only** — post them as one comment on the card and continue to step 4, Load project context, without a prompt, in both modes. Write the comment following [Linear card language](reference/card-language.md): each note's card line, what the reviewer found and its proposed wording, with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`.
+
+6. **Stops** — fix them yourself before any branch exists, in both modes. Each stop is a promise the builder would have to guess at, so reword the card until it can be built and judged: use the reviewer's proposed wording, or your own where it fits the card better. Save the card with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`, then post one comment following [Linear card language](reference/card-language.md) that lists each change — the card line, what the reviewer found and the new wording — followed by the notes. Continue to step 4, Load project context.
 
    Ask the user only when a fix would change what the card is for — its purpose or scope, not its wording. In unattended mode, post the comment with that question and end the run.
 

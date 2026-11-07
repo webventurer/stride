@@ -140,10 +140,10 @@ describe("card check", () => {
 
     ok(
       check.includes(
-        "Check cost: start <s> s, <n> stops, <n> notes · end <s> s (slowest of three), <n> findings: <n> fixed, <n> not acted on",
+        "Check cost: start <s> s (slowest of three), <n> stops, <n> notes · end <s> s (slowest of three), <n> findings: <n> fixed, <n> not acted on",
       ),
     );
-    ok(start.includes("Note how long the reviewer took"));
+    ok(start.includes("Note how long the check took"));
   });
 
   it("checks once and leaves a second look at fixes to the user", () => {
@@ -257,6 +257,45 @@ describe("carrying a merged card's lesson to Todo", () => {
 });
 
 describe("card start check", () => {
+  it("runs three Sonnet reviewers at once, one per lens, in /linear:start step 3", () => {
+    const start = read(".claude/commands/linear/start.md");
+    const step3 = start.slice(
+      start.indexOf("### 3. Check the card"),
+      start.indexOf("### 4. Load project context"),
+    );
+
+    ok(step3.includes("three reviewers at once"));
+    ok(step3.includes("model `sonnet`"));
+    ok(!step3.includes("`opus`"));
+    for (const lens of ["Promise by promise", "Try to break it", "Prove it"]) {
+      ok(step3.includes(lens), lens);
+    }
+    ok(step3.includes("as one list"));
+    ok(step3.includes("leaves no findings file is run once more"));
+    ok(step3.includes("the slowest of the three"));
+    ok(step3.includes("git fetch origin main"));
+  });
+
+  it("gives the start and end reviewers the same three lens names", () => {
+    const startBrief = read(
+      ".claude/commands/linear/reference/card-start-review.md",
+    );
+    const endBrief = read(
+      ".claude/commands/linear/reference/card-check-review.md",
+    );
+
+    for (const brief of [startBrief, endBrief]) {
+      ok(brief.includes("## Read through your lens"));
+      for (const lens of [
+        "### Promise by promise",
+        "### Try to break it",
+        "### Prove it",
+      ]) {
+        ok(brief.includes(lens), lens);
+      }
+    }
+  });
+
   it("reads promises from the same definition the end check uses", () => {
     const start = read(
       ".claude/commands/linear/reference/card-start-review.md",
@@ -283,7 +322,11 @@ describe("card start check", () => {
   it("starts a card with no findings without a prompt", () => {
     const start = read(".claude/commands/linear/start.md");
 
-    ok(start.includes("continue to step 4 without a prompt"));
+    ok(
+      start.includes(
+        "continue to step 4, Load project context, without a prompt",
+      ),
+    );
   });
 
   it("fixes its own findings and asks only about the card's purpose", () => {
