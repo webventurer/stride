@@ -203,3 +203,15 @@ def test_epic_batch_is_empty_when_the_epic_has_nothing_in_todo():
     cards = [epic_card("X", "WB-2", 1)]
 
     assert epic_batch(cards, "WB-1", 3) == []
+
+
+def test_epic_batch_leaves_out_a_sub_issue_sharing_a_file_with_the_batch():
+    cards = [
+        epic_card("A", "WB-1", 1) | card("A", ("report.py",)),
+        epic_card("B", "WB-1", 2) | card("B", ("report.py",)),
+    ]
+
+    assert reasons(epic_batch(cards, "WB-1", 3)) == {
+        "A": None,
+        "B": "shares `report.py` with A",
+    }
