@@ -242,4 +242,13 @@ describe("the coordinator's steps for a batch of stride cards", () => {
     );
     ok(step5.includes("you ask the user, because which card's wording wins"));
   });
+
+  it("removes a job's worktree with git worktree remove and never --force", () => {
+    ok(step5.includes("`git worktree remove <path>`"));
+    ok(step5.includes("git -C <path> status --porcelain"));
+    ok(step5.includes("not to use `remove_card_worktree.sh`"));
+    for (const text of [skill, brief, ...referenceFiles]) {
+      ok(!/worktree remove[^`\n]*--force/.test(text));
+    }
+  });
 });
