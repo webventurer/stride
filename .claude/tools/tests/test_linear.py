@@ -431,6 +431,36 @@ def test_min_backlog_sort_order_returns_none_when_empty():
         assert min_backlog_sort_order("proj-1") is None
 
 
+def relation_nodes(*pairs: tuple[str, str]) -> dict:
+    nodes = [
+        {"type": kind, "issue": {"identifier": ident}} for kind, ident in pairs
+    ]
+    return {"nodes": nodes}
+
+
+def test_issue_blockers_lists_only_blocking_relations():
+    data = {
+        "issue": {
+            "inverseRelations": relation_nodes(
+                ("blocks", "WB-1"), ("related", "WB-2"), ("blocks", "WB-3")
+            )
+        }
+    }
+    env, post = with_env_and_mock(data)
+    with env, post:
+        assert linear.get_issue_blockers("WB-9") == ["WB-1", "WB-3"]
+
+
+def test_add_blocker_creates_a_blocks_relation_from_the_blocker():
+    data = {"issueRelationCreate": {"success": True}}
+    env, post = with_env_and_mock(data)
+    with env, post as mock:
+        assert linear.add_blocker("WB-9", "WB-1") is True
+
+    assert sent_variables(mock) == {"blocker": "WB-1", "blocked": "WB-9"}
+    assert "type: blocks" in sent_query(mock)
+
+
 def test_set_sort_order_passes_float_and_returns_success():
     data = {"issueUpdate": {"success": True}}
     env, post = with_env_and_mock(data)

@@ -28,6 +28,7 @@ from legacy import (  # noqa: E402
     migrate_from_legacy,
 )
 from linear import (  # noqa: E402
+    add_blocker,
     bearer_token,
     create_attachment,
     create_comment,
@@ -35,6 +36,7 @@ from linear import (  # noqa: E402
     create_milestone,
     create_project,
     get_issue,
+    get_issue_blockers,
     get_project,
     get_team,
     label_drift,
@@ -248,6 +250,19 @@ def issue_get_cmd(identifier: str):
     if not issue:
         raise click.ClickException(f"Issue not found: {identifier}")
     echo_json(issue)
+
+
+@issue_group.command("blockers")
+@click.argument("identifier")
+def issue_blockers_cmd(identifier: str):
+    echo_json(get_issue_blockers(identifier))
+
+
+@issue_group.command("block")
+@click.argument("identifier")
+@click.option("--by", "blocker", required=True, help="The blocking card")
+def issue_block_cmd(identifier: str, blocker: str):
+    echo_json(add_blocker(identifier, blocker))
 
 
 @issue_group.command("create")

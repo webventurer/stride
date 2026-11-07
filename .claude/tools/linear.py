@@ -654,6 +654,33 @@ def update_project_content(project_id: str, content: str) -> bool:
     return data["projectUpdate"]["success"]
 
 
+# ---- Blockers: Linear's "blocked by" links ----
+
+BLOCKER_FIELDS = "inverseRelations { nodes { type issue { identifier } } }"
+
+
+def blocker_identifiers(node: dict) -> list[str]:
+    relations = node["inverseRelations"]["nodes"]
+    return [
+        r["issue"]["identifier"] for r in relations if r["type"] == "blocks"
+    ]
+
+
+def get_issue_blockers(identifier: str) -> list[str]:
+    query = f"query($id: String!) {{ issue(id: $id) {{ {BLOCKER_FIELDS} }} }}"
+    return blocker_identifiers(graphql_data(query, {"id": identifier})["issue"])
+
+
+def add_blocker(blocked: str, blocker: str) -> bool:
+    query = (
+        "mutation($blocker: String!, $blocked: String!) { issueRelationCreate("
+        "input: { issueId: $blocker, relatedIssueId: $blocked, type: blocks }"
+        ") { success } }"
+    )
+    variables = {"blocker": blocker, "blocked": blocked}
+    return graphql_data(query, variables)["issueRelationCreate"]["success"]
+
+
 # ---- Board order ----
 
 
