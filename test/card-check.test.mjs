@@ -1,5 +1,5 @@
 import { ok } from "node:assert";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -430,4 +430,29 @@ describe("reviewer diff base", () => {
       ok(!text.includes("git diff main\n"), brief);
     }
   });
+});
+
+describe("the start and end reviewers' setting", () => {
+  const files = [
+    [".claude/commands/linear/start.md", "**Spawn three reviewers at once.**"],
+    [".claude/commands/linear/reference/card-check.md", "Spawn three fresh sub-agents at once"],
+  ];
+
+  for (const [path, marker] of files) {
+    it(`starts the three reviewers as Sonnet at high effort in ${path}`, () => {
+      const spawn = read(path)
+        .split("\n")
+        .find((line) => line.includes(marker));
+
+      ok(spawn.includes("model `sonnet`"), spawn);
+      ok(spawn.includes("effort `high`"), spawn);
+    });
+
+    it(`links the measurement behind the setting from ${path}`, () => {
+      const link = read(path).match(/\]\(([^)]*chain-of-command-config\.md)[^)]*\)/);
+
+      ok(link, "no link to chain-of-command-config.md");
+      ok(existsSync(join(strideRoot, dirname(path), link[1])), link[1]);
+    });
+  }
 });
