@@ -10,7 +10,11 @@ from pathlib import Path
 TOOLS_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(TOOLS_DIR))
 
-from todo_order import cards_in_work_order, new_sort_orders  # noqa: E402
+from todo_order import (  # noqa: E402
+    cards_in_work_order,
+    epics_in,
+    new_sort_orders,
+)
 
 URGENT, HIGH, MEDIUM, LOW, NO_PRIORITY = 1, 2, 3, 4, 0
 
@@ -98,12 +102,65 @@ def test_todo_order_still_places_cards_that_block_each_other():
 def test_new_sort_orders_rise_in_the_new_order():
     ordered = [card("C", HIGH, 30), card("A", HIGH, 10), card("B", HIGH, 20)]
 
-    assert new_sort_orders(ordered) == {"C": 10, "A": 20, "B": 30}
+    assert new_sort_orders(ordered, []) == {"C": 10, "A": 20, "B": 30}
 
 
 def test_new_sort_orders_rise_when_cards_share_a_sort_order():
     ordered = [card("A", HIGH, 5), card("B", HIGH, 5), card("C", HIGH, 5)]
 
-    values = list(new_sort_orders(ordered).values())
+    values = list(new_sort_orders(ordered, []).values())
 
     assert values == sorted(values) and len(set(values)) == 3
+
+
+def epic(identifier: str, sort_order: float) -> dict:
+    return card(identifier, NO_PRIORITY, sort_order) | {
+        "title": f"Epic: {identifier}"
+    }
+
+
+def test_epics_in_picks_only_the_epic_cards():
+    cards = [epic("E", 0), card("A", HIGH, 1)]
+
+    assert identifiers(epics_in(cards)) == ["E"]
+
+
+def test_new_sort_orders_put_a_card_above_an_epic_below_it():
+    ordered = [card("A", HIGH, 1), card("B", MEDIUM, 20), card("C", LOW, 30)]
+
+    orders = new_sort_orders(ordered, [epic("E", 10)])
+
+    assert orders["A"] > 10
+    assert orders["A"] < orders["B"] < orders["C"]
+
+
+def test_new_sort_orders_keep_the_places_of_cards_already_below_an_epic():
+    ordered = [card("A", HIGH, 20), card("B", MEDIUM, 30)]
+
+    assert new_sort_orders(ordered, [epic("E", 10)]) == {"A": 20, "B": 30}
+
+
+def test_new_sort_orders_put_every_card_below_the_highest_of_two_epics():
+    ordered = [card("A", HIGH, 1), card("B", MEDIUM, 2)]
+
+    orders = new_sort_orders(ordered, [epic("E1", 10), epic("E2", 50)])
+
+    assert min(orders.values()) > 50
+
+
+def test_new_sort_orders_put_a_card_sharing_an_epics_place_below_it():
+    ordered = [card("A", HIGH, 10)]
+
+    assert new_sort_orders(ordered, [epic("E", 10)])["A"] > 10
+
+
+def test_new_sort_orders_keep_today_s_places_with_no_epic():
+    ordered = [card("C", HIGH, 30), card("A", HIGH, 10), card("B", HIGH, 20)]
+
+    assert new_sort_orders(ordered, []) == {"C": 10, "A": 20, "B": 30}
+
+
+def test_new_sort_orders_never_give_an_epic_a_place():
+    ordered = [card("A", HIGH, 1)]
+
+    assert "E" not in new_sort_orders(ordered, [epic("E", 10)])
