@@ -161,4 +161,32 @@ describe("a /parallel-sessions job running a stride card", () => {
     ok(skill.includes("always as background `claude -p` sessions"));
     ok(skill.includes("once the user has approved its pull request"));
   });
+
+  it("frees an exited job's slot and keeps its worktree until the exit notice", () => {
+    ok(
+      inOrder(skill, [
+        "When a job's session exits holding a slot, release its slot at once",
+        "An idle notice releases nothing",
+        "exited, waiting to be resumed",
+        "a job already marked merged or failed keeps that state",
+        "tells it to claim a slot before it carries on",
+        "resume an exited job only when `slots.py status` shows a free slot",
+        "give the go to a card whose job holds a slot",
+        "Remove a job's worktree and archive its session only after that job's exit notice has arrived",
+      ]),
+    );
+  });
+
+  it("keeps a waiting job's turn open and has a job claim again after an exit", () => {
+    ok(
+      inOrder(brief, [
+        "A `claude -p` session ends when its turn ends",
+        "keep your turn open for every wait on the coordinator",
+        "renewing your slot at each interval while you hold one",
+        "Wait in steps of no more than 60 seconds",
+        "never in one long sleep",
+        "told to carry on after your session exited, claim a slot first",
+      ]),
+    );
+  });
 });
