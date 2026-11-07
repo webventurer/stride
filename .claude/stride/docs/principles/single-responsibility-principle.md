@@ -129,13 +129,15 @@ Consider a bicycle gear calculator. Each class has a single, focused responsibil
 
 ```python
 import math
+from dataclasses import dataclass
 
+
+@dataclass
 class Wheel:
-    """Calculates wheel measurements."""
+    """A bicycle wheel."""
 
-    def __init__(self, rim: float, tire: float):
-        self.rim = rim
-        self.tire = tire
+    rim: float
+    tire: float
 
     @property
     def diameter(self) -> float:
@@ -145,13 +147,14 @@ class Wheel:
     def circumference(self) -> float:
         return self.diameter * math.pi
 
-class Gear:
-    """Calculates gear ratios."""
 
-    def __init__(self, chainring: int, cog: int, wheel: Wheel):
-        self.chainring = chainring
-        self.cog = cog
-        self.wheel = wheel
+@dataclass
+class Gear:
+    """A chainring and cog driving a wheel."""
+
+    chainring: int
+    cog: int
+    wheel: Wheel
 
     @property
     def ratio(self) -> float:
@@ -169,8 +172,8 @@ wheel = Wheel(rim=26, tire=1.5)
 gear = Gear(chainring=52, cog=11, wheel=wheel)
 
 print(wheel.circumference)  # 91.106...
-print(gear.ratio)           # 4.727...
-print(gear.gear_inches)     # 137.09...
+print(gear.ratio)  # 4.727...
+print(gear.gear_inches)  # 137.09...
 ```
 
 Each class answers reasonable questions:
@@ -206,8 +209,8 @@ Wrap instance variables in properties so the knowledge of what that data means l
 ```python
 @property
 def cog(self) -> int:
-    adjustment = self.bar_adjustment if self.foo else self.baz_adjustment
-    return self._cog * adjustment
+    adjustment = self.fixed_scale if self.is_fixed else self.free_scale
+    return self.base_cog * adjustment
 ```
 
 This transforms `cog` from data (referenced everywhere) to behaviour (defined once). DRY code tolerates change because any change in behaviour can be made in just one place.
@@ -219,19 +222,23 @@ Sometimes you can't control your input — an external API sends you nested arra
 ```python
 from dataclasses import dataclass
 
+
 @dataclass
 class WheelData:
+    """A wheel's rim and tire sizes."""
+
     rim: float
     tire: float
 
+
 class WheelCollection:
-    """Isolates knowledge of raw data structure."""
+    """Wheels built from raw rows of numbers."""
 
     def __init__(self, data: list[list[float]]):
         self.wheels = [WheelData(rim=row[0], tire=row[1]) for row in data]
 
     def diameters(self) -> list[float]:
-        return [w.rim + (w.tire * 2) for w in self.wheels]
+        return [wheel.rim + (wheel.tire * 2) for wheel in self.wheels]
 ```
 
 The `diameters` method has no knowledge of the incoming array structure — it just knows `wheels` is iterable and each item has `rim` and `tire`. If the input format changes (say, the API swaps column order), only the constructor changes.
@@ -286,9 +293,9 @@ bindata/
 The `__init__.py` re-exports what consumers need:
 
 ```python
-from bindata.client import BinanceClient
-from bindata.alerts import PriceAlert
-from bindata.portfolio import Portfolio
+from .api import BinanceClient
+from .alerts import PriceAlert
+from .portfolio import Portfolio
 ```
 
 Existing code that did `from bindata import BinanceClient` still works.
