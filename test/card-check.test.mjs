@@ -456,3 +456,28 @@ describe("the start and end reviewers' setting", () => {
     });
   }
 });
+
+describe("the simplification reviewer's setting", () => {
+  const start = read(".claude/commands/linear/start.md");
+  const step10 = start.slice(
+    start.indexOf("### 10. Simplification review"),
+    start.indexOf("### 11. Card check"),
+  );
+
+  it("starts the reviewer as Sonnet at high effort, not Opus", () => {
+    const spawn = step10
+      .split("\n")
+      .find((line) => line.includes("**Spawn the reviewer.**"));
+
+    ok(spawn.includes("model `sonnet`"), spawn);
+    ok(spawn.includes("effort `high`"), spawn);
+    ok(!step10.includes("`opus`"));
+  });
+
+  it("links the measurement behind the setting from step 10", () => {
+    const link = step10.match(/\]\(([^)#]*chain-of-command-config\.md)[^)]*\)/);
+
+    ok(link, "no link to chain-of-command-config.md in step 10");
+    ok(existsSync(join(strideRoot, ".claude/commands/linear", link[1])), link[1]);
+  });
+});
