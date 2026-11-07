@@ -101,10 +101,10 @@ behave, so a config that omits them leaves the active behaviour knowable only
 from each command's fallback expression:
 
 ```bash
-jq -r '.focus // "MISSING"' .stride.json
-jq -r '.unattended // "MISSING"' .stride.json
-jq -r '."parallel-sessions" // "MISSING"' .stride.json
+jq -r '["focus", "unattended", "parallel-sessions"] - keys | .[]' .stride.json
 ```
+
+It prints the name of each field whose key is absent from the file, and nothing when all three are there. A key holding `false` or `null` is present. This step reports whether a key is there, not whether its value is valid.
 
 A repo pinned before a field existed lacks it. Report each missing field
 by name with the value that would be written — `focus` → `"outcome"`,
