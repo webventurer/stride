@@ -6,7 +6,7 @@ description: Implement a Linear issue — branch, code, validate, review, open a
 
 Implement, validate, and open a PR in one headless flow.
 
-Accepts a story ID or an epic ID: `/start PG-205`. An epic argument triggers **[epic iteration](reference/epic-iteration.md)** — on `main` its sub-issues in Todo run as a batch the way `/linear:start` with no card runs Todo; on any other branch they are worked one at a time, with interactive mode pausing at each PR.
+Accepts a story ID or an epic ID: `/start PG-205`. An epic argument triggers **[epic iteration](reference/epic-iteration.md)** — on `main` its sub-issues in Todo run as a batch the way `/linear:start` with no card runs Todo, and unattended mode runs on batch after batch until none of its cards can start; on any other branch they are worked one at a time, with interactive mode pausing at each PR.
 
 Pass `--worktree` to set up the issue in an isolated git worktree and hand off to a new terminal tab in your current VS Code window, instead of working inline — see **[worktree setup](reference/worktree.md#setup)**.
 

@@ -286,3 +286,47 @@ describe("an unattended run through Todo", () => {
     );
   });
 });
+
+describe("an unattended run through a named epic", () => {
+  const epicIteration = read(
+    ".claude/commands/linear/reference/epic-iteration.md",
+  );
+  const start = read(".claude/commands/linear/start.md");
+  const batchOnMain = epicIteration.slice(
+    epicIteration.indexOf("## Batch on `main`"),
+    epicIteration.indexOf("## E1."),
+  );
+
+  it("asks stride again after each batch with the epic and every card run", () => {
+    ok(batchOnMain.includes('--epic "<epic-identifier>"'));
+    ok(batchOnMain.includes("--started <card>"));
+    ok(batchOnMain.includes("[Todo run](todo-run.md)"));
+  });
+
+  it("runs a lone card as a batch of one so the run goes on", () => {
+    ok(batchOnMain.includes("as a batch of one"));
+    ok(
+      !batchOnMain.includes(
+        "even for a `single` card: when that card's pull request is merged, the run ends",
+      ),
+    );
+  });
+
+  it("stops after one batch only in interactive mode", () => {
+    ok(batchOnMain.includes("Interactive mode"));
+    ok(!batchOnMain.includes("Then stop: one batch, in both modes"));
+  });
+
+  it("reports each of the epic's cards as done, failed or waiting", () => {
+    ok(inOrder(batchOnMain, ["**Done:**", "**Failed:**", "**Waiting:**"]));
+  });
+
+  it("lists a failed card once, and ends on blocked or empty with that report", () => {
+    ok(batchOnMain.includes("that isn't listed as failed"));
+    ok(batchOnMain.includes("it opens the final report below"));
+  });
+
+  it("is described by /linear:start as running on until the epic is done", () => {
+    ok(start.includes("until none of its cards can start"));
+  });
+});
