@@ -27,7 +27,7 @@ You **report**. You do not edit the card, the code or the Vision. Write output o
 - **The current repository** — the code, tests and documents the card's promises concern
 - **Finished sibling cards**, when you were given a parent epic. List its cards with `uv run .claude/tools/linear_cli.py list-by-parent <epic-UUID>`, using the UUID you were given, read each Done sibling with `uv run .claude/tools/linear_cli.py issue get <id>`, and see what it shipped with `git log main -i --grep=<id>`
 - **What changed since the card's description last changed.** [Agility](agility.md) says why. Get that time with `uv run .claude/tools/linear_cli.py issue description-changed-at <card-id>`: the last change to the description, or when the card was created if it never changed. A move between columns, a new place in the column or a new link doesn't move it. Then read:
-  - **Commits that reached `main` since that time**, whichever card they came from, if any. This lists them by when GitHub received them, not the date each commit carries, so a commit made earlier but pushed or merged later is still read, and it fetches `main` first:
+  - **Commits that reached `main` since that time**, whichever card they came from, if any. This lists them by when GitHub received them, not the date each commit carries, so a commit made earlier but pushed or merged later is still read. `/linear:start` has already fetched `main` from GitHub, so you read it as it is there:
 
     ```bash
     .claude/tools/main_changes_since.sh <time>
@@ -35,6 +35,24 @@ You **report**. You do not edit the card, the code or the Vision. Write output o
 
     Read each one listed with `git show --stat <sha>`, and a merge's own commits with `git log --oneline <sha>^1..<sha>`.
   - **Comments on the epic's open sibling cards made since that time**, when you were given a parent epic: `uv run .claude/tools/linear_cli.py comment list <id>` for each sibling still open, neither Done nor Cancelled
+
+---
+
+## Read through your lens
+
+Three reviewers check every card before work starts, and the orchestrator tells each one which lens is theirs. They carry the same names as the end check's lenses in [card check review](card-check-review.md#read-through-your-lens), turned to face a card that isn't built yet. Each lens looks a different way, so together they cover the card three ways rather than one way three times. Whatever your lens, read everything under [What you read](#what-you-read), report any finding you meet, and write the same output; spend most of your effort on your lens.
+
+### Promise by promise
+
+Go through the card one promise at a time and judge whether each passes the two tests below.
+
+### Try to break it
+
+For each promise, look in the current code, commands and skills for the situation that would make it fail once built as written: an edge case the card doesn't mention, or something already in the repository that rules it out. Name the file and line.
+
+### Prove it
+
+For each promise, work out what would prove it at the end — a test, a line, or the card's live check — and whether anything stops that proof: another line on the card, such as its "What we won't do" or its live check, what finished sibling cards shipped, or what has changed since the card's description last changed.
 
 ---
 

@@ -56,7 +56,7 @@ The pull request body carries the latest verdicts, one row per promise, so a rea
 
 Checked tree: `<the tree once the check's fixes are committed>`
 Checked card: `<card fingerprint>`
-Check cost: start <s> s, <n> stops, <n> notes · end <s> s (slowest of three), <n> findings: <n> fixed, <n> not acted on
+Check cost: start <s> s (slowest of three), <n> stops, <n> notes · end <s> s (slowest of three), <n> findings: <n> fixed, <n> not acted on
 
 | Promise | Verdict | Evidence |
 |:--------|:--------|:---------|

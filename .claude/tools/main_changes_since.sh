@@ -2,7 +2,8 @@
 set -euo pipefail
 # Lists the commits that reached main on GitHub since a time, counted by when
 # GitHub received them rather than the date each commit carries, so a commit
-# made before the time but pushed or merged after it is still listed.
+# made before the time but pushed or merged after it is still listed. Fetch
+# origin's main before running it; this reads origin/main as it stands.
 # Usage: .claude/tools/main_changes_since.sh <ISO 8601 time>
 
 # --- Guards ---
@@ -34,7 +35,6 @@ main_tip_before() {
 
 require_args "$@"
 SINCE="$(whole_seconds "$1")"
-git fetch -q origin main
 TIP_BEFORE="$(main_tip_before)"
 [ -n "$TIP_BEFORE" ] || exit 0
 git log --first-parent --format='%h %ci %s' "$TIP_BEFORE..origin/main"
