@@ -36,6 +36,7 @@ from linear import (  # noqa: E402
     create_issue,
     create_milestone,
     create_project,
+    get_description_changed_at,
     get_issue,
     get_issue_blockers,
     get_project,
@@ -304,6 +305,12 @@ def issue_get_cmd(identifier: str):
 @click.argument("identifier")
 def issue_blockers_cmd(identifier: str):
     echo_json(get_issue_blockers(identifier))
+
+
+@issue_group.command("description-changed-at")
+@click.argument("identifier")
+def issue_description_changed_at_cmd(identifier: str):
+    echo_json(get_description_changed_at(identifier))
 
 
 @issue_group.command("block")
