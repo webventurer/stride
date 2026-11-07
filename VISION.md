@@ -2,7 +2,15 @@
 
 > Apply guardrails, not walls. Encourage discipline but don't obstruct flow.
 
-## The principle
+## What it delivers
+
+Manage your own dev team on a Kanban board so everything's visible — except the team is AI.
+
+stride turns AI speed into maintainable codebases. It gives your coding agent the discipline of atomic commits, a Linear-tracked story flow, and a shared vocabulary for sizing work — Claude Code, Codex, Gemini, or any CLI that speaks the same open standards. Plain markdown, authored once in `.claude/` and generated out to whichever tool you run — no runtime, no lock-in.
+
+The result: a `git log` you can trust, a kanban board that reflects reality, and a codebase that stays navigable as it grows.
+
+### The principle
 
 **Speed up whenever you can, but never at the cost of quality. Scheduling is stride's job, not yours. Every finished card teaches the next ones.**
 
@@ -12,14 +20,6 @@ In practice that means four things:
 - **Quality:** a card in a batch gets every check it would get on its own.
 - **No scheduling for you:** you decide what goes in Todo. Stride decides the order and how many run at once.
 - **Agile:** take a small step, see what it taught you, and change the plan before the next step.
-
-## What it delivers
-
-Manage your own dev team on a Kanban board so everything's visible — except the team is AI.
-
-stride turns AI speed into maintainable codebases. It gives your coding agent the discipline of atomic commits, a Linear-tracked story flow, and a shared vocabulary for sizing work — Claude Code, Codex, Gemini, or any CLI that speaks the same open standards. Plain markdown, authored once in `.claude/` and generated out to whichever tool you run — no runtime, no lock-in.
-
-The result: a `git log` you can trust, a kanban board that reflects reality, and a codebase that stays navigable as it grows.
 
 ## Who it's for
 
