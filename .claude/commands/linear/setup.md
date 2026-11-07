@@ -100,9 +100,10 @@ file is missing or its field already exists:
 ```bash
 uv run .claude/tools/linear_cli.py backfill-focus
 uv run .claude/tools/linear_cli.py backfill-unattended
+uv run .claude/tools/linear_cli.py backfill-parallel-sessions
 ```
 
-Setup is the single place config defaults are *authored* — no delivery command rewrites config as a side effect of shipping work. [`/linear:check`](check.md) may repair a config that predates a field, through these same idempotent commands, because it is where a user goes to ask whether the setup is sound. `focus` falls back to `outcome`; `unattended` falls back to `false`. What the backfills write, the no-clobber rule, and how to recover a malformed config: [recovery/backfill-focus-field.md](recovery/backfill-focus-field.md) and [recovery/backfill-unattended-field.md](recovery/backfill-unattended-field.md).
+Setup is the single place config defaults are *authored* — no delivery command rewrites config as a side effect of shipping work. [`/linear:check`](check.md) may repair a config that predates a field, through these same idempotent commands, because it is where a user goes to ask whether the setup is sound. `focus` falls back to `outcome`; `unattended` falls back to `false`; `parallel-sessions` falls back to `3`. What the backfills write, the no-clobber rule, and how to recover a malformed config: [recovery/backfill-focus-field.md](recovery/backfill-focus-field.md), [recovery/backfill-unattended-field.md](recovery/backfill-unattended-field.md) and [recovery/backfill-parallel-sessions-field.md](recovery/backfill-parallel-sessions-field.md).
 
 Then check for `.stride.json` at the repo root:
 
@@ -114,7 +115,7 @@ Then check for `.stride.json` at the repo root:
   ```
 
   The call is idempotent, so re-running setup is safe. Setup never re-creates a project.
-- **Missing** → the repo is genuinely unpinned. Ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.stride.json` (`project`, `api_key_env`, `focus`, and `unattended`), and updates `.gitignore`.
+- **Missing** → the repo is genuinely unpinned. Ask whether to create a Linear project for this repo now. If the user declines, skip. If they accept, follow [Create a Linear project](reference/create-project.md), using the chosen team from step 2 — it creates the project, seeds `VISION.md` when present, writes `.stride.json` (`project`, `api_key_env`, `focus`, `unattended` and `parallel-sessions`), and updates `.gitignore`.
 
 ### 8. Summary
 

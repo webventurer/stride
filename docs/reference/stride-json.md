@@ -9,7 +9,8 @@ Stride creates or updates this file during Linear setup. A typical file looks li
   "project": "Stride >>>",
   "api_key_env": "LINEAR_WEBVENTURER_API_KEY",
   "focus": "outcome",
-  "unattended": false
+  "unattended": false,
+  "parallel-sessions": 3
 }
 ```
 
@@ -74,6 +75,16 @@ Unattended mode does not mean “ignore errors.” Stride still stops for:
 - choices that are unclear, destructive or need your judgement
 - branch protection, required external review or security controls
 
+### `parallel-sessions`
+
+The most cards Stride runs at once.
+
+```json
+"parallel-sessions": 3
+```
+
+Use a whole number of 1 or more; `1` means one card at a time. A missing field is treated as `3`, and `/linear:setup` writes it. Any other value, such as `0`, `"three"` or `2.5`, is refused with a message naming the field.
+
 ## Keep the file out of git
 
 Add `.stride.json` to `.gitignore`:
@@ -86,6 +97,6 @@ The `unattended` setting gives Stride permission to continue through routine mer
 
 ## Change a setting
 
-Edit `.stride.json` in the repository root. Use JSON strings for `project`, `api_key_env` and `focus`; use the JSON booleans `true` or `false` for `unattended` without quotation marks.
+Edit `.stride.json` in the repository root. Use JSON strings for `project`, `api_key_env` and `focus`; use the JSON booleans `true` or `false` for `unattended` without quotation marks, and a whole number for `parallel-sessions`.
 
 Run `/linear:check` after changing Linear settings to confirm that the API key, project and board still match the workflow Stride expects.

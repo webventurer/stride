@@ -96,18 +96,19 @@ Read `.stride.json` at the repo root:
 
   A match confirms the binding is live. No match → the name in `.stride.json` doesn't resolve — the project was renamed or deleted, or `api_key_env` points at the wrong workspace. Point the user at `/linear:setup` to re-pin, or at `.stride.json` to fix the name.
 
-Then read the config defaults. `focus` and `unattended` change how commands
+Then read the config defaults. `focus`, `unattended` and `parallel-sessions` change how commands
 behave, so a config that omits them leaves the active behaviour knowable only
 from each command's fallback expression:
 
 ```bash
 jq -r '.focus // "MISSING"' .stride.json
 jq -r '.unattended // "MISSING"' .stride.json
+jq -r '."parallel-sessions" // "MISSING"' .stride.json
 ```
 
-A repo pinned before a field existed carries neither. Report each missing field
+A repo pinned before a field existed lacks it. Report each missing field
 by name with the value that would be written — `focus` → `"outcome"`,
-`unattended` → `false` — then offer to write it:
+`unattended` → `false`, `parallel-sessions` → `3` — then offer to write it:
 
 ```
 Config defaults missing from .stride.json:
@@ -116,19 +117,20 @@ Config defaults missing from .stride.json:
 Add them now? (y/n)
 ```
 
-- **y** → run the backfill for each missing field. Both are idempotent and
+- **y** → run the backfill for each missing field. Each is idempotent and
   never replace an explicit choice:
 
   ```bash
   uv run .claude/tools/linear_cli.py backfill-focus
   uv run .claude/tools/linear_cli.py backfill-unattended
+  uv run .claude/tools/linear_cli.py backfill-parallel-sessions
   ```
 
 - **n** → leave the file alone. Behaviour is unchanged either way; the fallback
-  already reads as `outcome` and `false`.
+  already reads as `outcome`, `false` and `3`.
 
 Unattended mode writes the missing defaults without asking — the value is
-already specified and the write is reversible. When both fields are present,
+already specified and the write is reversible. When every field is present,
 say nothing: a complete config is the common path and earns no prompt.
 
 ### 6. Remind about board ordering
