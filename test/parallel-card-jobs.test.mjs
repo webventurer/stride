@@ -196,6 +196,11 @@ describe("the coordinator's steps for a batch of stride cards", () => {
     skill.indexOf("### 5. Watch and check"),
     skill.indexOf("### 6. Report"),
   );
+  const referenceFiles = [
+    "chain-of-command.md",
+    "chain-of-command-config.md",
+    "testing-the-chain-of-command.md",
+  ].map((name) => read(`.claude/skills/parallel-sessions/reference/${name}`));
 
   it("names the card in a card job's brief and checks the pull request's files against it", () => {
     ok(skill.includes("names the card in place of a path list"));
@@ -213,5 +218,15 @@ describe("the coordinator's steps for a batch of stride cards", () => {
         "don't run the check",
       ]),
     );
+  });
+
+  it("keeps each batch in its own folder under work/runs", () => {
+    ok(skill.includes("`work/runs/<batch>/`"));
+    ok(skill.includes("YYYY-MM-DD-HHMMSS"));
+    ok(skill.includes("never reuses a folder that exists"));
+    for (const text of [skill, brief, ...referenceFiles]) {
+      ok(!/work\/(logs|briefs)\//.test(text));
+      ok(!text.includes("work/progress.md"));
+    }
   });
 });
