@@ -1257,6 +1257,30 @@ def test_project_config_does_not_migrate_legacy_when_file_missing():
         assert not legacy_path.unlink.called
 
 
+# ---- WB-937: parallel-sessions sets how many cards run at once ----
+
+
+def test_parallel_session_limit_returns_configured_number():
+    with patch("linear.project_config", return_value={"parallel-sessions": 5}):
+        assert linear.parallel_session_limit() == 5
+
+
+def test_parallel_session_limit_defaults_to_three_when_missing():
+    with patch("linear.project_config", return_value={"project": "Foo"}):
+        assert linear.parallel_session_limit() == 3
+
+
+@pytest.mark.parametrize("value", [0, -2, "three", 2.5, True, None])
+def test_parallel_session_limit_refuses_invalid_value(value: object):
+    with (
+        patch(
+            "linear.project_config", return_value={"parallel-sessions": value}
+        ),
+        pytest.raises(LinearError, match="parallel-sessions"),
+    ):
+        linear.parallel_session_limit()
+
+
 # ---- WB-541: config paths resolve from repo root, not the CWD ----
 
 

@@ -22,6 +22,7 @@ import legacy  # noqa: E402
 import linear  # noqa: E402
 from legacy import (  # noqa: E402
     backfill_focus,
+    backfill_parallel_sessions,
     backfill_unattended,
     migrate_from_legacy,
 )
@@ -114,6 +115,34 @@ def test_backfill_unattended_adds_default_when_missing(tmp_path: Path):
     with patch("linear.STRIDE_CONFIG_PATH", stride):
         config = backfill_unattended()
     assert config == {"project": "Foo", "unattended": DEFAULT_UNATTENDED}
+
+
+def test_backfill_parallel_sessions_adds_default_when_missing(tmp_path: Path):
+    stride = tmp_path / ".stride.json"
+    stride.write_text('{\n  "project": "Foo"\n}\n')
+    with patch("linear.STRIDE_CONFIG_PATH", stride):
+        config = backfill_parallel_sessions()
+    assert config == {"project": "Foo", "parallel-sessions": 3}
+
+
+@pytest.mark.parametrize("value", [5, 0])
+def test_backfill_parallel_sessions_keeps_existing_value(
+    tmp_path: Path,
+    value: int,
+):
+    stride = tmp_path / ".stride.json"
+    original = json.dumps({"project": "Foo", "parallel-sessions": value})
+    stride.write_text(original)
+    with patch("linear.STRIDE_CONFIG_PATH", stride):
+        assert backfill_parallel_sessions()["parallel-sessions"] == value
+    assert stride.read_text() == original
+
+
+def test_backfill_parallel_sessions_no_op_when_file_missing(tmp_path: Path):
+    stride = tmp_path / ".stride.json"
+    with patch("linear.STRIDE_CONFIG_PATH", stride):
+        assert backfill_parallel_sessions() == {}
+    assert not stride.exists()
 
 
 def test_backfill_unattended_leaves_explicit_choice_untouched(tmp_path: Path):

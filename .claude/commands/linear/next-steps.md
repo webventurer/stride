@@ -28,18 +28,19 @@ prompt. Unattended mode ranks all work and remains read-only.
 Check for a `.stride.json` file in the repository root.
 
 - If **found**: read the project name from it (`project` field in JSON)
-- If **not found**: list available projects (`uv run .claude/tools/linear_cli.py project list` — auth per [reference/workflow.md](reference/workflow.md)), ask the user to choose, then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save all four fields as `.stride.json`:
+- If **not found**: list available projects (`uv run .claude/tools/linear_cli.py project list` — auth per [reference/workflow.md](reference/workflow.md)), ask the user to choose, then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save all five fields as `.stride.json`:
 
   ```json
   {
     "project": "<chosen-project-name>",
     "api_key_env": "LINEAR_<WORKSPACE>_API_KEY",
     "focus": "outcome",
-    "unattended": false
+    "unattended": false,
+    "parallel-sessions": 3
   }
   ```
 
-  Then check the repo's `.gitignore` — if `.stride.json` isn't listed, append it. The `focus` field sets the default output abstraction — `"outcome"` is the default; see [reference/output-focus.md](reference/output-focus.md) for the accepted values. The `unattended` field defaults to `false`; see [reference/unattended.md](reference/unattended.md).
+  Then check the repo's `.gitignore` — if `.stride.json` isn't listed, append it. The `focus` field sets the default output abstraction — `"outcome"` is the default; see [reference/output-focus.md](reference/output-focus.md) for the accepted values. The `unattended` field defaults to `false`; see [reference/unattended.md](reference/unattended.md). The `parallel-sessions` field defaults to `3`: the most cards stride runs at once; see [recovery/backfill-parallel-sessions-field.md](recovery/backfill-parallel-sessions-field.md).
 
   Then set the chosen project's board to Manual ordering, so stride's `sortOrder` pins show from the first card (the call is idempotent):
 

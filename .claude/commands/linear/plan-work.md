@@ -63,18 +63,19 @@ First, check `$ARGUMENTS` for the `--project <name>` flag.
 - **If `--project <name>` is present** (cross-project mode): use the flag's value as the project name. **Mark the run as cross-project mode** — step 1 (Vision check) is skipped and step 9 swaps the Vision-grounding requirement for a cross-project note.
 - **Otherwise** (within-project mode), check for a `.stride.json` file in the repository root.
   - If **found**: read the project name from it (`project` field in JSON).
-  - If **not found**: list available projects *(auth per [reference/workflow.md](reference/workflow.md))* and ask the user to choose. Then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save all four fields as `.stride.json`:
+  - If **not found**: list available projects *(auth per [reference/workflow.md](reference/workflow.md))* and ask the user to choose. Then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save all five fields as `.stride.json`:
 
     ```json
     {
       "project": "<chosen-project-name>",
       "api_key_env": "LINEAR_<WORKSPACE>_API_KEY",
       "focus": "outcome",
-      "unattended": false
+      "unattended": false,
+      "parallel-sessions": 3
     }
     ```
 
-    Then check the repo's `.gitignore` — if `.stride.json` isn't listed, append it. The `api_key_env` field lets `linear_cli.py` read the bearer token without a per-call `LINEAR_API_KEY=` wrap. The `focus` field sets the default output abstraction for the `/linear:*` commands — `"outcome"` is the default; see [reference/output-focus.md](reference/output-focus.md) for the accepted values. The `unattended` field defaults to `false`; see [reference/unattended.md](reference/unattended.md).
+    Then check the repo's `.gitignore` — if `.stride.json` isn't listed, append it. The `api_key_env` field lets `linear_cli.py` read the bearer token without a per-call `LINEAR_API_KEY=` wrap. The `focus` field sets the default output abstraction for the `/linear:*` commands — `"outcome"` is the default; see [reference/output-focus.md](reference/output-focus.md) for the accepted values. The `unattended` field defaults to `false`; see [reference/unattended.md](reference/unattended.md). The `parallel-sessions` field defaults to `3`: the most cards stride runs at once; see [recovery/backfill-parallel-sessions-field.md](recovery/backfill-parallel-sessions-field.md).
 
     ```bash
     uv run .claude/tools/linear_cli.py project list

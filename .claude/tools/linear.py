@@ -109,6 +109,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 STRIDE_CONFIG_PATH = REPO_ROOT / ".stride.json"
 DEFAULT_FOCUS = "outcome"
 DEFAULT_UNATTENDED = False
+DEFAULT_PARALLEL_SESSION_LIMIT = 3
 
 
 def write_config(config: dict) -> None:
@@ -127,6 +128,22 @@ def read_config_json() -> dict:
 
 def project_config() -> dict:
     return read_config_json() if STRIDE_CONFIG_PATH.exists() else {}
+
+
+def parallel_session_limit() -> int:
+    configured = project_config().get(
+        "parallel-sessions", DEFAULT_PARALLEL_SESSION_LIMIT
+    )
+    if (
+        isinstance(configured, bool)
+        or not isinstance(configured, int)
+        or configured < 1
+    ):
+        raise LinearError(
+            f'.stride.json "parallel-sessions" must be a whole '
+            f"number of 1 or more, not {json.dumps(configured)}."
+        )
+    return configured
 
 
 def token_from_project_config() -> str | None:

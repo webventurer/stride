@@ -11,6 +11,7 @@ The dependency points one way — legacy → current — never the reverse.
 
 from linear import (
     DEFAULT_FOCUS,
+    DEFAULT_PARALLEL_SESSION_LIMIT,
     DEFAULT_UNATTENDED,
     STRIDE_CONFIG_PATH,
     LinearError,
@@ -60,6 +61,14 @@ def backfill_focus() -> dict:
     config = project_config()
     if config and "focus" not in config:
         config["focus"] = DEFAULT_FOCUS
+        write_config(config)
+    return config
+
+
+def backfill_parallel_sessions() -> dict:
+    config = project_config()
+    if config and "parallel-sessions" not in config:
+        config["parallel-sessions"] = DEFAULT_PARALLEL_SESSION_LIMIT
         write_config(config)
     return config
 

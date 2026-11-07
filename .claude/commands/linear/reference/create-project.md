@@ -31,16 +31,17 @@ When creating a new Linear project for a repo:
    ```
 
    `--content @VISION.md` reads the file directly — markdown newlines and special characters never touch the shell ([why](workflow.md#how-skills-talk-to-linear)).
-5. Write `.stride.json` at the repo root — **all four fields**, so `linear_cli.py` reads the bearer token without a per-call `LINEAR_API_KEY=` wrap and the commands have explicit output and interaction defaults to read:
+5. Write `.stride.json` at the repo root — **all five fields**, so `linear_cli.py` reads the bearer token without a per-call `LINEAR_API_KEY=` wrap and the commands have explicit output and interaction defaults to read:
 
    ```json
    {
      "project": "<project-name>",
      "api_key_env": "LINEAR_<WORKSPACE>_API_KEY",
      "focus": "outcome",
-     "unattended": false
+     "unattended": false,
+     "parallel-sessions": 3
    }
    ```
 
-   The `focus` field defaults to `"outcome"`; see [output-focus.md](output-focus.md) for the accepted values. The `unattended` field defaults to `false`; see [unattended.md](unattended.md).
+   The `focus` field defaults to `"outcome"`; see [output-focus.md](output-focus.md) for the accepted values. The `unattended` field defaults to `false`; see [unattended.md](unattended.md). The `parallel-sessions` field defaults to `3`: the most cards stride runs at once.
 6. If `.gitignore` doesn't already list `.stride.json`, append it.

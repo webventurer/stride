@@ -23,6 +23,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from legacy import (  # noqa: E402
     backfill_focus,
+    backfill_parallel_sessions,
     backfill_unattended,
     migrate_from_legacy,
 )
@@ -220,6 +221,11 @@ def backfill_focus_cmd():
 @cli.command("backfill-unattended")
 def backfill_unattended_cmd():
     echo_json(backfill_unattended())
+
+
+@cli.command("backfill-parallel-sessions")
+def backfill_parallel_sessions_cmd():
+    echo_json(backfill_parallel_sessions())
 
 
 # ---- Issue / comment / team / project / label / whoami subgroups ----

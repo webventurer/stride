@@ -16,6 +16,7 @@ describe("config defaults", () => {
 
     ok(check.includes("backfill-focus"));
     ok(check.includes("backfill-unattended"));
+    ok(check.includes("backfill-parallel-sessions"));
     ok(check.includes("Add them now? (y/n)"));
     ok(check.includes("Unattended mode writes the missing defaults"));
   });
@@ -25,6 +26,17 @@ describe("config defaults", () => {
 
     ok(setup.includes("single place config defaults are *authored*"));
     ok(setup.includes("may repair a config that predates a field"));
+    ok(setup.includes("backfill-parallel-sessions"));
+  });
+
+  it("writes parallel-sessions into every new .stride.json", () => {
+    for (const path of [
+      ".claude/commands/linear/plan-work.md",
+      ".claude/commands/linear/next-steps.md",
+      ".claude/commands/linear/reference/create-project.md",
+    ]) {
+      ok(read(path).includes('"parallel-sessions": 3'), path);
+    }
   });
 
   it("names the repair offer in the unattended contract", () => {
