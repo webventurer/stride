@@ -19,13 +19,13 @@ EXEMPT_SUBJECTS = ("Merge ", "fixup!", "squash!")
 
 
 def main() -> int:
-    problems = width_violations(message_in(sys.argv[1:]))
+    problems = width_violations(commit_message(sys.argv[1:]))
     if problems:
         report(problems)
     return 1 if problems else 0
 
 
-def message_in(argv: list) -> str:
+def commit_message(argv: list) -> str:
     if argv[:1] != ["--args"]:
         return sys.stdin.read()
     return inline_message(argv[1:]) or file_message(argv[1:])
@@ -49,14 +49,14 @@ def file_message(args: list) -> str:
     ]
     equals = [a.split("=", 1)[1] for a in args if a.startswith("--file=")]
     paths = [p for p in flagged + equals if p and p != "-"]
-    return text_of(paths[0]) if paths else ""
+    return file_text(paths[0]) if paths else ""
 
 
 def value_after(args: list, index: int) -> str | None:
     return args[index + 1] if index + 1 < len(args) else None
 
 
-def text_of(path: str) -> str:
+def file_text(path: str) -> str:
     try:
         return open(path, encoding="utf-8").read()
     except OSError:

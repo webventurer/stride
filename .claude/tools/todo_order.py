@@ -19,7 +19,7 @@ def is_epic(card: dict) -> bool:
     return card["title"].startswith(EPIC_PREFIX)
 
 
-def epics_in(cards: list[dict]) -> list[dict]:
+def epic_cards(cards: list[dict]) -> list[dict]:
     return [c for c in cards if is_epic(c)]
 
 

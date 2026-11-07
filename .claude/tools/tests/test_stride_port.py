@@ -16,7 +16,7 @@ TOOLS_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(TOOLS_DIR))
 
 import stride_port  # noqa: E402
-from stride_port import launch, main, next_free_port, template_for  # noqa: E402
+from stride_port import framework_template, launch, main, next_free_port  # noqa: E402
 
 
 def free_port() -> int:
@@ -74,13 +74,15 @@ def test_main_honours_base_port():
     assert int(result.output) >= port
 
 
-def test_template_for_returns_the_framework_command():
-    assert template_for("3") == "python manage.py runserver 0.0.0.0:{port}"
+def test_framework_template_returns_the_framework_command():
+    assert (
+        framework_template("3") == "python manage.py runserver 0.0.0.0:{port}"
+    )
 
 
-def test_template_for_rejects_an_unknown_choice():
+def test_framework_template_rejects_an_unknown_choice():
     with pytest.raises(click.ClickException):
-        template_for("9")
+        framework_template("9")
 
 
 def test_launch_runs_the_formatted_command(monkeypatch):

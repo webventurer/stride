@@ -12,7 +12,7 @@ sys.path.insert(0, str(TOOLS_DIR))
 
 from todo_order import (  # noqa: E402
     cards_in_work_order,
-    epics_in,
+    epic_cards,
     new_sort_orders,
 )
 
@@ -119,10 +119,10 @@ def epic(identifier: str, sort_order: float) -> dict:
     }
 
 
-def test_epics_in_picks_only_the_epic_cards():
+def test_epic_cards_picks_only_the_epic_cards():
     cards = [epic("E", 0), card("A", HIGH, 1)]
 
-    assert identifiers(epics_in(cards)) == ["E"]
+    assert identifiers(epic_cards(cards)) == ["E"]
 
 
 def test_new_sort_orders_put_a_card_above_an_epic_below_it():

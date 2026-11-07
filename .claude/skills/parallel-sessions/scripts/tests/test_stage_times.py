@@ -320,7 +320,7 @@ class RecorderTest(unittest.TestCase):
 
         self.assertEqual([r.seconds for r in self.rows("Merge")], [4])
 
-    def merge_rows_for(self, command: str) -> list:
+    def rows_after_merge_command(self, command: str) -> list:
         write_jsonl(
             self.folder / "s1.jsonl",
             [
@@ -332,7 +332,9 @@ class RecorderTest(unittest.TestCase):
         return self.rows("Merge")
 
     def test_a_merge_run_with_a_quoted_directory_change_is_a_merge(self):
-        rows = self.merge_rows_for('cd "/path with spaces" && gh pr merge 5')
+        rows = self.rows_after_merge_command(
+            'cd "/path with spaces" && gh pr merge 5'
+        )
 
         self.assertEqual([r.seconds for r in rows], [4])
 
@@ -342,19 +344,21 @@ class RecorderTest(unittest.TestCase):
             " 2>&1 | tail -3; gh pr view 268"
         )
 
-        self.assertEqual([r.seconds for r in self.merge_rows_for(command)], [4])
+        self.assertEqual(
+            [r.seconds for r in self.rows_after_merge_command(command)], [4]
+        )
 
     def test_a_merge_mentioned_on_a_later_line_is_not_a_merge(self):
         command = "cat <<'EOF'\nsome text\ngh pr merge 5\nEOF"
 
-        self.assertEqual(self.merge_rows_for(command), [])
+        self.assertEqual(self.rows_after_merge_command(command), [])
 
     def test_a_merge_mentioned_after_and_mid_line_is_not_a_merge(self):
         command = (
             "python - <<'EOF'\ncommand = \"cd repo && gh pr merge 5\"\nEOF"
         )
 
-        self.assertEqual(self.merge_rows_for(command), [])
+        self.assertEqual(self.rows_after_merge_command(command), [])
 
     def test_the_window_starts_at_linear_start_not_an_earlier_mention(self):
         write_jsonl(
