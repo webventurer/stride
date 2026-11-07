@@ -7,7 +7,7 @@ Give it several jobs that don't depend on each other, such as three Linear cards
 1. **Settle the batch.** The coordinator, the session you talk to, works out what the batch is for, the job each session runs (such as `/linear:start` on one card), the items, how many run at once, and whether they share one checkout or get a worktree each. It asks only about what your message left out.
 2. **Wait for "go".** It shows the batch, one line per item, and starts nothing until you say go.
 3. **Start every session in one turn.** Each session gets a written brief naming the files it may change. A slot store caps how many run at once, so the rest wait their turn without you starting them.
-4. **Check and merge.** When a session's work is ready, the coordinator checks the commit against the paths its brief named. In worktree mode it checks each branch combined with `main` before merging it.
+4. **Check and merge.** When a session's work is ready, the coordinator checks the commit against the paths its brief named, and that nothing in those paths is left uncommitted. In worktree mode it checks each branch combined with `main` before merging it.
 
 ## Two modes
 
