@@ -45,5 +45,5 @@ The work did fit — *into a different project*. The Distinction made the call l
 ## What this Distinction is *not*
 
 - **Not licence to weaken every gate at the first sign of friction.** The default reading is *signal*. *Context-mismatch* requires evidence — recurrence + legitimate work — not just one user pushing back.
-- **Not a way to skip the trace-back rule.** When friction-as-signal fires, the answer is still *"push back, or add a criterion via `/vision`"* — not *"call it context-mismatch and carve an exception."* If you can't show recurrence and legitimate work, it's signal.
+- **Not a way to skip the trace-back rule.** When friction-as-signal fires, the answer is still *"push back, or add a criterion via `/vision-evolve`"* — not *"call it context-mismatch and carve an exception."* If you can't show recurrence and legitimate work, it's signal.
 - **Not a substitute for `VISION.md`.** The Distinction tells maintainers which Principle to reach for; it doesn't replace the anchor itself. The Vision is what *defines* legitimate work. Without it, neither reading is grounded.
