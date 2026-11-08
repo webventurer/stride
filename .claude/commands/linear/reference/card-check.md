@@ -50,42 +50,20 @@ The check passes when every promise is kept, fixed, or recorded as Not acted on 
 
 ## When the card is the problem
 
-An unclear verdict, an empty file, a promise the user would rather drop, or a broken verdict the user decides the code should not fix — each one means the card itself may be wrong. Stop in both modes and ask the user in the shape below.
+An unclear verdict, an empty file, a promise the user would rather drop, or a broken verdict the user decides the code should not fix — each one means the card itself may be wrong. Stop in both modes and ask the user as "How to ask" below sets out.
 
 ### How to ask
 
-Ask in these four parts and nothing more:
-
-1. **The problem**, in one line of everyday words.
-2. **The rules** that matter, as two or three short numbered lines.
-3. **One fix**, quoted, ready to approve. Never a menu of options.
-4. **What stays the same**, then a yes or no question.
+Ask in the four labelled parts in order and nothing more, as [asking the user](asking-the-user.md) sets out.
 
 Around the shape:
 
 - **One finding per question.** The question holds only the finding that needs the user's decision. A finding the check fixes itself stays out of it.
 - **The card's words, not the reviewers' labels.** Quote the card's own words where the question needs them.
-- **Several promises stop the check together:** ask about them one at a time, each in this shape, and ask the next only after the first is answered, and before the check runs again.
-- **The card makes no promise the check can judge:** the problem line says so, the rules are what the card does say, and the quoted fix is one promise to add.
-- **The user answers no:** ask for their own wording in one line and use that. Don't offer a second fix.
+- **Several promises stop the check together:** ask about them one at a time, each in the four parts, and ask the next only after the first is answered, and before the check runs again.
+- **The card makes no promise the check can judge:** Context says so, The gap lists what the card does say, and My answer quotes one promise to add.
+- **The user answers no:** ask for their own wording in one line, with no four parts for that line, and use it. Don't offer a second fix.
 - **The user wants the code fixed, not the card:** they can say so at any time. The question doesn't list it as a second option.
-
-The question that settled the shape, on WB-938, word for word:
-
-> The card says a waiting card "never moves up". That's slightly wrong.
->
-> The code sorts Todo with two rules:
->
-> 1. **Important cards go higher.**
-> 2. **A card can't sit above the card it's waiting on.**
->
-> Rule 1 can still move a waiting card up if it's important. So "never moves up" is false, and the reviewers caught it.
->
-> **Fix:** cut that phrase and say only what's true:
->
-> > "A card never sits above the card it's waiting on."
->
-> The code stays as it is; only the card's words change. OK to use that?
 
 ### What the answer does
 

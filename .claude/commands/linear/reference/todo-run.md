@@ -34,7 +34,7 @@ A blocker that sits in Backlog or Cancelled never becomes Done in this run eithe
 
 ## A question for the user
 
-A question is posted on its card as a comment as it arises, whether a job's start check raised it or a lesson raised it, and the run holds it. No batch's report puts a question to the user, and the run stops for none: the cards that don't wait on an answer keep running. A lesson question leaves only its own card out of later batches, because `start-choice` reads the card's comments: the question is open while no later comment starts `Answer:`.
+A question carries the four labelled parts in order, as [asking the user](asking-the-user.md) sets out. It is posted on its card as a comment as it arises, whether a job's start check raised it or a lesson raised it, and the run holds it. No batch's report puts a question to the user, and the run stops for none: the cards that don't wait on an answer keep running. A lesson question leaves only its own card out of later batches, because `start-choice` reads the card's comments: the question is open while no later comment starts `Answer:`.
 
 ## The final report
 
@@ -45,4 +45,4 @@ The run's last message to the user lists, in this order:
 - **Failed:** each card that failed, with the check that failed or the decision it needs.
 - **Waiting:** each card still in Todo that isn't listed as failed, with the reason `start-choice` gave.
 - **Lessons:** for each merged card, the lesson it carried and the cards it reworded, or "no lesson for Todo", read from its `/linear:finish` summary.
-- **Questions:** every question held during the run, each with its card. This comes last, so the user's answer is the last thing asked for. The user answers on the card, in a comment starting `Answer:`.
+- **Questions:** every question held during the run, each in the four labelled parts with its card. This comes last, so the user's answer is the last thing asked for. The user answers on the card, in a comment starting `Answer:`.
