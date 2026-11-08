@@ -66,17 +66,16 @@ In unattended mode:
 - Do not launch Diffity automatically
 - Skip routine review, approval, ship-phrase, and housekeeping prompts
 - Apply reversible or deterministic choices whose outcome is already specified
-- Follow each delivery command's unattended Vision-evolution path when no
-  Success criterion plainly fits
+- Tend the Vision with `/vision-evolve` when no Success criterion plainly fits
 - Keep read-only commands read-only; `/linear:next-steps` writes only Todo's
   order
 - Continue a delivery flow only after its validation and repository checks pass
 
-Vision fit follows the delivery command. Interactive mode stops for the user's
-choice. In unattended `/linear:quick` and `/linear:finish`, warn, add a new
-Success criterion based on the closest fit, commit the Vision change, re-check
-the trace, and continue without asking. The machine-local `unattended` setting
-is the authority for that write; never merge against the stretched criterion.
+Vision fit follows the delivery command. When no Success criterion plainly
+fits, `/linear:quick` and `/linear:finish` tend the Vision with
+[`/vision-evolve`](../../../skills/vision-evolve/SKILL.md) in both modes, with
+no sign-off, then re-check the trace and continue; never merge against the
+stretched criterion.
 
 ## Merge after local validation
 

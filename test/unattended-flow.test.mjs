@@ -59,12 +59,12 @@ describe("unattended Linear flow", () => {
   it("handles stretched Vision matches by mode", () => {
     for (const name of ["quick", "finish"]) {
       const command = read(`.claude/commands/linear/${name}.md`);
-      ok(command.includes("Update an existing Success criterion"), name);
-      ok(command.includes("add a new Success criterion"), name);
-      ok(command.includes("Interactive mode stops"), name);
-      ok(command.includes("In unattended mode, add a new Success criterion"), name);
-      ok(command.includes("separate atomic commit"), name);
-      ok(command.includes("continue without asking"), name);
+      ok(command.includes("/vision-evolve"), name);
+      ok(!command.includes("Update an existing Success criterion"), name);
+      ok(
+        !command.includes("In unattended mode, add a new Success criterion"),
+        name,
+      );
     }
 
     const quick = read(".claude/commands/linear/quick.md");
@@ -72,6 +72,7 @@ describe("unattended Linear flow", () => {
 
     const policy = read(".claude/commands/linear/reference/unattended.md");
     ok(policy.includes("Vision fit follows the delivery command"));
+    ok(policy.includes("/vision-evolve"));
   });
 
   it("materialises the default in new configs", () => {

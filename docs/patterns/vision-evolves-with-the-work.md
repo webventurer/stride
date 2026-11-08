@@ -20,9 +20,9 @@ The pattern fires at three distinct gates. Same move at each:
 
 | Gate | When it fires | What it does |
 |:--|:--|:--|
-| **[`/linear:plan-work`](/skills/linear#linear-plan-work) step 1 — Decision rules** | At draft time, the issue's *"Why this matters"* can't trace to any existing criterion | Prompt the user: add a new criterion to `VISION.md` (re-run `/vision` to evolve it), or drop the issue as out of scope |
-| **[`/linear:quick`](/skills/linear#linear-quick) step 6 — trace Vision** | Before merge, no criterion plainly fits the completed change | Explain the thin fit. Interactive mode stops for an update-or-add choice; unattended mode adds and commits the closest durable criterion, re-checks, and continues |
-| **[`/linear:finish`](/skills/linear#linear-finish) step 7 — confirm Vision outcome** | Before merge, the issue's stated trace is strained and no other criterion plainly fits | Post the gap to the issue. Interactive mode stops for an update-or-add choice; unattended mode adds and commits the closest durable criterion, re-checks, and continues |
+| **[`/linear:plan-work`](/skills/linear#linear-plan-work) step 1 — Decision rules** | At draft time, the issue's *"Why this matters"* can't trace to any existing criterion | Prompt the user: grow the Vision with [`/vision-evolve`](/skills/vision-evolve), or drop the issue as out of scope |
+| **[`/linear:quick`](/skills/linear#linear-quick) step 6 — trace Vision** | Before merge, no criterion plainly fits the completed change | Explain the thin fit, then tend the Vision with `/vision-evolve`, re-check, and continue |
+| **[`/linear:finish`](/skills/linear#linear-finish) step 7 — confirm Vision outcome** | Before merge, the issue's stated trace is strained and no other criterion plainly fits | Post the gap to the issue, then tend the Vision with `/vision-evolve`, re-check, and continue |
 
 The upfront gate is the cheap catch. The merge-time gates are the backup — they fire when the strain wasn't visible until after the work was built. All three end in the same move: evolve the Vision on the branch.
 
@@ -45,14 +45,9 @@ The Vision changes only when the work pushes against it — and when it changes,
 
 You finish a piece of work and run `/linear:finish`. At the trace-confirm step, the agent flags that the issue's *"Why this matters"* doesn't fit any existing Success criterion cleanly — the closest candidates need bridging language to make the connection hold.
 
-In interactive mode, the agent asks whether to update an existing Success criterion or add a new one, then asks *in one line, what shifted?* You answer by naming the outcome the project is actually committed to but hasn't yet written down, and the agent posts your answer to the issue.
+The agent tends the Vision itself with [`/vision-evolve`](/skills/vision-evolve), in interactive and unattended mode alike. It names the outcome the project is actually committed to but hasn't yet written down, changes the criterion in `VISION.md` as a separate atomic commit on the same branch, and tells you what it changed. The agent posts the gap to the issue.
 
-On the same branch, you update or add the criterion in `VISION.md` as a separate atomic commit, then re-run `/linear:finish`. The trace check now matches the changed criterion. The merge goes through. The Vision-sync step detects `VISION.md` in the merged diff and syncs the updated criteria list to the Linear project description.
-
-In unattended mode, the agent gives the same warning but does not pause. It
-uses the closest fit as context, writes the durable outcome the work revealed,
-commits that Vision change separately, re-checks the trace, and continues only
-after the new criterion plainly fits.
+The trace check then matches the changed criterion and the merge goes through. The Vision-sync step detects `VISION.md` in the merged diff and syncs the updated criteria list to the Linear project description.
 
 End-to-end in one session: strain caught, criterion added, work merged, Linear synced. No follow-up issue, no second PR.
 
@@ -61,4 +56,4 @@ End-to-end in one session: strain caught, criterion added, work merged, Linear s
 - **Not licence to add a criterion every time a trace feels off.** Read [*revise, don't stretch*](./revise-dont-stretch.md) first — most strain resolves with a revised trace toward an existing criterion. The Vision evolves only when revision can't find a clean fit.
 - **Not a way to retroactively justify scope creep.** The new criterion has to describe an outcome the project is genuinely committed to — not just the work in front of you. If the criterion only exists to make this one issue trace cleanly, it's a fictional anchor in slower motion.
 - **Not exclusive to** `/linear:finish`. `/linear:plan-work` catches the same drift before drafting, and `/linear:quick` catches it before merging a fast-loop change. The Pattern is the *evolution on the same branch*, not the gate that surfaces the need.
-- **Not a substitute for** `/vision`. Adding a criterion mid-branch is the amendable catch — a one-line addition where the gap is obvious. Interactive mode offers `/vision` for the user's update; unattended mode writes only the closest durable criterion. Substantive rewrites (new audience, new scope, multiple new outcomes) still belong in `/vision`.
+- **Not a substitute for** `/vision`. Adding a criterion mid-branch is the amendable catch — a one-line addition where the gap is obvious, made by `/vision-evolve`. Writing a Vision for the first time still belongs in `/vision`.

@@ -46,7 +46,7 @@ Interactive mode merges **only** when you say an explicit ship phrase: **`ship`,
 - The PR opens at **review** time (step 5); in interactive mode only the **merge** waits for the ship phrase
 - Use `--merge` (not `--squash`) to preserve atomic commits
 - Keep scope to one change — if the diff grows past a one-scroll review, stop and suggest `/linear:plan-work`
-- <mark>**Don't shortcut the Vision trace.** A drift is surfaced for your decision — exactly as `/linear:finish` does — *before* the merge, while the catch is still actionable.</mark>
+- <mark>**Don't shortcut the Vision trace.** A drift is caught and the Vision tended — exactly as `/linear:finish` does — *before* the merge, while the catch is still actionable.</mark>
 - The card is filed once, directly in **Done** — interactive mode may defer it to bundle with later changes
 
 ---
@@ -133,28 +133,10 @@ In interactive mode, continue only once the user says a ship phrase. In unattend
   ```
 
 - **No clear fit** — the closest criterion only fits with stretching or bridging
-  language. Warn before the merge and explain why the fit is thin.
-
-  Interactive mode stops and asks the user to evolve the Vision:
-
-  ```
-  This change would ship: <one-line description of the diff>
-  Closest Vision criterion: "<best-fit>"
-  But the fit is thin because <why>.
-
-  No Success criterion plainly fits this work.
-  Update an existing Success criterion or add a new Success criterion? (update / add)
-  ```
-
-  Either answer pauses the interactive flow. Tell the user to run `/vision`, make the
-  chosen update, and `/commit` it on this branch before re-running
-  `/linear:quick`. Never draft or edit the criterion from the current change.
-
-  In unattended mode, add a new Success criterion to `VISION.md`. Use the
-  closest criterion as context, but write the durable outcome this work reveals
-  rather than a criterion that merely restates the current card. Run `/commit`
-  so the Vision change is a separate atomic commit on the same branch, re-run
-  the trace, and continue without asking once the new criterion plainly fits.
+  language. Warn before the merge, explain why the fit is thin, then tend the
+  Vision with [`/vision-evolve`](../../skills/vision-evolve/SKILL.md), in
+  interactive and unattended mode alike. It changes `VISION.md` itself and
+  needs no sign-off. Continue once the trace plainly fits the changed Vision.
 
 The merge hasn't happened yet, so a drift is fully actionable here. The PR is already open from step 5 — once the trace is settled, merge it:
 
@@ -223,7 +205,6 @@ Display:
 - Uncommitted changes on `main` → branch + `/commit` before shipping (never ship from `main`)
 - Build/tests fail → fix before shipping; never merge red
 - No ship phrase given in interactive mode → never merge; keep iterating. The PR opened at step 5 stays open (reversible) — if the user abandons the flow, the open PR and pushed branch are theirs to close or resume; quick doesn't auto-close them
-- Vision drift in interactive mode → stop before merge; resume after the user's Vision change is committed
-- Vision drift in unattended mode → warn, add and commit the closest durable Success criterion, re-check, then continue
+- Vision drift → tend the Vision with [`/vision-evolve`](../../skills/vision-evolve/SKILL.md), re-check, then continue
 - Change outgrew a one-scroll diff → stop, suggest `/linear:plan-work`
 - `uv run .claude/tools/linear_cli.py issue create` / `attach` fails after merge → surface it; the PR is already merged, so re-running the file step (with the bundle intact) recovers the card

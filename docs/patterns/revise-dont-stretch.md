@@ -15,7 +15,7 @@ Two outcomes:
 | Outcome | What happens |
 |:--|:--|
 | **Revised trace lands cleanly** | Use it. Note in the draft *why* the better fit was missed first time — Vision evolved since you last absorbed it, earlier scan missed it, etc. |
-| **Revision can't find a clean fit** | Surface the strain to the user honestly. Follow `/linear:plan-work`'s existing *can't-trace* path: add a new criterion to `VISION.md` (re-run `/vision`), or drop the issue as out of scope |
+| **Revision can't find a clean fit** | Surface the strain to the user honestly. Follow `/linear:plan-work`'s existing *can't-trace* path: grow the Vision with `/vision-evolve`, or drop the issue as out of scope |
 
 ## Why this is the right move
 

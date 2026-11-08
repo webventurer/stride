@@ -18,7 +18,7 @@ approval prompt.
 
 - `VISION.md` at the repo root is the source of truth — this command is one-way (repo → Linear)
 - Two fields are mirrored: `content` (the full document) and `description` (the subtitle, from VISION.md's opening blockquote tagline). Touch no other metadata
-- For existing projects: show what will change; interactive mode requires explicit confirmation, while unattended mode applies the one-way sync
+- For existing projects: show what will change; interactive mode requires explicit confirmation, while unattended mode applies the one-way sync. When [`/vision-evolve`](../../skills/vision-evolve/SKILL.md) runs this command, it shows the difference and applies the sync without asking, in either mode
 - For new projects (no `.stride.json`): the user supplies the name, `VISION.md` becomes the initial `content` and its tagline the subtitle, the team is resolved from `uv run .claude/tools/linear_cli.py team list` — no diff exists to confirm
 - If both `content` and subtitle already match `VISION.md`, skip the write — report and stop
 - If `VISION.md` has no opening blockquote, leave the subtitle untouched — never blank an existing one
@@ -99,7 +99,7 @@ Then:
   Linear already matches VISION.md (content + subtitle) — no update needed.
   ```
 
-- **Either differs**: show what will change (the content diff and/or the old→new subtitle). Unattended mode continues to step 5. Interactive mode asks:
+- **Either differs**: show what will change (the content diff and/or the old→new subtitle). Unattended mode, and a run from `/vision-evolve`, continue to step 5. Interactive mode asks:
 
   ```
   Replace the Linear content and/or subtitle with VISION.md? (y/n)

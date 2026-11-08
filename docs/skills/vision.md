@@ -6,7 +6,7 @@
 
 A Vision is the canonical "what is this project for" document. Written once, evolved sparingly. It's the anchor every issue, every feature, and every architectural decision should trace back to.
 
-`/vision` walks you through writing one. It offers two modes — **short** (one question, ~2 minutes, CRAFT-assembled) for small projects, and **full** (seven questions, ~15 minutes, one at a time) for substantial products. Either way it drafts the file, shows it for approval, then writes `VISION.md` at the repo root.
+`/vision` walks you through writing one. It offers two modes — **short** (one question, ~2 minutes, CRAFT-assembled) for small projects, and **full** (seven questions, ~15 minutes, one at a time) for substantial products. Either way it drafts the file, shows it for approval, then writes `VISION.md` at the repo root. To change a Vision that already exists, use [`/vision-evolve`](/skills/vision-evolve).
 
 *Vision sits above the loop — issues, features, and architectural decisions trace back to it.*
 
@@ -29,11 +29,11 @@ A Vision is the canonical "what is this project for" document. Written once, evo
 - Bootstrapping a Vision for an existing project that grew up without one
 - Any consumer repo where someone wants to capture product intent before writing more code
 
-Pick **short mode** when the work is a small dashboard, a side-tool, or anything where the seven-question interview would feel disproportionate. Pick **full mode** for substantial products where the act of articulating each section is itself the value. A short-Vision project can graduate to full Vision later by re-running `/vision`.
+Pick **short mode** when the work is a small dashboard, a side-tool, or anything where the seven-question interview would feel disproportionate. Pick **full mode** for substantial products where the act of articulating each section is itself the value. A short-Vision project can graduate to full Vision later by re-running `/vision` and choosing to replace it.
 
 ## When NOT to use
 
-- The project already has a good `VISION.md` and you just want edits — go direct
+- The project already has a good `VISION.md` and you just want to change it — use [`/vision-evolve`](/skills/vision-evolve)
 - You want per-story scope — that's a Linear issue, not a Vision
 - You want an implementation plan — that's [`/linear:plan-work`](/skills/linear#linearplan-work), not this
 

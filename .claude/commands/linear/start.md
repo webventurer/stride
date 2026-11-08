@@ -125,7 +125,7 @@ If the issue has no "Why this matters" section, decide whether it qualifies for 
   1. Edit the issue to add "Why this matters" referencing a
      Success criterion, then re-run /linear:start.
   2. If the work genuinely doesn't trace to a criterion, run
-     /vision to add one, then update the issue.
+     /vision-evolve to add one, then update the issue.
   ```
 
   Don't start implementation against a modern issue with no anchor.
