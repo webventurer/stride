@@ -115,7 +115,8 @@ First line: the verbatim measurable criterion from the Vision
 this work serves, in italic markdown — e.g. *"Linear board state
 matches branch state automatically as /linear:* runs"*. Then 1–2
 sentences on user impact, business reason, or technical risk
-that makes this worth doing now.
+that makes this worth doing now, including how often it
+happened, what it costs, and what happens if nothing is done.
 
 ### Where things stand
 Current state — the bug, gap, or opportunity (1–2 sentences)

@@ -33,6 +33,10 @@ Two lines that say nearly the same thing split the work between them, and nobody
 
 A line that restates the card in hand will never apply to a second card. Name the lasting outcome the work reveals, the thing the project is now committed to, and write that. Ask whether a card next month that has nothing to do with this one could still be filed against the line.
 
+### A learning earns a line only when it recurs and points to a better way of working
+
+When a line would record something the work taught, judge it with [moves the needle](../../commands/linear/reference/moves-the-needle.md). A learning that keeps coming back and clearly points to a better way of working earns a line. A one-off that cost little adds no Success criterion: name it to the user in one line and leave the Vision as it is. This is about learnings, not the trace: work for a card that fits no Success criterion still gets the line it needs, whether the work is already built (`/linear:finish` and `/linear:quick` merge against that line) or about to be filed (`/linear:plan-work`).
+
 ### The agent owns this upkeep, and needs no sign-off
 
 Tending the Vision is part of the work, in interactive and unattended mode alike. Change `VISION.md` yourself, then tell the user what you changed and why in one plain sentence, and carry on. Don't stop to ask whether the new line is wanted, and don't hand the edit back to the user.
