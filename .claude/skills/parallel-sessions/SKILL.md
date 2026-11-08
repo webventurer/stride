@@ -169,7 +169,7 @@ Before you put any question to the user, call `/advisor` and record what it said
 
 Never merge work that fills in something only the user can give with a guessed value, such as a made-up interest rate: keep it off `main` until the user answers.
 
-The question reaches the user with none of the context the batch has built up, so put it in at most three short paragraphs, in this order: what the thing is and what the job asked of it; why that runs into trouble, as it would actually happen; then the options with your recommendation first, ending on a question the user can answer yes or no. Include a worked example, a before that shows the trouble and an after that shows the fix, taken from the real files or cards. Mention anything the user would be approving without knowing, such as a card line a session already added.
+The question reaches the user with none of the context the batch has built up, so it carries the four labelled parts in order, as [asking the user](../../commands/linear/reference/asking-the-user.md) sets out. Put anything the user would be approving without knowing, such as a card line a session already added, in The gap.
 
 ### 6. Report
 

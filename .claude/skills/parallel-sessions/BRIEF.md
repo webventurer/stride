@@ -33,6 +33,8 @@ Send the coordinator a message with `SendMessage` when:
 - **Your card is already done:** `/linear:start` cancelled it at its start check, because everything it promised already holds on `main`. Message the coordinator that the card ended in Canceled, naming the card and saying its comment names what keeps each promise. There is no pull request to send. Release your slot and end your turn at once, without waiting for a reply.
 - **Your work is ready:** your commit exists, or your pull request is open when the job opens one. Send the commit or the pull request's URL.
 
+A question that reaches the user, posted on the card or passed on by the coordinator, carries the four labelled parts in order, as [asking the user](../../commands/linear/reference/asking-the-user.md) sets out.
+
 Bring every other question to the coordinator, not to `/advisor`: the coordinator knows what the other jobs are doing and answers with that in mind.
 
 The coordinator may send you back to fix what merging your work with the others exposes: claim a slot again, fix it with your commit route, and message again when it's ready.
