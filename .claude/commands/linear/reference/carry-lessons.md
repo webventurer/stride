@@ -19,7 +19,7 @@ The start check's comment is the one listing its stops and notes, posted before 
 
 State each start-check stop or note, and each row of the record whose verdict is Fixed or Not acted on, as one rule about how a promise is worded or tested. For example, a finding that a promise naming two worktree locations was tested for one becomes "a promise naming two situations needs a test for each".
 
-Then judge each lesson with [moves the needle](moves-the-needle.md). A lesson that has come back, which the check records of earlier merged cards and the comments on the cards in Todo show, or that would cost a lot even once, goes on to step 3. A one-off that cost little is named in one line in step 4's report, and no card in Todo is reworded for it.
+Then judge each lesson with [moves the needle](moves-the-needle.md). A lesson that has come back, which a comment on a card in Todo or the `## Card check` record of another recently merged pull request shows (read them when a lesson looks familiar), or that would cost a lot even once, goes on to step 3. A one-off that cost little is named in one line in step 4's report, and no card in Todo is reworded for it.
 
 ## 3. Apply it to the cards in Todo
 

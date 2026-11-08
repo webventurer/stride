@@ -245,12 +245,12 @@ When the check contradicts the description, correct the draft and tell the user 
 
 #### Will it move the needle?
 
-Every card is a claim on the attention of the person running stride, so a card is drafted only when there is evidence it will matter. Read [moves the needle](reference/moves-the-needle.md), then answer three questions from what the code check and any recording or results file showed: how often has this happened, what does it cost, and what happens if nothing is done? The check also runs in cross-project mode, and on the epic-sized path it runs for each story.
+Every card is a claim on the attention of the person running stride, so a card is drafted only when there is evidence it will matter. Read [moves the needle](reference/moves-the-needle.md), then answer three questions from what the code check and any recording or results file showed: how often has this happened, what does it cost, and what happens if nothing is done? The check also runs in cross-project mode, and on the epic-sized path it runs for the parent epic and for each story.
 
 - **When the case is made:** continue to step 8. The answers go in the draft's "Why this matters" (step 9).
 - **When the case is thin:** say so, with the reason, and recommend not filing. In interactive mode the person can overrule the recommendation, and the draft then records that they did. In unattended mode, file nothing and report the reason.
 - **An explicit request is the case:** when the person's own words ask for this specific piece of work, that counts as the case, and the draft records that they asked. A follow-up an agent found while doing other work is not an explicit request, even when the person told the agent to file follow-ups.
-- **Several follow-ups in one run:** judge each one. File the ones that make the case and end the output with one line that names each one left out, with its reason. Follow-ups filed by separate runs are each judged by their own run.
+- **Several follow-ups in one run** (a focused first issue plus its follow-ups, or an epic's stories): judge each one. File the ones that make the case and end step 13's confirmation with one line that names each one left out, with its reason. Follow-ups filed by separate runs are each judged by their own run.
 
 ### 8. Test consideration
 

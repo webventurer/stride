@@ -35,7 +35,7 @@ A line that restates the card in hand will never apply to a second card. Name th
 
 ### A learning earns a line only when it recurs and points to a better way of working
 
-When a line would record something the work taught, judge it with [moves the needle](../../commands/linear/reference/moves-the-needle.md). A learning that keeps coming back and clearly points to a better way of working earns a line. A one-off that cost little adds no Success criterion: name it to the user in one line and leave the Vision as it is. This is about learnings, not the trace: work already built for a card that fits no Success criterion still gets the line it needs, so `/linear:finish` and `/linear:quick` can merge against it.
+When a line would record something the work taught, judge it with [moves the needle](../../commands/linear/reference/moves-the-needle.md). A learning that keeps coming back and clearly points to a better way of working earns a line. A one-off that cost little adds no Success criterion: name it to the user in one line and leave the Vision as it is. This is about learnings, not the trace: work for a card that fits no Success criterion still gets the line it needs, whether the work is already built (`/linear:finish` and `/linear:quick` merge against that line) or about to be filed (`/linear:plan-work`).
 
 ### The agent owns this upkeep, and needs no sign-off
 

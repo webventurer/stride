@@ -115,7 +115,7 @@ First line: the verbatim measurable criterion from the Vision
 this bug violates, in italic markdown — e.g. *"Background jobs
 run reliably after the first one"*. Then 1–2 sentences on user
 impact: who hits this, how often, what they can't do because
-of it.
+of it, and what happens if nothing is done.
 
 ### Symptoms
 What a user observes. User-visible terms, not internals. 2–4

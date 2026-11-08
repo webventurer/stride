@@ -30,6 +30,7 @@ describe("moves the needle", () => {
     ok(plan.includes("reference/moves-the-needle.md"));
     ok(plan.includes("In unattended mode, file nothing and report the reason"));
     ok(plan.includes("recommend not filing"));
+    ok(plan.includes("In interactive mode the person can overrule the recommendation"));
   });
 
   it("counts a person's own request as the case but not a follow-up an agent found", () => {
@@ -50,6 +51,11 @@ describe("moves the needle", () => {
 
     ok(plan.includes("how often it happened, what it costs, and what happens if nothing is done"));
     ok(plan.includes("beside the cross-project line"));
+
+    for (const name of ["story", "bug", "epic"]) {
+      const template = read(`.claude/commands/linear/reference/templates/${name}.md`);
+      ok(template.includes("what happens if nothing is done"), name);
+    }
   });
 
   it("is where carry-lessons and /vision-evolve send the same judgement", () => {
@@ -65,6 +71,13 @@ describe("moves the needle", () => {
     const evolve = read(".claude/skills/vision-evolve/SKILL.md");
 
     ok(carry.includes("no card in Todo is reworded for it"));
+    for (const path of [
+      ".claude/commands/linear/reference/carry-lessons.md",
+      ".claude/commands/linear/reference/output-focus.md",
+      ".claude/commands/linear/reference/todo-run.md",
+    ]) {
+      ok(read(path).includes("one-off lessons named and left"), path);
+    }
     ok(evolve.includes("adds no Success criterion"));
     ok(evolve.includes("still gets the line it needs"));
   });

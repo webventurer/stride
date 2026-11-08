@@ -107,7 +107,8 @@ First line: the verbatim measurable criterion from the Vision
 this work serves, in italic markdown — e.g. *"Linear board state
 matches branch state automatically as /linear:* runs"*. Then 2–4
 sentences on user impact, business reason, or technical risk
-that makes the whole epic worth doing now.
+that makes the whole epic worth doing now, including how often
+it happened, what it costs, and what happens if nothing is done.
 
 ### What success looks like
 One paragraph: the outcome a reader sees when the last sub-issue

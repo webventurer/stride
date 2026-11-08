@@ -17,7 +17,7 @@ Start the list empty. After each batch, add every card in it, whether or not it 
    uv run .claude/tools/linear_cli.py start-choice --project "<project>" --branch main --started <card> --started <card>
    ```
 
-3. For `batch` or `single`, run the cards through `/parallel-sessions`, settled as `start.md` sets out. A `single` card runs the same way, as a batch of one, so a failure ends that card's job and not the run. Add its cards to the list. When the report comes back, report one line for each merged card, its lesson result from its `/linear:finish` summary (the cards it reworded, or "no lesson for Todo"), then go back to step 1.
+3. For `batch` or `single`, run the cards through `/parallel-sessions`, settled as `start.md` sets out. A `single` card runs the same way, as a batch of one, so a failure ends that card's job and not the run. Add its cards to the list. When the report comes back, report one line for each merged card, its lesson result from its `/linear:finish` summary (the cards it reworded, the one-off lessons named and left, or "no lesson for Todo"), then go back to step 1.
 4. For `blocked` or `empty`, the run is over: no card in Todo can start. Go to the final report.
 
 The reasons the run reports are the ones `start-choice` prints for a card that is out: a blocker that isn't Done, a lesson question with no answer, or a card the run already started.
@@ -44,5 +44,5 @@ The run's last message to the user lists, in this order:
 - **Canceled:** each card that ended in Canceled because its work was already done, with the reason in its comment.
 - **Failed:** each card that failed, with the check that failed or the decision it needs.
 - **Waiting:** each card still in Todo that isn't listed as failed, with the reason `start-choice` gave.
-- **Lessons:** for each merged card, the lesson it carried and the cards it reworded, or "no lesson for Todo", read from its `/linear:finish` summary.
+- **Lessons:** for each merged card, the lesson it carried and the cards it reworded, the one-off lessons named and left, or "no lesson for Todo", read from its `/linear:finish` summary.
 - **Questions:** every question held during the run, each in the four labelled parts with its card. This comes last, so the user's answer is the last thing asked for. The user answers on the card, in a comment starting `Answer:`.
