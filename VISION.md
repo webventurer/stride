@@ -42,7 +42,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] When new work strains against older criteria, the Vision can be updated to reflect what was learned — `VISION.md` evolves with the work, not separately from it
 - [ ] Work is filed against a criterion it plainly serves. When the closest one only fits if you stretch what it says, the loop stops and says so before merging, instead of picking the nearest and calling it verified
 - [ ] What a reader is told stride installs matches what it installs — every shipped skill and command is described where a reader looks, and the counts agree across the README, the docs site and the installer's own output
-- [ ] Example code in the docs stride installs follows the same style as stride's own code, so an agent learning from either sees one way of writing it
+- [ ] Stride's own code, and the examples in the docs it installs, follow one consistent house style — such as each helper sitting below the code that calls it — so an agent learning from either picks up one way of writing code
 - [ ] You can improve stride through using it — friction hit while working *in* the project can be surfaced, fixed, and used *on* the project within the same session, so the tool compounds
 - [ ] Every commit on a stride-managed branch passes multi-pass atomicity — no monolithic commits, every message explains *why*
 - [ ] What ships is the simplest thing that works — before you review a change, a reviewer that never saw the reasoning reads it cold and names what can be deleted, so scaffolding that felt necessary while writing it never reaches `main`
@@ -65,7 +65,6 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
 - [ ] stride's tests exercise the real code under test, never a reimplemented copy — so a regression in the real code fails the suite instead of passing green against a stale duplicate
 - [ ] stride's own Python tooling stays consistently formatted and lint-clean — tidied on demand with a single command, never enforced on the commit path, so housekeeping stays cheap and off the critical path
-- [ ] stride's own Python reads top-down — each helper sits below the code that calls it, so an agent learning from stride's code picks up one order, never two
 - [ ] After `/linear:update-vision` runs, the Linear project description matches `VISION.md`
 - [ ] `npx github:webventurer/stride` installs in under 30 seconds, no global side effects
 - [ ] Setup gets a fresh user from `npx` to their first successful `/linear:start` in under 90 seconds on any supported OS. Authentication uses a Personal API Key in `~/.env`, feeding a single code path through every command. No external CLI dependencies that require building from source.
