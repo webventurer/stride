@@ -34,14 +34,6 @@ CLI_EXPIRY_SECONDS = 1
 CLI_LAPSE_WAIT_SECONDS = CLI_EXPIRY_SECONDS * 1.5
 
 
-def claim_when_all_are_ready(
-    store_folder: str, holder: str, starting_line: Barrier, results: Queue
-):
-    pool = SlotPool(Cache(store_folder), LIMIT, LONG_EXPIRY_SECONDS)
-    starting_line.wait()
-    results.put(pool.claim(holder))
-
-
 class SlotPoolTest(unittest.TestCase):
     """Tests for a pool of slots shared by separate processes."""
 
@@ -255,6 +247,14 @@ def run_to_completion(workers: Sequence[BaseProcess]):
 def renew_after_a_pause(pool: SlotPool, holder: str):
     time.sleep(SHORT_EXPIRY_SECONDS / 2)
     pool.renew(holder)
+
+
+def claim_when_all_are_ready(
+    store_folder: str, holder: str, starting_line: Barrier, results: Queue
+):
+    pool = SlotPool(Cache(store_folder), LIMIT, LONG_EXPIRY_SECONDS)
+    starting_line.wait()
+    results.put(pool.claim(holder))
 
 
 if __name__ == "__main__":
