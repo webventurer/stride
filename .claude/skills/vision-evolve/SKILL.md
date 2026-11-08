@@ -7,9 +7,15 @@ description: Tend a Vision that already exists — add a line, reword one, or fo
 
 A Vision only stays a true guide if it is tended as the work grows. `/vision` writes one for the first time; this skill looks after it from then on: adding a line, rewording one, or folding lines together. [Revise, don't stretch](https://github.com/webventurer/stride/blob/main/docs/patterns/revise-dont-stretch.md) and [the Vision evolves with the work](https://github.com/webventurer/stride/blob/main/docs/patterns/vision-evolves-with-the-work.md) hold the thinking behind it.
 
-These are principles, not steps. Read the Vision, apply them with judgement, and keep the change small.
+## The principle
 
-## The principles
+**The Vision is a true account of what the project is for, kept true as the work grows.**
+
+Anyone reading `VISION.md` should be able to trust two things: every line names something the project really delivers, and every piece of work traces honestly to one of them. When either stops being true, the Vision is no longer a guide, only a document. Everything below serves that one aim; read the Vision, judge what keeps it true, and keep the change small.
+
+## How it plays out
+
+These guidelines are what the principle usually asks for. When a case fits none of them, go back to the principle.
 
 ### A line says something true and useful about what the project delivers
 
