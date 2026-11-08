@@ -96,23 +96,6 @@ def slot_key(slot: int) -> str:
     return f"slot-{slot}"
 
 
-def shared_store_path(checkout: Path) -> Path:
-    return main_checkout_path(checkout) / STORE_FOLDER
-
-
-def main_checkout_path(checkout: Path) -> Path:
-    common = read_git_output(
-        checkout, "rev-parse", "--path-format=absolute", "--git-common-dir"
-    )
-    return Path(common).resolve().parent
-
-
-def read_git_output(directory: Path, *arguments: str) -> str:
-    command = ["git", "-C", str(directory), *arguments]
-    result = subprocess.run(command, capture_output=True, text=True, check=True)
-    return result.stdout.strip()
-
-
 @click.group()
 @click.option(
     "--store",
@@ -188,6 +171,23 @@ def claim_line(claim: Claim) -> str:
 def exit_with(exit_code: int, message: str):
     click.echo(message)
     raise click.exceptions.Exit(exit_code)
+
+
+def shared_store_path(checkout: Path) -> Path:
+    return main_checkout_path(checkout) / STORE_FOLDER
+
+
+def main_checkout_path(checkout: Path) -> Path:
+    common = read_git_output(
+        checkout, "rev-parse", "--path-format=absolute", "--git-common-dir"
+    )
+    return Path(common).resolve().parent
+
+
+def read_git_output(directory: Path, *arguments: str) -> str:
+    command = ["git", "-C", str(directory), *arguments]
+    result = subprocess.run(command, capture_output=True, text=True, check=True)
+    return result.stdout.strip()
 
 
 if __name__ == "__main__":
