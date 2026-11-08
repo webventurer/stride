@@ -59,6 +59,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] Every multi-step stride interaction discloses its scope upfront — number of steps, time estimate, escape hatch — so the user is never trapped in an open-ended sequence
 - [ ] When you list the commits this branch is adding, the story reads naturally to a non-engineer scanning top-to-bottom (`git log main..HEAD --oneline` to check)
 - [ ] Every Linear card can be understood by someone who does not know stride's commands or code — its title names a stakeholder outcome, while its description and updates use concrete, everyday words
+- [ ] A card on the board describes the code as it is — its account of the problem and its proposed fix are read against the code, and against any recording or results it cites, before the card is drafted, so nobody picks up a plan the code rules out
 - [ ] The card moves through Backlog → Doing → In Review → Done as `/linear:*` runs — no manual clicks on the board
 - [ ] Stories with a shared purpose sit under one epic, and the epic traces back to a Vision outcome
 - [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
