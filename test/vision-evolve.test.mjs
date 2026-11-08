@@ -25,6 +25,13 @@ describe("vision-evolve skill", () => {
     ok(skill.includes("say the Linear copy was skipped"));
   });
 
+  it("is where finish, quick and plan-work send work that fits no criterion", () => {
+    for (const name of ["finish", "quick", "plan-work"]) {
+      const command = read(`.claude/commands/linear/${name}.md`);
+      ok(command.includes("/vision-evolve"), name);
+    }
+  });
+
   it("is counted in the Codex install page", () => {
     const page = read("docs/install-codex.md");
     const words = [

@@ -212,45 +212,21 @@ Use this path when the stated trace is strained and a re-read finds no other
 criterion that plainly fits. Surface the commits, the closest criterion, and a
 plain-English explanation of why the fit is thin.
 
-Interactive mode stops before merge and asks:
-
-```
-No Success criterion plainly fits this work.
-Update an existing Success criterion or add a new Success criterion? (update / add)
-```
-
-Either answer pauses the interactive flow. Ask one follow-up — *"In one line, what
-shifted?"* — and post the user's answer as a Linear comment on the issue via
-`uv run .claude/tools/linear_cli.py comment create <issue-id> --body "..."`.
-Then tell the user:
-
-> *"Run `/vision` to update or add the criterion in `VISION.md`, then run
-> `/commit` to add it as a separate atomic commit on this branch and re-run
-> `/linear:finish`."*
-
-Exit cleanly. Do not merge, and never draft or edit the criterion from the
-current issue. Re-running `/linear:finish` re-runs validation (step 4) and the
-trace check against the user-authored Vision change.
-
-In unattended mode, add a new Success criterion to `VISION.md`. Use the closest
-criterion as context, but write the durable outcome the work reveals rather
-than restating the current issue. Post a one-line comment naming the gap, run
-`/commit` so the Vision change is a separate atomic commit on this branch,
-re-run the trace, and continue without asking once the new criterion plainly
-fits.
+Then tend the Vision with [`/vision-evolve`](../../skills/vision-evolve/SKILL.md),
+in interactive and unattended mode alike. It changes `VISION.md` itself and
+needs no sign-off. Post a one-line comment on the issue naming the gap, then
+continue once the trace plainly fits the changed Vision.
 
 #### When in doubt, ask
 
 If the agent is genuinely uncertain whether any criterion plainly fits, fall
-back to **No exact fit** rather than auto-confirming. In interactive mode this
-asks; in unattended mode it evolves the Vision before continuing. <mark>**A
-false silent confirmation is worse than a Vision update:** the silent match
-path's whole value is *trustworthy* verification.</mark>
+back to **No exact fit** rather than auto-confirming. <mark>**A false silent
+confirmation is worse than a Vision update:** the silent match path's whole
+value is *trustworthy* verification.</mark>
 
 This step turns the "Why this matters" line from a write-once token into a
 verified reference. A missing criterion rides alongside its originating feature
-instead of needing a separate PR. Interactive mode leaves the wording to the
-user; unattended mode treats its machine-local setting as authority to write it.
+instead of needing a separate PR.
 
 ### 8. Check the change against its card
 
@@ -465,8 +441,7 @@ Read the output focus and apply this command's format from [reference/output-foc
 - Card check finds an unclear promise or nothing checkable → stop, do not merge
 - Fixup commits present + user picks "abort" → exit cleanly, do not merge (autosquash + force-push manually, then re-run)
 - Fixup rebase conflicts → abort rebase, surface conflict, do not merge
-- Vision has no exact fit in interactive mode → exit cleanly, do not merge (re-run after committing the user-authored Vision update)
-- Vision has no exact fit in unattended mode → warn, add and commit the closest durable Success criterion, re-check, then continue
+- Vision has no exact fit → tend the Vision with [`/vision-evolve`](../../skills/vision-evolve/SKILL.md), re-check, then continue
 - A lesson would change a Todo card's purpose → post the question on that card; interactive mode asks the user there and then, unattended mode finishes the remaining steps and reports the question; a card started by name stops there before the next card starts, and a run through Todo leaves only that card out of its later batches
 - Branch not fully merged → stop, warn (never force-delete)
 - Local branch already deleted → skip silently
