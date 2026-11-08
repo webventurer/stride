@@ -174,6 +174,20 @@ describe("a /parallel-sessions job running a stride card", () => {
     );
   });
 
+  it("has the launcher resume a connection-error exit and the coordinator only the rest", () => {
+    ok(
+      inOrder(skill, [
+        "**The launcher resumes a session that a lost connection cut off.**",
+        "resumed whether or not it had reported ready",
+        "holding no slot",
+        "starts only once the launcher holds a slot for it",
+        "set to `failed` in its row of `progress.md`",
+        "A session cut off by a connection error is the launcher's to resume, so leave its row alone",
+        "for a reason other than a connection error the launcher resumes, resume it in its worktree",
+      ]),
+    );
+  });
+
   it("frees an exited job's slot and keeps its worktree until the exit notice", () => {
     ok(
       inOrder(skill, [

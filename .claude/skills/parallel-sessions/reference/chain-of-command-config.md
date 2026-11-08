@@ -13,7 +13,7 @@
 
 ## The soldier runs at high effort with the advisor off
 
-A soldier started as a background `claude -p` session takes its settings and its billing on its launch line. `scripts/launch_jobs.py` builds this line for each job's first start; a resume builds it by hand:
+A soldier started as a background `claude -p` session takes its settings and its billing on its launch line. `scripts/launch_jobs.py` builds this line for each job's first start and for each resume after a lost connection; a resume the coordinator makes builds it by hand:
 
 ```bash
 cd <checkout> && env -u ANTHROPIC_API_KEY CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 \
