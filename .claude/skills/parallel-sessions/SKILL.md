@@ -29,7 +29,7 @@ description: Run a batch of independent jobs (captures, transcripts, reviews, au
 
 ## Quick reference
 
-<mark>**Settle the batch and wait for "go", start every session in one turn, and let the slot store hold the limit.**</mark> A session that can't claim a slot waits and retries; the coordinator releases the slot of a session that exits, and a claim that is never renewed lapses as the backstop, so the batch never jams.
+<mark>**Settle the batch and wait for "go", start the sessions in one turn, and let the slot store hold the limit.**</mark> A side session that can't claim a slot waits and retries; a `claude -p` session is started by the launcher only once it holds one. The coordinator or the launcher releases the slot of a session that exits, and a claim that is never renewed lapses as the backstop, so the batch never jams.
 
 | Piece | What it does |
 |:------|:-------------|
@@ -108,7 +108,7 @@ As you start each session, note its name from `ListAgents`, which is how you mes
 
 #### Without a side-session tool
 
-When this session can't start side sessions, start each job as a background `claude -p` session instead. It claims a slot, runs its brief and messages you like a side session, and it ends when this session ends, so keep this session open until the batch is done.
+When this session can't start side sessions, start each job as a background `claude -p` session instead. [`scripts/launch_jobs.py`](scripts/launch_jobs.py) starts them: it claims each job's slot first and starts that job's session only once it holds one, so a session never waits for a slot. The session finds its claim held, runs its brief and messages you like a side session, and it ends when this session ends, so keep this session open until the batch is done.
 
 1. **Make each job's checkout.** In worktree mode, find the main checkout from git, as the parent of `$(git rev-parse --git-common-dir)`, the way the slot store does, so a coordinator running inside a worktree doesn't nest new ones in its own. Make sure the main checkout ignores `.claude/worktrees/`, adding `/.claude/worktrees` to the shared exclude file (`$(git rev-parse --git-common-dir)/info/exclude`) when it doesn't, then add one worktree per job from `origin/main` at `.claude/worktrees/<holder name>` in the main checkout, beside the app's own session worktrees. In shared checkout mode, every session runs in the main checkout; skip to step 4.
 2. **Link in what git doesn't carry.** A new worktree has no git-ignored files, so the commands, tools and settings the job's skills read are missing. Run stride's linking script for each worktree, with both paths absolute:
@@ -125,18 +125,18 @@ When this session can't start side sessions, start each job as a background `cla
 
    If it exits non-zero, report it and don't start that job: without the settings, the job's first Linear call fails.
 3. **Check git sees nothing new.** `git status --porcelain` prints nothing in each worktree, and nothing new in the main checkout.
-4. **Start every session in one turn,** each in the background in its job's checkout, on its model and effort with the advisor off and billed to the user's plan, as [the chain of command config](reference/chain-of-command-config.md) sets out, with its log in `work/runs/<batch>/logs/`:
+4. **Start the launcher in the turn the "go" begins,** in the background. Write `work/runs/<batch>/jobs.json` first: a list with one entry per job, in the order they should start, giving the job's `holder` name, `checkout`, `brief`, `model`, `effort`, `log` and `errors` as absolute paths or names. Then run, from the main checkout:
 
    ```bash
-   cd <checkout> && env -u ANTHROPIC_API_KEY CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 \
-     claude -p "$(cat <brief>)" \
-     --model <model> --effort <effort> \
-     --dangerously-skip-permissions --output-format stream-json \
-     --verbose > <main checkout>/work/runs/<batch>/logs/<holder name>.jsonl \
-     2> <main checkout>/work/runs/<batch>/logs/<holder name>.err
+   uv run --no-project --with diskcache --with click \
+     python .claude/skills/parallel-sessions/scripts/launch_jobs.py \
+     --limit <N> work/runs/<batch>/jobs.json \
+     > work/runs/<batch>/launcher.log 2>&1
    ```
 
-   Every line of the log is JSON carrying the session's ID as `session_id`, which is what resumes it; errors go to the separate `.err` file so they don't break the JSON. Each session shows up in `ListAgents` under a name taken from its checkout's folder: note it and ask for its idle notice, as for a side session.
+   Give it the batch's `--store` and `--expiry` when the batch sets them. The launcher starts each job's session in its checkout on its model and effort, with the advisor off and billed to the user's plan, as [the chain of command config](reference/chain-of-command-config.md) sets out, with its log in `work/runs/<batch>/logs/`. When none is free it waits and checks again every 15 seconds, so a job starts within a minute of any slot freeing. It frees a job's slot when that job's session exits, whatever its exit code. A launcher that is stopped leaves the claims it holds to lapse at their expiry.
+
+   Every line of a session's log is JSON carrying the session's ID as `session_id`, which is what resumes it; errors go to the separate `.err` file so they don't break the JSON. Each session shows up in `ListAgents` under a name taken from its checkout's folder, once the launcher has started it: note it and ask for its idle notice, as for a side session.
 5. **Give the user the progress file's full path,** since these sessions don't appear in the app's sidebar; the logs are beside it in `work/runs/<batch>/logs/`.
 
 ### 5. Watch and check
@@ -148,7 +148,7 @@ uv run --no-project --with diskcache --with click \
   python .claude/skills/parallel-sessions/scripts/slots.py --limit 3 status
 ```
 
-When a job's session exits holding a slot, release its slot at once with `slots.py release <holder>`, before anything else, so the next waiting job can claim it. An idle notice releases nothing: a job that is only idle is still waiting for its go and keeps its slot. Whether or not it still held a slot, when a job's session exits before its card has merged, set the job's row in `work/runs/<batch>/progress.md` to "exited, waiting to be resumed"; a job already marked merged, failed or canceled keeps that state.
+The launcher frees the slot of each `claude -p` session it started when that session exits. When a side session, or a `claude -p` session you resumed, exits holding a slot, release its slot at once with `slots.py release <holder>`, before anything else, so the next waiting job can claim it. An idle notice releases nothing: a job that is only idle is still waiting for its go and keeps its slot. Whether or not it still held a slot, when a job's session exits before its card has merged, set the job's row in `work/runs/<batch>/progress.md` to "exited, waiting to be resumed"; a job already marked merged, failed or canceled keeps that state.
 
 Each session messages you when its work is ready, when it hits an error it can't fix, and when it has a question about its job's purpose or scope. As each job's work is ready:
 
@@ -199,7 +199,7 @@ A claim is a single atomic add in the store, so when several sessions claim at t
 
 ## Tests
 
-The tests for `slots.py`, `measure_run.py` and `stage_times.py` live in stride's own repository, beside the skill's source, and run with `pnpm test:py` there. An install leaves them out.
+The tests for `slots.py`, `launch_jobs.py`, `measure_run.py` and `stage_times.py` live in stride's own repository, beside the skill's source, and run with `pnpm test:py` there. An install leaves them out.
 
 ---
 
