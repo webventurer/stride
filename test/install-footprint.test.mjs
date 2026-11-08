@@ -115,6 +115,7 @@ describe("install footprint", () => {
       "reference/model-costs.md",
       "reference/testing-the-chain-of-command.md",
       "scripts/slots.py",
+      "scripts/launch_jobs.py",
       "scripts/measure_run.py",
     ]) {
       strictEqual(existsSync(join(skill, file)), true, file);

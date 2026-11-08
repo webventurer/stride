@@ -161,10 +161,24 @@ describe("a /parallel-sessions job running a stride card", () => {
     ok(skill.includes("once the user has approved its pull request"));
   });
 
+  it("starts each claude -p session only once the launcher holds its slot", () => {
+    ok(
+      inOrder(skill, [
+        "#### Without a side-session tool",
+        "scripts/launch_jobs.py",
+        "claims each job's slot first and starts that job's session only once it holds one",
+        "work/runs/<batch>/jobs.json",
+        "starts within a minute of any slot freeing",
+        "frees a job's slot when that job's session exits, whatever its exit code",
+      ]),
+    );
+  });
+
   it("frees an exited job's slot and keeps its worktree until the exit notice", () => {
     ok(
       inOrder(skill, [
-        "When a job's session exits holding a slot, release its slot at once",
+        "The launcher frees the slot of each `claude -p` session it started when that session exits",
+        "release its slot at once",
         "An idle notice releases nothing",
         "exited, waiting to be resumed",
         "a job already marked merged, failed or canceled keeps that state",
