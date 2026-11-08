@@ -32,6 +32,13 @@ describe("vision-evolve skill", () => {
     }
   });
 
+  it("is where /vision sends the changing of an existing Vision", () => {
+    const vision = read(".claude/skills/vision/SKILL.md");
+
+    ok(vision.includes("/vision-evolve"));
+    ok(!vision.includes("Edit — switch to direct editing"));
+  });
+
   it("is counted in the Codex install page", () => {
     const page = read("docs/install-codex.md");
     const words = [

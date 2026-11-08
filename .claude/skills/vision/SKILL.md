@@ -5,7 +5,7 @@ description: Walk through writing a project Vision interactively. Two modes — 
 
 # /vision — author a project Vision
 
-A Vision is the canonical "what is this project for" document. Written once, evolved sparingly.
+A Vision is the canonical "what is this project for" document. Written once, evolved sparingly. This skill writes it for the first time; [`/vision-evolve`](../vision-evolve/SKILL.md) changes one that already exists.
 
 A good Vision is **load-bearing**: it anchors decisions, names the constraints, and refuses to drift into adjective soup. Iterations sharpen it; they don't bloat it. Future-you, a future agent, or a new contributor should be able to read it in 2–3 minutes and know what the project is, who it's for, and what it won't do.
 
@@ -23,7 +23,7 @@ Pick **short mode** when the work is a small dashboard, a side-tool, or anything
 
 ## When NOT to use
 
-- The project already has a good `VISION.md` and the user just wants edits — go direct
+- The project already has a good `VISION.md` and the user just wants to change it — use `/vision-evolve`
 - The user wants per-story scope — that's a Linear issue, not a Vision
 - The user wants an implementation plan — that's `/linear:plan-work`, not this
 
@@ -56,7 +56,7 @@ If `VISION.md` already exists at the repo root, read it and show the user. Ask:
 > "A `VISION.md` already exists. Replace it, edit it, or stop?"
 
 - **Replace** — proceed with the interview, overwrite when done.
-- **Edit** — switch to direct editing, skip the interview.
+- **Edit** — point the user at `/vision-evolve`, which tends an existing Vision, and stop.
 - **Stop** — exit cleanly.
 
 ### 2. Choose mode — short or full
@@ -108,7 +108,7 @@ Open with the upfront disclosure — count, time estimate, skip affordance:
 
 - Don't push back, don't re-prompt — move directly to the next question.
 - Track the question number as skipped (for surfacing at the approval gate in step 5).
-- In step 4's assembled draft, render that section's content as `_TBD — answer later via /vision_` instead of the missing answer.
+- In step 4's assembled draft, render that section's content as `_TBD — answer later via /vision-evolve_` instead of the missing answer.
 
 #### Q1 — What it delivers
 
@@ -224,7 +224,7 @@ For full-mode drafts where the user skipped one or more questions, surface the s
 
 > "You skipped: Q3 (Why it exists), Q6 (What can't change). Continue and write `VISION.md` with `_TBD_` placeholders, or fill them in now?"
 
-If the user picks *fill in now*, ask the skipped questions in order; otherwise continue to step 6 with the placeholders intact. Re-running `/vision` later in edit mode lets the user fill them in any time.
+If the user picks *fill in now*, ask the skipped questions in order; otherwise continue to step 6 with the placeholders intact. Running `/vision-evolve` later lets the user fill them in any time.
 
 ### 6. Write the file
 
@@ -263,7 +263,7 @@ Close with two reminders:
 >
 > **The Vision is the only artefact downstream tooling carries forward.** Anything you didn't write here, future planners and agents have to invent. Be explicit about what matters.
 
-If the project graduates from a small side-tool to something more substantial later, re-run `/vision` and pick **full** to deepen the Vision. The existing Replace/Edit/Stop prompt handles the upgrade.
+If the project graduates from a small side-tool to something more substantial later, re-run `/vision` and pick **full** to deepen the Vision. The existing Replace prompt handles the upgrade.
 
 ---
 
