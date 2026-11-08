@@ -104,11 +104,11 @@ For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved c
 
 ### /linear:plan-work
 
-**Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, optionally refines the description with CRAFT, drafts title and description, and waits for your approval before creating.
+**Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, optionally refines the description with CRAFT, reads the code the card would touch to confirm the problem and the fix hold up, drafts title and description, and waits for your approval before creating.
 
 Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). Every draft's "Why this matters" section explicitly traces back to a Vision outcome, and the agent pushes back if the user's request can't be tied to one. When a broad description splits into multiple follow-ups, the follow-ups are ordered by Vision alignment — the one advancing the least-progressed Success criterion sits first.
 
-In `--research` mode, explores the codebase and Linear first, then adds code examples (showing how similar patterns are already implemented) and acceptance criteria (observable outcomes, not implementation steps).
+In `--research` mode, also explores Linear and the project's documents, then adds code examples (showing how similar patterns are already implemented) and acceptance criteria (observable outcomes, not implementation steps).
 
 The `--worktree` flag is the place to opt into an isolated workspace — after the issue is created, the command sets up a git worktree at `.claude/worktrees/<issue-id-lowercase>` inside the repo, and hands off to a new Claude Code session. `/linear:start` runs inline by default; if you want a worktree, decide at planning time, not start time.
 

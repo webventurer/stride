@@ -12,12 +12,12 @@ past duplicate, scope, project, or Vision ambiguity.
 
 ## Modes
 
-- **Quick mode** (default): `/plan-work "description"` — draft, review, create
-- **Research mode**: `/plan-work --research "description"` — explore codebase and Linear first, then draft with richer context
+- **Quick mode** (default): `/plan-work "description"` — check the code, draft, review, create
+- **Research mode**: `/plan-work --research "description"` — also explore Linear and the project's documents, then draft with richer context
 
 ## Flags
 
-- `--research` — explore codebase and Linear before drafting (adds implementation notes, code examples, related code and issues)
+- `--research` — go beyond the code check every run makes, exploring Linear and the project's documents before drafting (adds implementation notes, code examples, related code and issues)
 - `--craft` — auto-run CRAFT prompt refinement without asking (skips the interactive prompt in step 4)
 - `--epic` — skip size-sensing and go straight to the epic-sized parent-issue flow (see step 5). Pass this when you already know the description is a named initiative with multiple stories.
 - `--bug` — skip shape-sensing and draft straight to the bug template (see step 6). Pass this when you already know the description is a bug report (symptoms + repro + gap), not a feature request.
@@ -46,7 +46,7 @@ past duplicate, scope, project, or Vision ambiguity.
 - Titles use plain language — no bare jargon or stride-internal vocabulary. The [`/clear-speak` skill](../../skills/clear-speak/SKILL.md) is stride's canonical standard for what counts as jargon and how to replace it.
 - Labels are optional — suggest at most 3, only when clearly relevant. Prefer no labels over speculative ones.
 - Priority defaults to Medium. Only upgrade if the user says it's urgent or the description implies user-facing impact (breakage, a time-sensitive launch, etc.).
-- Research mode exists to improve the draft, not to produce an audit. Cap file exploration at 2–5 relevant files; summarise patterns, don't catalogue the repo.
+- The code check and research mode exist to improve the draft, not to produce an audit. Cap file exploration at 2–5 relevant files per card; summarise patterns, don't catalogue the repo.
 
 ### Process
 
@@ -224,13 +224,24 @@ If no signals fire, skip silently and continue to step 7 — feature-shaped is t
 
 **Shape and size are independent.** A feature can be story- or epic-sized, and so can a bug. When both the epic-sized path (step 5) and bug-shaped marker are active, the parent issue uses epic.md and sub-issues use bug.md. No `epic-bug` template exists — bug at epic scale is rare enough that the two-template composition handles it.
 
-### 7. Research (only with `--research`)
+### 7. Check the code (all modes)
 
-- Search the codebase for 2–5 relevant files using Grep/Glob — summarise patterns or constraints, avoid exhaustive repository analysis
+<mark>**A card's account of the problem and its proposed fix are guesses until they are read against the code.**</mark> Find the 2–5 files the card would touch using Grep/Glob, and read them. In cross-project mode, read them in the target project's repo when it is on this machine. On the epic-sized path, check each story rather than the parent.
+
+Before drafting, confirm:
+
+- **The account is true:** what the card will say about how things stand today matches the code
+- **The fix can work:** what the card will promise is possible given how the code behaves, and the code doesn't already have something that does the job
+- **The evidence says what the card says:** when the description cites a specific run, recording or results file, open that data too
+
+When the check contradicts the description, correct the draft and tell the user what changed. When the requested fix can't work, interactive mode asks how to proceed, and unattended mode stops and names the file that rules it out. When the code can't be reached, or the check leaves a point open, say so under *Assumptions to confirm*.
+
+**With `--research`**, also:
+
 - Check Linear for similar issues via `uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "<keywords>"` (broader search than step 3)
 - Read relevant project documentation if necessary (see [reference/project-docs.md](reference/project-docs.md) for standard paths)
 - Fetch available labels via `uv run .claude/tools/linear_cli.py label list` (workspace-scoped)
-- Summarise findings for use in the draft
+- Summarise patterns, constraints and findings for use in the draft
 
 ### 8. Test consideration
 
@@ -277,7 +288,7 @@ Don't draft past the user's answer. The Vision is the project's stated purpose; 
 
 > *"Cross-project draft — Vision anchoring deferred. Re-anchor via `/linear:start` from within the target project's repo when the work is picked up."*
 
-Everything else in the draft (sizing, *Where things stand*, *What we'll do*, *What we won't do*, *Expected outcome*, *How to test it*, *Assumptions to confirm*) is filled as normal from the user's description, optionally CRAFT-sharpened.
+Everything else in the draft (sizing, *Where things stand*, *What we'll do*, *What we won't do*, *Expected outcome*, *How to test it*, *Assumptions to confirm*) is filled as normal from the user's description, optionally CRAFT-sharpened, and from step 7's check of the code.
 
 Apply the priority, labels, and scope guidance from the decision rules above.
 

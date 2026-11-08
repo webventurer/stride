@@ -97,9 +97,9 @@ For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved c
 
 ### `/linear:plan-work`
 
-**Plan work and create a Linear issue.** Checks for duplicates, optionally refines the description with CRAFT, drafts title and description, and waits for your approval before creating.
+**Plan work and create a Linear issue.** Checks for duplicates, optionally refines the description with CRAFT, reads the code the card would touch to confirm the problem and the fix hold up, drafts title and description, and waits for your approval before creating.
 
-In `--research` mode, explores the codebase and Linear first, then adds code examples (showing how similar patterns are already implemented) and acceptance criteria (observable outcomes, not implementation steps).
+In `--research` mode, also explores Linear and the project's documents, then adds code examples (showing how similar patterns are already implemented) and acceptance criteria (observable outcomes, not implementation steps).
 
 Also assesses whether tests make sense for the change. If they do, the issue notes that tests should be written first — not strict TDD, but having them in place catches regressions later.
 
