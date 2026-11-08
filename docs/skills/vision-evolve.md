@@ -4,9 +4,15 @@ A Vision only stays a true guide if it is tended as the work grows. [`/vision`](
 
 The agent runs it when work fits no Success criterion, in `/linear:finish`, `/linear:quick` and `/linear:plan-work`. You can also run it yourself whenever a line no longer says what the project delivers.
 
-## The principles
+## The principle
 
-It is written as principles, not steps. The agent applies them with judgement and keeps each change small.
+**The Vision is a true account of what the project is for, kept true as the work grows.**
+
+Anyone reading `VISION.md` should be able to trust two things: every line names something the project really delivers, and every piece of work traces honestly to one of them. Everything below serves that one aim, and the agent keeps each change small.
+
+## How it plays out
+
+These guidelines are what the principle usually asks for. When a case fits none of them, the agent goes back to the principle.
 
 - **A line says something true and useful about what the project delivers.** A Success criterion names an outcome someone could see, in words a reader who has never seen the code understands.
 - **Work that fits no line means the Vision has grown.** Grow it honestly. Squeezing the work into a line that doesn't cover it leaves a trace that says the work was verified when it wasn't.
