@@ -243,6 +243,15 @@ When the check contradicts the description, correct the draft and tell the user 
 - Fetch available labels via `uv run .claude/tools/linear_cli.py label list` (workspace-scoped)
 - Summarise patterns, constraints and findings for use in the draft
 
+#### Will it move the needle?
+
+Every card is a claim on the attention of the person running stride, so a card is drafted only when there is evidence it will matter. Read [moves the needle](reference/moves-the-needle.md), then answer three questions from what the code check and any recording or results file showed: how often has this happened, what does it cost, and what happens if nothing is done? The check also runs in cross-project mode, and on the epic-sized path it runs for each story.
+
+- **When the case is made:** continue to step 8. The answers go in the draft's "Why this matters" (step 9).
+- **When the case is thin:** say so, with the reason, and recommend not filing. In interactive mode the person can overrule the recommendation, and the draft then records that they did. In unattended mode, file nothing and report the reason.
+- **An explicit request is the case:** when the person's own words ask for this specific piece of work, that counts as the case, and the draft records that they asked. A follow-up an agent found while doing other work is not an explicit request, even when the person told the agent to file follow-ups.
+- **Several follow-ups in one run:** judge each one. File the ones that make the case and end the output with one line that names each one left out, with its reason. Follow-ups filed by separate runs are each judged by their own run.
+
 ### 8. Test consideration
 
 Assess whether tests make sense for this change. Not every issue needs them — pure documentation, config changes, or exploratory spikes typically don't.
@@ -287,6 +296,8 @@ Don't draft past the user's answer. The Vision is the project's stated purpose; 
 **Cross-project mode** (`--project` flag was passed): the current repo's Vision doesn't apply. Replace the *"Why this matters → Vision criterion"* requirement with a single line:
 
 > *"Cross-project draft — Vision anchoring deferred. Re-anchor via `/linear:start` from within the target project's repo when the work is picked up."*
+
+**State the case for filing** in "Why this matters", in both modes, in plain words: how often it happened, what it costs, and what happens if nothing is done, from the check in step 7. In cross-project mode they sit beside the cross-project line.
 
 Everything else in the draft (sizing, *Where things stand*, *What we'll do*, *What we won't do*, *Expected outcome*, *How to test it*, *Assumptions to confirm*) is filled as normal from the user's description, optionally CRAFT-sharpened, and from step 7's check of the code.
 
