@@ -249,6 +249,16 @@ class ResumeTest(unittest.TestCase):
             (failures, len(self.resumes()), resume["session"]),
         )
 
+    def test_a_resume_frees_its_slot_when_it_exits(self):
+        self.launch(("cut", "ok"))
+
+        self.assertEqual([], self.pool.held_claims())
+
+    def test_a_job_cut_off_after_reporting_ready_is_resumed(self):
+        failures = self.launch(("cut-after-ready", "ok"))
+
+        self.assertEqual((0, 1), (failures, len(self.resumes())))
+
     def test_the_resume_message_tells_it_to_check_what_it_committed(self):
         self.launch(("cut", "ok"))
 
@@ -579,7 +589,10 @@ def write_stand_in(folder: Path, events: Path) -> Path:
         "f'session-{holder}', 'cwd': str(Path.cwd())}), flush=True)\n"
         "time.sleep(seconds)\n"
         "record('end')\n"
-        "if outcome == 'cut':\n"
+        "if outcome == 'cut-after-ready':\n"
+        "    print(json.dumps({'type': 'assistant', 'tool': 'SendMessage', "
+        "'message': 'work is ready'}), flush=True)\n"
+        "if outcome in ('cut', 'cut-after-ready'):\n"
         "    print(json.dumps({'type': 'result', 'is_error': True, "
         "'result': \"Can't reach the API server\"}))\n"
         "    sys.exit(1)\n"
