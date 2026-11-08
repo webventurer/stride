@@ -65,6 +65,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
 - [ ] stride's tests exercise the real code under test, never a reimplemented copy — so a regression in the real code fails the suite instead of passing green against a stale duplicate
 - [ ] stride's own Python tooling stays consistently formatted and lint-clean — tidied on demand with a single command, never enforced on the commit path, so housekeeping stays cheap and off the critical path
+- [ ] stride's own Python reads top-down — each helper sits below the code that calls it, so an agent learning from stride's code picks up one order, never two
 - [ ] After `/linear:update-vision` runs, the Linear project description matches `VISION.md`
 - [ ] `npx github:webventurer/stride` installs in under 30 seconds, no global side effects
 - [ ] Setup gets a fresh user from `npx` to their first successful `/linear:start` in under 90 seconds on any supported OS. Authentication uses a Personal API Key in `~/.env`, feeding a single code path through every command. No external CLI dependencies that require building from source.
