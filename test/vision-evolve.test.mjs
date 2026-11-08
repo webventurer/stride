@@ -37,6 +37,8 @@ describe("vision-evolve skill", () => {
 
     ok(vision.includes("/vision-evolve"));
     ok(!vision.includes("Edit — switch to direct editing"));
+    const editChoice = vision.split("\n").find((line) => line.startsWith("- **Edit**"));
+    ok(editChoice?.includes("/vision-evolve"));
   });
 
   it("is counted in the Codex install page", () => {
