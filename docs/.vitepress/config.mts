@@ -10,6 +10,7 @@ export default defineConfig({
       { text: 'Guide', link: '/getting-started' },
       { text: 'Skills', items: [
         { text: '/vision', link: '/skills/vision' },
+        { text: '/vision-evolve', link: '/skills/vision-evolve' },
         { text: '/commit', link: '/skills/commit' },
         { text: '/linear', link: '/skills/linear' },
         { text: '/craft', link: '/skills/craft' },
@@ -34,6 +35,7 @@ export default defineConfig({
         text: 'Skills',
         items: [
           { text: '/vision — Project vision', link: '/skills/vision' },
+          { text: '/vision-evolve — Tend the Vision', link: '/skills/vision-evolve' },
           { text: '/commit — Atomic commits', link: '/skills/commit' },
           { text: '/linear — Linear workflow', link: '/skills/linear' },
           { text: '/craft — Prompt generation', link: '/skills/craft' },

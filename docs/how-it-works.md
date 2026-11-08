@@ -12,6 +12,8 @@ your-project/
     ├── skills/
     │   ├── vision/          # /vision skill
     │   │   └── SKILL.md     # Seven-question walkthrough → VISION.md
+    │   ├── vision-evolve/   # /vision-evolve skill
+    │   │   └── SKILL.md     # Principles for tending an existing Vision
     │   ├── commit/          # /commit skill
     │   │   ├── SKILL.md     # Principles, coherence test, atomicity rules
     │   │   └── WORKFLOW.md  # Multi-pass execution sequence

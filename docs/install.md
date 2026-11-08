@@ -120,6 +120,7 @@ This removes all copied directories, the example file, and strips the stride hoo
 ```text
 .claude/
 ├── skills/vision/       # project Vision authoring skill
+├── skills/vision-evolve/  # existing Vision upkeep skill
 ├── skills/commit/       # skill + workflow + reference docs
 ├── skills/craft/        # CRAFT prompt skill
 ├── skills/clear-speak/  # plain-language rewrite skill

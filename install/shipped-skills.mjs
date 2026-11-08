@@ -5,6 +5,11 @@ export const SHIPPED_SKILLS = [
     usage: "author the project Vision (run this first)",
   },
   {
+    name: "vision-evolve",
+    blurb: "existing Vision upkeep skill",
+    usage: "tend an existing Vision as the work grows",
+  },
+  {
     name: "commit",
     blurb: "multi-pass atomic commit skill",
     usage: "multi-pass atomic git commits",

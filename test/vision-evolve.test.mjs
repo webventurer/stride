@@ -1,0 +1,50 @@
+import { ok } from "node:assert";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { describe, it } from "node:test";
+import { fileURLToPath } from "node:url";
+import { SHIPPED_SKILLS } from "../install/shipped-skills.mjs";
+
+const strideRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+describe("vision-evolve skill", () => {
+  it("names its five principles", () => {
+    const skill = read(".claude/skills/vision-evolve/SKILL.md");
+
+    ok(skill.includes("says something true and useful"));
+    ok(skill.includes("has grown"));
+    ok(skill.includes("become one stronger line"));
+    ok(skill.includes("lasting outcome"));
+    ok(skill.includes("needs no sign-off"));
+  });
+
+  it("copies the changed Vision to the Linear project page", () => {
+    const skill = read(".claude/skills/vision-evolve/SKILL.md");
+
+    ok(skill.includes("/linear:update-vision"));
+    ok(skill.includes("say the Linear copy was skipped"));
+  });
+
+  it("is counted in the Codex install page", () => {
+    const page = read("docs/install-codex.md");
+    const words = [
+      "zero",
+      "one",
+      "two",
+      "three",
+      "four",
+      "five",
+      "six",
+      "seven",
+      "eight",
+      "nine",
+      "ten",
+    ];
+
+    ok(page.includes(`the ${words[SHIPPED_SKILLS.length]} shipped skills`));
+  });
+});
+
+function read(path) {
+  return readFileSync(join(strideRoot, path), "utf8");
+}
