@@ -318,6 +318,33 @@ describe("the coordinator's steps for a batch of stride cards", () => {
       ok(!/worktree remove[^`\n]*--force/.test(text));
     }
   });
+
+  it("has a job make its scratch copy of the repo under .claude/worktrees, named for the job, and remove it itself", () => {
+    ok(
+      inOrder(brief, [
+        "**Scratch copies.**",
+        "git worktree add --detach",
+        ".claude/worktrees/<holder name>-<what it holds>",
+        "stop anything you ran in it",
+        "put back any tracked file you changed",
+        "`git worktree remove <path>`",
+        "before you report your work ready",
+        "if git refuses",
+      ]),
+    );
+  });
+
+  it("has the coordinator remove any scratch copy a job left, in either mode, without force", () => {
+    ok(
+      inOrder(step5, [
+        "scratch copy",
+        "starts with the job's holder name",
+        "`git worktree remove <path>`",
+        "in either mode",
+      ]),
+    );
+    ok(step5.includes("the merge-check scratch worktree follows the same rules"));
+  });
 });
 
 describe("an unattended run through Todo", () => {
