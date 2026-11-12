@@ -12,7 +12,7 @@ past duplicate, scope, project, or Vision ambiguity.
 
 ## Modes
 
-- **Quick mode** (default): `/plan-work "description"` — check the code, draft, review, create
+- **Quick mode** (default): `/plan-work "description"` — check the code, draft, create
 - **Research mode**: `/plan-work --research "description"` — also explore Linear and the project's documents, then draft with richer context
 
 ## Flags
@@ -51,7 +51,7 @@ past duplicate, scope, project, or Vision ambiguity.
 ### Process
 
 - Duplicate handling is two-tier: exact/near-exact → interactive mode warns and asks; unattended mode stops. Similar/related → mention briefly and continue.
-- Interactive mode always gets final approval before creation. Unattended mode creates after every hard check passes.
+- A story or bug card is created as soon as every check passes, without showing the draft. When something only the user can decide is open, interactive mode shows the draft and asks for approval before creating, and unattended mode stops at its hard stops. The epic-sized path keeps its draft and approval.
 - Never assign the issue unless the user explicitly asks.
 
 ## Steps
@@ -234,7 +234,7 @@ Before drafting, confirm:
 - **The fix can work:** what the card will promise is possible given how the code behaves, and the code doesn't already have something that does the job
 - **The evidence says what the card says:** when the description cites a specific run, recording or results file, open that data too
 
-When the check contradicts the description, correct the draft and tell the user what changed. When the requested fix can't work, interactive mode asks how to proceed, and unattended mode stops and names the file that rules it out. When the code can't be reached, or the check leaves a point open, say so under *Assumptions to confirm*.
+When the check contradicts the description, correct the draft and tell the user what changed. When the requested fix can't work, interactive mode asks how to proceed, and unattended mode stops and names the file that rules it out. When the code can't be reached, or the check leaves a point open, say so under *Assumptions to confirm* (under *Suspected causes* for a bug); step 11 treats that point as open.
 
 **With `--research`**, also:
 
@@ -250,7 +250,7 @@ Every card is a claim on the attention of the person running stride, so a card i
 - **When the case is made:** continue to step 8. The answers go in the draft's "Why this matters" (step 9).
 - **When the case is thin:** say so, with the reason, and recommend not filing. In interactive mode the person can overrule the recommendation, and the draft then records that they did. In unattended mode, file nothing and report the reason.
 - **An explicit request is the case:** when the person's own words ask for this specific piece of work, that counts as the case, and the draft records that they asked. A follow-up an agent found while doing other work is not an explicit request, even when the person told the agent to file follow-ups.
-- **Several follow-ups in one run** (a focused first issue plus its follow-ups, or an epic's stories): judge each one. File the ones that make the case and end step 13's confirmation with one line that names each one left out, with its reason. Follow-ups filed by separate runs are each judged by their own run.
+- **Several follow-ups in one run** (a focused first issue plus its follow-ups, or an epic's stories): judge each one. File the ones that make the case and print one line above step 13's receipt that names each one left out, with its reason. Follow-ups filed by separate runs are each judged by their own run.
 
 ### 8. Test consideration
 
@@ -305,15 +305,10 @@ Apply the priority, labels, and scope guidance from the decision rules above.
 
 ### 10. Cross-model feedback loop (optional)
 
-Skip this step in unattended mode unless the user explicitly requested
+Skip this step in both modes unless the user explicitly requested
 cross-model feedback in the same invocation.
 
-After drafting the issue:
-
-1. **Claude presents the draft** with its own assessment — what's strong, what could be better, any concerns about scope or feasibility
-2. Ask: **"Want to send this to ChatGPT for feedback before creating?"**
-
-If **yes**, run the three-voice feedback loop (Claude → ChatGPT → Claude → User):
+After drafting the issue, **Claude presents the draft** with its own assessment — what's strong, what could be better, any concerns about scope or feasibility. Then run the three-voice feedback loop (Claude → ChatGPT → Claude → User):
 
 **Round N:**
 
@@ -329,19 +324,25 @@ uv run .claude/tools/openrouter_cli.py "<full draft text + Claude assessment>" -
 
 4. **User decides** — ask: **"Send to ChatGPT again or save the issue on Linear?"**
    - If **again** — repeat from step 1 with the revised draft
-   - If **save** — continue to step 11
+   - If **save** — the user has seen the draft; saving counts as the approval step 11 asks for, on every path. Continue to step 12
 
 Each round has three voices: Claude proposes and synthesises, ChatGPT challenges, the user steers. The loop sharpens the issue through cross-model perspectives — like a design review but for issue planning.
 
-### 11. Present for approval
+### 11. Show the draft only when something is open
 
-In unattended mode, show the full draft for the record and continue directly
-to step 12. The config setting is the persistent approval for routine issue
-creation; duplicate, scope, project, and Vision ambiguity remain hard stops.
+On the epic-sized path, show the full draft and ask for explicit approval before creating, as the [epic flow](reference/epic-flow.md) sets out. In unattended mode, show it for the record and continue directly to step 12.
 
-The rest of this step is the interactive path.
+On the story and bug path, the draft is not shown. Something is **open** when only the user can decide it:
 
-Show the full draft to the user. Ask for explicit approval before creating.
+- a near-duplicate, a Vision ambiguity, or an epic-shaped or bug-shaped description that step 5 or 6 raised as a question (an explicit `--epic` or `--bug` flag skips that question, so it isn't open) (steps 1, 3, 5, 6, 9)
+- a case that doesn't move the needle (step 7)
+- a requested fix the code check rules out (step 7)
+- a project name that doesn't match exactly one project, which step 0 stops on before any draft exists, so it asks about the name rather than showing a draft
+- a point the code check or the Vision trace could not settle, which the draft would file under *Assumptions to confirm*, or under *Suspected causes* in a bug draft (an entry that only restates a known default doesn't count)
+
+When nothing is open, continue directly to step 12 in both modes. The config setting is the persistent approval for routine issue creation; duplicate, scope, project, and Vision ambiguity remain hard stops in unattended mode, and a point the code check could not settle goes into the card's *Assumptions to confirm* (*Suspected causes* for a bug).
+
+When something is open in interactive mode, show the full draft to the user and ask for explicit approval before creating.
 
 <mark>**Present the draft as the final text output of the turn, and ask for approval in plain prose.**</mark> Never pair the draft with a tool-based approval dialog in the same turn — the dialog can suppress the text above it, and the user ends up approving a card they never saw. End the turn on the draft + prose question; the user's reply is the gate.
 
@@ -350,7 +351,7 @@ Show the full draft to the user. Ask for explicit approval before creating.
 
 ### 12. Create the issue
 
-Only after interactive approval, or after every unattended hard check passes.
+Only after every check passes with nothing open, after interactive approval, or on the epic-sized path after its approval.
 Write the drafted description to a file first and pass it with `--description
 @<file>` — the body is multi-line markdown, so it goes through a file, never an
 inline string ([why](reference/workflow.md#how-skills-talk-to-linear)).
@@ -377,10 +378,13 @@ Do not assign the issue unless the user explicitly requested it.
 
 ### 13. Confirm creation
 
-Display:
-- Linear issue identifier (e.g., PG-184)
-- URL to the issue
-- Branch name from Linear's `gitBranchName` field
+Never print the draft. First print only the lines other steps require, when they apply: what the code check corrected in the description (step 7), similar issues found (step 3), the cross-project note (step 1), and the one line naming each follow-up left out (step 7).
+
+Then end the run with the receipt as one line:
+
+```
+PG-184 Add a video section — <issue URL> — branch <gitBranchName from Linear>
+```
 
 ## Error handling
 

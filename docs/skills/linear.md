@@ -104,7 +104,7 @@ For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved c
 
 ### /linear:plan-work
 
-**Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, optionally refines the description with CRAFT, reads the code the card would touch to confirm the problem and the fix hold up, drafts title and description, and waits for your approval before creating.
+**Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, optionally refines the description with CRAFT, reads the code the card would touch to confirm the problem and the fix hold up, drafts title and description, and files the card without showing the draft, ending with one line: the identifier, title, link and branch name. It stops and shows the draft only when something needs your decision, such as a near-duplicate, a Vision ambiguity or a case that doesn't move the needle.
 
 Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). Every draft's "Why this matters" section explicitly traces back to a Vision outcome, and the agent pushes back if the user's request can't be tied to one. When a broad description splits into multiple follow-ups, the follow-ups are ordered by Vision alignment — the one advancing the least-progressed Success criterion sits first.
 
