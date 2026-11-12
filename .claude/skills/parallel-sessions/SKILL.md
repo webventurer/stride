@@ -81,6 +81,8 @@ When `/linear:start` runs a batch of cards, it settles the six values itself and
 
 Copy [BRIEF.md](BRIEF.md) once per job and fill it in: the mission, word for word, the job, the exact paths it may write, the holder name (the job's name, unique in the batch), the slot store, the limit, the commit route for the mode and the coordinator's session name, this session's name as `ListAgents` gives it. Name every path up front: the coordinator checks each commit against them.
 
+Fill the brief's screenshots rule from the repo's `screenshot-tool` setting: run `uv run .claude/tools/linear_cli.py screenshot-tool`, and when its `screenshot-tool` value is a name, put that name in the rule of every brief. When the value is `null`, delete the rule, so the brief reads as it did before the setting existed. A setting that isn't a tool's name makes the command refuse it: show its message and stop.
+
 A job running a stride card is the exception: its brief names the card in place of a path list, because the card's own "What we'll do" says what the job may change, and a card often mentions files it doesn't change. Everything below that checks paths against the brief, the commit check in step 5 and the report in step 6, applies to jobs that aren't a stride card; a card job's files are checked as step 5 sets out.
 
 A question you can already see in a job, such as a choice that turns on another job, is cheapest settled in its brief. Settle it only with an answer that keeps every part of the mission: a default that would break one part, such as pounds for a branch that sells in euros, is not settled. Take it to `/advisor`, then to the user if the advisor can't settle it.

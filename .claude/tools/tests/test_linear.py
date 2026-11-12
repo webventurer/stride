@@ -1525,6 +1525,28 @@ def test_parallel_session_limit_refuses_invalid_value(value: object):
         linear.parallel_session_limit()
 
 
+# ---- WB-1045: a repo names the screenshot tool its jobs use ----
+
+
+def test_screenshot_tool_returns_configured_name():
+    with patch("linear.project_config", return_value={"screenshot-tool": "agentshot"}):
+        assert linear.screenshot_tool() == "agentshot"
+
+
+def test_screenshot_tool_is_none_when_missing():
+    with patch("linear.project_config", return_value={"project": "Foo"}):
+        assert linear.screenshot_tool() is None
+
+
+@pytest.mark.parametrize("value", ["", "  ", 3, True, None, ["agentshot"]])
+def test_screenshot_tool_refuses_invalid_value(value: object):
+    with (
+        patch("linear.project_config", return_value={"screenshot-tool": value}),
+        pytest.raises(LinearError, match="screenshot-tool"),
+    ):
+        linear.screenshot_tool()
+
+
 # ---- WB-541: config paths resolve from repo root, not the CWD ----
 
 
