@@ -21,7 +21,7 @@ Nothing here has been smoke-tested by running stride's hooks under Codex. That t
 | Skills (`commit`, `craft`, `vision`, `clear-speak`) | `.codex/skills/` or `.agents/skills/` — same SKILL.md standard | **Trivial** — cross-compatible as-is |
 | Commands (`/linear:*`) | No equivalent — becomes a skill per command (`$linear-start`) | **Moderate** — rules now specified by Codex's own migrator |
 | PreToolUse hook (`block_bare_git_commit.sh`) | `.codex/hooks.json` | **None** — payload is field-identical, runs unmodified |
-| UserPromptSubmit hook (`inject_design_principles.sh`) | `.codex/hooks.json` | **Easy** — wrap stdout in JSON, resolve path from `cwd` |
+| UserPromptSubmit hook (`inject_design_principles.sh`) | `.codex/hooks.json` | **Easy** — wrap stdout in JSON, find the doc from the script's own location |
 | `permissions.deny` (`mcp__claude_ai_Linear__*`) | No equivalent | **Unported** — a guardrail that does not translate |
 | `do_commit.sh` + width check | Nothing needed — plain bash + python, tool-agnostic | **None** — already portable |
 | MCP (`.mcp.json` → context7) | `[mcp_servers]` in `.codex/config.toml` — no `.mcp.json` compat | **Easy** — one-time TOML translation |
@@ -108,7 +108,7 @@ Adding a frontmatter `description` to each `.claude/commands/linear/*.md` is a p
 **`inject_design_principles.sh` needs two edits**, neither of which forks the file:
 
 - Wrap stdout in `{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"..."}}`.
-- Resolve the doc path from the payload's `cwd` instead of `$CLAUDE_PROJECT_DIR`.
+- Find the doc from the script's own location instead of `$CLAUDE_PROJECT_DIR`, so it works from any folder the shell sits in.
 
 Claude Code accepts the same `hookSpecificOutput.additionalContext` shape for `UserPromptSubmit`, so **one hook file serves both tools**. No hook renderer is needed at all — only a `hooks.json` writer.
 
