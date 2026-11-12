@@ -72,7 +72,7 @@ This is the strongest argument for revisiting WB-533's choice of `.codex/skills/
 Both of stride's scripts already satisfy Gemini's contract:
 
 - `block_bare_git_commit.sh` reads `.tool_input.command` and exits 2 with the reason on `stderr`. Gemini's `run_shell_command` takes a `command` string argument, and `BeforeTool` documents *"Exit Code 2 (Block Tool): Prevents execution. Uses `stderr` as the `reason` sent to the agent."* The script runs unmodified; only the matcher changes from `^Bash$` to `run_shell_command`.
-- `inject_design_principles.sh` already emits `hookSpecificOutput.additionalContext` and resolves its doc from the payload's `cwd`. `BeforeAgent` reads exactly that field. The only change is the event name it registers under.
+- `inject_design_principles.sh` already emits `hookSpecificOutput.additionalContext` and finds its doc from the script's own location. `BeforeAgent` reads exactly that field. The only change is the event name it registers under.
 
 Registration goes in `.gemini/settings.json` under `hooks`, with the same `matcher` + `hooks[]` + `{type, command}` shape Claude and Codex use.
 
