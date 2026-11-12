@@ -77,7 +77,7 @@ for another assignee.
 
 **If the argument is itself an epic** — its title starts `Epic: `, or `uv run .claude/tools/linear_cli.py list-by-parent <issue-UUID>` returns sub-issues — don't treat it as a single story. Follow [reference/epic-iteration.md](reference/epic-iteration.md) instead; on `main` it asks stride for the epic's batch, and on any other branch it drives the numbered steps below once per sub-issue, pausing at each PR.
 
-### 2. Vision check
+### 2. Vision check, then move the card to Doing
 
 Vision is the guiding light — implementation decisions made without it drift toward whatever feels reasonable. Before implementation begins, check that one exists.
 
@@ -131,6 +131,16 @@ If the issue has no "Why this matters" section, decide whether it qualifies for 
   Don't start implementation against a modern issue with no anchor.
 
 <mark>**The hard gate is on `VISION.md` and (for modern issues) on the outcome reference.**</mark> No Vision = stop. Modern issue with no outcome reference = stop. Legacy issue with no outcome reference = soft warning, continue. Carry the loaded Vision and (when present) the named outcome as context throughout step 8 (Implement) — when making design decisions, reference what the work is in service of.
+
+**Move the card to Doing now,** once the card is found, the lesson-question and other-assignee stops in step 1 and the Vision gate above have passed, and before the card check in step 3. Whatever the card check does — reword the card, cancel it, ask a question — the card is already in Doing, so `next-batch` and `start-choice` never offer it to a second session. A card that stopped at one of the earlier stops stays where it was.
+
+Only update if the current state is Todo, Backlog, or Backburner:
+
+```bash
+uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state Doing
+```
+
+If already Doing, leave unchanged. Never set any other state in this step.
 
 ### 3. Check the card
 
@@ -206,7 +216,7 @@ Branch priority:
 
 If already on the correct branch (resuming inside a worktree set up earlier with `--worktree`), skip to step 7.
 
-**If `--worktree` was passed**, don't create the branch inline — the worktree creates it. Skip the inline checkout; the worktree setup after step 7 handles branch creation (see [worktree setup](reference/worktree.md#setup)).
+**If `--worktree` was passed**, don't create the branch inline — the worktree creates it. Skip the inline checkout; the worktree setup in step 7 handles branch creation (see [worktree setup](reference/worktree.md#setup)).
 
 Otherwise, create the branch inline from the remote's `main` ([clean start](reference/clean-start.md#branch-from-the-remote)):
 
@@ -216,17 +226,11 @@ git switch -c <branch> origin/main
 
 Continue to step 7.
 
-### 7. Update Linear status → Doing
+### 7. Set up the worktree
 
-Only update if the current state is Todo, Backlog, or Backburner.
+Only when `--worktree` was passed. The card is already in Doing from step 2.
 
-```bash
-uv run .claude/tools/linear_cli.py issue update $ARGUMENTS --state Doing
-```
-
-If already Doing, leave unchanged. Never set any other state in this step.
-
-**If `--worktree` was passed**, set up the worktree now and hand off — follow [worktree setup](reference/worktree.md#setup). It creates the worktree, prints the handoff, and **exits before step 8**; the fresh `claude` session resumes from there (re-running `/linear:start <issue-id>` without the flag picks up at step 6 already on the branch).
+Set up the worktree now and hand off — follow [worktree setup](reference/worktree.md#setup). It creates the worktree, prints the handoff, and **exits before step 8**; the fresh `claude` session resumes from there (re-running `/linear:start <issue-id>` without the flag picks up at step 6 already on the branch).
 
 ### 8. Plan, then implement
 

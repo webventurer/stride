@@ -80,3 +80,47 @@ def test_keep_in_touch_list_names_where_to_send_a_refused_action(mode):
 def test_commit_rule_tells_the_job_to_report_the_verdict_to_the_coordinator():
     rule = route(SHARED_CHECKOUT)
     assert re.search(r"report .*coordinator", rule, re.IGNORECASE | re.DOTALL)
+
+
+SKILL = REPO_ROOT / ".claude" / "skills" / "parallel-sessions" / "SKILL.md"
+
+
+def screenshot_rule(brief: str) -> str:
+    rules = section(brief, "## Rules")
+    match = re.search(r"^- \*\*Screenshots\.\*\*.*$", rules, re.MULTILINE)
+    assert match, "no screenshot rule in the brief's Rules"
+    return match.group(0)
+
+
+@pytest.mark.parametrize("mode", ALL_MODES)
+def test_every_brief_carries_the_optional_screenshot_rule(mode):
+    rule = screenshot_rule(filled_in_brief(mode))
+    assert mentions(rule, ("screenshot", "time limit", "message the coordinator", "any other tool"))
+    assert mentions(rule, ("screenshot-tool", "delete"))
+
+
+@pytest.mark.parametrize("mode", ALL_MODES)
+def test_a_brief_filled_in_with_a_tool_names_it(mode):
+    rule = screenshot_rule(filled_in_brief(mode))
+    filled = rule.replace("<the repo's screenshot tool>", "agentshot")
+    assert filled.count("agentshot") == 2
+    assert "<the repo's screenshot tool>" not in filled
+
+
+@pytest.mark.parametrize("mode", ALL_MODES)
+def test_a_brief_with_the_rule_deleted_never_mentions_screenshots(mode):
+    brief = filled_in_brief(mode)
+    without = brief.replace(screenshot_rule(brief) + "\n", "")
+    assert without != brief
+    assert "screenshot" not in without.lower()
+
+
+def test_screenshot_rule_sits_on_one_line_so_deleting_it_leaves_the_rest_unchanged():
+    brief = BRIEF.read_text()
+    rule = screenshot_rule(brief)
+    assert brief.count(rule) == 1
+
+
+def test_filling_in_the_brief_is_told_to_read_the_screenshot_tool_setting():
+    step = section(SKILL.read_text(), "### 3. Write one brief per job")
+    assert mentions(step, ("screenshot-tool", "linear_cli.py screenshot-tool", "delete"))

@@ -62,6 +62,7 @@ from linear import (  # noqa: E402
     resolve_project_id,
     resolve_state_for_issue,
     resolve_workspace_labels,
+    screenshot_tool,
     search_by_project,
     set_project_view_manual,
     set_sort_order,
@@ -233,6 +234,14 @@ def considered_line(card: dict) -> dict:
     }
 
 
+@cli.command("screenshot-tool")
+def screenshot_tool_cmd():
+    try:
+        echo_json({"screenshot-tool": screenshot_tool()})
+    except LinearError as error:
+        raise click.ClickException(str(error)) from error
+
+
 @cli.command("start-choice")
 @click.option("--project", required=True)
 @click.option("--branch", required=True, help="The current git branch")
@@ -240,7 +249,7 @@ def considered_line(card: dict) -> dict:
 @click.option(
     "--started",
     multiple=True,
-    help="A card this run already started; left out while in Todo",
+    help="A card this run already started and stopped before reaching Doing; left out while it is still in Todo",
 )
 def start_choice_cmd(
     project: str, branch: str, epic: str | None, started: tuple[str, ...]

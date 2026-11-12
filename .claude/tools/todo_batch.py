@@ -62,7 +62,7 @@ def reason_left_out(
     if card["waits_on_answer"]:
         return "waits for an answer to a lesson question"
     if card["identifier"] in started:
-        return "started earlier in this run and stopped in Todo"
+        return "started earlier in this run and stopped before reaching Doing"
     return shared_file_reason(card, batch)
 
 

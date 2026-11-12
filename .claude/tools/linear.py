@@ -146,6 +146,19 @@ def parallel_session_limit() -> int:
     return configured
 
 
+def screenshot_tool() -> str | None:
+    config = project_config()
+    if "screenshot-tool" not in config:
+        return None
+    configured = config["screenshot-tool"]
+    if not isinstance(configured, str) or not configured.strip():
+        raise LinearError(
+            f'.stride.json "screenshot-tool" must be the name of a tool, '
+            f"not {json.dumps(configured)}."
+        )
+    return configured
+
+
 def token_from_project_config() -> str | None:
     env_name = project_config().get("api_key_env")
     return os.environ.get(env_name) if env_name else None

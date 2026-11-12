@@ -85,6 +85,16 @@ The most cards Stride runs at once.
 
 Use a whole number of 1 or more; `1` means one card at a time. A missing field is treated as `3`, and `/linear:setup` writes it. Any other value, such as `0`, `"three"` or `2.5`, is refused with a message naming the field.
 
+### `screenshot-tool`
+
+The tool this repository expects for screenshots and other visual checks. Optional.
+
+```json
+"screenshot-tool": "agentshot"
+```
+
+When it is set, `/parallel-sessions` puts the tool's name in every job's brief and tells the job to take its screenshots with it, run it under a time limit, and message the coordinator before using any other tool for a visual check. A missing field means the repository names no tool: briefs carry no screenshots rule and a job may use any tool. `/linear:setup` doesn't write this field. An empty value, or one that isn't text, is refused with a message naming the field.
+
 ## Keep the file out of git
 
 Add `.stride.json` to `.gitignore`:
@@ -97,6 +107,6 @@ The `unattended` setting gives Stride permission to continue through routine mer
 
 ## Change a setting
 
-Edit `.stride.json` in the repository root. Use JSON strings for `project`, `api_key_env` and `focus`; use the JSON booleans `true` or `false` for `unattended` without quotation marks, and a whole number for `parallel-sessions`.
+Edit `.stride.json` in the repository root. Use JSON strings for `project`, `api_key_env` and `focus`; use the JSON booleans `true` or `false` for `unattended` without quotation marks, a whole number for `parallel-sessions` and a JSON string for `screenshot-tool`.
 
 Run `/linear:check` after changing Linear settings to confirm that the API key, project and board still match the workflow Stride expects.

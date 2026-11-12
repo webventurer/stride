@@ -51,6 +51,7 @@ If you're told to carry on after your session exited, claim a slot first, as ste
 - **Time limits.** Give any command that waits on something outside it, such as a browser, a server or a network call, a time limit under five minutes: the shell tool's own timeout, or the command's own limit, such as `curl --max-time`. The launcher stops a shell command still running at five minutes as stalled.
 - **Refused actions.** If a hook or guard refuses an action, stop that step and message the coordinator with what was refused and which step stopped. Carry on only with steps that don't depend on it, and never get the same result another way, such as writing a refused file with a shell heredoc. A guard's own remedy, such as reading the skill it names, is allowed.
 - **People.** Name people and never assume a pronoun: no "he", "she", "him" or "her" for a person in commit messages, pull request text or comments, unless that person stated it in the card or the mission.
+- **Screenshots.** *(For the coordinator: keep this rule only when the repo's `.stride.json` sets `screenshot-tool`, and put the tool's name in place of `<the repo's screenshot tool>`; otherwise delete the rule. Delete this note once the rule is filled in.)* Take every screenshot for a visual check with `<the repo's screenshot tool>`, and run it under a time limit. Message the coordinator and wait for its answer before you use any other tool for a visual check, and if the tool fails or reaches the time limit.
 
 ## Steps
 

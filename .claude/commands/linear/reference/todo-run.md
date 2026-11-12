@@ -6,7 +6,7 @@
 
 ## The run keeps a list of the cards it has started
 
-Start the list empty. After each batch, add every card in it, whether or not it merged. A card that merges is Done and leaves Todo by itself. A card the run started that is still in Todo stopped before it reached Doing, such as at its start check, and the list keeps it out of every later batch, so the same card is never started twice.
+Start the list empty. After each batch, add every card in it, whether or not it merged. A card that merges is Done and leaves Todo by itself. A card the run started that is still in Todo stopped before it reached Doing, such as at its lesson-question or Vision stop, and the list keeps it out of every later batch, so the same card is never started twice. A card that stopped later, such as at its start check, is in Doing and no batch offers it.
 
 ## Each round
 
