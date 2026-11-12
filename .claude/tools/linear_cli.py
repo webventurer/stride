@@ -249,7 +249,7 @@ def screenshot_tool_cmd():
 @click.option(
     "--started",
     multiple=True,
-    help="A card this run already started; left out while in Todo",
+    help="A card this run already started and stopped before reaching Doing; left out while it is still in Todo",
 )
 def start_choice_cmd(
     project: str, branch: str, epic: str | None, started: tuple[str, ...]

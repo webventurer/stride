@@ -72,7 +72,7 @@ def test_considered_cards_leaves_out_a_card_the_run_already_started():
     cards = [card("A"), card("B")]
 
     assert reasons(considered_cards(cards, 3, frozenset({"A"}))) == {
-        "A": "started earlier in this run and stopped in Todo",
+        "A": "started earlier in this run and stopped before reaching Doing",
         "B": None,
     }
 
