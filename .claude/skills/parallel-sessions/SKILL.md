@@ -98,7 +98,7 @@ The slot store defaults to `work/slots` under the main checkout. The script find
 | `work/slots/` | The slot store, shared by every batch so one limit holds for all |
 | `work/stage-times/` | The record of how long each stage of each merged card took, written by [`scripts/stage_times.py`](scripts/stage_times.py); `uv run .claude/skills/parallel-sessions/scripts/stage_times.py report` shows where the time goes |
 
-Add `/work` to the shared exclude file, `$(git rev-parse --git-common-dir)/info/exclude`, so git never sees it. Write the progress file before starting any session, with every job waiting for a slot, and update a job's row each time its state changes: working, sent back, ready, "exited, waiting to be resumed", merged, waiting on the user, or failed. It is what the user opens to see the batch, and what a new coordinator reads to pick the batch up: a new coordinator takes the newest folder under `work/runs/`.
+Add `/work` to the shared exclude file, `$(git rev-parse --git-common-dir)/info/exclude`, so git never sees it. Write the progress file before starting any session, with every job waiting for a slot, and update a job's row each time its state changes: working, sent back, ready, stalled, "exited, waiting to be resumed", merged, waiting on the user, or failed. It is what the user opens to see the batch, and what a new coordinator reads to pick the batch up: a new coordinator takes the newest folder under `work/runs/`.
 
 ### 4. Start every session in one turn
 
@@ -139,7 +139,15 @@ When this session can't start side sessions, start each job as a background `cla
 
    **The launcher resumes a session that a lost connection cut off.** A session that exits with a non-zero code and a connection message in its log's last line or its `.err` file, such as "Can't reach the API server", is resumed by its session ID with a message telling it to check what it has already committed. It is resumed whether or not it had reported ready, and a session whose log holds no session ID is started again from its brief. The launcher waits before each resume, holding no slot: 5 minutes before the first, then three times as long before each next one (`--resume-wait` sets the first), so an outage of hours doesn't use up the tries. It resumes at most 5 times (`--resume-tries`), and the first run doesn't count. A resumed session starts only once the launcher holds a slot for it, as a first run does, and its log is `<holder name>.resume-<n>.jsonl`. Any other non-zero exit, or a job out of tries, is set to `failed` in its row of `progress.md` and printed to `launcher.log`; its final line and exit code count it. An exit with code 0 is left alone. A launcher that is stopped leaves the claims it holds to lapse at their expiry.
 
+   **The launcher stops a shell command that hangs.** At each check, every 15 seconds (`--poll`), it reads each running session's current log, the resumed one after a resume. A shell command counts as running from its call until its result appears, and each is judged on its own by the `elapsed_time_seconds` its `tool_progress` lines carry. One still running at 5 minutes (`--stall-limit` sets it in seconds) is stopped with every process it started, while the session, its other commands and its background tasks run on, so the session sees the command fail and carries on. The limit sits under Claude Code's own 10-minute cap on a shell command, which is where a hung command would otherwise end. The launcher sets the job's row to `stalled`, unless it is already merged, canceled or failed, and writes `<holder> stalled: stopped after <seconds> seconds: <the command's first line>` to `launcher.log`. A sub-agent that runs long is not a shell command, so it is never stopped.
+
    Every line of a session's log is JSON carrying the session's ID as `session_id`, which is what resumes it; errors go to the separate `.err` file so they don't break the JSON. Each session shows up in `ListAgents` under a name taken from its checkout's folder, once the launcher has started it: note it and ask for its idle notice, as for a side session.
+
+   **Watch `launcher.log` for stalls,** started in the same turn, so a stall reaches you as a notice without the user asking. Run this with the Monitor tool at its longest timeout, and start it again each time it expires until the batch is done:
+
+   ```bash
+   tail -n 0 -F work/runs/<batch>/launcher.log | grep --line-buffered ' stalled: '
+   ```
 5. **Give the user the progress file's full path,** since these sessions don't appear in the app's sidebar; the logs are beside it in `work/runs/<batch>/logs/`.
 
 ### 5. Watch and check
@@ -152,6 +160,8 @@ uv run --no-project --with diskcache --with click \
 ```
 
 The launcher frees the slot of each `claude -p` session it started when that session exits. When a side session, or a `claude -p` session you resumed, exits holding a slot, release its slot at once with `slots.py release <holder>`, before anything else, so the next waiting job can claim it. An idle notice releases nothing: a job that is only idle is still waiting for its go and keeps its slot. Whether or not it still held a slot, when a job's session exits before its card has merged, set the job's row in `work/runs/<batch>/progress.md` to "exited, waiting to be resumed"; a job already marked merged, failed or canceled keeps that state. A session cut off by a connection error is the launcher's to resume, so leave its row alone: the launcher marks it failed once it has run out of tries.
+
+When a stall notice arrives, the launcher has already stopped the command. Message that job's session: name the command, say it was stopped after running past the stall limit, and tell it to do that step again with a time limit, or another way. Then set the job's row back to working.
 
 Each session messages you when its work is ready, when it hits an error it can't fix, and when it has a question about its job's purpose or scope. As each job's work is ready:
 

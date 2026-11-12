@@ -30,6 +30,7 @@ from launch_jobs import (
     cut_by_connection,
     find_session_id,
     main,
+    stalled_commands,
 )
 from slots import SlotPool
 
@@ -45,6 +46,8 @@ SINGLE_SLOT_LIMIT = 1
 RESUME_WAIT_SECONDS = 0.3
 RESUME_TRIES = 2
 WORKING_ROW = "| job-0 | sonnet | branch-0 | job-0.jsonl | working |"
+STALL_LIMIT_SECONDS = 300
+SLOW_POLL_SECONDS = 1.0
 
 
 class LauncherTest(unittest.TestCase):
@@ -443,6 +446,222 @@ class ResumeTest(unittest.TestCase):
         return self.progress.read_text().splitlines()[1].endswith("| failed |")
 
 
+class StalledCommandsTest(unittest.TestCase):
+    """Tests for finding a shell command that has run past the limit."""
+
+    def setUp(self):
+        self.folder = tempfile.TemporaryDirectory()
+        self.log = Path(self.folder.name) / "job-0.jsonl"
+
+    def tearDown(self):
+        self.folder.cleanup()
+
+    def test_a_command_past_the_limit_with_no_result_is_reported(self):
+        self.write(call("hung", "sleep 900"), progress("hung", 330))
+
+        self.assertEqual([("hung", "sleep 900", 330)], self.stalled())
+
+    def test_a_command_with_a_result_is_not_reported(self):
+        self.write(
+            call("done", "pnpm build"), progress("done", 330), result("done")
+        )
+
+        self.assertEqual([], self.stalled())
+
+    def test_a_finished_command_whose_output_looks_like_progress_is_not_reported(
+        self,
+    ):
+        echoed = json.dumps(progress("done", 900))
+        self.write(
+            call("done", f"echo '{echoed}'"),
+            {
+                "type": "user",
+                "message": {
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": "done",
+                            "content": echoed,
+                        }
+                    ]
+                },
+            },
+        )
+
+        self.assertEqual([], self.stalled())
+
+    def test_a_command_under_the_limit_is_not_reported(self):
+        self.write(call("slow", "pnpm test"), progress("slow", 270))
+
+        self.assertEqual([], self.stalled())
+
+    def test_only_the_command_past_the_limit_is_reported(self):
+        self.write(
+            call("done", "pnpm build"),
+            call("hung", "sleep 900"),
+            progress("done", 330),
+            progress("hung", 330),
+            result("done"),
+        )
+
+        self.assertEqual([("hung", "sleep 900", 330)], self.stalled())
+
+    def test_a_long_sub_agent_is_not_a_hung_command(self):
+        self.write(
+            call("agent", "review the card", tool="Agent"),
+            progress("agent", 900, tool="Agent"),
+        )
+
+        self.assertEqual([], self.stalled())
+
+    def write(self, *entries: dict):
+        self.log.write_text(
+            "".join(json.dumps(entry) + "\n" for entry in entries)
+        )
+
+    def stalled(self) -> list:
+        return [
+            (stall.tool_use_id, stall.command, stall.elapsed_seconds)
+            for stall in stalled_commands(self.log, STALL_LIMIT_SECONDS)
+        ]
+
+
+class StallTest(unittest.TestCase):
+    """Tests for stopping a job's hung command while its session runs on."""
+
+    def setUp(self):
+        self.folder = tempfile.TemporaryDirectory()
+        self.root = Path(self.folder.name)
+        self.events = self.root / "events.txt"
+        self.events.touch()
+        self.claude = write_stand_in(self.root, self.events)
+        self.progress = self.root / "progress.md"
+        self.progress.write_text(
+            f"| holder | model | branch | log | state |\n{WORKING_ROW}\n"
+        )
+        self.pool = SlotPool(
+            Cache(str(self.root / "slots")), LIMIT, LONG_EXPIRY_SECONDS
+        )
+
+    def tearDown(self):
+        self.pool.store.close()
+        self.folder.cleanup()
+
+    def test_a_hung_command_is_stopped_and_the_session_runs_on(self):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            failures = self.launch(("hang",))
+
+        self.assertEqual(
+            (0, ["killed", "child-gone", "sibling-alive"]),
+            (failures, self.kinds()[1:4]),
+        )
+
+    def test_a_twin_of_the_hung_command_started_earlier_keeps_running(self):
+        Launcher(
+            self.pool,
+            str(self.claude),
+            POLL_SECONDS,
+            RESUME_TRIES,
+            RESUME_WAIT_SECONDS,
+            self.progress,
+            1,
+        ).run(
+            [
+                Job(
+                    "job-0",
+                    str(self.root),
+                    *write_job_files(self.root, "job-0", ("hang-twin",)),
+                )
+            ]
+        )
+
+        self.assertIn("twin-alive", self.kinds())
+
+    def test_a_hung_command_marks_its_job_stalled(self):
+        self.launch(("hang",))
+
+        self.assertTrue(
+            self.progress.read_text().splitlines()[1].endswith("| stalled |")
+        )
+
+    def test_the_launcher_names_the_job_the_command_and_how_long_it_ran(self):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.launch(("hang",))
+
+        self.assertIn(
+            "job-0 stalled: stopped after 600 seconds: sleep 30",
+            output.getvalue(),
+        )
+
+    def test_a_row_already_merged_canceled_or_failed_is_not_marked_stalled(
+        self,
+    ):
+        for state in ("merged", "canceled", "failed"):
+            with self.subTest(state=state):
+                self.progress.write_text(
+                    f"| holder | state |\n| job-0 | {state} |\n"
+                )
+
+                self.launch(("hang",))
+
+                self.assertEqual(
+                    f"| job-0 | {state} |",
+                    self.progress.read_text().splitlines()[1],
+                )
+
+    def test_a_resumed_job_is_judged_by_its_current_log(self):
+        jobs = [
+            Job(
+                "job-0",
+                str(self.root),
+                *write_job_files(
+                    self.root,
+                    "job-0",
+                    ("cut-mid-command", "ok"),
+                    SLOW_POLL_SECONDS * 2,
+                ),
+            )
+        ]
+
+        Launcher(
+            self.pool,
+            str(self.claude),
+            SLOW_POLL_SECONDS,
+            RESUME_TRIES,
+            RESUME_WAIT_SECONDS,
+            self.progress,
+            STALL_LIMIT_SECONDS,
+        ).run(jobs)
+
+        self.assertEqual(WORKING_ROW, self.progress.read_text().splitlines()[1])
+
+    def launch(self, outcomes: tuple[str, ...]) -> int:
+        return Launcher(
+            self.pool,
+            str(self.claude),
+            POLL_SECONDS,
+            RESUME_TRIES,
+            RESUME_WAIT_SECONDS,
+            self.progress,
+            STALL_LIMIT_SECONDS,
+        ).run(
+            [
+                Job(
+                    "job-0",
+                    str(self.root),
+                    *write_job_files(self.root, "job-0", outcomes),
+                )
+            ]
+        )
+
+    def kinds(self) -> list[str]:
+        return [
+            line.split()[0] for line in self.events.read_text().splitlines()
+        ]
+
+
 class LaunchCommandTest(unittest.TestCase):
     """Tests for the launcher's command line."""
 
@@ -587,6 +806,54 @@ def write_stand_in(folder: Path, events: Path) -> Path:
         "if outcome != 'cut-early':\n"
         "    print(json.dumps({'type': 'system', 'session_id': "
         "f'session-{holder}', 'cwd': str(Path.cwd())}), flush=True)\n"
+        "def hung_command(elapsed=600):\n"
+        "    print(json.dumps({'type': 'assistant', 'message': {'content': "
+        "[{'type': 'tool_use', 'id': 'hung', 'name': 'Bash', "
+        "'input': {'command': 'sleep 30'}}]}}))\n"
+        "    print(json.dumps({'type': 'tool_progress', 'tool_name': 'Bash', "
+        "'parent_tool_use_id': 'hung', 'elapsed_time_seconds': elapsed}), "
+        "flush=True)\n"
+        "if outcome == 'cut-mid-command':\n"
+        "    hung_command()\n"
+        '    print("Can\'t reach the API server", file=sys.stderr)\n'
+        "    sys.exit(1)\n"
+        "def shell(command):\n"
+        "    import subprocess\n"
+        "    return subprocess.Popen(['bash', '-c', 'true && eval ' + "
+        "repr(command) + ' < /dev/null && pwd -P > /dev/null'])\n"
+        "if outcome == 'hang-twin':\n"
+        "    twin = shell('sleep 30')\n"
+        "    time.sleep(3)\n"
+        "    hung = shell('sleep 30')\n"
+        "    time.sleep(0.3)\n"
+        "    hung_command(elapsed=1)\n"
+        "    hung.wait()\n"
+        "    record('twin-alive' if twin.poll() is None else 'twin-gone')\n"
+        "    twin.kill()\n"
+        "    print(json.dumps({'type': 'user', 'message': {'content': "
+        "[{'type': 'tool_result', 'tool_use_id': 'hung'}]}}), flush=True)\n"
+        "if outcome == 'hang':\n"
+        "    import os, subprocess\n"
+        "    hung, sibling = shell('sleep 30'), shell('sleep 41')\n"
+        "    child = []\n"
+        "    while not child:\n"
+        "        time.sleep(0.05)\n"
+        "        child = subprocess.run(['pgrep', '-P', str(hung.pid)], "
+        "capture_output=True, text=True).stdout.split()\n"
+        "    hung_command()\n"
+        "    hung.wait()\n"
+        "    time.sleep(0.2)\n"
+        "    record('killed' if hung.returncode else 'finished')\n"
+        "    try:\n"
+        "        os.kill(int(child[0]), 0)\n"
+        "        record('child-alive')\n"
+        "        os.kill(int(child[0]), 9)\n"
+        "    except OSError:\n"
+        "        record('child-gone')\n"
+        "    record('sibling-alive' if sibling.poll() is None else 'sibling-gone')\n"
+        "    sibling.kill()\n"
+        "    print(json.dumps({'type': 'user', 'message': {'content': "
+        "[{'type': 'tool_result', 'tool_use_id': 'hung'}]}}), flush=True)\n"
         "time.sleep(seconds)\n"
         "record('end')\n"
         "if outcome == 'cut-after-ready':\n"
@@ -606,10 +873,13 @@ def write_stand_in(folder: Path, events: Path) -> Path:
 
 
 def write_job_files(
-    root: Path, name: str, outcomes: tuple[str, ...] = ("ok",)
+    root: Path,
+    name: str,
+    outcomes: tuple[str, ...] = ("ok",),
+    seconds: float = SESSION_SECONDS,
 ) -> list[str]:
     brief = root / f"{name}.md"
-    brief.write_text(f"{name} {SESSION_SECONDS}")
+    brief.write_text(f"{name} {seconds}")
     (root / f"{name}.plan").write_text(" ".join(outcomes))
     return [
         str(brief),
@@ -618,6 +888,40 @@ def write_job_files(
         str(root / f"{name}.jsonl"),
         str(root / f"{name}.err"),
     ]
+
+
+def call(tool_use_id: str, command: str, tool: str = "Bash") -> dict:
+    return {
+        "type": "assistant",
+        "message": {
+            "content": [
+                {
+                    "type": "tool_use",
+                    "id": tool_use_id,
+                    "name": tool,
+                    "input": {"command": command},
+                }
+            ]
+        },
+    }
+
+
+def progress(tool_use_id: str, seconds: int, tool: str = "Bash") -> dict:
+    return {
+        "type": "tool_progress",
+        "tool_name": tool,
+        "parent_tool_use_id": tool_use_id,
+        "elapsed_time_seconds": seconds,
+    }
+
+
+def result(tool_use_id: str) -> dict:
+    return {
+        "type": "user",
+        "message": {
+            "content": [{"type": "tool_result", "tool_use_id": tool_use_id}]
+        },
+    }
 
 
 if __name__ == "__main__":
