@@ -2034,8 +2034,8 @@ def test_start_choice_for_an_epic_never_names_a_card_of_another_epic():
     assert start_choice_for_epic(cards, started=("A", "B")) == {
         "action": "blocked",
         "reasons": {
-            "A": "started earlier in this run and stopped in Todo",
-            "B": "started earlier in this run and stopped in Todo",
+            "A": "started earlier in this run and stopped before reaching Doing",
+            "B": "started earlier in this run and stopped before reaching Doing",
         },
     }
 
@@ -2205,7 +2205,7 @@ def test_start_choice_ends_with_each_reason_when_only_waiting_cards_remain():
     assert choice == {
         "action": "blocked",
         "reasons": {
-            "WB-1": "started earlier in this run and stopped in Todo",
+            "WB-1": "started earlier in this run and stopped before reaching Doing",
             "WB-2": "waits for an answer to a lesson question",
             "C": "blocked by X",
         },
