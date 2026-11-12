@@ -234,7 +234,7 @@ Before drafting, confirm:
 - **The fix can work:** what the card will promise is possible given how the code behaves, and the code doesn't already have something that does the job
 - **The evidence says what the card says:** when the description cites a specific run, recording or results file, open that data too
 
-When the check contradicts the description, correct the draft and tell the user what changed. When the requested fix can't work, interactive mode asks how to proceed, and unattended mode stops and names the file that rules it out. When the code can't be reached, or the check leaves a point open, say so under *Assumptions to confirm* (under *Suspected causes* for a bug); step 11 treats that point as open.
+When the check contradicts the description, correct the draft and tell the user what changed. When the requested fix can't work, interactive mode asks how to proceed, and unattended mode stops and names the file that rules it out. When the code can't be reached, or the check leaves a point open, say so under *Assumptions to confirm*; step 11 treats that point as open for a story. A bug draft's *Suspected causes* are guesses by design and are not open.
 
 **With `--research`**, also:
 
@@ -338,9 +338,9 @@ On the story and bug path, the draft is not shown. Something is **open** when on
 - a case that doesn't move the needle (step 7)
 - a requested fix the code check rules out (step 7)
 - a project name that doesn't match exactly one project, which step 0 stops on before any draft exists, so it asks about the name rather than showing a draft
-- a point the code check or the Vision trace could not settle, which the draft would file under *Assumptions to confirm*, or under *Suspected causes* in a bug draft (an entry that only restates a known default doesn't count)
+- a point the code check or the Vision trace could not settle, which a story draft would file under *Assumptions to confirm* (an entry that only restates a known default doesn't count)
 
-When nothing is open, continue directly to step 12 in both modes. The config setting is the persistent approval for routine issue creation; duplicate, scope, project, and Vision ambiguity remain hard stops in unattended mode, and a point the code check could not settle goes into the card's *Assumptions to confirm* (*Suspected causes* for a bug).
+When nothing is open, continue directly to step 12 in both modes. The config setting is the persistent approval for routine issue creation; duplicate, scope, project, and Vision ambiguity remain hard stops in unattended mode, and a point the code check could not settle goes into the card's *Assumptions to confirm*.
 
 When something is open in interactive mode, show the full draft to the user and ask for explicit approval before creating.
 
@@ -378,7 +378,7 @@ Do not assign the issue unless the user explicitly requested it.
 
 ### 13. Confirm creation
 
-Never print the draft. First print only the lines other steps require, when they apply: what the code check corrected in the description (step 7), similar issues found (step 3), the cross-project note (step 1), and the one line naming each follow-up left out (step 7).
+Never print the draft. On the epic-sized path, the summary in [epic flow](reference/epic-flow.md) replaces this receipt, and the rest of this step is for story and bug cards. First print only the lines other steps require, when they apply: what the code check corrected in the description (step 7), similar issues found (step 3), the cross-project note (step 1), and the one line naming each follow-up left out (step 7).
 
 Then end the run with the receipt as one line:
 
