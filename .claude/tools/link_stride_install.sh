@@ -3,6 +3,8 @@ set -euo pipefail
 # Links what stride installed in the main checkout into a fresh worktree.
 # Stride's install is gitignored, so a new worktree lacks it; each missing
 # path is linked from the main checkout and hidden from git status.
+# Also links each git-ignored path the main checkout's .stride.json names
+# in its "worktree-links" list, so the repo's own commit hooks find them.
 # Usage: .claude/tools/link_stride_install.sh <main-repo> <worktree>
 
 # --- Guards ---
@@ -53,9 +55,41 @@ link_missing_paths() {
   done
 }
 
+named_paths() {
+  [ -f "$SETTINGS" ] && grep -q '"worktree-links"' "$SETTINGS" || return 0
+  if ! jq -e '(.["worktree-links"] // []) | type == "array" and all(type == "string")' "$SETTINGS" >/dev/null; then
+    echo '.stride.json "worktree-links" must be a list of paths; none linked.' >&2
+    return 0
+  fi
+  jq -r '(.["worktree-links"] // [])[]' "$SETTINGS"
+}
+
+is_plain_path() {
+  case "$1" in
+    "" | /* | *[[:space:]]* | *[*?[]* | .. | ../* | */.. | */../*) return 1 ;;
+  esac
+}
+
+link_named_paths() {
+  local path
+  while IFS= read -r path; do
+    if ! is_plain_path "$path"; then
+      echo "Refused worktree-links name: $path" >&2
+      continue
+    fi
+    path="${path%/}"
+    if is_missing_from_worktree "$path"; then
+      link_path "$path"
+    elif [ ! -e "$MAIN_REPO/$path" ] && [ ! -e "$WORKTREE/$path" ]; then
+      ABSENT+=("$path")
+    fi
+  done < <(named_paths)
+}
+
 report_links() {
-  [ "${#LINKED[@]}" -gt 0 ] || return 0
-  echo "Linked from $MAIN_REPO into the worktree: ${LINKED[*]}"
+  [ "${#LINKED[@]}" -gt 0 ] && echo "Linked from $MAIN_REPO into the worktree: ${LINKED[*]}"
+  [ "${#ABSENT[@]}" -gt 0 ] && echo "Not linked, missing from the main checkout: ${ABSENT[*]}"
+  return 0
 }
 
 # --- Execution ---
@@ -64,7 +98,10 @@ require_args "$@"
 MAIN_REPO="$1"
 WORKTREE="$2"
 EXCLUDE="$(git -C "$WORKTREE" rev-parse --path-format=absolute --git-common-dir)/info/exclude"
+SETTINGS="$MAIN_REPO/.stride.json"
 LINKED=()
+ABSENT=()
 mkdir -p "$(dirname "$EXCLUDE")"
 link_missing_paths
+link_named_paths
 report_links

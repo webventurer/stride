@@ -93,6 +93,7 @@ The paths linked are:
 - **Every path in the stride section of the parent's `.gitignore`**, between the `# >>> stride` and `# <<< stride <<<` markers. This includes stride's Codex files, such as `.codex/skills/` and `.codex/hooks.json`.
 - **`.claude/settings.local.json`**, where stride's hooks are configured.
 - **The parent's venv**, `.venv` or `venv`, so Python runs straight away in the worktree.
+- **Every path in the `worktree-links` list** in the parent's `.stride.json`, the git-ignored files the repository's own commit hooks read, such as a `.semgrep/` rules folder. A path the parent lacks is reported, and a name with a space, a wildcard, a leading `/` or a `..` is refused.
 
 A path is linked only when the parent has it and the worktree doesn't. A path the branch tracks, or one linked earlier, is left alone. `.claude/worktrees` is never linked, even though stride's section lists it: the worktree sits inside that folder, so a link would point back at itself and its siblings. Each link is added to the repository's shared `info/exclude` without a trailing slash, because git matches a trailing-slash ignore line such as `.claude/tools/` only against a real folder, never against a link. Without that line every linked folder would show in `git status` as untracked.
 
@@ -102,7 +103,7 @@ After the settings are shared, run the linking script with the two absolute path
 "$main_repo/.claude/tools/link_stride_install.sh" "$main_repo" "$worktree"
 ```
 
-It prints one line naming what it linked. When nothing was linked, it prints nothing. That's the case for a repo with no stride section and no venv.
+It prints one line naming what it linked, and one naming each `worktree-links` path the parent lacks. When nothing was linked and nothing is missing, it prints nothing. That's the case for a repo with no stride section, no venv and no `worktree-links`.
 
 <mark>**A linked file is the parent's file.**</mark> Editing a linked skill, command or tool inside the worktree edits the parent's copy, and the change shows in every worktree at once. Those paths aren't the branch's to change. To change stride itself, edit it in the parent or reinstall.
 

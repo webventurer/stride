@@ -1,10 +1,12 @@
 import { deepStrictEqual, ok, strictEqual } from "node:assert";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import {
+  chmodSync,
   existsSync,
   lstatSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readlinkSync,
   rmSync,
   writeFileSync,
@@ -147,5 +149,94 @@ describe("worktree linking step", () => {
     const output = runLinking(mainRepo, worktree);
 
     deepStrictEqual(output, "");
+  });
+
+  describe("paths the repo names in .stride.json", () => {
+    function nameInSettings(names) {
+      writeFile(mainRepo, ".stride.json", JSON.stringify({ "worktree-links": names }));
+    }
+
+    function addWorktree() {
+      git(mainRepo, "worktree", "add", "-q", worktree, "-b", "wb-1");
+    }
+
+    function runLinkingCapturing() {
+      return spawnSync(linkScript, [mainRepo, worktree], { encoding: "utf8" });
+    }
+
+    it("links a named folder so a commit hook that reads it passes", () => {
+      makeRepo(mainRepo, ".semgrep/\n.stride.json\n");
+      writeFile(mainRepo, ".semgrep/rules.yml");
+      nameInSettings([".semgrep/"]);
+      writeFile(mainRepo, ".git/hooks/pre-commit", "#!/bin/sh\ntest -f .semgrep/rules.yml\n");
+      chmodSync(join(mainRepo, ".git/hooks/pre-commit"), 0o755);
+      addWorktree();
+
+      runLinking(mainRepo, worktree);
+
+      strictEqual(readlinkSync(join(worktree, ".semgrep")), join(mainRepo, ".semgrep"));
+      strictEqual(git(worktree, "status", "--porcelain"), "");
+      writeFile(worktree, "change.txt");
+      git(worktree, "add", "change.txt");
+      git(worktree, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "change");
+    });
+
+    it("reports a named path the main checkout lacks and links the rest", () => {
+      makeRepo(mainRepo, ".semgrep/\n.venv/\n.stride.json\n");
+      writeFile(mainRepo, ".venv/bin/python");
+      nameInSettings([".semgrep/"]);
+      addWorktree();
+
+      const result = runLinkingCapturing();
+
+      strictEqual(result.status, 0);
+      ok(result.stdout.includes("Not linked, missing from the main checkout: .semgrep"));
+      ok(lstatSync(join(worktree, ".venv")).isSymbolicLink());
+      ok(!existsSync(join(worktree, ".semgrep")));
+    });
+
+    it("refuses a name with a space, a wildcard, a leading slash or a .. and links nothing for it", () => {
+      makeRepo(mainRepo, ".semgrep/\n.stride.json\n");
+      writeFile(mainRepo, ".semgrep/rules.yml");
+      writeFile(mainRepo, "has space");
+      writeFile(mainRepo, ".sem*");
+      const refused = ["has space", ".sem*", "/etc", "../outside", "a/../.semgrep"];
+      nameInSettings([...refused, ".semgrep"]);
+      addWorktree();
+
+      const result = runLinkingCapturing();
+
+      strictEqual(result.status, 0);
+      for (const name of refused) {
+        ok(result.stderr.includes(`Refused worktree-links name: ${name}`), name);
+      }
+      deepStrictEqual(
+        readdirSync(worktree).filter((entry) => entry !== ".git").sort(),
+        [".gitignore", ".semgrep", "README.md"],
+      );
+    });
+
+    it("sets up exactly as today when .stride.json names nothing", () => {
+      makeRepo(mainRepo, ".stride.json\n");
+      writeFile(mainRepo, ".stride.json", JSON.stringify({ project: "App" }));
+      addWorktree();
+
+      const result = runLinkingCapturing();
+
+      strictEqual(result.status, 0);
+      strictEqual(result.stdout, "");
+      strictEqual(result.stderr, "");
+    });
+
+    it("ignores a list that isn't text, says so, and exits zero", () => {
+      makeRepo(mainRepo, ".stride.json\n");
+      nameInSettings([1, { a: 2 }]);
+      addWorktree();
+
+      const result = runLinkingCapturing();
+
+      strictEqual(result.status, 0);
+      ok(result.stderr.includes('.stride.json "worktree-links" must be a list of paths'));
+    });
   });
 });

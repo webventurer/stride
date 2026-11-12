@@ -95,6 +95,18 @@ The tool this repository expects for screenshots and other visual checks. Option
 
 When it is set, `/parallel-sessions` puts the tool's name in every job's brief and tells the job to take its screenshots with it, run it under a time limit, and message the coordinator before using any other tool for a visual check. A missing field means the repository names no tool: briefs carry no screenshots rule and a job may use any tool. `/linear:setup` doesn't write this field. An empty value, or one that isn't text, is refused with a message naming the field.
 
+### `worktree-links`
+
+The git-ignored files and folders your repository's own commit hooks read, so each job's worktree has them. Optional.
+
+```json
+"worktree-links": [".semgrep/"]
+```
+
+A new worktree is a fresh checkout, so it has none of the repository's git-ignored files. When the setup runs, each path named here that exists in the main checkout is linked into the worktree at the same path, and hidden from `git status`. A job's first commit then runs the hook against the same files the main checkout does. The worktree stride builds to check a card combined with `main` gets them too.
+
+Every job in a batch shares the main checkout's copy, so a hook should read these files, not write to them. A path the main checkout doesn't have is reported by name in the setup output, and the rest of the setup carries on. A path with a space or a wildcard in it, one that starts with `/`, or one that contains `..`, is refused with a message and nothing is linked for it. A value that isn't a list of text is ignored with a message. A missing field links nothing extra. `/linear:setup` doesn't write this field.
+
 ## Keep the file out of git
 
 Add `.stride.json` to `.gitignore`:
@@ -107,6 +119,6 @@ The `unattended` setting gives Stride permission to continue through routine mer
 
 ## Change a setting
 
-Edit `.stride.json` in the repository root. Use JSON strings for `project`, `api_key_env` and `focus`; use the JSON booleans `true` or `false` for `unattended` without quotation marks, a whole number for `parallel-sessions` and a JSON string for `screenshot-tool`.
+Edit `.stride.json` in the repository root. Use JSON strings for `project`, `api_key_env` and `focus`; use the JSON booleans `true` or `false` for `unattended` without quotation marks, a whole number for `parallel-sessions`, a JSON string for `screenshot-tool` and a JSON list of strings for `worktree-links`.
 
 Run `/linear:check` after changing Linear settings to confirm that the API key, project and board still match the workflow Stride expects.
