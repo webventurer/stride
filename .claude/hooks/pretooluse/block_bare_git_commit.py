@@ -245,7 +245,7 @@ def command_index(tokens):
 def after_cd(tokens, folder, scoped):
     if scoped or tokens[0] != "cd" or len(tokens) != 2:
         return None
-    return join_folder(folder, tokens[1])
+    return join_folder(folder, tokens[1], logical=True)
 
 
 def commit_folder(arguments, folder):
@@ -266,11 +266,12 @@ def commit_folder(arguments, folder):
     return False
 
 
-def join_folder(folder, target):
+def join_folder(folder, target, logical=False):
     target = os.path.expanduser(target)
     if folder is None or not target or re.search(r"[$`*?\[]", target):
         return None
-    return os.path.normpath(os.path.join(folder, target))
+    joined = os.path.join(folder, target)
+    return os.path.normpath(joined) if logical else joined
 
 
 def placement_of(folder, project):

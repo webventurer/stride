@@ -83,6 +83,7 @@ ROWS = [
     ("git --work-tree {project} commit -m x", "scratch", REFUSED),
     ('cd {project} && echo "git commit', "scratch", REFUSED),
     ('git -C {scratch} commit -m a && echo "git commit', "project", REFUSED),
+    ("git -C {lnk}/.. commit -m x", "project", REFUSED),
     ("bash -c 'git commit -m x'", "project", ALLOWED),
 ]
 
@@ -109,6 +110,7 @@ def folders(tmp_path_factory):
     )
     (project / "nested").mkdir()
     subprocess.run(["git", "init", "-q"], cwd=project / "nested", check=True)
+    (scratch / "lnk").symlink_to(project / "docs")
     (root / "plain").mkdir()
     (root / "linked").symlink_to(project)
     return {
@@ -118,6 +120,7 @@ def folders(tmp_path_factory):
         "worktree": root / "worktree",
         "linked": root / "linked",
         "plain": root / "plain",
+        "lnk": scratch / "lnk",
         "nested": project / "nested",
         "missing": root / "missing",
     }
