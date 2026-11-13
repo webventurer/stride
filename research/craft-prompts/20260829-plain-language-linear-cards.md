@@ -14,7 +14,7 @@ The requested outcome is:
 
 The story traces to this approved Vision criterion:
 
-> Every Linear card can be understood by someone who does not know stride's commands or code — its title names a stakeholder outcome, while its description and updates use concrete, everyday words
+> Anyone who doesn't know stride's commands or code can understand every Linear card: an outcome in its title, everyday words in its description and updates
 
 ## Role
 

@@ -21,6 +21,8 @@ These guidelines are what the principle usually asks for. When a case fits none 
 
 A Success criterion is a promise the project can be checked against. It names an outcome someone could see, in words a reader who has never seen the code understands. A line that is vague, true of any project, or true only of the code's shape says nothing, so reword it or remove it.
 
+Every card opens by quoting the line it serves, so a line has to be quick to read. Write each one as one sentence of 25 words or fewer, counting the words after the `- [ ]` marker, with no full stop before its end. Name the outcome and leave the how to the cards: mechanism, file names and examples stay out unless the outcome can't be said without them. A line that promises several outcomes becomes two lines rather than dropping one.
+
 ### Work that fits no line means the Vision has grown
 
 When the closest line only fits if you stretch what it says, the Vision is missing a line. Grow it honestly. Squeezing the work into a line that doesn't cover it leaves a record that says the work was verified when it wasn't, and the next reader trusts a trace that isn't true.

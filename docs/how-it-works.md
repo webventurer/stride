@@ -67,7 +67,7 @@ The distinction: a skill teaches the agent *how to think* about a problem (atomi
 
 Hooks that enforce discipline at the tool level:
 
-- Block bare `git commit` — forces use of the `/commit` skill
+- Block bare `git commit` into your project or its worktrees — forces use of the `/commit` skill. A commit in a repository outside the project, such as a scratch repository a test builds, passes, and so does a command that only mentions the words, such as a search
 - Run security checks on file edits
 - Validate formatting standards
 
@@ -146,7 +146,7 @@ This requires an OpenRouter API key. See the [install guide](/install) for setup
 When you run `npx github:webventurer/stride`, the script (`bin/install.mjs`) does four things:
 
 1. **Copies files** into your project's `.claude/` directory — skills, commands, hooks, tools, and supporting docs. Never writes outside `.claude/`
-2. **Sets permissions** — makes hook scripts (`do_commit.sh`, `block_bare_git_commit.sh`) executable
+2. **Sets permissions** — makes hook scripts (`do_commit.sh`, `block_bare_git_commit.sh`, `block_bare_git_commit.py`) executable
 3. **Merges settings** — if you already have a `.claude/settings.json`, it asks before merging. If you say no, nothing is touched. If you don't have one, it creates a minimal config with the commit hook wired up
 4. **Prints a summary** — shows what was installed and which commands are available
 

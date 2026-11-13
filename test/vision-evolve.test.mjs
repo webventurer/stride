@@ -18,6 +18,31 @@ describe("vision-evolve skill", () => {
     ok(skill.includes("needs no sign-off"));
   });
 
+  it("says a Success criterion is one sentence of 25 words or fewer", () => {
+    for (const path of [
+      ".claude/skills/vision-evolve/SKILL.md",
+      "docs/skills/vision-evolve.md",
+    ]) {
+      ok(read(path).includes("one sentence of 25 words or fewer"), path);
+    }
+  });
+
+  it("keeps every Success criterion to one sentence of 25 words or fewer", () => {
+    const section = read("VISION.md")
+      .split("## Success criteria")[1]
+      .split("\n## ")[0];
+    const criteria = section
+      .split("\n")
+      .filter((line) => line.startsWith("- ["))
+      .map((line) => line.replace(/^- \[.\] /, ""));
+
+    ok(criteria.length > 0);
+    for (const criterion of criteria) {
+      ok(criterion.split(/\s+/).length <= 25, criterion);
+      ok(!/[.!?]\s/.test(criterion), criterion);
+    }
+  });
+
   it("copies the changed Vision to the Linear project page", () => {
     const skill = read(".claude/skills/vision-evolve/SKILL.md");
 
