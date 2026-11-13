@@ -50,7 +50,13 @@ The check passes when every promise is kept, fixed, or recorded as Not acted on 
 
 ## When the card is the problem
 
-An unclear verdict, an empty file, a promise the user would rather drop, or a broken verdict the user decides the code should not fix — each one means the card itself may be wrong. Stop in both modes and ask the user as "How to ask" below sets out.
+An unclear verdict, an empty file, a promise the user would rather drop, or a broken verdict the user decides the code should not fix — each one means the card itself may be wrong. Stop in both modes and ask the user as "How to ask" below sets out, unless the fix leaves behaviour as it is today and keeps every ask.
+
+### When the fix leaves behaviour as it is today
+
+A rewording that leaves behaviour as it is today and keeps every ask doesn't stop, in both modes. Today means `main` before this card: the new wording describes what `main` already does, so it can't hide a promise the branch broke, and every change the card asks for is still promised. Apply it with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`, then note it on the card with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`: which promise changed, from what to what, and that it leaves behaviour as it is on `main` and keeps every ask. Write the comment following [Linear card language](card-language.md). Then run the check from step 1 against the new wording.
+
+A fix that changes what the card is for, its purpose or scope, still stops for the user.
 
 ### How to ask
 
@@ -70,7 +76,7 @@ Around the shape:
 - **Yes** — apply only the wording the user gives or approves, with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`. Then record the change on the card with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`: which promise changed, from what to what, why, and that the user signed off. Write the comment following [Linear card language](card-language.md). Then run the check from step 1 against the new wording
 - **Fix the code instead** — continue from step 2 with the user's direction
 
-<mark>**A card change always stops for the user, in unattended mode too.**</mark> Unattended mode fixes code without asking; it never decides what the card should promise.
+<mark>**A card change stops for the user, in unattended mode too, unless it leaves behaviour as it is today and keeps every ask.**</mark> Unattended mode fixes code without asking; it never decides what the card should promise.
 
 ## 3. Record the result in the pull request
 

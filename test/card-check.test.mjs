@@ -78,11 +78,27 @@ describe("card check", () => {
     ok(check.includes("Never edit the card to make a verdict pass"));
     ok(
       check.includes(
-        "A card change always stops for the user, in unattended mode too",
+        "A card change stops for the user, in unattended mode too, unless it leaves behaviour as it is today and keeps every ask",
       ),
     );
     ok(check.includes("that the user signed off"));
     ok(check.includes("reference/card-check-review.md"));
+  });
+
+  it("fixes the card itself when the fix leaves behaviour as it is on main", () => {
+    const check = read(".claude/commands/linear/reference/card-check.md");
+
+    ok(check.includes("Today means `main` before this card"));
+    ok(
+      check.includes(
+        "that it leaves behaviour as it is on `main` and keeps every ask",
+      ),
+    );
+    ok(
+      check.includes(
+        "A fix that changes what the card is for, its purpose or scope, still stops for the user",
+      ),
+    );
   });
 
   it("judges only what the finished change can show", () => {
