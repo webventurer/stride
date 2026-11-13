@@ -18,6 +18,15 @@ describe("vision-evolve skill", () => {
     ok(skill.includes("needs no sign-off"));
   });
 
+  it("says a Success criterion is one sentence of 25 words or fewer", () => {
+    for (const path of [
+      ".claude/skills/vision-evolve/SKILL.md",
+      "docs/skills/vision-evolve.md",
+    ]) {
+      ok(read(path).includes("one sentence of 25 words or fewer"), path);
+    }
+  });
+
   it("keeps every Success criterion to one sentence of 25 words or fewer", () => {
     const section = read("VISION.md")
       .split("## Success criteria")[1]

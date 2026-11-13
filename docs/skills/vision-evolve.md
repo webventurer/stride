@@ -14,7 +14,7 @@ Anyone reading `VISION.md` should be able to trust two things: every line names 
 
 These guidelines are what the principle usually asks for. When a case fits none of them, the agent goes back to the principle.
 
-- **A line says something true and useful about what the project delivers.** A Success criterion names an outcome someone could see, in words a reader who has never seen the code understands.
+- **A line says something true and useful about what the project delivers.** A Success criterion names an outcome someone could see, in words a reader who has never seen the code understands. Every card quotes the line it serves, so each line is one sentence of 25 words or fewer, with the how left to the cards.
 - **Work that fits no line means the Vision has grown.** Grow it honestly. Squeezing the work into a line that doesn't cover it leaves a trace that says the work was verified when it wasn't.
 - **Lines that overlap become one stronger line.** Two lines that say nearly the same thing leave nobody sure which one a card serves.
 - **A line written only to justify one card isn't useful.** It should name the lasting outcome the work reveals, so a later card with nothing to do with this one could still be filed against it.
