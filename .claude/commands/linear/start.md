@@ -539,7 +539,7 @@ happens first.
 - No commits ahead of `main` → stop
 - Build fails → fix, re-validate, continue
 - Simplification reviewer proposes nothing → not an error, report and continue
-- Card check finds an unclear promise or nothing checkable → stop for the user, in both modes
+- Card check finds an unclear promise or nothing checkable → stop for the user, in both modes, unless the fix leaves behaviour as it is today and keeps every ask
 - PR already exists → not an error, show URL and continue
 - diffity missing or errors → skip the visual diff silently; the PR on GitHub is the diff surface, never a terminal `git diff`
 - Squash leaves the diff stat changed (file content drift) → abort the squash, restore via reflog, leave commits as-is
