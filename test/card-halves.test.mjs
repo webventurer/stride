@@ -72,6 +72,28 @@ describe("card halves", () => {
       );
     });
 
+    it(`${name} template example keeps each reader's line to two sentences with no backticks`, () => {
+      const template = read(path);
+      const example = template.slice(template.indexOf("## Example"));
+      const lines = example
+        .split("\n\n")
+        .filter((paragraph) =>
+          /^\*\*(Today|The problem|The change|Example):\*\*/.test(paragraph),
+        );
+
+      ok(
+        lines.length === 4,
+        `${name}: expected four labelled lines, found ${lines.length}`,
+      );
+      for (const line of lines) {
+        ok(
+          (line.match(/[.!?](\s|$)/g) ?? []).length <= 2,
+          `${name}: over two sentences: ${line}`,
+        );
+        ok(!line.includes("`"), `${name}: backticks in: ${line}`);
+      }
+    });
+
     it(`${name} template has no Where things stand section`, () => {
       ok(!read(path).includes("### Where things stand"), name);
     });
