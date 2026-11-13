@@ -119,8 +119,9 @@ characters total. Example: `Epic: Bulk/Batch Blog Processing
 ### Why this matters
 
 **Serves:** the verbatim measurable criterion from the Vision
-this work serves, in double quotes — e.g. "Linear board state
-matches branch state automatically as /linear:* runs". A
+this work serves, in double quotes — e.g. "The card moves
+through Backlog → Doing → In Review → Done as `/linear:*` runs".
+A
 cross-project card, which has no Vision to quote, holds the
 "Vision anchoring deferred" line from `plan-work.md` instead.
 
@@ -175,7 +176,7 @@ shape of the work.
 
 ### Why this matters
 
-**Serves:** "Linear board state matches branch state automatically as `/linear:*` runs (Backlog → Doing → In Review → Done)"
+**Serves:** "The card moves through Backlog → Doing → In Review → Done as `/linear:*` runs — no manual clicks on the board"
 
 **Today:** big pieces of work are filed as milestones, which have no description and never show up on the kanban board, like a chapter heading printed on a page nobody turns to.
 

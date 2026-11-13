@@ -125,8 +125,9 @@ toggle to dashboard header"). Under 70 characters.
 ### Why this matters
 
 **Serves:** the verbatim measurable criterion from the Vision
-this work serves, in double quotes — e.g. "Linear board state
-matches branch state automatically as /linear:* runs". A
+this work serves, in double quotes — e.g. "The card moves
+through Backlog → Doing → In Review → Done as `/linear:*` runs".
+A
 cross-project card, which has no Vision to quote, holds the
 "Vision anchoring deferred" line from `plan-work.md` instead.
 
