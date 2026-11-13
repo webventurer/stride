@@ -99,6 +99,27 @@ describe("card halves", () => {
     });
   }
 
+  it("example Serves: lines that quote stride's own Vision match VISION.md", () => {
+    const vision = read("VISION.md");
+    const quoted = [
+      `${templatesRoot}/epic.md`,
+      "docs/reference/issue-template.md",
+    ].flatMap((path) =>
+      [...read(path).matchAll(/^\*\*Serves:\*\* "(.*)"$/gm)].map((match) => [
+        path,
+        match[1],
+      ]),
+    );
+
+    ok(quoted.length >= 2, "expected an example Serves: line in each file");
+    for (const [path, line] of quoted) {
+      ok(
+        vision.includes(`- [ ] ${line}`),
+        `${path}: not in VISION.md: ${line}`,
+      );
+    }
+  });
+
   it("no instruction asks a card writer for a Where things stand section", () => {
     const allowed = ["older card", "There is no"];
     const offenders = instructionFolders
