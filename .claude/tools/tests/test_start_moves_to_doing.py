@@ -24,3 +24,11 @@ def test_the_move_to_doing_comes_before_the_card_check():
     text = START.read_text()
 
     assert text.index("--state Doing") < text.index(CARD_CHECK_HEADING)
+
+
+def test_the_old_card_rewrite_comes_after_the_move_to_doing_and_before_the_reviewers():
+    text = START.read_text()
+
+    rewrite = text.index("reference/rewrite-old-card.md")
+    assert text.index("--state Doing") < rewrite
+    assert rewrite < text.index("**Spawn three reviewers at once.**")

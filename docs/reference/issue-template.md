@@ -60,7 +60,7 @@ Sections 7, 9, and 10 are optional — omit them when they don't add value.
 
 ### The reader's half
 
-The five lines are one or two sentences each (**Serves:** is as long as the Vision line is), written in plain words for a reader of about 16: no file names and no commands in backticks outside the **Serves:** quote, and any stride term explained in the same sentence. The reader's half promises nothing the builder's half doesn't also promise, and whoever rewords one half rewords the other in the same edit. There is no "Where things stand" section: what happens now goes in **Today:**. A card already on the board without the reader's half is left as it is.
+The five lines are one or two sentences each (**Serves:** is as long as the Vision line is), written in plain words for a reader of about 16: no file names and no commands in backticks outside the **Serves:** quote, and any stride term explained in the same sentence. The reader's half promises nothing the builder's half doesn't also promise, and whoever rewords one half rewords the other in the same edit. There is no "Where things stand" section: what happens now goes in **Today:**. A story or bug card already on the board without the reader's half is rewritten into this shape when `/linear:start` starts it, and left as it is until then.
 
 A bug card keeps the same reader's half, and its builder's half holds its symptoms, repro, expected vs actual, suspected causes, what we won't do, acceptance and regression test instead of the four story sections.
 
