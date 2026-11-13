@@ -73,7 +73,7 @@ Around the shape:
 
 ### What the answer does
 
-- **Yes** — apply only the wording the user gives or approves, with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`. Then record the change on the card with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`: which promise changed, from what to what, why, and that the user signed off. Write the comment following [Linear card language](card-language.md). Then run the check from step 1 against the new wording
+- **Yes** — apply only the wording the user gives or approves, rewording both halves in the same edit so "The change:" never describes the old behaviour, with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`. Then record the change on the card with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`: which promise changed, from what to what, why, and that the user signed off. Write the comment following [Linear card language](card-language.md). Then run the check from step 1 against the new wording
 - **Fix the code instead** — continue from step 2 with the user's direction
 
 <mark>**A card change stops for the user, in unattended mode too, unless it leaves behaviour as it is today and keeps every ask.**</mark> Unattended mode fixes code without asking; it never decides what the card should promise.
