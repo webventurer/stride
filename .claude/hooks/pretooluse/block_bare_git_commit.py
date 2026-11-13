@@ -52,6 +52,8 @@ OPTIONS_WITH_VALUE = {
     "--config-env",
     "--attr-source",
     "--super-prefix",
+    "--git-dir",
+    "--work-tree",
 }
 REDIRECTING_OPTIONS = ("--git-dir", "--work-tree")
 SCOPE_MARKERS = re.compile(r"[(){}`|]|(?<!&)&(?!&)")

@@ -79,6 +79,8 @@ ROWS = [
     ("2>&1 git commit -m x", "project", REFUSED),
     ("env git commit -m x", "project", REFUSED),
     ("git commit -m x 2>&1", "scratch", ALLOWED),
+    ("git --git-dir {project}/.git commit -m x", "scratch", REFUSED),
+    ("git --work-tree {project} commit -m x", "scratch", REFUSED),
 ]
 
 
