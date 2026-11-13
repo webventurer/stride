@@ -324,7 +324,7 @@ uv run .claude/tools/openrouter_cli.py "<full draft text + Claude assessment>" -
 
 4. **User decides** — ask: **"Send to ChatGPT again or save the issue on Linear?"**
    - If **again** — repeat from step 1 with the revised draft
-   - If **save** — the user has seen the draft; saving counts as the approval step 11 asks for, on every path. Continue to step 12
+   - If **save** — on the epic-sized path, continue to step 11 for its approval. On the story and bug path the user has seen the draft, so saving counts as the approval; continue to step 12
 
 Each round has three voices: Claude proposes and synthesises, ChatGPT challenges, the user steers. The loop sharpens the issue through cross-model perspectives — like a design review but for issue planning.
 
@@ -351,7 +351,7 @@ When something is open in interactive mode, show the full draft to the user and 
 
 ### 12. Create the issue
 
-Only after every check passes with nothing open, after interactive approval, or on the epic-sized path after its approval.
+Only after every check passes with nothing open, after interactive approval, on the epic-sized path after its approval, or in unattended mode after every hard check passes.
 Write the drafted description to a file first and pass it with `--description
 @<file>` — the body is multi-line markdown, so it goes through a file, never an
 inline string ([why](reference/workflow.md#how-skills-talk-to-linear)).
@@ -378,7 +378,7 @@ Do not assign the issue unless the user explicitly requested it.
 
 ### 13. Confirm creation
 
-Never print the draft. On the epic-sized path, the summary in [epic flow](reference/epic-flow.md) replaces this receipt, and the rest of this step is for story and bug cards. First print only the lines other steps require, when they apply: what the code check corrected in the description (step 7), similar issues found (step 3), the cross-project note (step 1), and the one line naming each follow-up left out (step 7).
+Never print the draft. On the epic-sized path, display the identifier, URL and branch name after the summary in [epic flow](reference/epic-flow.md), as before; the rest of this step is for story and bug cards. First print only the lines other steps require, when they apply: what the code check corrected in the description (step 7), similar issues found (step 3), the cross-project note (step 1), and the one line naming each follow-up left out (step 7).
 
 Then end the run with the receipt as one line:
 
