@@ -164,16 +164,18 @@ Interactive mode shows that order and asks once: **"Write this order to Todo on 
 
 #### Pick the next batch
 
-Cards that don't depend on each other can run side by side, so next-steps names the next batch. It works down Todo in the order above, adding each card that passes two rules, until the batch holds the `parallel-sessions` number from `.stride.json` or Todo runs out:
+Cards that don't depend on each other can run side by side, so next-steps names the next batch. It works down Todo in the order above, adding each card that passes the rules below, until the batch holds the `parallel-sessions` number from `.stride.json` or Todo runs out:
 
 - **Blockers:** a card is out while any card blocking it is not Done, wherever that blocker sits. A blocker that is Done doesn't count.
-- **Files:** a card is out when it shares a file with a card already in the batch. A card's files are the backticked names ending in a file extension, such as `next-steps.md`, anywhere in its description except "Why this matters", "What we won't do" and "Live check", with a command allowed after the name (`linear_cli.py order-todo`). The file behind each `/command` or `/skill` named in "What we'll do" counts too: `/linear:start` is `.claude/commands/linear/start.md`. Two paths are the same file when one ends with the other.
+- **Answers:** a card is out while a lesson question on it has no answer.
+
+A file name that two cards share never holds one out: each card runs in its own worktree, and the merge, one card at a time, sorts out a shared file.
 
 ```bash
 uv run .claude/tools/linear_cli.py next-batch --project "<project>"
 ```
 
-Show each card it considered, in or out, with the reason it gives, such as "blocked by WB-12" or "shares `report.py` with WB-14". Call the batch a best guess: two cards can still clash in a file neither mentions. When the command stops with the `parallel-sessions` setting's message instead, show that message in place of a batch. Next-steps doesn't run the batch.
+Show each card it considered, in or out, with the reason it gives, such as "blocked by WB-12". When the command stops with the `parallel-sessions` setting's message instead, show that message in place of a batch. Next-steps doesn't run the batch.
 
 ### 7. Recommend next actions
 
