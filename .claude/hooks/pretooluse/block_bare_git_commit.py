@@ -76,9 +76,9 @@ def refusal_for(command, start, project):
     loose = statements is None
     if loose:
         statements = loose_statements(command)
-    commits = commits_in(statements, start, command, loose)
-    if not commits and loose and BARE_COMMIT.search(command):
-        commits = [start]
+    commits, last_folder = commits_in(statements, start, command, loose)
+    if loose and BARE_COMMIT.search(command):
+        commits.append(last_folder)
     if not commits:
         return None
     if GIT_REDIRECT.search(command):
@@ -223,7 +223,7 @@ def commits_in(statements, start, command, loose):
                 found = commit_folder(tokens[index + 1 :], folder)
                 if found is not False:
                     commits.append(found)
-    return commits
+    return commits, folder
 
 
 def command_index(tokens):

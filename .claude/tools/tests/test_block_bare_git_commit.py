@@ -81,6 +81,9 @@ ROWS = [
     ("git commit -m x 2>&1", "scratch", ALLOWED),
     ("git --git-dir {project}/.git commit -m x", "scratch", REFUSED),
     ("git --work-tree {project} commit -m x", "scratch", REFUSED),
+    ('cd {project} && echo "git commit', "scratch", REFUSED),
+    ('git -C {scratch} commit -m a && echo "git commit', "project", REFUSED),
+    ("bash -c 'git commit -m x'", "project", ALLOWED),
 ]
 
 
