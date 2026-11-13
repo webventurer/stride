@@ -317,7 +317,7 @@ After drafting the issue, **Claude presents the draft** with its own assessment 
 1. **Send to ChatGPT** — send the current draft (including Claude's assessment) to ChatGPT. The helper's default reviewer model is OpenRouter's `~openai/gpt-latest` alias, which auto-refreshes server-side as OpenAI ships new top-tier models. Override with `-m <other-model>` only when a different reviewer voice is wanted.
 
 ```bash
-uv run .claude/tools/openrouter_cli.py "<full draft text + Claude assessment>" -s "You are reviewing a Linear issue draft and a first review from Claude. Give specific, actionable feedback on why this matters, where things stand, what we'll do, and expected outcome. Point out gaps, assumptions, or scope creep. Agree or disagree with the first review. Be direct."
+uv run .claude/tools/openrouter_cli.py "<full draft text + Claude assessment>" -s "You are reviewing a Linear issue draft and a first review from Claude. Give specific, actionable feedback on the reader's half (what it serves, today, the problem, the change, an example), what we'll do, and expected outcome. Point out gaps, assumptions, or scope creep. Agree or disagree with the first review. Be direct."
 ```
 
 2. **Show ChatGPT's feedback** — display the full ChatGPT response as text output so the user can read it. Do not summarise or collapse it — the user needs to see the raw feedback before Claude responds. Use a heading like "**ChatGPT's feedback (round N):**" followed by the complete response text.
