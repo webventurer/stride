@@ -19,8 +19,8 @@
 #   STRIDE_SMOKE_IMAGE=ubuntu:22.04 LINEAR_API_KEY=... ./onboarding/smoke-test.sh
 #
 # Exits 0 if under budget, 1 if over, 2 on setup error. Anchors on the Vision
-# criterion: "Setup gets a fresh user from `npx` to their first successful
-# `/linear:start` in under 90 seconds on any supported OS."
+# criterion: "Setup takes a fresh user from `npx` to a first successful
+# `/linear:start` in under 90 seconds on any supported OS"
 
 set -euo pipefail
 
