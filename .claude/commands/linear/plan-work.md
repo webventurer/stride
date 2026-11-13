@@ -282,7 +282,7 @@ sub-issue drafts.
 
 **Epic parent-issue drafts** — use [epic.md](reference/templates/epic.md) instead. Sub-issues under the parent default to story.md — they're stories that happen to have a parent. When the epic is also bug-shaped (`--epic --bug`), sub-issues use bug.md instead. Research mode never applies to the epic itself; that detail belongs on each sub-issue.
 
-**Ground the draft in the Vision** loaded at step 1 — *within-project mode only*. The "Serves:" line must quote, word for word, the one Vision outcome the issue serves — a Success criteria line, or a "What can't change" line — and "The change:" explains how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
+**Ground the draft in the Vision** loaded at step 1 — *within-project mode only*. The "Serves:" line must quote, word for word, the one Vision success criterion the issue serves, and "The change:" explains how this work moves toward it. If the user's description doesn't trace cleanly to any Vision outcome:
 
 > "I can't trace this work back to a Vision outcome. The Vision says: [list relevant outcomes]. Two paths:
 >
