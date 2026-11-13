@@ -56,7 +56,7 @@ Copying a template to create an independent starting point may be appropriate. C
 
 ### Writing a Linear story
 
-The principle is that a reader should understand why the work matters and predict what the proposed change will do. That explains the order in [story.md](../../../commands/linear/reference/templates/story.md): **Why this matters → Where things stand → What we'll do**.
+The principle is that a reader should understand why the work matters and predict what the proposed change will do. That explains the order in [story.md](../../../commands/linear/reference/templates/story.md): **the reader's half (Serves → Today → The problem → The change → Example) → What we'll do**.
 
 Within “What we'll do”, name the relevant principle when one exists, then explain how the proposed behaviour follows from it. Concrete triggers, checks, exceptions and examples make that reasoning usable. Configuration names and file lists come after the explanation. The principle gives the reader a reason; the details let them implement and verify the decision.
 
