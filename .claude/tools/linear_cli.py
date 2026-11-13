@@ -62,6 +62,7 @@ from linear import (  # noqa: E402
     resolve_project_id,
     resolve_state_for_issue,
     resolve_workspace_labels,
+    rewrite_template,
     screenshot_tool,
     search_by_project,
     set_project_view_manual,
@@ -382,6 +383,15 @@ def issue_blockers_cmd(identifier: str):
 @click.argument("identifier")
 def issue_description_changed_at_cmd(identifier: str):
     echo_json(get_description_changed_at(identifier))
+
+
+@issue_group.command("rewrite-template")
+@click.argument("identifier")
+def issue_rewrite_template_cmd(identifier: str):
+    issue = get_issue(bearer_token(), identifier)
+    if not issue:
+        raise click.ClickException(f"Issue not found: {identifier}")
+    echo_json(rewrite_template(issue))
 
 
 @issue_group.command("block")

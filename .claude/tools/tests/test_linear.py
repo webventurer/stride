@@ -1892,6 +1892,73 @@ def test_issue_description_changed_at_prints_the_time():
     assert json.loads(result.output) == "2026-11-04T10:00:00.000Z"
 
 
+# ---- WB-1053: an old-shape card is rewritten when work starts on it ----
+
+
+def card_in_shape(description, state="Doing", labels=("Story",), title="A card"):
+    return {
+        "title": title,
+        "description": description,
+        "state": {"name": state},
+        "labels": {"nodes": [{"name": name} for name in labels]},
+    }
+
+
+OLD_SHAPE = "### Why this matters\n\nAn old card.\n\n### What we'll do\n\nIt."
+NEW_SHAPE = "**For the reader**\n\n### Why this matters\n\n---\n\n**For the builder**"
+
+
+def test_rewrite_template_is_story_for_an_old_card():
+    assert linear.rewrite_template(card_in_shape(OLD_SHAPE)) == "story"
+
+
+def test_rewrite_template_is_bug_for_an_old_card_with_the_bug_label():
+    card = card_in_shape(OLD_SHAPE, labels=("Bug",))
+
+    assert linear.rewrite_template(card) == "bug"
+
+
+def test_rewrite_template_is_none_for_a_card_already_in_the_new_shape():
+    assert linear.rewrite_template(card_in_shape(NEW_SHAPE)) == "none"
+
+
+def test_rewrite_template_ignores_a_card_that_only_quotes_the_reader_half():
+    quoting = "### Why this matters\n\nAdd a **For the reader** half."
+
+    assert linear.rewrite_template(card_in_shape(quoting)) == "story"
+
+
+@pytest.mark.parametrize("state", ["Done", "Canceled"])
+def test_rewrite_template_is_none_for_a_closed_card(state):
+    assert linear.rewrite_template(card_in_shape(OLD_SHAPE, state)) == "none"
+
+
+def test_rewrite_template_is_none_for_an_epic():
+    by_label = card_in_shape(OLD_SHAPE, labels=("Epic",))
+    by_title = card_in_shape(OLD_SHAPE, title="Epic: A big thing")
+
+    assert linear.rewrite_template(by_label) == "none"
+    assert linear.rewrite_template(by_title) == "none"
+
+
+@pytest.mark.parametrize("description", ["", None, "  \n"])
+def test_rewrite_template_is_none_for_an_empty_description(description):
+    assert linear.rewrite_template(card_in_shape(description)) == "none"
+
+
+def test_issue_rewrite_template_prints_the_template():
+    with (
+        patch("linear_cli.bearer_token", return_value="lin_test"),
+        patch("linear_cli.get_issue", return_value=card_in_shape(OLD_SHAPE)),
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli, ["issue", "rewrite-template", "WB-9"]
+        )
+
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output) == "story"
+
+
 # ---- WB-942: /linear:start with no card runs the next batch from Todo ----
 
 
