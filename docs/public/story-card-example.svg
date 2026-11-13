@@ -1,48 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 850" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 912" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif">
   <!-- Card -->
-  <rect x="1" y="1" width="758" height="848" fill="#ffffff" stroke="#e5e7eb" stroke-width="1" rx="10"/>
+  <rect x="1" y="1" width="758" height="910" fill="#ffffff" stroke="#e5e7eb" stroke-width="1" rx="10"/>
 
   <!-- Title -->
   <text x="32" y="56" font-size="22" font-weight="700" fill="#111827">Each fruit shows its variety and harvest date</text>
 
-  <!-- Why this matters -->
-  <text x="32" y="108" font-size="16" font-weight="700" fill="#111827">Why this matters</text>
-  <text x="32" y="138" font-size="14" fill="#374151">The catalogue lumps every fruit into one generic "fruit" row,</text>
-  <text x="32" y="158" font-size="14" fill="#374151">so customers can't search by apple variety. Surfacing variety</text>
-  <text x="32" y="178" font-size="14" fill="#374151">and harvest date is the precondition for filter and notify.</text>
-
-  <!-- Where things stand -->
-  <text x="32" y="220" font-size="16" font-weight="700" fill="#111827">Where things stand</text>
-  <text x="32" y="250" font-size="14" fill="#374151">Catalogue shows one row per orchard with fruit type as a single</text>
-  <text x="32" y="270" font-size="14" fill="#374151">string. No variety, no harvest date, no Cox vs Braeburn.</text>
-
+  <!-- For the reader -->
+  <text x="32" y="108" font-size="12" font-weight="700" letter-spacing="1" fill="#6b7280">FOR THE READER</text>
+  <text x="32" y="138" font-size="16" font-weight="700" fill="#111827">Why this matters</text>
+  <text x="32" y="168" font-size="14" fill="#374151"><tspan font-weight="700" fill="#111827">Serves:</tspan> "Customers can find a fruit by its variety"</text>
+  <text x="32" y="188" font-size="14" fill="#374151"><tspan font-weight="700" fill="#111827">Today:</tspan> the catalogue lists every fruit as one generic "fruit" row,</text>
+  <text x="32" y="208" font-size="14" fill="#374151">like a shop shelf with no labels.</text>
+  <text x="32" y="228" font-size="14" fill="#374151"><tspan font-weight="700" fill="#111827">The problem:</tspan> customers can't search by apple variety, and variety and</text>
+  <text x="32" y="248" font-size="14" fill="#374151">harvest date are what filter and notify need first.</text>
+  <text x="32" y="268" font-size="14" fill="#374151"><tspan font-weight="700" fill="#111827">The change:</tspan> each catalogue row shows the fruit's variety and harvest date.</text>
+  <text x="32" y="288" font-size="14" fill="#374151"><tspan font-weight="700" fill="#111827">Example:</tspan> a customer tells a Cox from a Braeburn at a glance.</text>
+  <line x1="32" y1="314" x2="728" y2="314" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="32" y="344" font-size="12" font-weight="700" letter-spacing="1" fill="#6b7280">FOR THE BUILDER</text>
   <!-- What we'll do -->
-  <text x="32" y="312" font-size="16" font-weight="700" fill="#111827">What we'll do</text>
-  <text x="32" y="342" font-size="14" fill="#374151">• Add Variety model with name, kind enum, and notes</text>
-  <text x="32" y="362" font-size="14" fill="#374151">• Add harvested_on date to the Fruit model</text>
-  <text x="32" y="382" font-size="14" fill="#374151">• Render variety + harvest date on each catalogue row</text>
+  <text x="32" y="374" font-size="16" font-weight="700" fill="#111827">What we'll do</text>
+  <text x="32" y="404" font-size="14" fill="#374151">• Add Variety model with name, kind enum, and notes</text>
+  <text x="32" y="424" font-size="14" fill="#374151">• Add harvested_on date to the Fruit model</text>
+  <text x="32" y="444" font-size="14" fill="#374151">• Render variety + harvest date on each catalogue row</text>
 
   <!-- What we won't do -->
-  <text x="32" y="424" font-size="16" font-weight="700" fill="#111827">What we won't do</text>
-  <text x="32" y="454" font-size="14" fill="#374151">• No filter or search-by-variety UI yet — data only</text>
-  <text x="32" y="474" font-size="14" fill="#374151">• No editing varieties from the catalogue page</text>
+  <text x="32" y="486" font-size="16" font-weight="700" fill="#111827">What we won't do</text>
+  <text x="32" y="516" font-size="14" fill="#374151">• No filter or search-by-variety UI yet — data only</text>
+  <text x="32" y="536" font-size="14" fill="#374151">• No editing varieties from the catalogue page</text>
 
   <!-- Expected outcome -->
-  <text x="32" y="516" font-size="16" font-weight="700" fill="#111827">Expected outcome</text>
-  <text x="32" y="546" font-size="14" fill="#374151">• Each row shows variety name (or "—") and harvest date</text>
-  <text x="32" y="566" font-size="14" fill="#374151">• A customer tells Cox from Braeburn at a glance</text>
+  <text x="32" y="578" font-size="16" font-weight="700" fill="#111827">Expected outcome</text>
+  <text x="32" y="608" font-size="14" fill="#374151">• Each row shows variety name (or "—") and harvest date</text>
+  <text x="32" y="628" font-size="14" fill="#374151">• A customer tells Cox from Braeburn at a glance</text>
 
   <!-- How to test it -->
-  <text x="32" y="608" font-size="16" font-weight="700" fill="#111827">How to test it</text>
-  <text x="32" y="638" font-size="14" fill="#374151">Write tests first. Unit: kind enum + past-date validation.</text>
-  <text x="32" y="658" font-size="14" fill="#374151">Integration: catalogue page renders both fields. Manual:</text>
-  <text x="32" y="678" font-size="14" fill="#374151">load /catalogue against staging seed data.</text>
+  <text x="32" y="670" font-size="16" font-weight="700" fill="#111827">How to test it</text>
+  <text x="32" y="700" font-size="14" fill="#374151">Write tests first. Unit: kind enum + past-date validation.</text>
+  <text x="32" y="720" font-size="14" fill="#374151">Integration: catalogue page renders both fields. Manual:</text>
+  <text x="32" y="740" font-size="14" fill="#374151">load /catalogue against staging seed data.</text>
 
   <!-- Assumptions to confirm -->
-  <text x="32" y="720" font-size="16" font-weight="700" fill="#111827">Assumptions to confirm</text>
-  <text x="32" y="750" font-size="14" fill="#374151">Legacy fruit_type maps cleanly to the kind enum — confirm</text>
-  <text x="32" y="770" font-size="14" fill="#374151">before running the backfill migration.</text>
+  <text x="32" y="782" font-size="16" font-weight="700" fill="#111827">Assumptions to confirm</text>
+  <text x="32" y="812" font-size="14" fill="#374151">Legacy fruit_type maps cleanly to the kind enum — confirm</text>
+  <text x="32" y="832" font-size="14" fill="#374151">before running the backfill migration.</text>
 
   <!-- Footer caption -->
-  <text x="32" y="817" font-size="12" font-style="italic" fill="#9ca3af">Mock-up. Story ships as one PR; the parent epic ticks 1/8 when this closes.</text>
+  <text x="32" y="879" font-size="12" font-style="italic" fill="#9ca3af">Mock-up. Story ships as one PR; the parent epic ticks 1/8 when this closes.</text>
 </svg>
