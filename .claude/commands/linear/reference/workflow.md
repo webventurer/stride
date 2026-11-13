@@ -97,7 +97,7 @@ For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved c
 
 ### `/linear:plan-work`
 
-**Plan work and create a Linear issue.** Checks for duplicates, optionally refines the description with CRAFT, reads the code the card would touch to confirm the problem and the fix hold up, drafts title and description, and waits for your approval before creating.
+**Plan work and create a Linear issue.** Checks for duplicates, optionally refines the description with CRAFT, reads the code the card would touch to confirm the problem and the fix hold up, drafts title and description, and files the card without showing the draft, ending with one line: the identifier, title, link and branch name. It stops and shows the draft only when something needs your decision, such as a near-duplicate, a Vision ambiguity or a case that doesn't move the needle.
 
 In `--research` mode, also explores Linear and the project's documents, then adds code examples (showing how similar patterns are already implemented) and acceptance criteria (observable outcomes, not implementation steps).
 
