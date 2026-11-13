@@ -14,7 +14,7 @@ Answer one question: **can every promise on this card be checked, should it stil
 
 ## What you read
 
-- **The card** you were given: its title and whole description. Its promises are exactly the ones the end check reads; follow [Find the promises](card-check-review.md#find-the-promises) in the end check's brief, including what it says makes no promise
+- **The card** you were given: its title and whole description. **Today:** (older cards: "Where things stand") is where it says what it assumes about the code; check that assumption against the repository. Its promises are exactly the ones the end check reads; follow [Find the promises](card-check-review.md#find-the-promises) in the end check's brief, including what it says makes no promise
 - **`VISION.md`:** the criterion the card's "Serves:" line (older cards: "Why this matters") claims to serve
 - **The current repository:** the code, tests and documents the card's promises concern
 - **Finished sibling cards**, when you were given a parent epic. List its cards with `uv run .claude/tools/linear_cli.py list-by-parent <epic-UUID>`, using the UUID you were given, read each Done sibling with `uv run .claude/tools/linear_cli.py issue get <id>`, and see what it shipped with `git log main -i --grep=<id>`

@@ -133,7 +133,8 @@ has no Vision to quote, holds the "Vision anchoring deferred"
 line from `plan-work.md` instead.
 
 **Today:** what happens now, with an everyday comparison
-(1–2 sentences).
+(1–2 sentences). It includes any fact the builder can't find in
+the code, such as something seen in another project.
 
 **The problem:** who hits this, how often, what they can't do
 because of it, and what happens if nothing is done (1–2
