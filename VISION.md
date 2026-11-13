@@ -39,42 +39,44 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 
 ## Success criteria
 
-- [ ] When new work strains against older criteria, the Vision can be updated to reflect what was learned — `VISION.md` evolves with the work, not separately from it
-- [ ] Work is filed against a criterion it plainly serves. When the closest one only fits if you stretch what it says, the loop stops and says so before merging, instead of picking the nearest and calling it verified
-- [ ] What a reader is told stride installs matches what it installs — every shipped skill and command is described where a reader looks, and the counts agree across the README, the docs site and the installer's own output
-- [ ] Stride's own code, and the examples in the docs it installs, follow one consistent house style — such as each helper sitting below the code that calls it — so an agent learning from either picks up one way of writing code
-- [ ] You can improve stride through using it — friction hit while working *in* the project can be surfaced, fixed, and used *on* the project within the same session, so the tool compounds
-- [ ] Every commit on a stride-managed branch passes multi-pass atomicity — no monolithic commits, every message explains *why*
-- [ ] What ships is the simplest thing that works — before you review a change, a reviewer that never saw the reasoning reads it cold and names what can be deleted, so scaffolding that felt necessary while writing it never reaches `main`
-- [ ] What merges does what its card promised — before merge, a reviewer that never saw the reasoning checks the change against the card's stated outcomes, and any gap is either fixed or the card is deliberately revised, never quietly rewritten to match: with sign-off, or, when the new wording leaves behaviour as it is on `main` and keeps every ask, with a note on the card saying so
-- [ ] Right tool for right job: every branch in a stride skill points at the artifact designed for its case — story drafts to `story.md`, epic drafts to `epic.md` — and never falls back to a generic "whatever's around" default
-- [ ] Stride's command files (`.claude/commands/*.md`) stay scannable as they grow — a reader can locate a step, rule, or flag in seconds, not minutes
-- [ ] Every `/linear:*` command produces the output its own spec documents — a documented column, sort, or field shows real data, never a silent blank or arbitrary order
-- [ ] You can predict how stride will behave by reading the repo, not by knowing hidden rules — a default that changes behaviour is materialised in the file it governs (e.g. `.stride.json`'s `focus`), so the active behaviour is inspectable on disk, never knowable only from prose or fallback code
+- [ ] When new work strains against the Success criteria, the Vision is updated with what was learned, so it evolves with the work
+- [ ] Work is filed against a criterion it plainly serves, and when none fits without stretching, stride stops and says so before merging
+- [ ] Every skill and command stride installs is described where a reader looks, with the same counts in the README, the docs site and the installer
+- [ ] Stride's code and the examples in its docs follow one house style, so an agent reading either learns one way to write code
+- [ ] Friction hit while working on stride can be surfaced, fixed and used within the same session, so the tool improves as you use it
+- [ ] Every commit on a stride-managed branch does one job, with no monolithic commits, and its message explains why
+- [ ] What ships is the simplest thing that works: before you review a change, a reviewer who never saw the reasoning names what to delete
+- [ ] What merges does what its card promised: before merge, a reviewer who never saw the reasoning checks it, and any gap is fixed
+- [ ] A card is never quietly rewritten to match the work: a revision needs your sign-off, or a note when behaviour and every ask stay unchanged
+- [ ] Every case in a stride skill points at the artifact made for that case, such as the story template, never a generic fallback
+- [ ] Stride's command files stay scannable as they grow, so a reader finds a step, rule or flag in seconds, not minutes
+- [ ] Every `/linear:*` command shows what its own spec documents, so each column, sort and field holds real data, never a silent blank or arbitrary order
+- [ ] You can predict stride's behaviour from the repo: a default that changes behaviour sits in the file it governs, not hidden in prose or code
 - [ ] The common path through every `/linear:*` command runs without prompts; interruptions appear only when stride detects friction worth the user's judgement
-- [ ] You can review your working changes at any point without leaving the flow — `/linear:start` surfaces the diff at its review step, and (with diffity installed) `/diffity-diff` opens a visual diff on demand
-- [ ] Parallel work streams run without leaving the editor — `--worktree` prepares a worktree you open as a terminal in the current VS Code window, so multiple cards run side by side without alt-tabbing between windows
-- [ ] The cards you move to Todo reach Done as fast as they can without lowering quality, and you never schedule them: `/linear:start` orders them, runs the independent ones side by side up to the number `parallel-sessions` sets in `.stride.json`, holds back any card that waits on another, and every card still passes every check it would get on its own
-- [ ] A batch of cards survives a lost network connection: a job whose session was cut off by it is resumed, after a wait and once a slot is free, so a temporary outage costs a retry rather than a lost job, and a job that cannot be saved is marked failed and reported instead of sitting unfinished until someone notices
-- [ ] Every finished card teaches the cards still to come: before the next card starts, what the last one's checks found is read, and any card in Todo that the lesson changes is reworded first, with a comment saying what changed and why. Take a small step, learn from it, apply the learning, then take the next step
-- [ ] Every multi-step stride interaction discloses its scope upfront — number of steps, time estimate, escape hatch — so the user is never trapped in an open-ended sequence
-- [ ] When you list the commits this branch is adding, the story reads naturally to a non-engineer scanning top-to-bottom (`git log main..HEAD --oneline` to check)
-- [ ] Every Linear card can be understood by someone who does not know stride's commands or code — its title names a stakeholder outcome, while its description and updates use concrete, everyday words
-- [ ] A card on the board describes the code as it is — its account of the problem and its proposed fix are read against the code, and against any recording or results it cites, before the card is drafted, so nobody picks up a plan the code rules out
-- [ ] A card reaches the board only when there is evidence it will move the needle, and what was left out is named in one line — your attention is spent on work that matters, not on cards you have to read, judge and cancel
+- [ ] You can review your working changes at any point without leaving the flow
+- [ ] Cards worked side by side each get a terminal in your current editor window, so you never switch between windows
+- [ ] Cards in Todo reach Done as fast as they can, side by side where possible, without skipping a check or making you schedule them
+- [ ] A lost network connection costs a batch a retry, not a job: a cut-off job resumes, and one that can't is reported as failed
+- [ ] Every finished card teaches the next ones: before the next starts, its lessons are read and any Todo card they change is reworded, saying why
+- [ ] Every multi-step stride interaction says upfront how many steps, how long, and how to stop, so you're never trapped in an open-ended sequence
+- [ ] A branch's commit list, read top to bottom, tells a story a non-engineer can follow
+- [ ] Anyone who doesn't know stride's commands or code can understand every Linear card: an outcome in its title, everyday words in its description and updates
+- [ ] A card's problem and fix are checked against the code and anything it cites before drafting, so nobody starts a plan the code rules out
+- [ ] A card reaches the board only with evidence it will move the needle, and what was left out is named in one line
 - [ ] The card moves through Backlog → Doing → In Review → Done as `/linear:*` runs — no manual clicks on the board
 - [ ] Stories with a shared purpose sit under one epic, and the epic traces back to a Vision outcome
 - [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
-- [ ] stride's tests exercise the real code under test, never a reimplemented copy — so a regression in the real code fails the suite instead of passing green against a stale duplicate
-- [ ] stride's own Python tooling stays consistently formatted and lint-clean — tidied on demand with a single command, never enforced on the commit path, so housekeeping stays cheap and off the critical path
+- [ ] stride's tests run the real code, never a copy, so a regression in the real code fails the suite
+- [ ] stride's own Python tooling stays formatted and lint-clean through one command run on demand, never a check on the commit path
 - [ ] After `/linear:update-vision` runs, the Linear project description matches `VISION.md`
 - [ ] `npx github:webventurer/stride` installs in under 30 seconds, no global side effects
-- [ ] Setup gets a fresh user from `npx` to their first successful `/linear:start` in under 90 seconds on any supported OS. Authentication uses a Personal API Key in `~/.env`, feeding a single code path through every command. No external CLI dependencies that require building from source.
-- [ ] The same story flow runs from any supported CLI without a second copy of stride — the `/linear:*` commands are reachable by that tool's own convention and the bare-`git commit` block still fires, both generated at install time from the `.claude/` source
-- [ ] Stride's guardrails reach the agent whichever folder its shell sits in: the design principles arrive with every prompt and a bare `git commit` is still blocked, from a subfolder as from the repo root, so no guardrail quietly drops out because the agent changed directory
-- [ ] Onboarding wall-clock time is measured by a smoke-test that runs end-to-end against a clean container on each release. A run that exceeds 90 seconds blocks the release until the regression is identified.
-- [ ] Install is verified on macOS (Apple Silicon), Ubuntu LTS, and Windows-via-WSL2. Each supported OS has a tested install path that runs without compiling dependencies from source.
-- [ ] The prereq-doctor names every missing prerequisite — tools to install **and** permissions to request — with the exact remediation step (a command, a Linear docs link, or a message template for the user to send their admin).
+- [ ] Setup takes a fresh user from `npx` to a first successful `/linear:start` in under 90 seconds on any supported OS
+- [ ] Every command authenticates through one Personal API Key in `~/.env`, and no setup step builds a dependency from source
+- [ ] The same story flow, bare-commit block included, runs from any supported CLI, generated at install time from the one `.claude/` source
+- [ ] Stride's guardrails reach the agent from any folder: the design principles arrive with every prompt and a bare `git commit` is still blocked
+- [ ] Each release runs an end-to-end onboarding test in a clean container, and a run over 90 seconds blocks the release until the cause is found
+- [ ] Install is tested on macOS (Apple Silicon), Ubuntu LTS and Windows via WSL2, each without compiling dependencies from source
+- [ ] The prerequisite check names every missing tool or permission with the exact fix: a command, a Linear docs link, or a message for your admin
 
 ## What can't change
 
