@@ -8,7 +8,7 @@
   <!-- For the reader -->
   <text x="32" y="108" font-size="12" font-weight="700" letter-spacing="1" fill="#6b7280">FOR THE READER</text>
   <text x="32" y="138" font-size="16" font-weight="700" fill="#111827">Why this matters</text>
-  <text x="32" y="168" font-size="14" fill="#374151"><tspan font-weight="700" fill="#111827">Serves:</tspan> "The card moves through Backlog → Doing → In Review → Done as /linear:* runs"</text>
+  <text x="32" y="168" font-size="14" fill="#374151"><tspan font-weight="700" fill="#111827">Serves:</tspan> "The card moves through Backlog → Doing → In Review → Done as /linear:* runs — no manual clicks on the board"</text>
   <text x="32" y="188" font-size="14" fill="#374151"><tspan font-weight="700" fill="#111827">Today:</tspan> the catalogue lists every fruit as one generic "fruit" row,</text>
   <text x="32" y="208" font-size="14" fill="#374151">like a shop shelf with no labels.</text>
   <text x="32" y="228" font-size="14" fill="#374151"><tspan font-weight="700" fill="#111827">The problem:</tspan> customers asking for apples can't find them, and the</text>

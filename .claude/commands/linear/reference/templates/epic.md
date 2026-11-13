@@ -120,8 +120,8 @@ characters total. Example: `Epic: Bulk/Batch Blog Processing
 
 **Serves:** the verbatim measurable criterion from the Vision
 this work serves, in double quotes — e.g. "The card moves
-through Backlog → Doing → In Review → Done as `/linear:*` runs".
-A
+through Backlog → Doing → In Review → Done as `/linear:*` runs —
+no manual clicks on the board". A
 cross-project card, which has no Vision to quote, holds the
 "Vision anchoring deferred" line from `plan-work.md` instead.
 

@@ -78,7 +78,7 @@ No Vision-tracing = no issue. Issues drafted in a vacuum drift from the project'
 
 ### Why this matters
 
-**Serves:** "Every Linear card can be understood by someone who does not know stride's commands or code — its title names a stakeholder outcome, while its description and updates use concrete, everyday words"
+**Serves:** "Anyone who doesn't know stride's commands or code can understand every Linear card: an outcome in its title, everyday words in its description and updates"
 
 **Today:** the issue template has a new two-part layout, but no one has checked how Linear draws it, like printing a poster without looking at the proof.
 
