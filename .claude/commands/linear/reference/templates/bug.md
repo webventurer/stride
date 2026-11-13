@@ -2,7 +2,7 @@
 
 > **What this is**: A CRAFT prompt template used by `plan-work.md` step 4 to turn a bug report into a precise diagnosis-shaped brief before drafting.
 >
-> **Why it exists**: Bugs answer a different shape of question than features — symptoms, repro, expected vs actual, suspected causes. Running bug-shaped work through the story template buries the rigour under *"Where things stand"* and invites premature commitment to a specific fix before diagnosis is done. This template surfaces the bug-shaped sections as first-class, so the draft reads as a diagnosis brief rather than a feature spec wearing a bug label.
+> **Why it exists**: Bugs answer a different shape of question than features — symptoms, repro, expected vs actual, suspected causes. Running bug-shaped work through the story template buries the rigour under story-shaped sections and invites premature commitment to a specific fix before diagnosis is done. This template surfaces the bug-shaped sections as first-class, so the draft reads as a diagnosis brief rather than a feature spec wearing a bug label.
 >
 > **Where it comes from**: The [CRAFT framework](../../../../skills/craft/SKILL.md) (Context, Role, Action, Format, Target audience) — the same meta-prompting technique [story.md](story.md) uses for features. Parallel structure, different sections.
 
@@ -12,14 +12,22 @@
 
 | # | Section | Question it answers |
 |:--|:--------|:--------------------|
-| 1 | Why this matters | Should I care? |
-| 2 | Symptoms | What does a user observe? |
-| 3 | Repro | How do I trigger it? |
-| 4 | Expected vs actual | What's the gap? |
-| 5 | Suspected causes | What might be wrong? |
-| 6 | What we won't do | Where's the boundary? |
-| 7 | Acceptance | How do we know it's fixed? |
-| 8 | Regression test | What would have caught this? |
+| | **For the reader** | Written for the person who decides what goes in Todo, under the `### Why this matters` heading |
+| 1 | Serves | Which Vision success criterion does this bug break? |
+| 2 | Today | What happens now? |
+| 3 | The problem | Should I care? |
+| 4 | The change | What will be different once it's fixed? |
+| 5 | Example | What does it look like? |
+| | *a horizontal rule, then* **For the builder** | Written for the AI that diagnoses and fixes it |
+| 6 | Symptoms | What does a user observe? |
+| 7 | Repro | How do I trigger it? |
+| 8 | Expected vs actual | What's the gap? |
+| 9 | Suspected causes | What might be wrong? |
+| 10 | What we won't do | Where's the boundary? |
+| 11 | Acceptance | How do we know it's fixed? |
+| 12 | Regression test | What would have caught this? |
+
+The reader's half holds the five labelled lines in order. "Today:", "The problem:", "The change:" and "Example:" are one or two sentences each; "Serves:" is whatever length the Vision line is. Outside the "Serves:" quote it names no file and shows no command in backticks, and a stride term it has to use is explained in the same sentence. It promises nothing the builder's half doesn't also promise: "The change:" and "Example:" are the lines that promise, and the start check stops a card whose promise has nothing behind it in the builder's half. Whoever rewords one half rewords the other in the same edit.
 
 <mark>**The bug template drops "What we'll do" and "Assumptions to confirm".**</mark> The deliverable is implicit — *fix the bug* — and committing to a specific fix before diagnosis is done is premature. Each suspected cause is itself an assumption to test, so a separate Assumptions section duplicates the work.
 
@@ -51,7 +59,7 @@ The Vision shapes the bug draft across multiple sections:
 
 | Vision content                  | Bug section it informs              |
 |:--------------------------------|:------------------------------------|
-| Measurable success criteria     | "Why this matters" — quote verbatim |
+| Measurable success criteria     | "Serves:" — quote verbatim          |
 | Constraints / what can't change | "What we won't do" boundary         |
 | Who it's for                    | Stakeholder framing and tone        |
 
@@ -59,7 +67,7 @@ The Vision names its measurable outcomes in the "Success
 criteria" section — a checkbox list of conditions you can tick
 off when delivered. A bug usually surfaces because one of those
 criteria is being violated. Identify which criterion is at
-stake and quote it verbatim in the Why-this-matters section.
+stake and quote it verbatim on the "Serves:" line.
 If the bug doesn't trace to any criterion, do not fabricate a
 connection — flag it as out-of-scope or as a signal the Vision
 needs a new criterion.
@@ -74,28 +82,32 @@ a good bug report leaves the fix open until diagnosis is done.
 
 ACTION:
 1. Identify which measurable criterion from the Vision is at
-   stake and quote it verbatim, then explain why this bug
-   matters — the user impact, business reason, or technical
-   risk that makes it worth fixing now. If no criterion fits,
-   stop and report this back — do not fabricate a connection.
-2. Describe the symptoms — what a user observes, in
+   stake and quote it verbatim on the "Serves:" line. If no
+   criterion fits, stop and report this back — do not fabricate
+   a connection.
+2. Write the rest of the reader's half in plain words: what
+   happens today, why this bug matters (who hits it, how often,
+   what they can't do because of it, what happens if nothing is
+   done), what will be different once it's fixed, and one
+   concrete example.
+3. Describe the symptoms — what a user observes, in
    user-visible terms. Not the internal cause, not the fix —
    just what's wrong from outside.
-3. Write the repro — numbered steps, exact commands, minimal
+4. Write the repro — numbered steps, exact commands, minimal
    setup. A developer with a clean checkout should be able to
    follow these and see the bug.
-4. State the gap — expected behaviour vs actual behaviour, in
+5. State the gap — expected behaviour vs actual behaviour, in
    two lines. No paragraphs.
-5. List suspected causes in order of likelihood. Each cause is
+6. List suspected causes in order of likelihood. Each cause is
    an assumption to test, not a commitment. The first one is
    the most likely; the last one is the long-shot worth
    keeping on the list.
-6. Define what we won't do — scope exclusions, only if
+7. Define what we won't do — scope exclusions, only if
    genuinely useful (e.g. "not refactoring the surrounding
    module while we're in there").
-7. Define acceptance — the failure mode disappears AND the
+8. Define acceptance — the failure mode disappears AND the
    regression test passes. Both, not one.
-8. Name the regression test — the test that would have caught
+9. Name the regression test — the test that would have caught
    this bug if it had existed. Where it lives, what it
    asserts.
 
@@ -110,12 +122,37 @@ title is what shows up on the board.
 
 ## Description
 
+**For the reader**
+
 ### Why this matters
-First line: the verbatim measurable criterion from the Vision
-this bug violates, in italic markdown — e.g. *"Background jobs
-run reliably after the first one"*. Then 1–2 sentences on user
-impact: who hits this, how often, what they can't do because
-of it, and what happens if nothing is done.
+
+**Serves:** the verbatim measurable criterion from the Vision
+this bug violates, in double quotes — e.g. "Background jobs
+run reliably after the first one". A cross-project card, which
+has no Vision to quote, holds the "Vision anchoring deferred"
+line from `plan-work.md` instead.
+
+**Today:** what happens now, with an everyday comparison
+(1–2 sentences). It includes any fact the builder can't find in
+the code, such as something seen in another project.
+
+**The problem:** who hits this, how often, what they can't do
+because of it, and what happens if nothing is done (1–2
+sentences).
+
+**The change:** what will be different once it's fixed, in
+plain words (1–2 sentences). It promises nothing the builder's
+half doesn't.
+
+**Example:** one concrete before-and-after (1–2 sentences).
+
+Written for a reader of about 16: no file names and no commands
+in backticks outside the "Serves:" quote, and a stride term it
+has to use is explained in the same sentence.
+
+---
+
+**For the builder**
 
 ### Symptoms
 What a user observes. User-visible terms, not internals. 2–4
@@ -202,16 +239,28 @@ there in the bug.
 
 > **Submit button does nothing on the contact form**
 
+**For the reader**
+
 ### Why this matters
-*Sets the stakes — why this work is worth doing now.*
 
-*"Users can reach support without leaving the site"*
+**Serves:** "Users can reach support without leaving the site"
 
-The contact form is the only path to support for users with
-billing issues. Clicking Submit produces no visible response —
-no success banner, no error, nothing. Anyone hitting a payment
-problem is silently locked out of the channel that exists to
-help them.
+**Today:** clicking Submit on the contact form does nothing, like
+pressing a doorbell that isn't wired to anything.
+
+**The problem:** the contact form is the only path to support for
+users with billing issues. Anyone hitting a payment problem is
+silently locked out of the channel that exists to help them.
+
+**The change:** Submit sends the message and shows a success
+banner, or shows what is wrong with the form.
+
+**Example:** a customer fills in the form with a billing question
+and clicks Submit; they see "Message sent" and support receives it.
+
+---
+
+**For the builder**
 
 ### Symptoms
 *What the user observes.*

@@ -30,7 +30,7 @@ uv run .claude/tools/linear_cli.py order-todo --project "<project>" --dry-run
 uv run .claude/tools/linear_cli.py issue get <id>
 ```
 
-For each card a lesson changes, reword only the lines it changes, save the card, and post one comment following [Linear card language](card-language.md):
+For each card a lesson changes, reword only the lines it changes, in both halves of the card where a line appears in each, save the card, and post one comment following [Linear card language](card-language.md):
 
 ```bash
 uv run .claude/tools/linear_cli.py issue update <id> --description @<file>

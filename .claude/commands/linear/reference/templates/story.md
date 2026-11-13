@@ -2,7 +2,7 @@
 
 > **What this is**: A CRAFT prompt template used by `plan-work.md` step 4 to turn a vague user description into a precise brief before research and drafting.
 >
-> **Why it exists**: Users often describe work loosely — "add error handling" or "fix the dashboard". Running this through CRAFT produces a structured brief (why it matters, where things stand, what we'll do, expected outcome) that gives the research step (4) precise targets and the drafting step (6) concrete material to work with.
+> **Why it exists**: Users often describe work loosely — "add error handling" or "fix the dashboard". Running this through CRAFT produces a structured brief (a plain-English part for the reader, then what we'll do and the expected outcome for the builder) that gives the research step (4) precise targets and the drafting step (6) concrete material to work with.
 >
 > **Where it comes from**: The [CRAFT framework](../../../skills/craft/SKILL.md) (Context, Role, Action, Format, Target audience) — a meta-prompting technique for generating structured, high-quality LLM outputs.
 
@@ -12,13 +12,20 @@
 
 | # | Section | Question it answers |
 |:--|:--------|:--------------------|
-| 1 | Why this matters | Should I care? |
-| 2 | Where things stand | What's the current state? |
-| 3 | What we'll do | What's the plan? |
-| 4 | What we won't do | Where's the boundary? |
-| 5 | Expected outcome | How do we know it's done? |
-| 6 | How to test it | How do we verify? |
-| 7 | Assumptions to confirm | What's still uncertain? |
+| | **For the reader** | Written for the person who decides what goes in Todo, under the `### Why this matters` heading |
+| 1 | Serves | Which Vision success criterion is this for? |
+| 2 | Today | What happens now? |
+| 3 | The problem | Should I care? |
+| 4 | The change | What will be different? |
+| 5 | Example | What does it look like? |
+| | *a horizontal rule, then* **For the builder** | Written for the AI that builds it |
+| 6 | What we'll do | What's the plan? |
+| 7 | What we won't do | Where's the boundary? |
+| 8 | Expected outcome | How do we know it's done? |
+| 9 | How to test it | How do we verify? |
+| 10 | Assumptions to confirm | What's still uncertain? |
+
+The reader's half holds the five labelled lines in order. "Today:", "The problem:", "The change:" and "Example:" are one or two sentences each; "Serves:" is whatever length the Vision line is. Outside the "Serves:" quote it names no file and shows no command in backticks, and a stride term it has to use is explained in the same sentence. It promises nothing the builder's half doesn't also promise: "The change:" and "Example:" are the lines that promise, and the start check stops a card whose promise has nothing behind it in the builder's half. Whoever rewords one half rewords the other in the same edit.
 
 ---
 
@@ -31,9 +38,10 @@ CONTEXT:
 We are creating a Linear issue for a software project. The user
 has described the work as: "[user's description]". This prompt
 will be used to guide codebase research and issue drafting — it
-needs to surface why this matters, where things stand, what
-we'll do, and the expected outcome so the resulting issue is
-immediately actionable by a developer.
+needs to surface a plain-English part for the reader (what it
+serves, today, the problem, the change, an example), then what
+we'll do and the expected outcome for the builder, so the
+resulting issue is immediately actionable by a developer.
 
 Every issue in this project must trace back to the project's
 Vision. The full Vision document follows:
@@ -47,11 +55,11 @@ the trace-back. Use it as follows:
 
 | Vision content                  | Issue section it informs            |
 |:--------------------------------|:------------------------------------|
-| Measurable success criteria     | "Why this matters" — quote verbatim |
+| Measurable success criteria     | "Serves:" — quote verbatim          |
 | Non-Goals / what it won't do    | "What we won't do" boundary         |
-| Constraints / what can't change | "Where things stand", "How to test" |
+| Constraints / what can't change | "Today:", "How to test it"          |
 | Who it's for                    | Stakeholder framing and tone        |
-| Why it exists / why now         | "Why this matters" rationale        |
+| Why it exists / why now         | "The problem:" rationale            |
 
 The Vision names its measurable outcomes in the "Success
 criteria" section — a checkbox list of conditions you can tick
@@ -59,7 +67,7 @@ off when delivered. Use those lines as the criteria for
 trace-back.
 
 The drafted issue must identify which criterion the work serves
-and quote that line verbatim in the Why-this-matters section.
+and quote that line verbatim on the "Serves:" line.
 If the work cannot be tied to any criterion, do not fabricate a
 connection — flag it as out-of-scope or as a signal the Vision
 needs a new criterion.
@@ -74,14 +82,16 @@ working on without asking clarifying questions.
 
 ACTION:
 1. Identify which measurable criterion from the Vision this work
-   serves and quote it verbatim, then explain why this matters —
-   the user impact, business reason, or technical risk that makes
-   this worth doing now. Let the Vision's Why / Why-now framing
-   inform the rationale. If no criterion fits, stop and report
-   this back — do not fabricate a connection. Either the work is
-   out of scope or the Vision needs a new criterion.
-2. Describe where things stand — the current state, whether
-   that's a bug, a gap, or an opportunity for something new
+   serves and quote it verbatim on the "Serves:" line. If no
+   criterion fits, stop and report this back — do not fabricate
+   a connection. Either the work is out of scope or the Vision
+   needs a new criterion.
+2. Write the rest of the reader's half in plain words: what
+   happens today (a bug, a gap, or an opportunity for something
+   new), why it matters — the user impact, business reason, or
+   technical risk that makes this worth doing now, letting the
+   Vision's Why / Why-now framing inform the rationale — what
+   will change, and one concrete example.
 3. Explain what we'll do — the concrete solution, then the
    deliverable and scope boundary. When a relevant principle
    exists, apply it to the context to derive concrete, testable
@@ -110,16 +120,37 @@ toggle to dashboard header"). Under 70 characters.
 
 ## Description
 
-### Why this matters
-First line: the verbatim measurable criterion from the Vision
-this work serves, in italic markdown — e.g. *"Linear board state
-matches branch state automatically as /linear:* runs"*. Then 1–2
-sentences on user impact, business reason, or technical risk
-that makes this worth doing now, including how often it
-happened, what it costs, and what happens if nothing is done.
+**For the reader**
 
-### Where things stand
-Current state — the bug, gap, or opportunity (1–2 sentences)
+### Why this matters
+
+**Serves:** the verbatim measurable criterion from the Vision
+this work serves, in double quotes — e.g. "The card moves
+through Backlog → Doing → In Review → Done as `/linear:*` runs —
+no manual clicks on the board". A
+cross-project card, which has no Vision to quote, holds the
+"Vision anchoring deferred" line from `plan-work.md` instead.
+
+**Today:** what happens now, with an everyday comparison
+(1–2 sentences). It includes any fact the builder can't find in
+the code, such as something seen in another project.
+
+**The problem:** the case for filing: how often it happened,
+what it costs, and what happens if nothing is done (1–2
+sentences).
+
+**The change:** what will be different, in plain words (1–2
+sentences). It promises nothing the builder's half doesn't.
+
+**Example:** one concrete before-and-after (1–2 sentences).
+
+Written for a reader of about 16: no file names and no commands
+in backticks outside the "Serves:" quote, and a stride term it
+has to use is explained in the same sentence.
+
+---
+
+**For the builder**
 
 ### What we'll do
 State the solution in one sentence, then explain how it works
@@ -192,20 +223,29 @@ are right there in the issue.
 
 > **Refuse a sign-up email that has no @ sign**
 
+**For the reader**
+
 ### Why this matters
-*Sets the stakes — why this work is worth doing now.*
 
-*"New users finish sign-up on their first try"*
+**Serves:** "New users finish sign-up on their first try"
 
-A typo in the email address today creates an account nobody
-can log in to, and the user only finds out when the welcome
+**Today:** the sign-up form accepts any text in the email field
+and creates the account straight away, like a post office that
+takes a parcel with no street on the address.
+
+**The problem:** a typo in the email address creates an account
+nobody can log in to. The user only finds out when the welcome
 email never arrives.
 
-### Where things stand
-*Current state — the gap, limitation, or opportunity.*
+**The change:** the form refuses an email address that has no @
+sign and says why.
 
-The sign-up form accepts any text in the email field and
-creates the account straight away.
+**Example:** "ana.example.com" is refused with a message under
+the field; "ana@example.com" creates the account.
+
+---
+
+**For the builder**
 
 ### What we'll do
 *Concrete deliverables — what ships when this closes.*

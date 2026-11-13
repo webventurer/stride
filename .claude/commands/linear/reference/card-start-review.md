@@ -14,8 +14,8 @@ Answer one question: **can every promise on this card be checked, should it stil
 
 ## What you read
 
-- **The card** you were given: its title and whole description. Its promises are exactly the ones the end check reads; follow [Find the promises](card-check-review.md#find-the-promises) in the end check's brief, including what it says makes no promise
-- **`VISION.md`:** the criterion the card's "Why this matters" claims to serve
+- **The card** you were given: its title and whole description. **Today:** (older cards: "Where things stand") is where it says what it assumes about the code; check that assumption against the repository. Its promises are exactly the ones the end check reads; follow [Find the promises](card-check-review.md#find-the-promises) in the end check's brief, including what it says makes no promise
+- **`VISION.md`:** the criterion the card's "Serves:" line (older cards: "Why this matters") claims to serve
 - **The current repository:** the code, tests and documents the card's promises concern
 - **Finished sibling cards**, when you were given a parent epic. List its cards with `uv run .claude/tools/linear_cli.py list-by-parent <epic-UUID>`, using the UUID you were given, read each Done sibling with `uv run .claude/tools/linear_cli.py issue get <id>`, and see what it shipped with `git log main -i --grep=<id>`
 - **What changed since the card's description last changed.** [Agility](agility.md) says why. Get that time with `uv run .claude/tools/linear_cli.py issue description-changed-at <card-id>`: the last change to the description, or when the card was created if it never changed. A move between columns, a new place in the column or a new link doesn't move it. Then read:
@@ -53,6 +53,14 @@ For each promise, look in the current code, commands and skills for the situatio
 
 For each promise, work out what would prove it at the end — a test, a line, or the card's live check — and whether anything stops that proof: another line on the card, such as its "What we won't do" or its live check, what finished sibling cards shipped, or what has changed since the card's description last changed.
 
+## The reader's half
+
+Run these three checks only on a card that opens with "For the reader". A card that doesn't, such as a card already on the board, is read as before. [Linear card language](card-language.md#open-every-card-with-a-part-for-the-reader) sets out the halves. Each fault is a `contradictory` stop, because the card breaks its own template's rule, and its `proposed` rewords both halves in the same edit:
+
+1. **A promise the builder's half doesn't make.** The reader's **The change:** or **Example:** promises something the builder's half doesn't. `evidence` names both lines. **Serves:**, **Today:** and **The problem:** give context and are not checked this way.
+2. **A "Serves:" line that doesn't match the Vision.** Compare the quote with `VISION.md` character for character. A cross-project card's "Vision anchoring deferred" line is exempt. When the quote matches an earlier wording of the same criterion, `proposed` is the current line.
+3. **A line over two sentences.** A **Today:**, **The problem:**, **The change:** or **Example:** line longer than two sentences. **Serves:** has no limit.
+
 ## The six kinds of finding
 
 | Finding | Use it when | `evidence` must name |
@@ -81,7 +89,7 @@ Each line below sits where the end check counts it as a promise, so each is an `
 | "The work runs through `/script`, so its workflow and checks apply to every changed file" | What we'll do | 1: no change can show a workflow was followed | The result `/script` protects, such as "no changed file catches a bare `Exception` without a reason", or remove the line when the card already promises that result |
 | "Risk: Medium: narrowing a catch can let an error through that used to be handled" | Expected outcome | 1: it rates what could go wrong without promising it doesn't | The risk not happening: "each error the old catch handled is still handled" |
 | "A reviewer may prefer another name" | Expected outcome | 2: it is true or false whatever the change does | Move it to "Assumptions to confirm" |
-| "The brief says nothing about other checks" | Expected outcome | 2: it describes today, so it reads the same whether or not the change works | Move it to "Where things stand" |
+| "The brief says nothing about other checks" | Expected outcome | 2: it describes today, so it reads the same whether or not the change works | Move it to "Today:" in the reader's half |
 
 ### When a line is a mechanism finding
 

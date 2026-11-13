@@ -12,12 +12,20 @@
 
 | # | Section | Question it answers |
 |:--|:--------|:--------------------|
-| 1 | Why this matters | Should I care, and which Vision outcome does this serve? |
-| 2 | What success looks like | What does this epic deliver as an outcome? |
-| 3 | What we agreed | What's already been decided before opening sub-issues? |
-| 4 | What we won't touch | What does this epic deliberately leave out? |
+| | **For the reader** | Written for the person who decides what goes in Todo, under the `### Why this matters` heading |
+| 1 | Serves | Which Vision success criterion is this for? |
+| 2 | Today | What happens now? |
+| 3 | The problem | Should I care? |
+| 4 | The change | What will be different when the epic is done? |
+| 5 | Example | What does it look like? |
+| | *a horizontal rule, then* **For the builder** | Written for the AI that drafts and builds the sub-issues |
+| 6 | What success looks like | What does this epic deliver as an outcome? |
+| 7 | What we agreed | What's already been decided before opening sub-issues? |
+| 8 | What we won't touch | What does this epic deliberately leave out? |
 
-<mark>**The epic body has no "What we'll do", "How to test it", or "Assumptions to confirm" sections.** Those live on each sub-issue. Putting them on the epic creates two places where the same scope conversation happens — and the sub-issue is the one a developer reads when they pick up work.</mark>
+The reader's half holds the five labelled lines in order. "Today:", "The problem:", "The change:" and "Example:" are one or two sentences each; "Serves:" is whatever length the Vision line is. Outside the "Serves:" quote it names no file and shows no command in backticks, and a stride term it has to use is explained in the same sentence. It promises nothing the builder's half doesn't also promise: "The change:" and "Example:" are the lines that promise, and the start check stops a card whose promise has nothing behind it in the builder's half. Whoever rewords one half rewords the other in the same edit.
+
+<mark>**The epic's builder half has no "What we'll do", "Expected outcome", "How to test it", or "Assumptions to confirm" sections.** Those live on each sub-issue. Putting them on the epic creates two places where the same scope conversation happens — and the sub-issue is the one a developer reads when they pick up work.</mark>
 
 **The AI-implementable spec — inputs, outputs, edge cases, constraints, acceptance criteria — lives on each sub-issue, not on the epic.** The epic stays human-readable narrative for stakeholders scanning the board; sub-issues hold the density an AI coding assistant needs to implement reliably.
 
@@ -49,8 +57,8 @@ The Vision shapes the draft across multiple sections:
 
 | Vision content                  | Epic section it informs                |
 |:--------------------------------|:---------------------------------------|
-| Measurable success criteria     | "Why this matters" — quote verbatim    |
-| Why it exists / why now         | "Why this matters" rationale           |
+| Measurable success criteria     | "Serves:" — quote verbatim             |
+| Why it exists / why now         | "The problem:" rationale               |
 | Constraints / what can't change | "What we won't touch" boundary         |
 | Non-Goals / what it won't do    | "What we won't touch" boundary         |
 | Who it's for                    | Stakeholder framing and tone           |
@@ -61,7 +69,7 @@ off when delivered. Use those lines as the criteria for
 trace-back.
 
 The drafted epic must identify which criterion the work serves
-and quote that line verbatim in the Why-this-matters section.
+and quote that line verbatim on the "Serves:" line.
 If the work cannot be tied to any criterion, do not fabricate a
 connection — flag it as out-of-scope or as a signal the Vision
 needs a new criterion.
@@ -76,17 +84,21 @@ and where the boundary is — the sub-issues handle the how.
 
 ACTION:
 1. Identify which measurable criterion from the Vision this work
-   serves and quote it verbatim, then explain why this matters —
-   the user impact, business reason, or technical risk that makes
-   this worth doing now. If no criterion fits, stop and report
-   this back — do not fabricate a connection.
-2. Describe what success looks like — the outcome the epic
+   serves and quote it verbatim on the "Serves:" line. If no
+   criterion fits, stop and report this back — do not fabricate
+   a connection.
+2. Write the rest of the reader's half in plain words: what
+   happens today, why it matters — the user impact, business
+   reason, or technical risk that makes the whole epic worth
+   doing now — what will be different when the epic is done, and
+   one concrete example.
+3. Describe what success looks like — the outcome the epic
    delivers. Outcome, not implementation. A reader should know
    what changes when the last sub-issue closes.
-3. Capture what we agreed — approach chosen, options discarded,
+4. Capture what we agreed — approach chosen, options discarded,
    anything that affects how sub-issues will be drafted. Omit
    if no decisions have been made yet.
-4. Define what we won't touch — the epic's deliberate edges.
+5. Define what we won't touch — the epic's deliberate edges.
    Helps reviewers spot scope drift on sub-issues that appear
    under it later.
 
@@ -102,13 +114,37 @@ characters total. Example: `Epic: Bulk/Batch Blog Processing
 
 ## Description
 
+**For the reader**
+
 ### Why this matters
-First line: the verbatim measurable criterion from the Vision
-this work serves, in italic markdown — e.g. *"Linear board state
-matches branch state automatically as /linear:* runs"*. Then 2–4
-sentences on user impact, business reason, or technical risk
-that makes the whole epic worth doing now, including how often
-it happened, what it costs, and what happens if nothing is done.
+
+**Serves:** the verbatim measurable criterion from the Vision
+this work serves, in double quotes — e.g. "The card moves
+through Backlog → Doing → In Review → Done as `/linear:*` runs —
+no manual clicks on the board". A
+cross-project card, which has no Vision to quote, holds the
+"Vision anchoring deferred" line from `plan-work.md` instead.
+
+**Today:** what happens now, with an everyday comparison
+(1–2 sentences). It includes any fact the builder can't find in
+the code, such as something seen in another project.
+
+**The problem:** how often it happened, what it costs, and
+what happens if nothing is done (1–2 sentences).
+
+**The change:** what will be different when the epic is done, in
+plain words (1–2 sentences). It promises nothing the builder's
+half doesn't.
+
+**Example:** one concrete before-and-after (1–2 sentences).
+
+Written for a reader of about 16: no file names and no commands
+in backticks outside the "Serves:" quote, and a stride term it
+has to use is explained in the same sentence.
+
+---
+
+**For the builder**
 
 ### What success looks like
 One paragraph: the outcome a reader sees when the last sub-issue
@@ -137,10 +173,23 @@ shape of the work.
 
 > **Title**: `Epic: Make epics first-class kanban cards`
 
-### Why this matters
-*"Linear board state matches branch state automatically as `/linear:*` runs (Backlog → Doing → In Review → Done)"*
+**For the reader**
 
-Epic-sized work in stride was created as Linear milestones, but milestones have no body, no status, and don't appear on the kanban board. So the epic narrative had nowhere natural to live, and the umbrella was invisible to anyone scanning the board. Switching epics to parent issues with sub-issues turns each epic into a real card with full body and board presence.
+### Why this matters
+
+**Serves:** "The card moves through Backlog → Doing → In Review → Done as `/linear:*` runs — no manual clicks on the board"
+
+**Today:** big pieces of work are filed as milestones, which have no description and never show up on the kanban board, like a chapter heading printed on a page nobody turns to.
+
+**The problem:** the story behind a big piece of work has nowhere to live, and anyone scanning the board can't see the umbrella.
+
+**The change:** a big piece of work becomes a real card on the board, with a full description and its smaller cards nested underneath.
+
+**Example:** you describe a big piece of work and answer "epic-sized"; a card titled "Epic: …" appears on the board with its smaller cards under it.
+
+---
+
+**For the builder**
 
 ### What success looks like
 A user running `/linear:plan-work` and answering "epic-sized" gets a parent issue with full body, `Epic: ` prefix in the title, and N sub-issues nested under it on the kanban board.
