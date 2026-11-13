@@ -32,7 +32,7 @@ The reader's half is for the person who decides what goes in Todo. The rules for
 
 - **Serves:** quotes one Vision success criterion word for word, never paraphrased or blended. A cross-project card, which has no Vision to quote, holds the "Vision anchoring deferred" line instead.
 - **Today:**, **The problem:**, **The change:** and **Example:** are one or two sentences each. **Serves:** is whatever length the Vision line is.
-- Outside the **Serves:** quote, it names no file and shows no command in backticks, and a stride term it has to use is explained in the same sentence. It is written for a reader of about 16.
+- Outside the **Serves:** quote, it names no file and shows no command in backticks, and a stride term it has to use is explained in the same sentence. It is written for a reader of about 16. That is judged by eye, not by a check: a writer unsure that a line reads that way lists it under "Assumptions to confirm" in the builder's half.
 - It promises nothing the builder's half doesn't also promise. **The change:** and **Example:** are the lines that promise. **Serves:**, **Today:** and **The problem:** give context and need no counterpart.
 - **Today:** holds what happens now, including any fact the builder can't find in the code, such as something seen in another project. There is no "Where things stand" section.
 
