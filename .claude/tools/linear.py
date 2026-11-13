@@ -729,6 +729,25 @@ def get_description_changed_at(identifier: str) -> str:
     return max(change_times, default=issue["createdAt"])
 
 
+READER_HALF_OPENING = "**For the reader**"
+CLOSED_STATES = ("Done", "Canceled")
+
+
+def rewrite_template(issue: dict) -> str:
+    labels = {label["name"] for label in issue["labels"]["nodes"]}
+    description = (issue.get("description") or "").strip()
+    unrewritable = (
+        not description
+        or description.startswith(READER_HALF_OPENING)
+        or "Epic" in labels
+        or issue["title"].startswith("Epic: ")
+        or issue["state"]["name"] in CLOSED_STATES
+    )
+    if unrewritable:
+        return "none"
+    return "bug" if "Bug" in labels else "story"
+
+
 def add_blocker(blocked: str, blocker: str) -> bool:
     query = (
         "mutation($blocker: String!, $blocked: String!) { issueRelationCreate("

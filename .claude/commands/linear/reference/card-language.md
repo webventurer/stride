@@ -38,7 +38,7 @@ The reader's half is for the person who decides what goes in Todo. The rules for
 
 Whoever rewords one half of a card rewords both halves in the same edit: the start check when it fixes a stop, the end check when it rewords a card itself, a lesson carried from another card, and the user's own approved wording. A reword of "What we'll do" that leaves **The change:** describing the old behaviour is refused.
 
-A card that doesn't open with "For the reader", such as a card already on the board, is judged as it is today: the rules above don't apply to it, and nothing rewrites it.
+A card that doesn't open with "For the reader", such as a card already on the board, is judged as it is today: the rules above don't apply to it. `/linear:start` rewrites it into the new shape when it starts the card, as [rewrite an old card](rewrite-old-card.md) sets out, and nothing else rewrites it.
 
 ## Explain the solution before the implementation
 
