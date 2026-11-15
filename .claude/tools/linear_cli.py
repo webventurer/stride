@@ -21,6 +21,7 @@ import click
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+from card_comments import comments_text  # noqa: E402
 from legacy import (  # noqa: E402
     backfill_focus,
     backfill_parallel_sessions,
@@ -563,6 +564,19 @@ def comment_group():
 @click.argument("issue_identifier")
 def comment_list_cmd(issue_identifier: str):
     echo_json(list_comments(bearer_token(), issue_identifier))
+
+
+@comment_group.command("save")
+@click.argument("issue_identifier")
+@click.option(
+    "--to", "target", required=True, help="File to write the card's comments to"
+)
+def comment_save_cmd(issue_identifier: str, target: str):
+    comments = list_comments(bearer_token(), issue_identifier)
+    path = Path(target)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(comments_text(comments))
+    click.echo(f"saved {len(comments)} comments to {target}")
 
 
 @comment_group.command("create")

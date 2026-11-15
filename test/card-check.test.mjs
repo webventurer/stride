@@ -193,6 +193,43 @@ describe("card check", () => {
     );
   });
 
+  it("hands the end reviewers the card's comments as proof for a promise that says its proof is posted on the card", () => {
+    const check = read(".claude/commands/linear/reference/card-check.md");
+    const brief = read(
+      ".claude/commands/linear/reference/card-check-review.md",
+    );
+    const convention = read(
+      "docs/conventions/check-the-card-at-the-start-and-the-end.md",
+    );
+
+    ok(
+      inOrder(check, [
+        "linear_cli.py issue get <issue-id>",
+        "/tmp/<identifier>/card.md",
+        "linear_cli.py comment save <issue-id> --to /tmp/<identifier>/comments.md",
+        "comments from `/tmp/<identifier>/comments.md`",
+      ]),
+    );
+    ok(brief.includes("says its proof is posted on the card"));
+    ok(brief.includes("comments file you were given"));
+    ok(
+      brief.includes(
+        "A promise that says no such thing is judged only from the change",
+      ),
+    );
+    ok(
+      brief.includes(
+        "A comment the stride flow posted, such as a reworded card or the start check's notes, proves no promise",
+      ),
+    );
+    ok(convention.includes("seeing only the card, its comments and the change"));
+    ok(!brief.includes("from the card, the diff"));
+    ok(!brief.includes("judge the card, the diff"));
+    ok(!brief.includes("holding only the card, the diff"));
+    ok(!brief.includes("the card's words and the change"));
+    ok(!brief.includes("only the card and the change"));
+  });
+
   it("explains both ends of the check in the conventions", () => {
     const page = "check-the-card-at-the-start-and-the-end.md";
     const convention = read(`docs/conventions/${page}`);
