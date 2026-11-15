@@ -8,17 +8,6 @@ stride gives you **atomic commits** — every change is one idea, independently 
 
 Everything installs as plain text into your `.claude/` directory — markdown skills and commands plus a small Python helper for Linear. No compiled binaries, no build step, no lock-in — read it, change it, make it yours.
 
-## The principle
-
-**Speed up whenever you can, but never at the cost of quality. Scheduling is stride's job, not yours. Every finished card teaches the next ones.**
-
-In practice that means four things:
-
-- **Fast:** cards that don't depend on each other run side by side, and a card waiting on another holds back until that card is done.
-- **Quality:** a card in a batch gets every check it would get on its own.
-- **No scheduling for you:** you decide what goes in Todo. Stride decides the order and how many run at once.
-- **Agile:** take a small step, see what it taught you, and change the plan before the next step.
-
 ## What you get
 
 **`/vision`** — The guiding light. One canonical `VISION.md` at the repo root: what the project delivers, why it exists, what success looks like. Every issue, every feature, every architectural decision traces back to it. `/linear:plan-work` enforces this — issues drafted in a vacuum get flagged for trace-back, not just warned. Vision evolves rarely and reads as stakeholder language; the rest of stride's loop runs against it. *(Planning, ranking, and implementation all read `VISION.md` before deciding anything — that's the upstream-anchor role.)* See [the `/vision` skill](https://webventurer.github.io/stride/skills/vision) for the seven-question walkthrough.
@@ -39,7 +28,18 @@ In practice that means four things:
 
 **`/clear-speak`** — Plain-language rewriting for anything the agent writes. Point it at a doc, a command file, an issue draft, a commit message, or a README paragraph and it replaces jargon with words a non-engineer can follow first time. `/linear:plan-work` and `/linear:finish` link to it as stride's standard for what counts as jargon, so issue titles and Vision-trace explanations stay readable.
 
-**`/parallel-sessions`** — Runs independent jobs, such as several Linear cards, as parallel Claude Code sessions, a set number at a time. Each session works in its own worktree and commits only its own work; the coordinator checks each branch against `main` before merging it, and brings you only the decisions that are yours to make.
+**`/parallel-sessions`** — Runs independent jobs, such as several Linear cards, as parallel Claude Code sessions, a set number at a time. Each session works in its own worktree and commits only its own work; the coordinator checks each branch against `main` before merging it, and brings you only the decisions that are yours to make. While they build, you can keep making quick changes to your app in your own session; [foreground loop, background structure](https://webventurer.github.io/stride/patterns/foreground-loop-background-structure) sets out the two lanes.
+
+## The principle
+
+**Speed up whenever you can, but never at the cost of quality. Scheduling is stride's job, not yours. Every finished card teaches the next ones.**
+
+In practice that means four things:
+
+- **Fast:** cards that don't depend on each other run side by side, and a card waiting on another holds back until that card is done.
+- **Quality:** a card in a batch gets every check it would get on its own.
+- **No scheduling for you:** you decide what goes in Todo. Stride decides the order and how many run at once.
+- **Agile:** take a small step, see what it taught you, and change the plan before the next step.
 
 ## The loop
 

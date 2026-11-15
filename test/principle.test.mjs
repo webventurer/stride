@@ -29,19 +29,19 @@ describe("stride's principle", () => {
     });
   }
 
-  it("README.md puts it before What you get", () => {
+  it("README.md puts it after What you get", () => {
     const readme = read("README.md");
     ok(
-      readme.indexOf("## The principle\n") <
+      readme.indexOf("## The principle\n") >
         readme.indexOf("## What you get\n"),
     );
   });
 
-  it("docs/why-stride.md puts it after its opening paragraph", () => {
+  it("docs/why-stride.md puts it after What stride gives you", () => {
     const page = read("docs/why-stride.md");
     ok(
       page.indexOf("## The principle\n") >
-        page.indexOf("Vibe coding builds on"),
+        page.indexOf("## What stride gives you\n"),
     );
   });
 });
