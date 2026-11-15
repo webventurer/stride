@@ -28,15 +28,15 @@ The new issue waits its turn. The current issue ships clean. The git log stays n
 
 The downstream cost of scope creep compounds: atomic commits depend on atomic issues; narratable logs depend on atomic commits; reviewable PRs depend on narratable diffs; debuggability depends on reviewable PRs. One absorbed scope ripples through all four layers.
 
-## Worked example: the WB-308 split
+## Worked example: splitting off a follow-up card
 
-Mid-session, while running `/linear:finish` on WB-297 (the friction Distinction doc), the agent surfaced a Vision-trace drift in stride-internal jargon. The user pushed back: *"can you say in plain English."* The plain-English version landed cleanly — but it surfaced a wider problem: the drift output should always read in plain English, not just when prompted.
+Mid-session, while running `/linear:finish` on a card that adds a docs page, the agent explained a Vision-trace drift in stride-internal jargon. The user pushed back: *"can you say in plain English."* The plain-English version landed cleanly — but it surfaced a wider problem: the drift output should always read in plain English, not just when prompted.
 
-The temptation: expand WB-297 to also fix the drift output's readability. *"I'm already editing `finish.md` — one more change won't hurt."*
+The temptation: expand the docs card to also fix the drift output's readability. *"I'm already editing `finish.md` — one more change won't hurt."*
 
-The move: file WB-308 *"/linear:finish drift output reads in plain English"* as its own card. WB-297 shipped its one purpose (the friction Distinction lives in docs); WB-308 became the next deliverable. Both git logs stayed atomic. Both PRs reviewed cleanly.
+The move: file a new card, *"/linear:finish drift output reads in plain English"*, as its own deliverable. The docs card shipped its one purpose (the page lives in docs); the new card became the next deliverable. Both git logs stayed atomic. Both PRs reviewed cleanly.
 
-The cost of doing this *the other way* — absorbing WB-308 into WB-297 — would have been hidden but real: the merge commit subject would have to read *"Add friction Distinction **and** make drift output plain-English"*, the trace-back would have to span two unrelated criteria, and any future `git bisect` looking for a regression in either change would land on the same commit.
+The cost of doing this *the other way* — absorbing the new card into the docs card — would have been hidden but real: the merge commit subject would have to read *"Add the docs page **and** make drift output plain-English"*, the trace-back would have to span two unrelated criteria, and any future `git bisect` looking for a regression in either change would land on the same commit.
 
 ## The "and" test
 
