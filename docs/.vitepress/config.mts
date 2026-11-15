@@ -46,10 +46,15 @@ export default defineConfig({
       {
         text: 'Patterns',
         items: [
-          { text: 'Friction Distinction', link: '/patterns/friction-distinction' },
           { text: 'New issue, not new scope', link: '/patterns/new-issue-not-new-scope' },
           { text: "Revise, don't stretch", link: '/patterns/revise-dont-stretch' },
           { text: 'Foreground loop, background structure', link: '/patterns/foreground-loop-background-structure' },
+        ],
+      },
+      {
+        text: 'Concepts',
+        items: [
+          { text: 'Friction is information', link: '/concepts/friction-distinction' },
         ],
       },
       {
