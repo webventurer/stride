@@ -9,6 +9,14 @@ Give it several jobs that don't depend on each other, such as three Linear cards
 3. **Start every session in one turn.** Each session gets a written brief naming the files it may change. A slot store caps how many run at once, so the rest wait their turn without you starting them.
 4. **Check and merge.** When a session's work is ready, the coordinator checks the commit against the paths its brief named, and that nothing in those paths is left uncommitted. In worktree mode it checks each branch combined with `main` before merging it.
 
+## Runs through Todo
+
+In unattended mode, `/linear:start` with no card named carries on through Todo, batch after batch, with no "go" between batches. It stops when no card in Todo can start.
+
+Cards that change the same files still run together. Each card is tested combined with `main` as it stands, one card at a time, before it merges, so a clash with another card, or with a commit you pushed meanwhile, is fixed before the merge.
+
+While a batch runs, you can keep making quick changes to your app in your own session, one request and one commit at a time. [Foreground loop, background structure](/patterns/foreground-loop-background-structure) sets out the two lanes.
+
 ## Two modes
 
 | Mode | Use it when | What happens |
