@@ -56,6 +56,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] You can review your working changes at any point without leaving the flow
 - [ ] Cards worked side by side each get a terminal in your current editor window, so you never switch between windows
 - [ ] Cards in Todo reach Done as fast as they can, side by side where possible, without skipping a check or making you schedule them
+- [ ] You keep making quick changes to your app while stride builds cards in the background, and neither one's work lands in the other's commits
 - [ ] A lost network connection costs a batch a retry, not a job: a cut-off job resumes, and one that can't is reported as failed
 - [ ] Every finished card teaches the next ones: before the next starts, its lessons are read and any Todo card they change is reworded, saying why
 - [ ] Every multi-step stride interaction says upfront how many steps, how long, and how to stop, so you're never trapped in an open-ended sequence
