@@ -56,6 +56,7 @@ export default defineConfig({
         items: [
           { text: 'Work on the project, in the project', link: '/concepts/work-on-and-in' },
           { text: 'Friction is information', link: '/concepts/friction-distinction' },
+          { text: 'The bottleneck moves to your decisions', link: '/concepts/attention-bottleneck' },
         ],
       },
       {

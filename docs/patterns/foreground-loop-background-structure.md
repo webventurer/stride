@@ -6,6 +6,8 @@ Split the work by how much thought it needs. Quick changes you can see in the ap
 
 **Goal:** Keep the fast changes fast by moving the slow ones out of the way.
 
+The split moves what holds you up from waiting on the agent to [your own decisions](/concepts/attention-bottleneck).
+
 ---
 
 ## Quick reference
