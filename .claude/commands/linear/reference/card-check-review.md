@@ -1,14 +1,14 @@
 # Card check review
 
-> The brief for an **independent** reviewer of a finished change. A fresh sub-agent reads this file and judges, promise by promise, whether the change keeps what its card promised — from the card, the diff and read-only checks on the branch, never from the author's reasoning. Run by the [card check](card-check.md).
+> The brief for an **independent** reviewer of a finished change. A fresh sub-agent reads this file and judges, promise by promise, whether the change keeps what its card promised — from the card, its comments, the diff and read-only checks on the branch, never from the author's reasoning. Run by the [card check](card-check.md).
 
 ---
 
 ## Why this file is separate
 
-The author knows what they meant each piece to do, so a change reads as keeping a promise when it only comes close. This file runs in a **fresh sub-agent with no memory of that reasoning**: it sees the card's words and the change, the same two things anyone checking the work later would see.
+The author knows what they meant each piece to do, so a change reads as keeping a promise when it only comes close. This file runs in a **fresh sub-agent with no memory of that reasoning**: it sees the card's words, its comments and the change, the same things anyone checking the work later would see.
 
-<mark>**Judge only what a stranger can see: the card, the diff, and what a read-only check run on the branch prints. If the proof that a promise is kept lives only in the author's head or the chat history, it is not proof.**</mark>
+<mark>**Judge only what a stranger can see: the card, the diff, what a read-only check run on the branch prints, and, for a promise that says its proof is posted on the card, the card's comments. If the proof that a promise is kept lives only in the author's head or the chat history, it is not proof.**</mark>
 
 ---
 
@@ -51,6 +51,8 @@ The reader's half (under "Why this matters"), "Assumptions to confirm" and "Live
 <mark>**A `broken` verdict without a concrete scenario is not a finding.**</mark> If you cannot say "when ___, the change does ___ instead of ___", the verdict is `kept-unproven` or `kept`.
 
 Proof is what the branch itself contains, or what a read-only check run on the branch prints. For code, that is a test that would fail if the promise broke. For instructions and documents, it is the line that states the behaviour where the reader who must follow it will look. A test elsewhere in the repository that already covers the promise counts; name it.
+
+A promise that says its proof is posted on the card, such as "post the list on the card" or a live run's result, is proved by a comment in the comments file you were given. Judge it from the comment: it is `kept` when a comment does what the promise says, with the comment's author and time as the evidence, and `kept-unproven` when no comment does and nothing in the change proves it. A promise that says no such thing is judged only from the change, and no comment proves it, however the comment is worded. A comment the stride flow posted, such as a reworded card or the start check's notes, proves no promise.
 
 Judge the card as written. A promise the change keeps in spirit but not in letter is `broken` or `unclear`, never `kept` — deciding what the card should have said is the user's call, not yours.
 
@@ -124,7 +126,7 @@ Rules for the file:
 
 ## What you must not do
 
-- Do not read or ask for the author's rationale — judge the card, the diff and your read-only checks alone
+- Do not read or ask for the author's rationale — judge the card, its comments, the diff and your read-only checks alone
 - Do not search outside the repository: open a path the card or the orchestrator names directly, find any other file with `git ls-files --cached --others --exclude-standard` or `git grep --untracked`, which both include files the change added but hasn't committed, and never start a search from `/` or the home folder. A search of the whole disk runs until the command time limit stops it
 - Do not edit, stage or commit anything — you report, the author acts
 - Do not run the project's build or tests
@@ -137,4 +139,4 @@ Rules for the file:
 
 ## The governing principle
 
-> A stranger holding only the card, the diff and the read-only checks you name should reach your verdict. If the only defence of a `kept` is the author's story, the promise is not yet proved kept.
+> A stranger holding only the card, its comments, the diff and the read-only checks you name should reach your verdict. If the only defence of a `kept` is the author's story, the promise is not yet proved kept.

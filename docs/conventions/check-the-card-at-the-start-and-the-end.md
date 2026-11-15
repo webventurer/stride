@@ -66,7 +66,7 @@ The start check feeds the end check. Every promise that survives it can be shown
 ### At the end
 
 - **When it runs.** `/linear:start` runs the check after validation and the simplification review, before it opens the pull request. `/linear:finish` runs it again before merging whenever the branch's content or the card's wording has changed since the last passing check, so a fix pushed or a promise reworded after the check is checked too
-- **Who checks.** Three fresh reviewers at once, each seeing only the card and the change — never the author's reasoning, the plan or the conversation. Each promise takes the worst verdict any of them gives.
+- **Who checks.** Three fresh reviewers at once, each seeing only the card, its comments and the change — never the author's reasoning, the plan or the conversation. The comments count only as proof of a promise that says its proof is posted on the card. Each promise takes the worst verdict any of them gives.
 - **What it returns.** Every promise on the card — each expected outcome, edge case, constraint and test scenario — with one verdict
 - **Where the result lives.** The pull request carries the verdict table, one row per promise, with fingerprints of the exact content and card wording that were checked
 
