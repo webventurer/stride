@@ -193,6 +193,21 @@ Tell the user which jobs committed, which ended without a commit (a session that
 
 ---
 
+## While a batch of stride cards runs
+
+From the batch's "go" until the batch's report in step 6, the coordinator changes no file in the project and makes no commit, other than its own run work: briefs, progress and logs under `work/`, the job worktrees, the check before each merge and the merges themselves. In a run through Todo the rule runs on until the run's final report in [Todo run](../../commands/linear/reference/todo-run.md), so it also holds between one batch's report and the next batch's "go". It applies to a batch of stride cards only, not to batches such as captures or transcripts.
+
+When the user asks for a change to the project's files, the coordinator doesn't start it. It replies in one or two sentences that it is running cards, that the change belongs in a new Claude session opened in the same project, and the user's request word for word, ready to paste there.
+
+- **Turned down:** "make the button smaller", "fix the typo in the README", `/commit`, `/linear:quick tighten the heading`, and growing the Vision with `/vision-evolve`
+- **Carried out:** a status question, an answer to a card's question, filing a new card with `/linear:plan-work` (it writes to the board only), stopping the run, and a change to a card's wording on the board
+- **Carried out:** approving a card's pull request, or sending its review feedback to that card's job, which fixes it in its own worktree; the coordinator never edits a project file itself
+- **Carried out:** the coordinator's own run work under `work/`, in the job worktrees and in the scratch worktree for the check before a merge
+
+In an interactive run, after the final report, the session takes any request again.
+
+---
+
 ## The slot store
 
 | Command | Does | Exit code |

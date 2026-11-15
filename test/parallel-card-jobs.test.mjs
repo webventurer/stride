@@ -424,3 +424,46 @@ describe("an unattended run through a named epic", () => {
     ok(start.includes("until none of its cards can start"));
   });
 });
+
+describe("the coordinator of a batch of stride cards while it runs", () => {
+  const rule = skill.slice(
+    skill.indexOf("## While a batch of stride cards runs"),
+    skill.indexOf("## The slot store"),
+  );
+
+  it("sends a change to the project's files to a new session", () => {
+    ok(rule.length > 0);
+    ok(rule.includes("changes no file in the project and makes no commit"));
+    ok(rule.includes("a new Claude session opened in the same project"));
+    ok(rule.includes("the user's request word for word"));
+  });
+
+  it("holds from the batch's go to the batch's report, and in a Todo run to the final report", () => {
+    ok(
+      inOrder(rule, [
+        'the batch\'s "go" until the batch\'s report',
+        "until the run's final report",
+        "between one batch's report and the next batch's \"go\"",
+      ]),
+    );
+  });
+
+  it("still carries out requests about the run itself", () => {
+    ok(rule.includes("a status question"));
+    ok(rule.includes("an answer to a card's question"));
+    ok(rule.includes("`/linear:plan-work`"));
+    ok(rule.includes("stopping the run"));
+    ok(rule.includes("review feedback"));
+    ok(rule.includes("`work/`"));
+  });
+
+  it("turns down the usual app changes, including growing the Vision", () => {
+    ok(rule.includes("make the button smaller"));
+    ok(rule.includes("`/commit`"));
+    ok(rule.includes("`/vision-evolve`"));
+  });
+
+  it("takes any request again after the final report of an interactive run", () => {
+    ok(rule.includes("takes any request again"));
+  });
+});
