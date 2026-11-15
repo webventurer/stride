@@ -254,13 +254,32 @@ git worktree list
 
 **All git commands must use `git -C <main-repo-path>`** to avoid depending on the worktree directory.
 
-**Step 10a — Switch to main and fast-forward it:**
+**Step 10a — Update the main checkout, only when nothing of the user's is in it:**
+
+The main checkout is where the user may be mid-commit or on another branch. A finish that switched it would pull the card's work into their commit. Ask the script first; it fetches, changes nothing and prints one line:
+
+```bash
+.claude/tools/main_checkout_update.sh <main-repo-path> <gitBranchName>
+```
+
+When it prints `updated`, the checkout is on `main` or on this card's own branch with nothing uncommitted, staged or untracked and nothing unpushed. Fast-forward it:
 
 ```bash
 git -C <main-repo-path> checkout main && git -C <main-repo-path> pull --ff-only
 ```
 
 `--ff-only` moves `main` to GitHub's or changes nothing. Never rebase or merge the main checkout here: a rebase replays any stray local commit unasked, and a clash would leave the shared checkout half-way through a rebase for every job behind it.
+
+When it prints `left: <reason>`, run neither the checkout nor the pull. The pull request merges on GitHub whatever the main checkout holds, so carry on with the remaining steps and say at the top of step 17's summary that the main checkout was left alone, the reason, and the steps that bring the card's work in:
+
+| Printed | Steps for the user |
+| --- | --- |
+| `left: uncommitted changes` | commit or stash them, then run `git pull --rebase` on `main` |
+| `left: unpushed commits` | run `git pull --rebase` on `main` |
+| `left: on branch <name>` or `left: detached HEAD` | switch to `main`, then run `git pull --rebase` |
+| `left: the fetch failed` | nothing was checked; say the fetch failed |
+
+As a `/parallel-sessions` job, include the reason in the message to the coordinator that the card has merged.
 
 When the checkout or the pull refuses, the pull request has already merged, so the refusal doesn't undo it or stop the finish: leave the main checkout as it is, carry on with the remaining steps, and report the refusal at the top of step 17's summary. Quote git's own error line and the output of:
 
@@ -280,7 +299,7 @@ Otherwise, follow [worktree teardown](reference/worktree.md#teardown) — it rem
 
 Now that any worktree is gone, the branch can be deleted. As a `/parallel-sessions` job, delete only the remote branch: the worktree still has the local one checked out, and the coordinator deletes it when it removes the worktree.
 
-- **Local**: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently. When step 10a's pull was refused, the main checkout lacks the merge commit and `-d` can say the branch isn't fully merged: skip the local deletion, say so in the summary, and carry on
+- **Local**: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently. When step 10a's pull was refused or the main checkout was left alone, it lacks the merge commit and `-d` can say the branch isn't fully merged: skip the local deletion, say so in the summary, and carry on
 - **Remote**: `git -C <main-repo-path> push origin --delete <gitBranchName>` — if already deleted (GitHub may auto-delete), skip silently
 
 ### 11. Update Linear → done
@@ -360,7 +379,8 @@ If the user declines, leave the epic untouched.
 Detect whether the merged PR's diff included `VISION.md`:
 
 ```bash
-merge_commit=$(git -C <main-repo-path> log -1 --format=%H)
+git -C <main-repo-path> fetch origin main
+merge_commit=$(git -C <main-repo-path> log origin/main --first-parent --grep="^Merge branch '<gitBranchName>'" -1 --format=%H)
 git -C <main-repo-path> diff <merge_commit>^..<merge_commit> --name-only
 ```
 
@@ -379,9 +399,9 @@ differing fields, and continue without prompting.
 
 Then:
 
-1. Read `VISION.md` from the repo root.
+1. Read `VISION.md` as the merge left it, not from the main checkout, whose copy is older when step 10a left it alone: `mkdir -p /tmp/<identifier> && git -C <main-repo-path> show <merge_commit>:VISION.md > /tmp/<identifier>/VISION.md`.
 2. Resolve the Linear project from `.stride.json`. Get its id, URL, and current subtitle (`description`) from the project list by name — `uv run .claude/tools/linear_cli.py project get` takes an ID, not a name: `uv run .claude/tools/linear_cli.py project list | jq -r --arg name "<project-name>" '.[] | select(.name == $name) | {id, url, description}'`.
-3. Fetch the current project `content` via `linear_cli.py` (the Vision lives in `content`, not the length-limited `description`). The subtitle is VISION.md's opening blockquote — the `>` line under the H1 (read it from the file loaded in sub-step 1):
+3. Fetch the current project `content` via `linear_cli.py` (the Vision lives in `content`, not the length-limited `description`). The subtitle is VISION.md's opening blockquote — the `>` line under the H1 (read it from the file saved in sub-step 1):
    ```bash
    uv run .claude/tools/linear_cli.py get-project-content <project-id>
    ```
@@ -393,9 +413,9 @@ Then:
      Replace the Linear content and/or subtitle with VISION.md? (y/n)
      ```
 
-5. On `y`, write whichever differs (`--content @VISION.md` reads the file directly — no shell quoting in the path ([why](reference/workflow.md#how-skills-talk-to-linear)); the subtitle is a short single-line field, so it stays inline):
+5. On `y`, write whichever differs (`--content @/tmp/<identifier>/VISION.md` reads the file directly — no shell quoting in the path ([why](reference/workflow.md#how-skills-talk-to-linear)); the subtitle is a short single-line field, so it stays inline):
    ```bash
-   uv run .claude/tools/linear_cli.py update-project-content <project-id> --content @VISION.md
+   uv run .claude/tools/linear_cli.py update-project-content <project-id> --content @/tmp/<identifier>/VISION.md
    uv run .claude/tools/linear_cli.py project update <project-id> --description "<tagline-from-step-3>"
    ```
    On `n`: skip the writes and continue to step 17.
@@ -437,6 +457,7 @@ Read the output focus and apply this command's format from [reference/output-foc
 - Uncommitted changes → stop, suggest `/commit`
 - Tests fail → stop, do not merge
 - Recording the stage times fails or finds no log → carry on; the card has already merged
+- Main checkout left alone in step 10a → run neither the checkout nor the pull, finish the remaining steps, report the reason and the steps that bring the work in at the top of the summary
 - `pull --ff-only` refuses in step 10a → leave the main checkout as it is, finish the remaining steps, report the refusal and `git log origin/main..main` in the summary
 - Card check finds an unclear promise or nothing checkable → stop, do not merge
 - Fixup commits present + user picks "abort" → exit cleanly, do not merge (autosquash + force-push manually, then re-run)
