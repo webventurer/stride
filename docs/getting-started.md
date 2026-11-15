@@ -37,6 +37,10 @@ The `/commit` skill encodes a **multi-pass methodology** that separates content 
 
 ## The loop
 
+Start with one card while you watch. Name a card with [`/linear:start <card>`](/skills/linear) and it works that card in your own session, so you see each step, and in interactive mode it stops at the pull request for you.
+
+When that feels familiar, move to two lanes. Put two or more cards in Todo and run `/linear:start` with no card from `main`: stride builds them side by side in the background while you make quick changes in a second session. [Foreground loop, background structure](/patterns/foreground-loop-background-structure) sets out the two lanes, and [`/parallel-sessions`](/skills/parallel-sessions) runs the cards.
+
 The three aren't independent — they're stages in the same loop, and each one makes the next one better.
 
 1. **`/craft`** sharpens the problem — structured prompt generation that turns a vague idea into a clear description *before* the agent starts work

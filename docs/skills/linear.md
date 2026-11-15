@@ -110,7 +110,7 @@ Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). Every draft's 
 
 In `--research` mode, also explores Linear and the project's documents, then adds code examples (showing how similar patterns are already implemented) and acceptance criteria (observable outcomes, not implementation steps).
 
-The `--worktree` flag is the place to opt into an isolated workspace — after the issue is created, the command sets up a git worktree at `.claude/worktrees/<issue-id-lowercase>` inside the repo, and hands off to a new Claude Code session. `/linear:start` runs inline by default; if you want a worktree, decide at planning time, not start time.
+`/linear:plan-work` refuses `--worktree`: the flag is part of [`/linear:start`](#linear-start), which sets up an isolated git worktree for the card when you pass it.
 
 **Story is the default; epic when warranted.** Most descriptions are story-sized — one deliverable that ships as one PR — so `/linear:plan-work` skips the sizing question and proceeds straight to drafting.
 
@@ -133,7 +133,6 @@ When you already know it's epic-sized, pass `--epic` to skip sensing and go stra
 - `/linear:plan-work --research "add PostHog integration"` — research mode
 - `/linear:plan-work --craft "add dark mode toggle"` — auto-run [CRAFT prompt refinement](/skills/craft)
 - `/linear:plan-work --research --craft "description"` — research + CRAFT combined
-- `/linear:plan-work --worktree "description"` — also set up an isolated worktree after creation
 - `/linear:plan-work --epic "Bulk blog processing across 200 articles"` — skip size-sensing, draft as a parent-issue epic
 - `/linear:plan-work --project bar "task description"` — file into a different Linear project, skip the Vision check
 
@@ -169,14 +168,17 @@ Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). The command su
 
 The agent groups commits by purpose and squashes similar ones into single commits with rewritten messages. Conservative by default — when uncertain whether two commits belong together, they stay separate. The user gates via terminal review and can recover the original commits via reflog if a squash was wrong.
 
-Treats the issue as the agreed specification — outcome, boundary, constraints, and proof — then derives an implementation checklist from the repository as it exists when work starts. The checklist names the affected files or responsibilities and the checks that prove the result; `/linear:start` shows it before editing and marks items complete as it works. It proceeds without an approval gate when the plan clearly satisfies the issue, and pauses only when the code exposes a missing decision, contradiction, or required scope expansion. The card is the contract; the checklist is the current route. Branches are created inline by default — no "worktree or inline?" prompt. To run on a worktree instead, opt in at planning time via `/linear:plan-work --worktree`.
+Treats the issue as the agreed specification — outcome, boundary, constraints, and proof — then derives an implementation checklist from the repository as it exists when work starts. The checklist names the affected files or responsibilities and the checks that prove the result; `/linear:start` shows it before editing and marks items complete as it works. It proceeds without an approval gate when the plan clearly satisfies the issue, and pauses only when the code exposes a missing decision, contradiction, or required scope expansion. The card is the contract; the checklist is the current route. Branches are created inline by default — no "worktree or inline?" prompt. To run on a worktree instead, pass `--worktree` to `/linear:start`, which hands the card to a new terminal tab.
+
+**Two ways to run it.** One card while you watch is the simple way to start: `/linear:start PG-205` works that card in your own session and folder, in either mode, so you see each step, and in interactive mode it stops at the pull request for you. The background way is for when you have several cards and want to keep making quick changes: with no card on `main`, it runs the cards at the top of Todo as a batch, side by side, each card in its own worktree, while you work in a second session. Unattended mode carries on batch after batch, and interactive mode runs one batch and stops. When only one card can start in interactive mode, it is worked in your own folder, so start it with `--worktree` to keep the foreground on `main`. Naming an epic from `main` runs its Todo cards as a batch, and with no card on another branch it resumes the card that branch names. [Foreground loop, background structure](/patterns/foreground-loop-background-structure) sets out the two lanes, and [`/parallel-sessions`](/skills/parallel-sessions) runs the batch.
 
 Ends by asking: "Does this look right, or do you want changes?"
 
 **Usage**:
 
-- `/linear:start PG-205` — explicit issue
-- `/linear:start` — infers from branch
+- `/linear:start PG-205` — works that card in your own session
+- `/linear:start PG-205 --worktree` — works that card in its own worktree, in a new terminal tab
+- `/linear:start` — from `main`, runs Todo as batches; from a card's branch, resumes that card
 
 ### /linear:fix
 

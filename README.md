@@ -47,6 +47,8 @@ The skills aren't independent — each one feeds the next.
 
 `/vision` sets the destination. `/craft` sharpens the problem. `/linear` turns it into a tracked issue (anchored to a Vision outcome) and manages the full lifecycle. `/commit` records each change as one atomic, revertible unit. Remove any piece and the loop still works, but the output gets worse.
 
+There are two ways to run it. Build one card while you watch each step, which is the simplest way to start, or put cards in Todo and stride builds them side by side in the background while you make quick changes in your own session. [Foreground loop, background structure](https://webventurer.github.io/stride/patterns/foreground-loop-background-structure) sets out the two lanes, and [`/parallel-sessions`](https://webventurer.github.io/stride/skills/parallel-sessions) runs the cards.
+
 ## Install
 
 ```bash
@@ -81,6 +83,8 @@ Before your first `/linear:*` command, install the prerequisites — `gh`, `uv`,
 # Merge, clean up, done
 /linear:finish PG-123
 ```
+
+`/linear:start PG-123` builds that one card in your own session while you watch. Run `/linear:start` from `main` with no card and it builds two or more cards in Todo side by side in the background while you make quick changes in a second session; see [foreground loop, background structure](https://webventurer.github.io/stride/patterns/foreground-loop-background-structure).
 
 ## Migration skills
 
