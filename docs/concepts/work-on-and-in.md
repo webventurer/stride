@@ -22,9 +22,9 @@ The loops feed each other. Working *in* the project surfaces what to fix *on* it
 When using stride surfaces a flaw in stride:
 
 1. **Don't push through the friction.** Name it — it's data, not noise ([friction is information](./friction-distinction)).
-2. **File it as it stands.** A new issue, not absorbed into whatever you were doing ([new issue, not new scope](./new-issue-not-new-scope)).
+2. **File it as it stands.** A new issue, not absorbed into whatever you were doing ([new issue, not new scope](../patterns/new-issue-not-new-scope)).
 3. **Fix it in the same working rhythm** — `/linear:quick` for an obvious one-scroll fix, `/linear:plan-work` when it crosses files or contracts.
-4. **Let the Vision grow if the flaw reveals a missing outcome** — on the same branch as the fix ([Vision evolves with the work](./vision-evolves-with-the-work)).
+4. **Let the Vision grow if the flaw reveals a missing outcome** — on the same branch as the fix ([Vision evolves with the work](../patterns/vision-evolves-with-the-work)).
 
 The reproduction case is free: you just hit it. The motivation is concrete: it annoyed *you*, doing *real* work. That beats any speculative backlog.
 
@@ -35,8 +35,8 @@ This is the upstream frame the other three patterns hang off — it says *run th
 | Pattern | Where it fires in the loop |
 |:--|:--|
 | [Friction is information](./friction-distinction) | The instant you hit the flaw — is this signal, or a use-case mismatch? |
-| [New issue, not new scope](./new-issue-not-new-scope) | Once it's signal — capture it without derailing the current work |
-| [Vision evolves with the work](./vision-evolves-with-the-work) | If the flaw exposes an outcome the Vision never named |
+| [New issue, not new scope](../patterns/new-issue-not-new-scope) | Once it's signal — capture it without derailing the current work |
+| [Vision evolves with the work](../patterns/vision-evolves-with-the-work) | If the flaw exposes an outcome the Vision never named |
 
 Reading them in isolation, you might wait for friction to find you. This pattern says: **put yourself in the friction on purpose.** Dogfood the tool on real work, and the backlog writes itself from what actually broke.
 
