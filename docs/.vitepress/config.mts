@@ -54,6 +54,7 @@ export default defineConfig({
       {
         text: 'Concepts',
         items: [
+          { text: 'Work on the project, in the project', link: '/concepts/work-on-and-in' },
           { text: 'Friction is information', link: '/concepts/friction-distinction' },
         ],
       },
