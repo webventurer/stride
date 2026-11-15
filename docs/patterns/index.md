@@ -9,3 +9,4 @@ Reusable moves and judgement-affording Distinctions for evolving stride itself. 
 | [New issue, not new scope](./new-issue-not-new-scope) | Pattern | Work surfaces mid-flight that wasn't in scope — file it as a new issue rather than absorbing it into the current one |
 | [Revise, don't stretch](./revise-dont-stretch) | Pattern | The Vision-trace feels strained at `/linear:plan-work` draft time |
 | [Vision evolves with the work](./vision-evolves-with-the-work) | Pattern | A trace gate fires because no Vision criterion fits — add the missing criterion on the same branch, not in a follow-up PR |
+| [Foreground loop, background structure](./foreground-loop-background-structure) | Pattern | You're making quick changes to your app while cards build — quick changes go in your own session, work that needs thought goes on a card |
