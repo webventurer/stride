@@ -19,7 +19,7 @@ Cards don't have to queue behind you. Cards that don't depend on each other buil
 ### Why it works
 
 - It matches how attention works. Seeing a change land moments after you ask keeps you engaged, and that's exactly what a long background run loses.
-- It's cheap. The background half is already proven: five cards merged cleanly on 13 Nov. The foreground half is one rule (stride won't touch your folder while you're working in it), one refusal (the session running cards won't take app changes) and docs. No new machinery.
+- It's cheap. The foreground half is one rule (stride won't touch your folder while you're working in it), one refusal (the session running cards won't take app changes) and docs. No new machinery.
 - It moves the bottleneck to the right place. The thing that limits you becomes what you decide to build, not waiting for stride.
 
 ## The principle

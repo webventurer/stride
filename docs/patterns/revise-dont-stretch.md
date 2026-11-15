@@ -25,16 +25,16 @@ Catching at draft time is cheap; revising one section beats shipping with a fict
 
 The Vision evolves with the work — newer criteria sometimes fit better than ones you scanned first. The trace you reach for first may have been overtaken by a more direct one mid-stream.
 
-## Worked example: WB-301
+## Worked example: a trace overtaken by a newer criterion
 
-At `/linear:plan-work` draft time, the agent traced WB-301 to:
+At `/linear:plan-work` draft time, the agent traced a card to:
 
-1. *"The card moves through Backlog → Doing → In Review → Done as `/linear:*` runs"*
-2. *"Issue titles read as stakeholder outcomes, not implementation steps"*
+1. *"The card moves through Backlog → Doing → In Review → Done as `/linear:*` runs — no manual clicks on the board"*
+2. *"Anyone who doesn't know stride's commands or code can understand every Linear card: an outcome in its title, everyday words in its description and updates"*
 
 Both fit, but only with bridging — neither directly named what the work was about.
 
-At `/linear:finish` (with the Vision-confirm step live), the user named the actual shift: the work served the *newer* criterion *"The common path through every `/linear:*` command runs without prompts; interruptions appear only when stride detects friction worth the user's judgement"* — added to `VISION.md` mid-stream during the friction-calibration work.
+At `/linear:finish` (with the Vision-confirm step live), the user named the actual shift: the work served the *newer* criterion *"The common path through every `/linear:*` command runs without prompts; interruptions appear only when stride detects friction worth the user's judgement"* — added to `VISION.md` while the card was in flight.
 
 The original trace was strained because **the Vision had evolved** between the draft and the finish. The agent's first-pass scan reached for criteria that were in scope when it last absorbed the Vision, not what fit best now.
 

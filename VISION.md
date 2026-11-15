@@ -42,6 +42,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] When new work strains against the Success criteria, the Vision is updated with what was learned, so it evolves with the work
 - [ ] Work is filed against a criterion it plainly serves, and when none fits without stretching, stride stops and says so before merging
 - [ ] Every skill and command stride installs is described where a reader looks, with the same counts in the README, the docs site and the installer
+- [ ] Anyone new to stride can follow every docs page: examples are generic, with no past card numbers or dates from how stride was built
 - [ ] Stride's code and the examples in its docs follow one house style, so an agent reading either learns one way to write code
 - [ ] Friction hit while working on stride can be surfaced, fixed and used within the same session, so the tool improves as you use it
 - [ ] Every commit on a stride-managed branch does one job, with no monolithic commits, and its message explains why
