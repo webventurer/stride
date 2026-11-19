@@ -18,7 +18,7 @@ The split moves what holds you up from waiting on the agent to [your own decisio
 | **Use when** | You are working on an app and have a mix of small tweaks and bigger structural work |
 | **Key benefit** | Features land quickly and you stay engaged, because you see each change in the app moments after asking for it |
 | **The test** | Can you say the change in one sentence and see it in the app straight away? Foreground. Does it need a decision about structure first? Background |
-| **Same files** | Both lanes may change the same files. Before a card merges, stride tests it combined with `main`, including your pushed commits, and any clash is fixed before the merge. Working on another part of the app avoids that fix |
+| **Same files** | Both lanes may change the same files. Before a card merges, stride tests it combined with `main`, including your pushed commits, and any clash is fixed before the merge. Working on another part of the app avoids that fix. [Working in both lanes costs one catch-up merge](#working-in-both-lanes-costs-one-catch-up-merge) says who pays it and when |
 
 ---
 
@@ -38,10 +38,10 @@ Run two lanes at once, each suited to its kind of work.
 
 | Lane | Where it runs | What goes in it | How it lands |
 |:-----|:--------------|:----------------|:-------------|
-| **Foreground** | Your own Claude session, on `main` in the main checkout | Changes you can say in a sentence and see in the app: sizes, labels, a new section | One request, then `/commit`, then a push, then the next |
+| **Foreground** | Your own Claude session, on `main` in the main checkout | Changes you can say in a sentence and see in the app: sizes, labels, a new section | One request, then `/commit`, then the next |
 | **Background** | Stride, working from Linear cards, in their own folders | Work that needs more thought: structure, data, anything that needs a decision before code | Its own branch. In interactive mode it stops at a pull request for you to review. In unattended mode it merges itself |
 
-**The foreground is a loop.** Ask for a change, check it in the app, `/commit`, push, ask for the next. You can line the requests up: type the next one while the last is still running, and the live session takes them in order. Each change lands as its own commit as you go. Keep the foreground in its own session, not the one that runs the cards: that session spends its time waiting on them, so your tweaks would queue behind it. When a push is refused because cards have merged, `git pull --rebase` brings them in.
+**The foreground is a loop.** Ask for a change, check it in the app, `/commit`, ask for the next. You can line the requests up: type the next one while the last is still running, and the live session takes them in order. Each change lands as its own commit as you go. Keep the foreground in its own session, not the one that runs the cards: that session spends its time waiting on them, so your tweaks would queue behind it. Push when you like. When a push is refused because cards have merged, `git pull --rebase` brings them in.
 
 **The background holds the thinking.** Draft the card with `/linear:plan-work` and start it with `/linear:start`. Stride branches, builds, validates and reviews it without needing the live session. A card builds in its own folder when it runs from Todo, in a batch or an unattended run, or when you start it with `--worktree`. A card started alone without `--worktree` works in the main checkout on its own branch, so start it with `--worktree` to keep the foreground on `main`.
 
@@ -53,13 +53,33 @@ Run two lanes at once, each suited to its kind of work.
 
 ---
 
+## Working in both lanes costs one catch-up merge
+
+Two lanes at once means your quick changes and the cards progress together. The price is one catch-up merge when the lanes meet, in which your changes are replayed one at a time on top of what the cards built. The agent does the catch-up while you carry on.
+
+**The lane that merges second pays.** If your commits are already pushed when a card finishes, the card pays, because stride fixes clashes before it merges. If you have unpushed commits when cards have merged, you pay when you run `git pull --rebase`.
+
+**Pushing after every `/commit` is optional.** You don't need to push to dodge the catch-up: one catch-up covers a whole run of changes. Not pushing has a cost: the cards can't see your unpushed work while they build, so a card can restructure code your changes depend on. The catch-up then has more to adapt, and the adapting is still the agent's job.
+
+**A line can merge cleanly and still break.** Few of your changes will clash outright. The risk is a line that replays without complaint but calls something a card removed or renamed. After each replayed commit, ask the agent to run:
+
+- the tests
+- the linter
+- a search for the names the cards removed or renamed
+
+Stride has no step that runs these checks today, so they are something to ask for. A fix goes into the commit that introduced the line, so each commit still does one job.
+
+For example, you make 20 small app changes while a card renames a folder the app uses. When you pull, your 20 changes are replayed one at a time on the renamed code. After each one the checks run, and a change that still points at the old folder name is fixed in that change.
+
+---
+
 ## Implementation
 
 **Step 1: Sort the list.** Go through what you want done and put each item in a lane. A tweak you can see goes in the foreground. Anything where you would have to stop and think about how it should work goes on a Linear card.
 
 **Step 2: Start the background first.** Write the cards and start them, so the slow work is running before the quick work begins.
 
-**Step 3: Run the foreground loop.** One request, check it in the app, `/commit`, push. Line up the next request while the current one runs.
+**Step 3: Run the foreground loop.** One request, check it in the app, `/commit`. Line up the next request while the current one runs.
 
 **Step 4: Move work that turns out bigger.** If a foreground change opens a question about structure, stop it, put it on a card and carry on with the next tweak.
 
