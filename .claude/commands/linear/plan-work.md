@@ -51,7 +51,7 @@ past duplicate, scope, project, or Vision ambiguity.
 ### Process
 
 - Duplicate handling is two-tier: exact/near-exact → interactive mode warns and asks; unattended mode stops. Similar/related → mention briefly and continue.
-- A story or bug card is created as soon as every check passes, without showing the draft. When something only the user can decide is open, interactive mode shows the draft and asks for approval before creating, and unattended mode stops at its hard stops. The epic-sized path keeps its draft and approval.
+- A story or bug card is created as soon as every check passes, without showing the draft; [step 11](#11-show-the-draft-only-when-something-is-open) says when something is open and what each mode does. The epic-sized path keeps its draft and approval.
 - Never assign the issue unless the user explicitly asks.
 
 ## Steps
@@ -234,7 +234,7 @@ Before drafting, confirm:
 - **The fix can work:** what the card will promise is possible given how the code behaves, and the code doesn't already have something that does the job
 - **The evidence says what the card says:** when the description cites a specific run, recording or results file, open that data too
 
-When the check contradicts the description, correct the draft and tell the user what changed. When the requested fix can't work, interactive mode asks how to proceed, and unattended mode stops and names the file that rules it out. When the code can't be reached, or the check leaves a point open, say so under *Assumptions to confirm*; step 11 treats that point as open for a story. A bug draft's *Suspected causes* are guesses by design and are not open.
+When the check contradicts the description, correct the draft and tell the user what changed. When the requested fix can't work, interactive mode asks how to proceed, and unattended mode stops and names the file that rules it out. When the code can't be reached, or the check leaves a point the builder can settle, say so under *Assumptions to confirm*; [step 11](#11-show-the-draft-only-when-something-is-open) sets out where a bug card files it and whether the draft is shown.
 
 **With `--research`**, also:
 
@@ -334,17 +334,20 @@ Each round has three voices: Claude proposes and synthesises, ChatGPT challenges
 
 On the epic-sized path, show the full draft and ask for explicit approval before creating, as the [epic flow](reference/epic-flow.md) sets out. In unattended mode, show it for the record and continue directly to step 12.
 
-On the story and bug path, the draft is not shown. Something is **open** when only the user can decide it:
+On the story and bug path, the draft is not shown. Something is **open** only when it is a decision that belongs to the person:
 
 - a near-duplicate, a Vision ambiguity, or an epic-shaped or bug-shaped description that step 5 or 6 raised as a question (an explicit `--epic` or `--bug` flag skips that question, so it isn't open) (steps 1, 3, 5, 6, 9)
 - a case that doesn't move the needle (step 7)
 - a requested fix the code check rules out (step 7)
 - a project name that doesn't match exactly one project, which step 0 stops on before any draft exists, so it asks about the name rather than showing a draft
-- a point the code check or the Vision trace could not settle, which a story draft would file under *Assumptions to confirm* (an entry that only restates a known default doesn't count)
 
-When nothing is open, continue directly to step 12 in both modes. The config setting is the persistent approval for routine issue creation; duplicate, scope, project, and Vision ambiguity remain hard stops in unattended mode, and a point the code check could not settle goes into the card's *Assumptions to confirm*.
+A point the builder can settle is **not open**, even when the code check couldn't settle it. A story draft files it under *Assumptions to confirm* and a bug draft under *Suspected causes*; an entry that only restates a known default is left out.
 
-When something is open in interactive mode, show the full draft to the user and ask for explicit approval before creating.
+What each mode does:
+
+- **Nothing open, or only builder points:** step 12 creates the card without showing the draft, in both modes. The config setting is the persistent approval for routine issue creation.
+- **Something open, interactive mode:** show the full draft to the user and ask for explicit approval before creating.
+- **Something open, unattended mode:** stop and name the reason without showing a draft.
 
 <mark>**Present the draft as the final text output of the turn, and ask for approval in plain prose.**</mark> Never pair the draft with a tool-based approval dialog in the same turn — the dialog can suppress the text above it, and the user ends up approving a card they never saw. End the turn on the draft + prose question; the user's reply is the gate.
 
@@ -353,7 +356,7 @@ When something is open in interactive mode, show the full draft to the user and 
 
 ### 12. Create the issue
 
-Only after every check passes with nothing open, after interactive approval, on the epic-sized path after its approval, or in unattended mode after every hard check passes.
+Only after every check passes and [step 11](#11-show-the-draft-only-when-something-is-open) leaves nothing open, after interactive approval, or on the epic-sized path after its approval (in unattended mode, after showing it for the record).
 Write the drafted description to a file first and pass it with `--description
 @<file>` — the body is multi-line markdown, so it goes through a file, never an
 inline string ([why](reference/workflow.md#how-skills-talk-to-linear)).
