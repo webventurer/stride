@@ -297,9 +297,15 @@ Otherwise, follow [worktree teardown](reference/worktree.md#teardown) — it rem
 
 **Step 10c — Delete branches:**
 
-Now that any worktree is gone, the branch can be deleted. As a `/parallel-sessions` job, delete only the remote branch: the worktree still has the local one checked out, and the coordinator deletes it when it removes the worktree.
+Now that any worktree is gone, the branch can be deleted. As a `/parallel-sessions` job, the worktree is still there with the local branch checked out, so delete the local branch with the script below instead of the **Local** bullet, then delete the remote branch with the **Remote** bullet. The coordinator removes only the worktree folder.
 
-- **Local**: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently. When step 10a's pull was refused or the main checkout was left alone, it lacks the merge commit and `-d` can say the branch isn't fully merged: skip the local deletion, say so in the summary, and carry on
+```bash
+.claude/tools/delete_job_branch.sh <gitBranchName>
+```
+
+It fetches, deletes the branch only when its work is on `origin/main`, detaches the worktree at the branch's own commit first, and prints `deleted` or `kept: <reason>`. It doesn't depend on step 10a: a main checkout left alone makes no difference. When it prints `kept: <reason>`, name the branch and the reason in step 17's summary and in the message to the coordinator, and carry on. Nothing force-deletes a branch.
+
+- **Local**, for a run that isn't a `/parallel-sessions` job: `git -C <main-repo-path> branch -d <gitBranchName>` — use lowercase `-d` since the merge commit makes the branch fully merged. If already deleted, skip silently. When step 10a's pull was refused or the main checkout was left alone, it lacks the merge commit and `-d` can say the branch isn't fully merged: skip the local deletion, say so in the summary, and carry on
 - **Remote**: `git -C <main-repo-path> push origin --delete <gitBranchName>` — if already deleted (GitHub may auto-delete), skip silently
 
 ### 11. Update Linear → done
