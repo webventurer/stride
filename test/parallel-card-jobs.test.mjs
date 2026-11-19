@@ -109,15 +109,13 @@ describe("a /parallel-sessions job running a stride card", () => {
     );
   });
 
-  it("leaves the job's worktree and local branch for the coordinator to remove", () => {
+  it("deletes the job's own branches and leaves the worktree for the coordinator to remove", () => {
     const finish = read(".claude/commands/linear/finish.md");
 
     ok(finish.includes("As a `/parallel-sessions` job, skip this step"));
-    ok(
-      finish.includes(
-        "As a `/parallel-sessions` job, delete only the remote branch",
-      ),
-    );
+    ok(finish.includes("delete_job_branch.sh <gitBranchName>"));
+    ok(brief.includes("deletes its local and remote branches"));
+    ok(!skill.includes("delete its local branch with the worktree"));
     ok(brief.includes("Message the coordinator that the card has merged"));
   });
 

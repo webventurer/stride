@@ -110,7 +110,7 @@ The simple way is one card while you watch: `/linear:start <card>` works it in y
 - **A set number at a time.** `parallel-sessions` in `.stride.json` sets how many cards build at once, not whether you watch: with `1`, an unattended run still builds each card in its own worktree, one at a time. Stride decides the order. See [`.stride.json`](/reference/stride-json).
 - **Tested combined with `main`.** Before a card merges, stride tests it combined with `main` as it stands, including commits you pushed meanwhile, and fixes any clash first.
 - **Your folder is left alone when it's busy.** A finishing card doesn't touch your folder when it holds uncommitted changes or commits you haven't pushed, is on a branch other than `main` or the card's own, or can't fetch.
-- **App changes go in a new session.** The session running the cards is busy waiting on them, so quick changes to your app go in a second session. Start Claude Code in a new terminal in the same folder, `/commit` and push after each change, and run `git pull --rebase` when a push is refused.
+- **App changes go in a new session.** The session running the cards is busy waiting on them, so quick changes to your app go in a second session. Start Claude Code in a new terminal in the same folder, `/commit` after each change, and run `git pull --rebase` when a push is refused.
 
 [Foreground loop, background structure](/patterns/foreground-loop-background-structure) sets out the two lanes, and [`/parallel-sessions`](/skills/parallel-sessions) runs the cards.
 
