@@ -10,6 +10,8 @@ from pathlib import Path
 TOOLS_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(TOOLS_DIR))
 
+from hand_work import files_in_hand  # noqa: E402
+from test_hand_work import commit_file, git, make_repos  # noqa: E402
 from todo_batch import cards_of_epic, considered_cards  # noqa: E402
 from todo_order import cards_in_work_order  # noqa: E402
 
@@ -269,3 +271,86 @@ def test_epic_batch_takes_two_sub_issues_naming_the_same_file():
     ]
 
     assert reasons(epic_batch(cards, "WB-1", 3)) == {"A": None, "B": None}
+
+
+def test_considered_cards_leaves_out_a_card_naming_a_file_in_hand():
+    cards = [card("A", ("src/server.py",)), card("B", ("report.py",))]
+
+    assert reasons(
+        considered_cards(cards, 3, in_hand=frozenset({"src/server.py"}))
+    ) == {
+        "A": "waits for your work on src/server.py to be pushed",
+        "B": None,
+    }
+
+
+def test_considered_cards_keeps_a_card_once_its_file_is_no_longer_in_hand():
+    cards = [card("A", ("src/server.py",))]
+
+    assert reasons(considered_cards(cards, 3, in_hand=frozenset())) == {
+        "A": None
+    }
+
+
+def test_considered_cards_matches_a_bare_name_to_a_longer_path_in_hand():
+    cards = [card("A", ("server.py",))]
+
+    assert reasons(
+        considered_cards(cards, 3, in_hand=frozenset({"src/server.py"}))
+    )["A"]
+
+
+def test_considered_cards_matches_a_name_written_as_an_auto_link():
+    description = "### What we'll do\n\nEdit [server.py](<http://server.py>).\n"
+    cards = [described("A", description)]
+
+    assert reasons(
+        considered_cards(cards, 3, in_hand=frozenset({"server.py"}))
+    )["A"]
+
+
+def test_considered_cards_still_keeps_two_cards_sharing_a_file_nobody_has_changed():
+    cards = [card("A", ("server.py",)), card("B", ("server.py",))]
+
+    assert reasons(
+        considered_cards(cards, 3, in_hand=frozenset({"other.py"}))
+    ) == {
+        "A": None,
+        "B": None,
+    }
+
+
+def test_considered_cards_runs_a_card_that_names_no_file():
+    cards = [described("A", "### What we'll do\n\nTidy the wording.\n")]
+
+    assert reasons(
+        considered_cards(cards, 3, in_hand=frozenset({"server.py"}))
+    ) == {"A": None}
+
+
+def test_considered_cards_does_not_count_a_hand_held_card_in_the_batch():
+    cards = [card("A", ("server.py",)), card("B"), card("C")]
+
+    in_batch = [
+        c["identifier"]
+        for c in considered_cards(cards, 2, in_hand=frozenset({"server.py"}))
+        if not c["reason"]
+    ]
+
+    assert in_batch == ["B", "C"]
+
+
+def test_considered_cards_leaves_out_a_card_naming_a_file_of_an_unpushed_commit_on_a_feature_branch(
+    tmp_path,
+):
+    _, mine = make_repos(tmp_path)
+    git(mine, "checkout", "-b", "feature")
+    commit_file(mine, "src/api.py", "api\n")
+    cards = [card("A", ("api.py",)), card("B", ("report.py",))]
+
+    in_hand = frozenset(files_in_hand(mine))
+
+    assert reasons(considered_cards(cards, 3, in_hand=in_hand)) == {
+        "A": "waits for your work on src/api.py to be pushed",
+        "B": None,
+    }

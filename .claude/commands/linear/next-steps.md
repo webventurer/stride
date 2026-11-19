@@ -175,7 +175,7 @@ A file name that two cards share never holds one out: each card runs in its own 
 uv run .claude/tools/linear_cli.py next-batch --project "<project>"
 ```
 
-Show each card it considered, in or out, with the reason it gives, such as "blocked by WB-12". When the command stops with the `parallel-sessions` setting's message instead, show that message in place of a batch. Next-steps doesn't run the batch.
+Show each card it considered, in or out, with the reason it gives, such as "blocked by WB-12" or "waits for your work on src/server.py to be pushed". When the command stops with the `parallel-sessions` setting's message instead, show that message in place of a batch. Next-steps doesn't run the batch.
 
 ### 7. Recommend next actions
 
