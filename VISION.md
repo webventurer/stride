@@ -66,6 +66,7 @@ AI coding agents are improving fast, and the structure-vs-speed trade-off compou
 - [ ] A card's problem and fix are checked against the code and anything it cites before drafting, so nobody starts a plan the code rules out
 - [ ] A card reaches the board only with evidence it will move the needle, and what was left out is named in one line
 - [ ] The card moves through Backlog → Doing → In Review → Done as `/linear:*` runs — no manual clicks on the board
+- [ ] A merged card leaves nothing behind: its branch is gone from GitHub and from your machine, and so is its worktree
 - [ ] Stories with a shared purpose sit under one epic, and the epic traces back to a Vision outcome
 - [ ] `git bisect` on a stride branch finds a regression in fewer than 5 commits
 - [ ] stride's tests run the real code, never a copy, so a regression in the real code fails the suite
