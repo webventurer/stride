@@ -22,6 +22,7 @@ import click
 sys.path.insert(0, str(Path(__file__).parent))
 
 from card_comments import comments_text  # noqa: E402
+from hand_work import files_in_hand, main_folder  # noqa: E402
 from legacy import (  # noqa: E402
     backfill_focus,
     backfill_parallel_sessions,
@@ -287,7 +288,10 @@ def list_considered_todo_cards(
     if epic:
         ordered = cards_of_epic(ordered, epic.upper())
     asked = [c | {"waits_on_answer": waits_for_answer(c)} for c in ordered]
-    return considered_cards(asked, size, frozenset(s.upper() for s in started))
+    in_hand = frozenset(files_in_hand(main_folder()))
+    return considered_cards(
+        asked, size, frozenset(s.upper() for s in started), in_hand
+    )
 
 
 def waits_for_answer(card: dict) -> bool:

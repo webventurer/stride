@@ -20,7 +20,7 @@ Start the list empty. After each batch, add every card in it, whether or not it 
 3. For `batch` or `single`, run the cards through `/parallel-sessions`, settled as `start.md` sets out. A `single` card runs the same way, as a batch of one, so a failure ends that card's job and not the run. Add its cards to the list. When the report comes back, report one line for each merged card, its lesson result from its `/linear:finish` summary (the cards it reworded, the one-off lessons named and left, or "no lesson for Todo"), then go back to step 1.
 4. For `blocked` or `empty`, the run is over: no card in Todo can start. Go to the final report.
 
-The reasons the run reports are the ones `start-choice` prints for a card that is out: a blocker that isn't Done, a lesson question with no answer, or a card the run already started.
+The reasons the run reports are the ones `start-choice` prints for a card that is out: a blocker that isn't Done, a lesson question with no answer, a card the run already started, or a card that names a file you have changed by hand in the main folder and not yet pushed (`waits for your work on <files> to be pushed`). The last one clears by itself: once none of the card's files has uncommitted or unpushed changes, the next `start-choice` offers the card again. A run with nothing else to start ends, and the final report lists the card under Waiting with its files named.
 
 ## A card that is already done
 

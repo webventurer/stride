@@ -18,7 +18,7 @@ The split moves what holds you up from waiting on the agent to [your own decisio
 | **Use when** | You are working on an app and have a mix of small tweaks and bigger structural work |
 | **Key benefit** | Features land quickly and you stay engaged, because you see each change in the app moments after asking for it |
 | **The test** | Can you say the change in one sentence and see it in the app straight away? Foreground. Does it need a decision about structure first? Background |
-| **Same files** | Both lanes may change the same files. Before a card merges, stride tests it combined with `main`, including your pushed commits, and any clash is fixed before the merge. Working on another part of the app avoids that fix. [Working in both lanes costs one catch-up merge](#working-in-both-lanes-costs-one-catch-up-merge) says who pays it and when |
+| **Same files** | Both lanes may change the same files. A card that names a file you've changed by hand and not pushed waits until you push, and its batch report names the file. Before any card merges, stride tests it combined with `main`, including your pushed commits, and any clash is fixed before the merge. Working on another part of the app avoids both. [Working in both lanes costs one catch-up merge](#working-in-both-lanes-costs-one-catch-up-merge) says who pays it and when |
 
 ---
 
@@ -59,7 +59,7 @@ Two lanes at once means your quick changes and the cards progress together. The 
 
 **The lane that merges second pays.** If your commits are already pushed when a card finishes, the card pays, because stride fixes clashes before it merges. If you have unpushed commits when cards have merged, you pay when you run `git pull --rebase`.
 
-**Pushing after every `/commit` is optional.** You don't need to push to dodge the catch-up: one catch-up covers a whole run of changes. Not pushing has a cost: the cards can't see your unpushed work while they build, so a card can restructure code your changes depend on. The catch-up then has more to adapt, and the adapting is still the agent's job.
+**Pushing after every `/commit` is optional.** You don't need to push to dodge the catch-up: one catch-up covers a whole run of changes. Not pushing has a cost: a card that names a file you've changed and not pushed waits until you push, and the cards can't see your unpushed work while they build, so a card that reaches your code without naming its file can still restructure code your changes depend on. The catch-up then has more to adapt, and the adapting is still the agent's job. After a card merges, stride replays your unpushed commits and uncommitted changes on the new `main` in a separate folder and reports whether they still apply, without touching your folder.
 
 **A line can merge cleanly and still break.** Few of your changes will clash outright. The risk is a line that replays without complaint but calls something a card removed or renamed. After each replayed commit, ask the agent to run:
 
