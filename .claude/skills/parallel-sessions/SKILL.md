@@ -85,7 +85,7 @@ Fill the brief's screenshots rule from the repo's `screenshot-tool` setting: run
 
 A job running a stride card is the exception: its brief names the card in place of a path list, because the card's own "What we'll do" says what the job may change, and a card often mentions files it doesn't change. Everything below that checks paths against the brief, the commit check in step 5 and the report in step 6, applies to jobs that aren't a stride card; a card job's files are checked as step 5 sets out.
 
-A question you can already see in a job, such as a choice that turns on another job, is cheapest settled in its brief. Settle it only with an answer that keeps every part of the mission: a default that would break one part, such as pounds for a branch that sells in euros, is not settled. Take it to `/advisor`, then to the user if the advisor can't settle it.
+A question you can already see in a job, such as a choice that turns on another job, is cheapest settled in its brief. Settle it only with an answer that keeps every part of the mission: a default that would break one part, such as pounds for a branch that sells in euros, is not settled. Take it to `/advisor`, then to the user if the advisor can't settle it. A question you settle here goes on the list of [settled decisions](#5-watch-and-check).
 
 The slot store defaults to `work/slots` under the main checkout. The script finds that folder from git even inside a worktree, so every session reaches the same store. Give `--store` an absolute path only to use a different one.
 
@@ -95,6 +95,7 @@ The slot store defaults to `work/slots` under the main checkout. The script find
 |:-----|:------|
 | `work/runs/<batch>/progress.md` | One row per job: holder name, model, branch, log path and state |
 | `work/runs/<batch>/briefs/<holder name>.md` | Each job's brief |
+| `work/runs/<batch>/decisions.md` | One line for each decision the coordinator settled, as [step 5](#5-watch-and-check) sets out |
 | `work/runs/<batch>/logs/<holder name>.jsonl` | Each session's log, with its errors in `<holder name>.err` and a resumed session's log in `<holder name>.resume-<n>.jsonl` |
 | `work/runs/<batch>/slots.txt` | Each `slots.py status` reading the coordinator takes, with the time of each |
 | `work/slots/` | The slot store, shared by every batch so one limit holds for all |
@@ -183,6 +184,8 @@ In a run through Todo, put no question to the user mid-run: post it on its card 
 
 Before you put any question to the user, call `/advisor` and record what it said. Ask the user only what the advisor can't advise on: a job's purpose or scope, or something only the user knows. Name which of the three the question is; if it is none of them, such as a choice between two designs, take the advisor's recommendation instead of asking. See [the chain of command](reference/chain-of-command.md).
 
+**Record each decision you settle, and leave it for the report.** A settled decision is a question you answer in the user's place: one a job asks, one you settle in its brief, or one you settle on the advisor's recommendation. As you settle it, add one line to `work/runs/<batch>/decisions.md` naming the card (or the job's holder name, in a batch that runs no cards), the question and the answer. Send the user no message about it then. Running the batch, such as sending work back, resuming a job or choosing a model, is not listed.
+
 Never merge work that fills in something only the user can give with a guessed value, such as a made-up interest rate: keep it off `main` until the user answers.
 
 The question reaches the user with none of the context the batch has built up, so it carries the four labelled parts in order, as [asking the user](../../commands/linear/reference/asking-the-user.md) sets out. Put anything the user would be approving without knowing, such as a card line a session already added, in The gap.
@@ -190,6 +193,8 @@ The question reaches the user with none of the context the batch has built up, s
 ### 6. Report
 
 Tell the user which jobs committed, which ended without a commit (a session that died, or a job that failed), which cards ended in Canceled because their work was already done, and any commit from a job that is not a stride card that touched a path outside its brief. Leave `work/runs/<batch>/progress.md` showing each job's final state.
+
+List every line of `work/runs/<batch>/decisions.md`, and say the user can overrule any of them by saying what they want instead; stride changes no merged work by itself. When nothing was settled, say so. In a run through Todo, or an unattended run through an epic, a batch's report lists no decisions: the run's final report does.
 
 **Report once every job is merged, canceled or waiting on the user and every session has exited,** then end the session. Put any question for the user last, after the report and the progress file's path, so the question is the last thing the session says. A notice that arrives after the question, such as a session exiting or a background task finishing, changes nothing the user needs: handle it without a word to the user, and if you must reply, end on the question again. A `claude -p` coordinator exits when its final turn ends with nothing left running. In a run through Todo, no batch's report puts a question to the user: hand this report to the run, which keeps going, and let the run's final message carry every question.
 

@@ -41,7 +41,7 @@ The run's last message lists the epic's cards that were in Todo when it began:
 - **Failed:** each card that failed, with the check that failed or the decision it needs.
 - **Waiting:** each card still in Todo that isn't listed as failed, with the reason `start-choice` gave.
 
-The Todo run's lessons and questions follow, questions last.
+The Todo run's lessons, decisions and questions follow, questions last.
 
 ## E1. Enumerate and disclose upfront
 
