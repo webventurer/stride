@@ -26,7 +26,7 @@ You **report**. You do not edit files, run the build, or apply your own proposal
 
 Read before judging — it holds the canonical tests you apply:
 
-1. `.claude/stride/docs/principles/design-decisions.md` — YAGNI, "do the simplest thing that works", and The test
+1. `.claude/stride/docs/principles/README.md` — the principles list, including YAGNI, "do the simplest thing that works", and The test
 
 ---
 

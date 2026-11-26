@@ -4,7 +4,7 @@
 
 ## The question
 
-Stride already injects two layers on every turn: **how to think** (the meta-cognitive framework) and **what to optimise for** (the six design principles). Both are domain-agnostic — they shape reasoning and values, not technical choices.
+Stride already injects two layers on every turn: **how to think** (the meta-cognitive framework) and **what to optimise for** (the principles list). Both are domain-agnostic — they shape reasoning and values, not technical choices.
 
 What they don't carry is the third layer: **what you need to know about the materials.** That a 90-char URL can't be wrapped. That data analysis belongs in pandas, not hand-rolled JavaScript loops. That a vector database solves a retrieval problem you may not have. That passing data as JSON between two Python functions is usually a worse in-memory dataframe.
 
@@ -82,7 +82,7 @@ This is the open question. Several homes are possible, and they're not mutually 
 
 Cutting across the *where* is a sharper question — **how does the knowledge reach the agent at the moment it decides?**
 
-- **Always in context (hook-injected),** like `design-decisions.md` and the meta-cognitive framework. Guarantees it fires every turn; costs context budget on every turn, and doesn't scale — you can't inject ten tool-choice ladders into every prompt.
+- **Always in context (hook-injected),** like the principles list and the meta-cognitive framework. Guarantees it fires every turn; costs context budget on every turn, and doesn't scale — you can't inject ten tool-choice ladders into every prompt.
 - **Retrieved when relevant (skill / doc pulled on demand),** like the option-ladders' AI Assistant Notes ("when a user asks how to load data, reference this"). Cheap and scalable; risks *not firing* when the agent doesn't recognise it's at a decision point — and not recognising the decision point is the original failure.
 
 That tension is the crux: the always-on layer is for the handful of universal moves (how to think, what to value); the retrieved layer is for the long tail of specific trade-offs. The hard part is the **trigger** — teaching the agent to notice "this is a tool-choice moment, go consult the ladder" reliably enough that the retrieved knowledge actually gets retrieved.

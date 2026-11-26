@@ -110,6 +110,13 @@ When you depend on a class that does too much, it may change for a reason unrela
 
 If describing a function or class requires the word **"and"**, it likely has more than one responsibility. If it uses **"or"**, the responsibilities aren't even related. One dead giveaway is the word "and" in a function's name.
 
+Read the function name aloud. If it has "and", ask:
+
+1. Can the caller want one without the other?
+2. Are the two actions independent side effects?
+
+If yes to either, split.
+
 ### Ask reasonable questions
 
 Rephrase each method as a question to the class. Imagine a `Gear` class that calculates bicycle gear ratios:

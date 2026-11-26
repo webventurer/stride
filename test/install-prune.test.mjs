@@ -52,6 +52,13 @@ describe("install prune", () => {
     strictEqual(existsSync(join(fixtureRoot, orphan)), true);
   });
 
+  it("removes the design-decisions page the principles list replaced", () => {
+    const orphan = ".claude/stride/docs/principles/design-decisions.md";
+    seed({ [orphan]: "six principles on one page\n" });
+    runInstall("y\nn\nn\n"); // prune Y, gitignore n
+    strictEqual(existsSync(join(fixtureRoot, orphan)), false);
+  });
+
   it("removes the orphan's now-empty ancestor directories", () => {
     seed({ ".claude/docs/concepts/atomicity.md": "stale doc\n" });
     runInstall("y\nn\nn\n");

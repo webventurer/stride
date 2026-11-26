@@ -279,7 +279,7 @@ Keep the Vision outcome from step 2 in mind throughout. When choosing between ap
 
 #### YAGNI gate
 
-Before writing each piece, apply [The test](../../stride/docs/principles/design-decisions.md#the-test) from the design-decisions doc — does it close doors, add complexity for a requirement that doesn't exist yet, or confuse a first-time reader? If a piece fails any of the three, drop or simplify before writing further.
+Before writing each piece, apply [The test](../../stride/docs/principles/README.md#the-test) from the principles list — does it close doors, add complexity for a requirement that doesn't exist yet, or confuse a first-time reader? If a piece fails any of the three, drop or simplify before writing further.
 
 #### Audit the footprint
 
