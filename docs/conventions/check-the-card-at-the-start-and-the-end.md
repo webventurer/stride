@@ -61,7 +61,7 @@ Each finding is a **stop** or a **note**. A stop is a promise the builder would 
 - **Notes only:** they're posted as one comment on the card and work starts, in both modes
 - **Any stop:** before a branch exists, the agent rewords the card so each promise can be built and judged, posts one comment listing every change and the notes, and work starts, in both modes. It asks the user only when a fix would change what the card is for — its purpose or scope, not its wording
 
-The start check feeds the end check. Every promise that survives it can be shown kept or broken, so the verdicts at the end mean something: a kept promise was really tested, and a broken one has a real scenario.
+The start check feeds the end check. Every promise that survives it can be shown kept or broken, so the verdicts at the end mean something: a kept promise has proof, or nothing about it could fail unseen, and a broken one has a real scenario.
 
 ### At the end
 
@@ -72,8 +72,8 @@ The start check feeds the end check. Every promise that survives it can be shown
 
 | Verdict | Meaning | What happens |
 |:--------|:--------|:-------------|
-| **Kept** | The change does it, and a named test or line proves it | Nothing |
-| **Kept, unproven** | The change appears to do it, but nothing proves it | The author adds the proof |
+| **Kept** | The change does it, and a named test, line or read-only check proves it, or the reviewer could name no failure that would go unseen without proof | Nothing |
+| **Kept, unproven** | The change appears to do it, nothing proves it, and the reviewer names what would go wrong unseen. Proof the card asks to have posted on it needs no named failure until it's posted | The author adds the proof |
 | **Broken** | A concrete scenario shows the change does not do it | The author fixes the code |
 | **Unclear** | The card's wording cannot be checked, or contradicts itself | Stop and ask the user |
 
@@ -115,9 +115,11 @@ Vision trace: verified
 
 # ✅ At the end: each promise gets a verdict before merge
 "The API reads while cron writes; a reader never sees a half-written file"
-  → kept: the history is written to a temporary file and swapped in
+  → kept: a test shows the history is written to a temporary file
+    and swapped in
 "Concurrent reads"
-  → kept, unproven: correct, but no test exercises it
+  → kept, unproven: correct, but no test exercises it, so a later change
+    could make a second reader wait for ever with nothing failing
 "A per-signal page without [the plan-added row] proves nothing, however short"
   → broken: a 1-row signal page with no plan-added row, fetched after a gap,
     turns the signal complete: true
