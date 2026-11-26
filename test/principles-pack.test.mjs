@@ -121,8 +121,8 @@ describe("principles pack", () => {
     }
   });
 
-  it("lists 18 principles", () => {
-    strictEqual(new Set(linkedPages(readme)).size, 18);
+  it("lists 19 principles", () => {
+    strictEqual(new Set(linkedPages(readme)).size, 19);
   });
 
   it("ends the README with The test", () => {
