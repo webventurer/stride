@@ -68,6 +68,11 @@ describe("a card drafted from a brief", () => {
     );
   });
 
+  it("keeps a read time for each card", () => {
+    ok(drafting.includes("> <card-folder>/read-at.txt"));
+    ok(plan.includes('--read-at "$(cat <card-folder>/read-at.txt)"'));
+  });
+
   it("has the drafter read the Vision", () => {
     ok(drafting.includes("Read `VISION.md` first"));
   });

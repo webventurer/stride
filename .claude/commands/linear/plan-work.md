@@ -247,13 +247,15 @@ If no signals fire, skip silently and continue to step 7 — feature-shaped is t
 3. **Note the time, then fetch `main`,** so the drafter and the reviewers read the same code, and the card's check record can say how old it is:
 
    ```bash
-   date -u +%Y-%m-%dT%H:%M:%SZ > <run-folder>/read-at.txt
+   mkdir -p <card-folder> && date -u +%Y-%m-%dT%H:%M:%SZ > <card-folder>/read-at.txt
    git fetch origin main
    ```
 
+   `<card-folder>` is the card's own folder inside the run's folder, so a fetch for one card never moves another card's read time.
+
    In cross-project mode, when the target project's repo is on this machine, fetch there with `git -C <target-repo> fetch origin main`.
 
-4. **Spawn the drafter** with the Task tool (`general-purpose`), one per card, each card with its own folder inside the run's folder:
+4. **Spawn the drafter** with the Task tool (`general-purpose`), one per card:
 
    > Draft one Linear card: <which card the brief asks for>. Your brief is `<run-folder>/brief.md`; it is all you have from the conversation. Read `VISION.md` first, with `git show origin/main:VISION.md`. Then follow steps 8 to 10 of `.claude/commands/linear/plan-work.md`, after the CRAFT run in its step 4 when the brief says CRAFT was chosen. Read the code, tests and documents as they are on `origin/main`, with `git show origin/main:<path>` and `git grep <pattern> origin/main`. Write the title to `<card-folder>/title.txt` and the description to `<card-folder>/description.md`. Write to `<card-folder>/notes.md` what the check of the code corrected, and anything those steps would put to the person: don't ask, and don't create anything in Linear.
 
@@ -449,7 +451,7 @@ Do not assign the issue unless the user explicitly requested it.
 
 ```bash
 uv run .claude/tools/linear_cli.py issue get <new-id> > <card-folder>/filed.json
-uv run .claude/tools/linear_cli.py issue record-check <new-id> --read-at "$(cat <run-folder>/read-at.txt)" --checked @<card-folder>/filed.json --findings @<card-folder>/findings.md
+uv run .claude/tools/linear_cli.py issue record-check <new-id> --read-at "$(cat <card-folder>/read-at.txt)" --checked @<card-folder>/filed.json --findings @<card-folder>/findings.md
 ```
 
 Post none for a cross-project card, or for a draft that changed after its review. Step 12's own fixes are part of the review; a change the person asks for, or their answer to a stop the review couldn't fix, comes after it. `/linear:start` then checks that card in full.
