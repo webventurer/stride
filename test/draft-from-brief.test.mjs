@@ -54,7 +54,13 @@ describe("a card drafted from a brief", () => {
   });
 
   it("fetches main before the drafter reads the code in full", () => {
-    ok(inOrder(drafting, ["git fetch origin main", "**Spawn the drafter**"]));
+    ok(
+      inOrder(drafting, [
+        "read-at.txt",
+        "git fetch origin main",
+        "**Spawn the drafter**",
+      ]),
+    );
     ok(plan.includes("read it in full"));
     ok(!plan.includes("2–5"));
   });

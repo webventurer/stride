@@ -146,7 +146,7 @@ If already Doing, leave unchanged. Never set any other state in this step.
 
 The card check in step 11 can only be as good as the promises it checks. Before a branch exists or any code is written, three fresh reviewers read the card the way that check will, each through its own lens, and report any promise that cannot be checked, contradicts something, misses an edge case the code plainly has, or no longer fits what has changed: what earlier cards shipped, commits that reached `main` and comments on the card and its sibling cards. [agility](reference/agility.md) says why the check looks at what has changed.
 
-A card an earlier run of this step already checked holds a check record. Only what changed since that record is checked, and when nothing has, no reviewer runs.
+A card already checked, by [`/linear:plan-work`](plan-work.md) before it was filed or by an earlier run of this step, holds a check record. Only what changed since that record is checked, and when nothing has, no reviewer runs.
 
 Skip this step when the current branch is already the card's branch, as when resuming inside a worktree: the run that created the branch checked the card first. As a `/parallel-sessions` job, run this step anyway: the skill made the worktree and its branch, and nothing has checked the card yet.
 

@@ -13,7 +13,7 @@ gh pr view <number> --json body -q .body
 uv run .claude/tools/linear_cli.py comment list <issue-id>
 ```
 
-A check record is a comment starting `**Card checked**`, posted when its start check completed, listing that check's stops and notes. A record with nothing below its first line found nothing, and a card with no check record is read from the pull request alone. A pull request with no `## Card check` record, such as one merged through `/linear:quick`, has nothing to read: report "no lesson for Todo" and stop here.
+A check record is a comment starting `**Card checked**`, posted when the card was filed and when its start check completed, listing that check's stops and notes. A record with nothing below its first line found nothing, and a card with no check record is read from the pull request alone. A pull request with no `## Card check` record, such as one merged through `/linear:quick`, has nothing to read: report "no lesson for Todo" and stop here.
 
 ## 2. Name each lesson
 

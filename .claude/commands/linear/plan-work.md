@@ -12,7 +12,7 @@ past duplicate, scope, project, or Vision ambiguity.
 
 ## Modes
 
-- **Quick mode** (default): `/plan-work "description"` — write a brief; a fresh agent checks the code and drafts; create
+- **Quick mode** (default): `/plan-work "description"` — write a brief; a fresh agent checks the code and drafts; review the draft; create
 - **Research mode**: `/plan-work --research "description"` — the drafter also explores Linear and the project's documents, then drafts with richer context
 
 ## Flags
@@ -51,7 +51,7 @@ past duplicate, scope, project, or Vision ambiguity.
 ### Process
 
 - Duplicate handling is two-tier: exact/near-exact → interactive mode warns and asks; unattended mode stops. Similar/related → mention briefly and continue.
-- A story or bug card is created as soon as every check passes, without showing the draft; [step 12](#12-show-the-draft-only-when-something-is-open) says when something is open and what each mode does. The epic-sized path keeps its draft and approval.
+- A story or bug card is created as soon as every check passes, without showing the draft; [step 13](#13-show-the-draft-only-when-something-is-open) says when something is open and what each mode does. The epic-sized path keeps its draft and approval.
 - Never assign the issue unless the user explicitly asks.
 
 ## Steps
@@ -91,7 +91,7 @@ First, check `$ARGUMENTS` for the `--project <name>` flag.
 **Resolve the project name** (both modes). `linear_cli.py issue create --project "<name>"` resolves the name internally on `uv run .claude/tools/linear_cli.py issue create --project "<name>"` — no UUID lookup needed. Run `uv run .claude/tools/linear_cli.py project get "<name>"` once to confirm the name resolves and capture the project UUID for any later `linear_cli.py` calls (`list-milestones`, `min-backlog-sort-order`, `create-milestone` all take it).
 
 - **Zero matches**: stop and tell the user the name doesn't resolve. Ask them to verify the spelling. Do not proceed to drafting on a typo.
-- **One match**: store the name. Use it as the `--project "<name>"` argument on every `uv run .claude/tools/linear_cli.py issue create` call (step 13 and any nested calls in step 5's epic-sized path).
+- **One match**: store the name. Use it as the `--project "<name>"` argument on every `uv run .claude/tools/linear_cli.py issue create` call (step 14 and any nested calls in step 5's epic-sized path).
 - **Multiple matches**: show the candidates and ask the user to disambiguate.
 
 ### 1. Vision check
@@ -186,7 +186,7 @@ If no signals fire, skip silently and continue to step 7 as story-sized. The com
 
 <mark>**Size-sensing offers, doesn't force.**</mark> When signals are detected, the agent asks; the user always has final say. Auto-flipping silently would be a worse failure mode than the old forced ask.
 
-**Story-sized path** (default / "no, it's one story" / "narrow to story") — continue to step 7 as normal. At step 13 (create issue), also search for parent-issue epics in the project (`uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "`): if any exist, ask "Link this story to an existing epic?" and if yes, set the parent after creation via `uv run .claude/tools/linear_cli.py issue update <new-id> --parent <epic-id>`. Legacy milestones — boards may still have them from before stride moved to parent-issue epics; if `uv run .claude/tools/linear_cli.py list-milestones <project-UUID>` returns any, offer them as a secondary option and use the `--project-milestone "<name>"` flag on `uv run .claude/tools/linear_cli.py issue create` instead.
+**Story-sized path** (default / "no, it's one story" / "narrow to story") — continue to step 7 as normal. At step 14 (create issue), also search for parent-issue epics in the project (`uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "`): if any exist, ask "Link this story to an existing epic?" and if yes, set the parent after creation via `uv run .claude/tools/linear_cli.py issue update <new-id> --parent <epic-id>`. Legacy milestones — boards may still have them from before stride moved to parent-issue epics; if `uv run .claude/tools/linear_cli.py list-milestones <project-UUID>` returns any, offer them as a secondary option and use the `--project-milestone "<name>"` flag on `uv run .claude/tools/linear_cli.py issue create` instead.
 
 In unattended mode, create the story without a parent or legacy milestone.
 Linkage requires an explicit ID or a later deliberate update; never infer it
@@ -244,9 +244,10 @@ If no signals fire, skip silently and continue to step 7 — feature-shaped is t
 
    It holds no plan and no card wording.
 
-3. **Fetch `main`,** so the drafter reads the code as it is on GitHub:
+3. **Note the time, then fetch `main`,** so the drafter and the reviewers read the same code, and the card's check record can say how old it is:
 
    ```bash
+   date -u +%Y-%m-%dT%H:%M:%SZ > <run-folder>/read-at.txt
    git fetch origin main
    ```
 
@@ -270,7 +271,7 @@ Before drafting, confirm:
 - **The fix can work:** what the card will promise is possible given how the code behaves, and the code doesn't already have something that does the job
 - **The evidence says what the card says:** when the description cites a specific run, recording or results file, open that data too
 
-When the check contradicts the description, correct the draft and tell the user what changed. When the requested fix can't work, interactive mode asks how to proceed, and unattended mode stops and names the file that rules it out. When the code can't be reached, or the check leaves a point the builder can settle, say so under *Assumptions to confirm*; [step 12](#12-show-the-draft-only-when-something-is-open) sets out where a bug card files it and whether the draft is shown.
+When the check contradicts the description, correct the draft and tell the user what changed. When the requested fix can't work, interactive mode asks how to proceed, and unattended mode stops and names the file that rules it out. When the code can't be reached, or the check leaves a point the builder can settle, say so under *Assumptions to confirm*; [step 13](#13-show-the-draft-only-when-something-is-open) sets out where a bug card files it and whether the draft is shown.
 
 **With `--research`**, also:
 
@@ -286,7 +287,7 @@ Every card is a claim on the attention of the person running stride, so a card i
 - **When the case is made:** continue to step 9. The answers go in the draft's reader's half, under "The problem:" (step 10).
 - **When the case is thin:** say so, with the reason, and recommend not filing. In interactive mode the person can overrule the recommendation, and the draft then records that they did. In unattended mode, file nothing and report the reason.
 - **An explicit request is the case:** when the person's own words ask for this specific piece of work, that counts as the case, and the draft records that they asked. A follow-up an agent found while doing other work is not an explicit request, even when the person told the agent to file follow-ups.
-- **Several follow-ups in one run** (a focused first issue plus its follow-ups, or an epic's stories): judge each one. File the ones that make the case and print one line above step 14's receipt that names each one left out, with its reason. Follow-ups filed by separate runs are each judged by their own run.
+- **Several follow-ups in one run** (a focused first issue plus its follow-ups, or an epic's stories): judge each one. File the ones that make the case and print one line above step 15's receipt that names each one left out, with its reason. Follow-ups filed by separate runs are each judged by their own run.
 
 ### 9. Test consideration
 
@@ -362,26 +363,51 @@ uv run .claude/tools/openrouter_cli.py "<full draft text + Claude assessment>" -
 
 4. **User decides** — ask: **"Send to ChatGPT again or save the issue on Linear?"**
    - If **again** — repeat from step 1 with the revised draft
-   - If **save** — on the epic-sized path, continue to step 12 for its approval. On the story and bug path the user has seen the draft, so saving counts as the approval; continue to step 13
+   - If **save** — continue to step 12, so the review reads the draft as saved. On the story and bug path the user has seen the draft, so saving counts as the approval; the epic-sized path still asks for its approval at step 13
 
 Each round has three voices: Claude proposes and synthesises, ChatGPT challenges, the user steers. The loop sharpens the issue through cross-model perspectives — like a design review but for issue planning.
 
-### 12. Show the draft only when something is open
+### 12. Check the draft before filing (all modes)
 
-On the epic-sized path, show the full draft and ask for explicit approval before creating, as the [epic flow](reference/epic-flow.md) sets out. In unattended mode, show it for the record and continue directly to step 13.
+Every draft, a story, a bug or an epic's parent, gets the [card start check](reference/card-start-review.md) before it is created, so the card the person first reads holds no unfixed stop.
+
+1. **Spawn three reviewers at once** with the Task tool (`general-purpose`, model `sonnet`, effort `high`), one per lens from the brief's [Read through your lens](reference/card-start-review.md#read-through-your-lens): "Promise by promise", "Try to break it" and "Prove it". Give each only this, with its own output path, and never the brief or the conversation:
+
+   > Read `.claude/commands/linear/reference/card-start-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. The card is a draft not yet filed: `<title>`. Read its exact description from `<card-folder>/description.md`. Its parent epic is `<epic-identifier>`, UUID `<epic-UUID>`. Write your findings as JSONL to `<output-path>`.
+
+   Leave out the epic sentence for a card with no parent epic. In cross-project mode add `It is for another project, whose repository is at <path>.`, or `It is for another project whose code is not on this machine.` A reviewer that leaves no findings file is run once more; if it leaves none again, file nothing for that draft, in both modes, and say which lens didn't report.
+
+2. **Already done** — when all three files hold a `done` finding, file nothing, and tell the person what already keeps each promise, from the findings' evidence. A `done` finding from fewer than all three is set aside.
+
+3. **Fix every stop** in the draft yourself, rewording both halves in the same edit. Read the three files as one list: findings that quote the same line, or name the same gap, count once, at the stricter level. A stop whose fix would change what the card is for, its purpose or scope, is open (step 13).
+
+4. **Write in every edge case** a `missing` finding names, whether it is a stop or a note.
+
+5. **Check the draft against the brief:** every decision and every exclusion in it is still on the card. Put back any that isn't.
+
+6. **Save what the review found** to `<card-folder>/findings.md`, following [Linear card language](reference/card-language.md): each stop with how it was fixed, then each note. Leave the file empty when there was nothing.
+
+The review runs once.
+
+### 13. Show the draft only when something is open
+
+**A stop the review couldn't fix is never filed,** on either path. Interactive mode names the stop and what its fix would change, writes the person's answer into the draft before creating, and files nothing without one. Unattended mode files nothing for that draft and names the reason.
+
+On the epic-sized path, show the full draft and ask for explicit approval before creating, as the [epic flow](reference/epic-flow.md) sets out. In unattended mode, show it for the record and, with no such stop open, continue directly to step 14.
 
 On the story and bug path, the draft is not shown. Something is **open** only when it is a decision that belongs to the person:
 
 - a near-duplicate, a Vision ambiguity, or an epic-shaped or bug-shaped description that step 5 or 6 raised as a question (an explicit `--epic` or `--bug` flag skips that question, so it isn't open) (steps 1, 3, 5, 6, 10)
 - a case that doesn't move the needle (step 8)
 - a requested fix the code check rules out (step 8)
+- a review stop whose fix would change what the card is for (step 12)
 - a project name that doesn't match exactly one project, which step 0 stops on before any draft exists, so it asks about the name rather than showing a draft
 
 A point the builder can settle is **not open**, even when the code check couldn't settle it. A story draft files it under *Assumptions to confirm* and a bug draft under *Suspected causes*; an entry that only restates a known default is left out.
 
 What each mode does:
 
-- **Nothing open, or only builder points:** step 13 creates the card without showing the draft, in both modes. The config setting is the persistent approval for routine issue creation.
+- **Nothing open, or only builder points:** step 14 creates the card without showing the draft, in both modes. The config setting is the persistent approval for routine issue creation.
 - **Something open, interactive mode:** show the full draft to the user and ask for explicit approval before creating.
 - **Something open, unattended mode:** stop and name the reason without showing a draft.
 
@@ -390,9 +416,9 @@ What each mode does:
 - If the user requests changes, revise and re-present
 - If the user declines, stop — do not create the issue
 
-### 13. Create the issue
+### 14. Create the issue
 
-Only after every check passes and [step 12](#12-show-the-draft-only-when-something-is-open) leaves nothing open, after interactive approval, or on the epic-sized path after its approval (in unattended mode, after showing it for the record).
+Only after every check passes and [step 13](#13-show-the-draft-only-when-something-is-open) leaves nothing open, after interactive approval, or on the epic-sized path after its approval (in unattended mode, after showing it for the record).
 Write the drafted description to a file first and pass it with `--description
 @<file>` — the body is multi-line markdown, so it goes through a file, never an
 inline string ([why](reference/workflow.md#how-skills-talk-to-linear)).
@@ -417,7 +443,16 @@ Capture the issue identifier (e.g. `PG-184`) from the JSON output. If the draft 
 
 Do not assign the issue unless the user explicitly requested it.
 
-### 14. Confirm creation
+**Post the card's check record,** so `/linear:start` only has to check what changes after this:
+
+```bash
+uv run .claude/tools/linear_cli.py issue get <new-id> > <card-folder>/filed.json
+uv run .claude/tools/linear_cli.py issue record-check <new-id> --read-at "$(cat <run-folder>/read-at.txt)" --checked @<card-folder>/filed.json --findings @<card-folder>/findings.md
+```
+
+Post none for a cross-project card, or for a draft that changed after its review at the person's request. `/linear:start` then checks that card in full.
+
+### 15. Confirm creation
 
 Never print the draft. On the epic-sized path, display the identifier, URL and branch name after the summary in [epic flow](reference/epic-flow.md), as before; the rest of this step is for story and bug cards. First print only the lines other steps require, when they apply: what the code check corrected in the description (step 8), similar issues found (step 3), the cross-project note (step 1), and the one line naming each follow-up left out (step 8).
 

@@ -104,7 +104,7 @@ For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved c
 
 ### /linear:plan-work
 
-**Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, and writes a short brief of what you asked for. A fresh agent drafts the card from that brief: it optionally refines the description with CRAFT, and reads the code the card would touch to confirm the problem and the fix hold up. The card is filed without showing the draft, ending with one line: the identifier, title, link and branch name. It stops and shows the draft only when something needs your decision, such as a near-duplicate, a Vision ambiguity or a case that doesn't move the needle.
+**Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, and writes a short brief of what you asked for. A fresh agent drafts the card from that brief: it optionally refines the description with CRAFT, and reads the code the card would touch to confirm the problem and the fix hold up. Three fresh reviewers then check the draft, their blocking findings are fixed, and the card is filed without showing the draft, ending with one line: the identifier, title, link and branch name. It stops only when something needs your decision, such as a near-duplicate, a Vision ambiguity or a case that doesn't move the needle.
 
 **What the brief holds.** Your words quoted exactly, the decisions you agreed in the conversation, what you ruled out, any fact the code doesn't show, and how the command was called. The drafter gets nothing else from the conversation, so it reads the card's subject the way a later builder will.
 

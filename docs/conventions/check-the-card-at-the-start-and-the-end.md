@@ -7,7 +7,7 @@
 Think of it like homework. The agent puts it this way:
 
 - The card is the homework question. It says what the work has to do.
-- The start check happens before any work. Three helpers read the question at once, each looking a different way, and make sure it's clear enough to answer. If a bit is vague, the question gets reworded first.
+- The start check happens before any work. Three helpers read the question at once, each looking a different way, and make sure it's clear enough to answer. If a bit is vague, the question gets reworded first. They do this when the question is written, and look again at the start only if something has changed since.
 - The end check happens after the work is done. Three markers read the answer and say where it misses what the question asked.
 - Then I go through what the markers said. If a marker is right, I fix the work. If I think a marker is wrong, I write "Not acted on" next to it, with my reason.
 
@@ -43,7 +43,7 @@ The tempting repair is the dangerous one. When code and card disagree, rewriting
 
 ### At the start
 
-- **When it runs.** `/linear:start` runs it right after the Vision check, before a branch exists or any code is written — for each card as it is started, never for a whole epic at once, so a later card is checked against what the earlier ones actually shipped
+- **When it runs.** `/linear:plan-work` runs it on a draft before the card is filed. `/linear:start` runs it again right after the Vision check, before a branch exists or any code is written — for each card as it is started, never for a whole epic at once, so a later card is checked against what the earlier ones actually shipped
 - **How much it checks.** Each completed check leaves a record on the card: when `main` was read and which wording passed. At the start, a card whose record still matches its wording is checked only against what changed since: commits on `main` and comments on the card and its sibling cards. With nothing changed, no reviewer runs. A card with no record, or reworded since, is checked in full
 - **Who checks.** Three fresh reviewers at once, each through its own lens — Promise by promise, Try to break it and Prove it — reading the card, `VISION.md`, the current code and, for a card in an epic, what its finished sibling cards shipped and what changed since the card was written; never the conversation that planned it. Their findings are read as one list
 - **What it reports.** Only problems, each naming the card's line and proposing new wording
