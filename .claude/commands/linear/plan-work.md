@@ -12,8 +12,8 @@ past duplicate, scope, project, or Vision ambiguity.
 
 ## Modes
 
-- **Quick mode** (default): `/plan-work "description"` — check the code, draft, create
-- **Research mode**: `/plan-work --research "description"` — also explore Linear and the project's documents, then draft with richer context
+- **Quick mode** (default): `/plan-work "description"` — write a brief; a fresh agent checks the code and drafts; create
+- **Research mode**: `/plan-work --research "description"` — the drafter also explores Linear and the project's documents, then drafts with richer context
 
 ## Flags
 
@@ -46,12 +46,12 @@ past duplicate, scope, project, or Vision ambiguity.
 - Titles use plain language — no bare jargon or stride-internal vocabulary. The [`/clear-speak` skill](../../skills/clear-speak/SKILL.md) is stride's canonical standard for what counts as jargon and how to replace it.
 - Labels are optional — suggest at most 3, only when clearly relevant. Prefer no labels over speculative ones.
 - Priority defaults to Medium. Only upgrade if the user says it's urgent or the description implies user-facing impact (breakage, a time-sensitive launch, etc.).
-- The code check and research mode exist to improve the draft, not to produce an audit. Cap file exploration at 2–5 relevant files per card; summarise patterns, don't catalogue the repo.
+- The code check and research mode exist to improve the draft, not to produce an audit. In the draft, summarise patterns, don't catalogue the repo.
 
 ### Process
 
 - Duplicate handling is two-tier: exact/near-exact → interactive mode warns and asks; unattended mode stops. Similar/related → mention briefly and continue.
-- A story or bug card is created as soon as every check passes, without showing the draft; [step 11](#11-show-the-draft-only-when-something-is-open) says when something is open and what each mode does. The epic-sized path keeps its draft and approval.
+- A story or bug card is created as soon as every check passes, without showing the draft; [step 12](#12-show-the-draft-only-when-something-is-open) says when something is open and what each mode does. The epic-sized path keeps its draft and approval.
 - Never assign the issue unless the user explicitly asks.
 
 ## Steps
@@ -60,7 +60,7 @@ past duplicate, scope, project, or Vision ambiguity.
 
 First, check `$ARGUMENTS` for the `--project <name>` flag.
 
-- **If `--project <name>` is present** (cross-project mode): use the flag's value as the project name. **Mark the run as cross-project mode** — step 1 (Vision check) is skipped and step 9 swaps the Vision-grounding requirement for a cross-project note.
+- **If `--project <name>` is present** (cross-project mode): use the flag's value as the project name. **Mark the run as cross-project mode** — step 1 (Vision check) is skipped and step 10 swaps the Vision-grounding requirement for a cross-project note.
 - **Otherwise** (within-project mode), check for a `.stride.json` file in the repository root.
   - If **found**: read the project name from it (`project` field in JSON).
   - If **not found**: list available projects *(auth per [reference/workflow.md](reference/workflow.md))* and ask the user to choose. Then ask which `LINEAR_*_API_KEY` env var in `~/.env` authenticates that workspace. Save all five fields as `.stride.json`:
@@ -91,7 +91,7 @@ First, check `$ARGUMENTS` for the `--project <name>` flag.
 **Resolve the project name** (both modes). `linear_cli.py issue create --project "<name>"` resolves the name internally on `uv run .claude/tools/linear_cli.py issue create --project "<name>"` — no UUID lookup needed. Run `uv run .claude/tools/linear_cli.py project get "<name>"` once to confirm the name resolves and capture the project UUID for any later `linear_cli.py` calls (`list-milestones`, `min-backlog-sort-order`, `create-milestone` all take it).
 
 - **Zero matches**: stop and tell the user the name doesn't resolve. Ask them to verify the spelling. Do not proceed to drafting on a typo.
-- **One match**: store the name. Use it as the `--project "<name>"` argument on every `uv run .claude/tools/linear_cli.py issue create` call (step 12 and any nested calls in step 5's epic-sized path).
+- **One match**: store the name. Use it as the `--project "<name>"` argument on every `uv run .claude/tools/linear_cli.py issue create` call (step 13 and any nested calls in step 5's epic-sized path).
 - **Multiple matches**: show the candidates and ask the user to disambiguate.
 
 ### 1. Vision check
@@ -153,7 +153,7 @@ If `--craft` flag is present, run CRAFT automatically. Without the flag,
 unattended mode skips CRAFT and interactive mode asks: "Would you like me to
 run `/craft` on your description first to sharpen the issue before drafting?"
 
-- If **yes** (or `--craft`): read [reference/templates/story.md](reference/templates/story.md) for story-sized work, or [reference/templates/epic.md](reference/templates/epic.md) when drafting the parent issue on the epic-sized path. Substitute `[user's description]` with what the user provided **and** `[VISION]` with the full contents of the `VISION.md` loaded in step 1, run `/craft` with the populated prompt, then use the refined output as the description for all subsequent steps. Substituting the entire Vision into the prompt is what lets the agent — or any model the prompt is sent to — anchor the draft on real criteria, real constraints, and real non-goals rather than guessing.
+- If **yes** (or `--craft`): say so in the brief (step 7). The drafter runs it before step 8: it reads [reference/templates/story.md](reference/templates/story.md) for story-sized work, [reference/templates/bug.md](reference/templates/bug.md) for a bug, or [reference/templates/epic.md](reference/templates/epic.md) for the parent issue on the epic-sized path, substitutes `[user's description]` with the person's words from the brief **and** `[VISION]` with the full contents of `VISION.md`, runs `/craft` with the populated prompt, then drafts from the refined output. Substituting the entire Vision into the prompt is what lets the agent — or any model the prompt is sent to — anchor the draft on real criteria, real constraints, and real non-goals rather than guessing.
 - If **no**: continue with the original description
 
 ### 5. Size — story by default, epic when warranted
@@ -162,7 +162,7 @@ Story is the default. Most descriptions are story-sized — one deliverable that
 
 **Trigger 1 — `--epic` flag.** If `--epic` was parsed in step 2, skip size-sensing entirely and follow the **epic-sized path** below.
 
-**Trigger 2 — size-sensing detects epic shape.** Read the description (the `--craft`-refined version from step 4 if `--craft` was used; otherwise the raw input). Look for **epic-shape signals**:
+**Trigger 2 — size-sensing detects epic shape.** Read the description. Look for **epic-shape signals**:
 
 - Multiple `and`-joined outcomes that don't share a single purpose
 - References to *"phases"*, *"stages"*, *"milestones"*, *"Q2"*, *"by launch"*, *"rollout"*, etc.
@@ -186,7 +186,7 @@ If no signals fire, skip silently and continue to step 7 as story-sized. The com
 
 <mark>**Size-sensing offers, doesn't force.**</mark> When signals are detected, the agent asks; the user always has final say. Auto-flipping silently would be a worse failure mode than the old forced ask.
 
-**Story-sized path** (default / "no, it's one story" / "narrow to story") — continue to step 7 as normal. At step 12 (create issue), also search for parent-issue epics in the project (`uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "`): if any exist, ask "Link this story to an existing epic?" and if yes, set the parent after creation via `uv run .claude/tools/linear_cli.py issue update <new-id> --parent <epic-id>`. Legacy milestones — boards may still have them from before stride moved to parent-issue epics; if `uv run .claude/tools/linear_cli.py list-milestones <project-UUID>` returns any, offer them as a secondary option and use the `--project-milestone "<name>"` flag on `uv run .claude/tools/linear_cli.py issue create` instead.
+**Story-sized path** (default / "no, it's one story" / "narrow to story") — continue to step 7 as normal. At step 13 (create issue), also search for parent-issue epics in the project (`uv run .claude/tools/linear_cli.py search-by-project --project "<project>" --text "Epic: "`): if any exist, ask "Link this story to an existing epic?" and if yes, set the parent after creation via `uv run .claude/tools/linear_cli.py issue update <new-id> --parent <epic-id>`. Legacy milestones — boards may still have them from before stride moved to parent-issue epics; if `uv run .claude/tools/linear_cli.py list-milestones <project-UUID>` returns any, offer them as a secondary option and use the `--project-milestone "<name>"` flag on `uv run .claude/tools/linear_cli.py issue create` instead.
 
 In unattended mode, create the story without a parent or legacy milestone.
 Linkage requires an explicit ID or a later deliberate update; never infer it
@@ -198,9 +198,9 @@ from a fuzzy search result.
 
 Feature is the default. Most descriptions are feature-shaped — *"add / build / ship / replace X"* — and asking every invocation imposes bug-shaped overhead on the common case. Skip this step and continue to step 7 unless one of the following triggers fires.
 
-**Trigger 1 — `--bug` flag.** If `--bug` was parsed in step 2, skip shape-sensing entirely and mark the draft as bug-shaped — step 9 will route to [bug.md](reference/templates/bug.md).
+**Trigger 1 — `--bug` flag.** If `--bug` was parsed in step 2, skip shape-sensing entirely and mark the draft as bug-shaped — step 10 will route to [bug.md](reference/templates/bug.md).
 
-**Trigger 2 — shape-sensing detects bug shape.** Read the description (the `--craft`-refined version from step 4 if `--craft` was used; otherwise the raw input). Look for **bug-shape signals**:
+**Trigger 2 — shape-sensing detects bug shape.** Read the description. Look for **bug-shape signals**:
 
 - Failure-mode keywords: *broken, fails, silently, no-op, regression, throws, crashes, errors out, doesn't work, stuck*
 - Verb is *fix*, not *add / build / ship / replace*
@@ -215,7 +215,7 @@ In unattended mode, stop and name the signals. Ask the user to re-run with
 
 Two paths:
 
-- **Use bug template** → mark the draft as bug-shaped; step 9 routes to bug.md.
+- **Use bug template** → mark the draft as bug-shaped; step 10 routes to bug.md.
 - **Treat as feature** → continue to step 7 with the description treated as feature-shaped.
 
 If no signals fire, skip silently and continue to step 7 — feature-shaped is the default.
@@ -224,9 +224,45 @@ If no signals fire, skip silently and continue to step 7 — feature-shaped is t
 
 **Shape and size are independent.** A feature can be story- or epic-sized, and so can a bug. When both the epic-sized path (step 5) and bug-shaped marker are active, the parent issue uses epic.md and sub-issues use bug.md. No `epic-bug` template exists — bug at epic scale is rare enough that the two-template composition handles it.
 
-### 7. Check the code (all modes)
+### 7. Write the brief and hand it to a fresh drafter (all modes)
 
-<mark>**A card's account of the problem and its proposed fix are guesses until they are read against the code.**</mark> Find the 2–5 files the card would touch using Grep/Glob, and read them. In cross-project mode, read them in the target project's repo when it is on this machine. On the epic-sized path, check each story rather than the parent.
+<mark>**The session that talked with the person doesn't draft the card.**</mark> It knows the backstory, so a vague line reads as clear to it. It writes down what the conversation holds, and a fresh agent drafts from that.
+
+1. **Make a folder for this run,** so runs side by side never share a file:
+
+   ```bash
+   mktemp -d /tmp/plan-work.XXXXXX
+   ```
+
+2. **Write the brief** to `<run-folder>/brief.md`. <mark>**It is the only thing the drafter gets from this conversation,**</mark> so a decision that lives only here must be in it. It holds:
+
+   - **The person's words,** quoted exactly
+   - **The decisions agreed** in the conversation
+   - **What is ruled out**
+   - **Facts and evidence the code doesn't show,** such as something seen in another project, or a run, recording or results file, each with its path or link
+   - **How the run was called:** the project, whether it is cross-project, the card's shape and size, the flags, whether CRAFT was chosen, the similar cards step 3 found, and the parent epic when there is one
+
+   It holds no plan and no card wording.
+
+3. **Fetch `main`,** so the drafter reads the code as it is on GitHub:
+
+   ```bash
+   git fetch origin main
+   ```
+
+   In cross-project mode, when the target project's repo is on this machine, fetch there with `git -C <target-repo> fetch origin main`.
+
+4. **Spawn the drafter** with the Task tool (`general-purpose`), one per card, each card with its own folder inside the run's folder:
+
+   > Draft one Linear card: <which card the brief asks for>. Your brief is `<run-folder>/brief.md`; it is all you have from the conversation. Read `VISION.md` first, with `git show origin/main:VISION.md`. Then follow steps 8 to 10 of `.claude/commands/linear/plan-work.md`, after the CRAFT run in its step 4 when the brief says CRAFT was chosen. Read the code, tests and documents as they are on `origin/main`, with `git show origin/main:<path>` and `git grep <pattern> origin/main`. Write the title to `<card-folder>/title.txt` and the description to `<card-folder>/description.md`. Write to `<card-folder>/notes.md` what the check of the code corrected, and anything those steps would put to the person: don't ask, and don't create anything in Linear.
+
+   In cross-project mode, tell it where the target project's repo is, or that it isn't on this machine, and that this repo's Vision doesn't apply.
+
+5. **Act on the drafter's notes** as steps 8 and 10 say: a fix the code rules out, a thin case or work that fits no Vision criterion is the session's to put to the person, or to stop on. When the person's answer changes what the card should say, add the answer to the brief and have a drafter draft it again.
+
+### 8. Check the code (all modes)
+
+<mark>**A card's account of the problem and its proposed fix are guesses until they are read against the code.**</mark> Find the code the card would touch using Grep/Glob, and read it in full: every file the change and its callers need, not a sample. In cross-project mode, read it in the target project's repo when it is on this machine. On the epic-sized path, check each story rather than the parent.
 
 Before drafting, confirm:
 
@@ -234,7 +270,7 @@ Before drafting, confirm:
 - **The fix can work:** what the card will promise is possible given how the code behaves, and the code doesn't already have something that does the job
 - **The evidence says what the card says:** when the description cites a specific run, recording or results file, open that data too
 
-When the check contradicts the description, correct the draft and tell the user what changed. When the requested fix can't work, interactive mode asks how to proceed, and unattended mode stops and names the file that rules it out. When the code can't be reached, or the check leaves a point the builder can settle, say so under *Assumptions to confirm*; [step 11](#11-show-the-draft-only-when-something-is-open) sets out where a bug card files it and whether the draft is shown.
+When the check contradicts the description, correct the draft and tell the user what changed. When the requested fix can't work, interactive mode asks how to proceed, and unattended mode stops and names the file that rules it out. When the code can't be reached, or the check leaves a point the builder can settle, say so under *Assumptions to confirm*; [step 12](#12-show-the-draft-only-when-something-is-open) sets out where a bug card files it and whether the draft is shown.
 
 **With `--research`**, also:
 
@@ -247,12 +283,12 @@ When the check contradicts the description, correct the draft and tell the user 
 
 Every card is a claim on the attention of the person running stride, so a card is drafted only when there is evidence it will matter. Read [moves the needle](reference/moves-the-needle.md), then answer three questions from what the code check and any recording or results file showed: how often has this happened, what does it cost, and what happens if nothing is done? The check also runs in cross-project mode, and on the epic-sized path it runs for the parent epic and for each story.
 
-- **When the case is made:** continue to step 8. The answers go in the draft's reader's half, under "The problem:" (step 9).
+- **When the case is made:** continue to step 9. The answers go in the draft's reader's half, under "The problem:" (step 10).
 - **When the case is thin:** say so, with the reason, and recommend not filing. In interactive mode the person can overrule the recommendation, and the draft then records that they did. In unattended mode, file nothing and report the reason.
 - **An explicit request is the case:** when the person's own words ask for this specific piece of work, that counts as the case, and the draft records that they asked. A follow-up an agent found while doing other work is not an explicit request, even when the person told the agent to file follow-ups.
-- **Several follow-ups in one run** (a focused first issue plus its follow-ups, or an epic's stories): judge each one. File the ones that make the case and print one line above step 13's receipt that names each one left out, with its reason. Follow-ups filed by separate runs are each judged by their own run.
+- **Several follow-ups in one run** (a focused first issue plus its follow-ups, or an epic's stories): judge each one. File the ones that make the case and print one line above step 14's receipt that names each one left out, with its reason. Follow-ups filed by separate runs are each judged by their own run.
 
-### 8. Test consideration
+### 9. Test consideration
 
 Assess whether tests make sense for this change. Not every issue needs them — pure documentation, config changes, or exploratory spikes typically don't.
 
@@ -268,7 +304,7 @@ behaviour, edge cases, error conditions.]
 
 Omit the section entirely when tests don't apply.
 
-### 9. Draft the issue
+### 10. Draft the issue
 
 Before drafting a card title or description in this step, read [Linear card
 language](reference/card-language.md). It applies to story, bug, epic, and
@@ -297,15 +333,15 @@ Don't draft past the user's answer. The Vision is the project's stated purpose; 
 
 > *"Cross-project draft — Vision anchoring deferred. Re-anchor via `/linear:start` from within the target project's repo when the work is picked up."*
 
-**State the case for filing** on "The problem:", in both modes, in plain words: how often it happened, what it costs, and what happens if nothing is done, from the check in step 7. In cross-project mode they sit beside the cross-project line.
+**State the case for filing** on "The problem:", in both modes, in plain words: how often it happened, what it costs, and what happens if nothing is done, from the check in step 8. In cross-project mode they sit beside the cross-project line.
 
-**Write the reader's half** under the `### Why this matters` heading, then a horizontal rule, then the builder's half, as the template for the card's shape sets out: five labelled lines in order ("Serves:", "Today:", "The problem:", "The change:", "Example:"), the four after "Serves:" one or two sentences each, in plain words with no file names. "Today:" holds what the code does now, from step 7's check, and any fact the builder can't find in the code.
+**Write the reader's half** under the `### Why this matters` heading, then a horizontal rule, then the builder's half, as the template for the card's shape sets out: five labelled lines in order ("Serves:", "Today:", "The problem:", "The change:", "Example:"), the four after "Serves:" one or two sentences each, in plain words with no file names. "Today:" holds what the code does now, from step 8's check, and any fact the builder can't find in the code.
 
-Everything else in the draft (sizing, *What we'll do*, *What we won't do*, *Expected outcome*, *How to test it*, *Assumptions to confirm*) is filled as normal from the user's description, optionally CRAFT-sharpened, and from step 7's check of the code.
+Everything else in the draft (sizing, *What we'll do*, *What we won't do*, *Expected outcome*, *How to test it*, *Assumptions to confirm*) is filled as normal from the user's description, optionally CRAFT-sharpened, and from step 8's check of the code.
 
 Apply the priority, labels, and scope guidance from the decision rules above.
 
-### 10. Cross-model feedback loop (optional)
+### 11. Cross-model feedback loop (optional)
 
 Skip this step in both modes unless the user explicitly requested
 cross-model feedback in the same invocation.
@@ -326,26 +362,26 @@ uv run .claude/tools/openrouter_cli.py "<full draft text + Claude assessment>" -
 
 4. **User decides** — ask: **"Send to ChatGPT again or save the issue on Linear?"**
    - If **again** — repeat from step 1 with the revised draft
-   - If **save** — on the epic-sized path, continue to step 11 for its approval. On the story and bug path the user has seen the draft, so saving counts as the approval; continue to step 12
+   - If **save** — on the epic-sized path, continue to step 12 for its approval. On the story and bug path the user has seen the draft, so saving counts as the approval; continue to step 13
 
 Each round has three voices: Claude proposes and synthesises, ChatGPT challenges, the user steers. The loop sharpens the issue through cross-model perspectives — like a design review but for issue planning.
 
-### 11. Show the draft only when something is open
+### 12. Show the draft only when something is open
 
-On the epic-sized path, show the full draft and ask for explicit approval before creating, as the [epic flow](reference/epic-flow.md) sets out. In unattended mode, show it for the record and continue directly to step 12.
+On the epic-sized path, show the full draft and ask for explicit approval before creating, as the [epic flow](reference/epic-flow.md) sets out. In unattended mode, show it for the record and continue directly to step 13.
 
 On the story and bug path, the draft is not shown. Something is **open** only when it is a decision that belongs to the person:
 
-- a near-duplicate, a Vision ambiguity, or an epic-shaped or bug-shaped description that step 5 or 6 raised as a question (an explicit `--epic` or `--bug` flag skips that question, so it isn't open) (steps 1, 3, 5, 6, 9)
-- a case that doesn't move the needle (step 7)
-- a requested fix the code check rules out (step 7)
+- a near-duplicate, a Vision ambiguity, or an epic-shaped or bug-shaped description that step 5 or 6 raised as a question (an explicit `--epic` or `--bug` flag skips that question, so it isn't open) (steps 1, 3, 5, 6, 10)
+- a case that doesn't move the needle (step 8)
+- a requested fix the code check rules out (step 8)
 - a project name that doesn't match exactly one project, which step 0 stops on before any draft exists, so it asks about the name rather than showing a draft
 
 A point the builder can settle is **not open**, even when the code check couldn't settle it. A story draft files it under *Assumptions to confirm* and a bug draft under *Suspected causes*; an entry that only restates a known default is left out.
 
 What each mode does:
 
-- **Nothing open, or only builder points:** step 12 creates the card without showing the draft, in both modes. The config setting is the persistent approval for routine issue creation.
+- **Nothing open, or only builder points:** step 13 creates the card without showing the draft, in both modes. The config setting is the persistent approval for routine issue creation.
 - **Something open, interactive mode:** show the full draft to the user and ask for explicit approval before creating.
 - **Something open, unattended mode:** stop and name the reason without showing a draft.
 
@@ -354,9 +390,9 @@ What each mode does:
 - If the user requests changes, revise and re-present
 - If the user declines, stop — do not create the issue
 
-### 12. Create the issue
+### 13. Create the issue
 
-Only after every check passes and [step 11](#11-show-the-draft-only-when-something-is-open) leaves nothing open, after interactive approval, or on the epic-sized path after its approval (in unattended mode, after showing it for the record).
+Only after every check passes and [step 12](#12-show-the-draft-only-when-something-is-open) leaves nothing open, after interactive approval, or on the epic-sized path after its approval (in unattended mode, after showing it for the record).
 Write the drafted description to a file first and pass it with `--description
 @<file>` — the body is multi-line markdown, so it goes through a file, never an
 inline string ([why](reference/workflow.md#how-skills-talk-to-linear)).
@@ -381,9 +417,9 @@ Capture the issue identifier (e.g. `PG-184`) from the JSON output. If the draft 
 
 Do not assign the issue unless the user explicitly requested it.
 
-### 13. Confirm creation
+### 14. Confirm creation
 
-Never print the draft. On the epic-sized path, display the identifier, URL and branch name after the summary in [epic flow](reference/epic-flow.md), as before; the rest of this step is for story and bug cards. First print only the lines other steps require, when they apply: what the code check corrected in the description (step 7), similar issues found (step 3), the cross-project note (step 1), and the one line naming each follow-up left out (step 7).
+Never print the draft. On the epic-sized path, display the identifier, URL and branch name after the summary in [epic flow](reference/epic-flow.md), as before; the rest of this step is for story and bug cards. First print only the lines other steps require, when they apply: what the code check corrected in the description (step 8), similar issues found (step 3), the cross-project note (step 1), and the one line naming each follow-up left out (step 8).
 
 Then end the run with the receipt as one line:
 

@@ -104,7 +104,9 @@ For each open PR, checks GitHub for `CHANGES_REQUESTED` reviews and unresolved c
 
 ### /linear:plan-work
 
-**Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, optionally refines the description with CRAFT, reads the code the card would touch to confirm the problem and the fix hold up, drafts title and description, and files the card without showing the draft, ending with one line: the identifier, title, link and branch name. It stops and shows the draft only when something needs your decision, such as a near-duplicate, a Vision ambiguity or a case that doesn't move the needle.
+**Plan work and create a Linear issue.** Checks for `VISION.md`, then for duplicates, and writes a short brief of what you asked for. A fresh agent drafts the card from that brief: it optionally refines the description with CRAFT, and reads the code the card would touch to confirm the problem and the fix hold up. The card is filed without showing the draft, ending with one line: the identifier, title, link and branch name. It stops and shows the draft only when something needs your decision, such as a near-duplicate, a Vision ambiguity or a case that doesn't move the needle.
+
+**What the brief holds.** Your words quoted exactly, the decisions you agreed in the conversation, what you ruled out, any fact the code doesn't show, and how the command was called. The drafter gets nothing else from the conversation, so it reads the card's subject the way a later builder will.
 
 Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). Every draft's "Why this matters" section explicitly traces back to a Vision outcome, and the agent pushes back if the user's request can't be tied to one. When a broad description splits into multiple follow-ups, the follow-ups are ordered by Vision alignment — the one advancing the least-progressed Success criterion sits first.
 
@@ -114,7 +116,7 @@ In `--research` mode, also explores Linear and the project's documents, then add
 
 **Story is the default; epic when warranted.** Most descriptions are story-sized — one deliverable that ships as one PR — so `/linear:plan-work` skips the sizing question and proceeds straight to drafting.
 
-After CRAFT (if used), the agent runs **size-sensing** on the description and looks for epic-shape signals:
+Before drafting, the agent runs **size-sensing** on the description and looks for epic-shape signals:
 
 - multiple `and`-joined outcomes that don't share a single purpose
 - references to phases or rollouts

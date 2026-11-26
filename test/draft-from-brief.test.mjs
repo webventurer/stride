@@ -1,0 +1,61 @@
+import { ok } from "node:assert";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { describe, it } from "node:test";
+import { fileURLToPath } from "node:url";
+
+const strideRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+function read(path) {
+  return readFileSync(join(strideRoot, path), "utf8");
+}
+
+function inOrder(text, markers) {
+  let at = -1;
+  return markers.every((marker) => {
+    at = text.indexOf(marker, at + 1);
+    return at !== -1;
+  });
+}
+
+function section(text, from, to) {
+  return text.slice(text.indexOf(from), text.indexOf(to));
+}
+
+const plan = read(".claude/commands/linear/plan-work.md");
+const drafting = section(
+  plan,
+  "### 7. Write the brief",
+  "### 8. Check the code",
+);
+
+describe("a card drafted from a brief", () => {
+  it("gives the drafter the brief as all it has from the conversation", () => {
+    ok(
+      drafting.includes(
+        "It is the only thing the drafter gets from this conversation",
+      ),
+    );
+    for (const held of [
+      "**The person's words,** quoted exactly",
+      "**The decisions agreed**",
+      "**What is ruled out**",
+      "**Facts and evidence the code doesn't show,**",
+      "**How the run was called:**",
+    ]) {
+      ok(drafting.includes(held), held);
+    }
+    ok(drafting.includes("It holds no plan and no card wording"));
+    ok(drafting.includes("it is all you have from the conversation"));
+  });
+
+  it("has the drafter read the Vision", () => {
+    ok(drafting.includes("Read `VISION.md` first"));
+  });
+
+  it("fetches main before the drafter reads the code in full", () => {
+    ok(inOrder(drafting, ["git fetch origin main", "**Spawn the drafter**"]));
+    ok(plan.includes("read it in full"));
+    ok(!plan.includes("2–5"));
+  });
+});
