@@ -21,6 +21,8 @@ mkdir -p /tmp/<identifier> && uv run .claude/tools/linear_cli.py issue get <issu
 uv run .claude/tools/linear_cli.py comment save <issue-id> --to /tmp/<identifier>/comments.md
 ```
 
+Then compute the [card fingerprint](#3-record-the-result-in-the-pull-request) with `git hash-object -w --stdin` and keep it for the record. `-w` stores the exact wording being checked in the repository, so a later [`/linear:finish`](../finish.md) can read it back.
+
 Then give each reviewer:
 
 > Read `.claude/commands/linear/reference/card-check-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. Review this branch's change since it left `main`. The card is: `<identifier> — <title>`. Read its exact description from `/tmp/<identifier>/card.md` and its comments from `/tmp/<identifier>/comments.md`. Write your verdicts as JSONL to `<output-path>`.
@@ -101,7 +103,7 @@ The tree hash names the exact content that was checked and fixed. Squashing or r
 
 The check cost line records what both checks took and what they found, so after a run of real cards the numbers show whether each check is worth its time. Take each time from the reviewer's completion notice; for the end check, the slowest of the three. A finding is counted once, even when several reviewers raised it. `/linear:finish` replaces the end part when it runs the check again.
 
-The card fingerprint names the exact wording the change was checked against, so a promise added or reworded after the check is checked too. Compute it from the card's title and description:
+The card fingerprint names the exact wording the change was checked against, so a promise added or reworded after the check is seen. It is computed from the card's title and description, by this command, which gets `-w` in step 1:
 
 ```bash
 uv run .claude/tools/linear_cli.py issue get <issue-id> | jq -r '.title + "\n\n" + .description' | git hash-object --stdin
@@ -110,11 +112,35 @@ uv run .claude/tools/linear_cli.py issue get <issue-id> | jq -r '.title + "\n\n"
 Moving the card between board columns keeps it; any change to the title or description gives a new one.
 
 - **`/linear:start`** writes this section into the body when it creates the pull request (step 17)
-- **`/linear:finish`** replaces the section after a re-check: save the body with `gh pr view <number> --json body -q .body`, replace the `## Card check` section, and write it back with `gh pr edit <number> --body-file <file>`
+- **`/linear:finish`** replaces the section after a re-check: save the body with `gh pr view <number> --json body -q .body`, replace the `## Card check` section, and write it back with `gh pr edit <number> --body-file <file>`. After a [behaviour-neutral change](#a-behaviour-neutral-change-needs-no-fresh-check) it adds that section's one line the same way
 
 ## Before merge: is the record current?
 
-`/linear:finish` merges only a branch whose current content has a passing check against the card's current wording. Read the pull request body and compare its `Checked tree:` value with `git rev-parse HEAD^{tree}`, and its `Checked card:` value with the card fingerprint computed now:
+`/linear:finish` merges only a branch whose current content has a passing check against the card's current wording, or differs from what was checked only by a [behaviour-neutral change](#a-behaviour-neutral-change-needs-no-fresh-check). Read the pull request body and compare its `Checked tree:` value with `git rev-parse HEAD^{tree}`, and its `Checked card:` value with the card fingerprint computed now:
 
 - **Same tree, same card, every verdict Kept, Fixed or Not acted on** — the check is current. Continue to the merge
-- **Different tree, different card, no `## Card check` section, or any other verdict** — the content or the card changed since the check, or the change never passed it. Run the check once from step 1, then record the new result
+- **Different tree or card, every verdict Kept, Fixed or Not acted on** — judge what changed as the next section sets out
+- **No `## Card check` section, or any other verdict** — the change never passed the check. Run the check once from step 1, then record the new result
+
+## A behaviour-neutral change needs no fresh check
+
+A change made after a passing check that touches no promise on the card and changes no behaviour gives three reviewers nothing to judge, so it merges without them, as [favour speed of implementation over exhaustive testing](../../../stride/docs/principles/favour-speed-of-implementation-over-exhaustive-testing.md) sets out. Anything else gets a fresh check, and so does any doubt. Both parts must pass:
+
+1. **The files.** List the files and folders the card's promises name or depend on, as paths from the repository root. From the branch, give them to the script after the record's checked tree:
+
+   ```bash
+   .claude/tools/late_change.sh <checked-tree> <promised-path> ...
+   ```
+
+   `fresh check: <reason>` means run the check. `no fresh check: <files>` passes this part only when you are also sure that no promise depends on what those files now say, and that nothing behaves differently because of them.
+2. **The card.** When the card fingerprint differs, read the checked wording with `git cat-file -p <checked-card>` and compare it with the card now. This part passes only when every line asks what it asked before. A promise added, dropped or changed in meaning, or wording git can't read back, means run the check.
+
+When both pass, push the late commits and run [`/linear:finish`](../finish.md) step 4's validation on them; a failure stops the merge. Then add this line under the record's table, replacing any earlier one:
+
+```markdown
+Not checked again: <what changed> in <the files, or the card's wording> — it touches no promise on the card and changes no behaviour
+```
+
+Leave `Checked tree:` and `Checked card:` as they are, so a later run judges every change since the real check. Then continue to the merge.
+
+When either part fails, run the check once from step 1, then record the new result.
