@@ -49,6 +49,16 @@ describe("a card drafted from a brief", () => {
     ok(drafting.includes("it is all you have from the conversation"));
   });
 
+  it("reads fetched main for a redraft and for another project", () => {
+    ok(drafting.includes("fetch `main` again as item 3 does"));
+    ok(
+      drafting.includes(
+        "reads that code with `git -C <target-repo>` on `origin/main`",
+      ),
+    );
+    ok(!plan.includes("Grep/Glob, and read it"));
+  });
+
   it("has the drafter read the Vision", () => {
     ok(drafting.includes("Read `VISION.md` first"));
   });

@@ -257,13 +257,13 @@ If no signals fire, skip silently and continue to step 7 — feature-shaped is t
 
    > Draft one Linear card: <which card the brief asks for>. Your brief is `<run-folder>/brief.md`; it is all you have from the conversation. Read `VISION.md` first, with `git show origin/main:VISION.md`. Then follow steps 8 to 10 of `.claude/commands/linear/plan-work.md`, after the CRAFT run in its step 4 when the brief says CRAFT was chosen. Read the code, tests and documents as they are on `origin/main`, with `git show origin/main:<path>` and `git grep <pattern> origin/main`. Write the title to `<card-folder>/title.txt` and the description to `<card-folder>/description.md`. Write to `<card-folder>/notes.md` what the check of the code corrected, and anything those steps would put to the person: don't ask, and don't create anything in Linear.
 
-   In cross-project mode, tell it where the target project's repo is, or that it isn't on this machine, and that this repo's Vision doesn't apply.
+   In cross-project mode, tell it that this repo's Vision doesn't apply, and where the target project's repo is, so it reads that code with `git -C <target-repo>` on `origin/main`, or that it isn't on this machine.
 
-5. **Act on the drafter's notes** as steps 8 and 10 say: a fix the code rules out, a thin case or work that fits no Vision criterion is the session's to put to the person, or to stop on. When the person's answer changes what the card should say, add the answer to the brief and have a drafter draft it again.
+5. **Act on the drafter's notes** as steps 8 and 10 say: a fix the code rules out, a thin case or work that fits no Vision criterion is the session's to put to the person, or to stop on. When the person's answer changes what the card should say, add the answer to the brief, fetch `main` again as item 3 does, and have a drafter draft it again.
 
 ### 8. Check the code (all modes)
 
-<mark>**A card's account of the problem and its proposed fix are guesses until they are read against the code.**</mark> Find the code the card would touch using Grep/Glob, and read it in full: every file the change and its callers need, not a sample. In cross-project mode, read it in the target project's repo when it is on this machine. On the epic-sized path, check each story rather than the parent.
+<mark>**A card's account of the problem and its proposed fix are guesses until they are read against the code.**</mark> Find the code the card would touch with `git grep` on `origin/main`, and read it in full there: every file the change and its callers need, not a sample. In cross-project mode, read it in the target project's repo when it is on this machine. On the epic-sized path, check each story rather than the parent.
 
 Before drafting, confirm:
 
