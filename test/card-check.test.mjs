@@ -230,6 +230,26 @@ describe("card check", () => {
     ok(!brief.includes("only the card and the change"));
   });
 
+  it("raises a missing proof only when a failure could go unseen without it", () => {
+    const brief = read(
+      ".claude/commands/linear/reference/card-check-review.md",
+    );
+    const convention = read(
+      "docs/conventions/check-the-card-at-the-start-and-the-end.md",
+    );
+
+    ok(
+      brief.includes(
+        "A `kept-unproven` verdict without a named failure is not a finding",
+      ),
+    );
+    ok(brief.includes("no unseen failure could be named"));
+    ok(brief.includes("name the failure that would go unseen"));
+    ok(brief.includes("This one needs no named failure"));
+    ok(convention.includes("could name no failure that would go unseen"));
+    ok(!convention.includes("a kept promise was really tested"));
+  });
+
   it("explains both ends of the check in the conventions", () => {
     const page = "check-the-card-at-the-start-and-the-end.md";
     const convention = read(`docs/conventions/${page}`);
