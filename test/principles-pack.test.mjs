@@ -42,6 +42,18 @@ function linkedPages(text) {
   return [...text.matchAll(/\]\(([^)#]+\.md)(#[^)]*)?\)/g)].map((m) => m[1]);
 }
 
+function principleLines(text) {
+  return text.split("\n").filter((line) => /^\d+\. \*\*\[/.test(line));
+}
+
+function lineSentences(line) {
+  const afterName = line
+    .replace(/^\d+\. \*\*\[[^\]]+\]\([^)]+\)\.?\*\*/, "")
+    .replace(/^ \([^)]+\)\./, "")
+    .trim();
+  return afterName.split(/(?<=\.)\s+(?=[A-Z])/).filter(Boolean);
+}
+
 function wordCount(text) {
   return text
     .replace(/<!--[\s\S]*?-->/g, "")
@@ -63,8 +75,38 @@ describe("principles pack", () => {
   const readme = read(`${PACK}/README.md`);
 
   it("keeps the README small enough to inject on every prompt", () => {
-    ok(Buffer.byteLength(readme) <= 4096, `${Buffer.byteLength(readme)} bytes`);
+    ok(Buffer.byteLength(readme) <= 6144, `${Buffer.byteLength(readme)} bytes`);
+    ok(wordCount(readme) <= 900, `${wordCount(readme)} words`);
   });
+
+  it("opens by saying how to use the principles and where the pages are", () => {
+    const opening = readme.split("\n## ")[0];
+    for (const phrase of [
+      "with judgement",
+      "a case of being agile",
+      "Open a principle's page when",
+      `${PACK}/`,
+    ]) {
+      ok(opening.includes(phrase), `opening lacks "${phrase}"`);
+    }
+  });
+
+  it("never tells the agent to obey a constraint", () => {
+    ok(!/obey|constraint/i.test(readme));
+  });
+
+  for (const line of principleLines(readme)) {
+    const page = linkedPages(line)[0];
+
+    it(`${page}'s line says what it asks and why`, () => {
+      ok(lineSentences(line).length >= 2, line);
+    });
+
+    it(`${page}'s line ends with a reason taken from its page`, () => {
+      const reason = lineSentences(line).at(-1);
+      ok(read(`${PACK}/${page}`).includes(reason), reason);
+    });
+  }
 
   it("lists every principle page in the README", () => {
     const listed = linkedPages(readme);

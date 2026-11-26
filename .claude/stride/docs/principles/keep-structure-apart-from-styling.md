@@ -2,7 +2,7 @@
 
 > A component says what is on the screen; a stylesheet says what it looks like.
 
-A component holds structure only: which elements appear, in what order, and what state each is in. Its look, such as colours, spacing, sizes and fonts, comes from stylesheets that can be replaced without touching the component. When the two are mixed, every change of look means editing the component, the same colour ends up written into many components, and a redesign turns into a search through every file that draws something.
+A component holds structure only: which elements appear, in what order, and what state each is in. Its look, such as colours, spacing, sizes and fonts, comes from stylesheets that can be replaced without touching the component. When the two are mixed, every change of look means editing the component. The same colour ends up written into many components, and a redesign turns into a search through every file that draws something.
 
 ## The test
 
