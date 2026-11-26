@@ -78,6 +78,10 @@ describe("the start check after an earlier check", () => {
     );
   });
 
+  it("records a check that cancels an already-done card", () => {
+    ok(startCheck.includes("Post the check record (item 10) too"));
+  });
+
   it("spawns nobody and says why when nothing changed", () => {
     ok(startCheck.includes("Spawn no reviewer, post nothing"));
     ok(
