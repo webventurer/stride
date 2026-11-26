@@ -34,7 +34,7 @@ Martin later clarified that a "reason to change" often comes from a specific *ro
 
 A `Wheel` class might have `diameter`, `circumference`, and `rotation_speed` methods. That's three things, but one responsibility: wheel measurements. They all change for the same reason — if the wheel's geometry changes.
 
-A `ReportGenerator` class with `fetch_data`, `format_report`, and `send_email` methods is doing three things *and* has three responsibilities. Data fetching, formatting, and email delivery change for different reasons and at different times.
+A `WeeklyReport` class with `fetch_data`, `format_report`, and `send_email` methods is doing three things *and* has three responsibilities. Data fetching, formatting, and email delivery change for different reasons and at different times.
 
 The test isn't "how many methods?" — it's **"how many reasons to change?"**
 
