@@ -114,6 +114,14 @@ describe("principles pack", () => {
     ok(read(`${PACK}/be-agile.md`).includes(AGILITY));
   });
 
+  it("single-responsibility-principle.md holds the read-it-aloud test", () => {
+    ok(
+      read(`${PACK}/single-responsibility-principle.md`).includes(
+        "Read the function name aloud",
+      ),
+    );
+  });
+
   it("start and quick link to the README's test", () => {
     for (const path of [
       ".claude/commands/linear/start.md",
