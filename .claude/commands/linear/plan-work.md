@@ -259,6 +259,8 @@ If no signals fire, skip silently and continue to step 7 — feature-shaped is t
 
    In cross-project mode, tell it that this repo's Vision doesn't apply, and where the target project's repo is, so it reads that code with `git -C <target-repo>` on `origin/main`, or that it isn't on this machine.
 
+   A Vision changed for this card isn't on GitHub yet. When this checkout's `VISION.md` holds a change `origin/main` doesn't, written by `/vision` or `/vision-evolve` just before or during this run, add to the drafter's prompt, and to each reviewer's in step 12: `The Vision has just changed: read VISION.md from the working tree, not from origin/main.`
+
 5. **Act on the drafter's notes** as steps 8 and 10 say: a fix the code rules out, a thin case or work that fits no Vision criterion is the session's to put to the person, or to stop on. When the person's answer changes what the card should say, add the answer to the brief, fetch `main` again as item 3 does, and have a drafter draft it again.
 
 ### 8. Check the code (all modes)
@@ -375,7 +377,7 @@ Every draft, a story, a bug or an epic's parent, gets the [card start check](ref
 
    > Read `.claude/commands/linear/reference/card-start-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. The card is a draft not yet filed: `<title>`. Read its exact description from `<card-folder>/description.md`. Its parent epic is `<epic-identifier>`, UUID `<epic-UUID>`. Write your findings as JSONL to `<output-path>`.
 
-   Leave out the epic sentence for a card with no parent epic. In cross-project mode add `It is for another project, whose repository is at <path>.`, or `It is for another project whose code is not on this machine.` A reviewer that leaves no findings file is run once more; if it leaves none again, file nothing for that draft, in both modes, and say which lens didn't report.
+   Leave out the epic sentence for a card with no parent epic, and add step 7's sentence about a changed Vision when it applies. In cross-project mode add `It is for another project, whose repository is at <path>.`, or `It is for another project whose code is not on this machine.` A reviewer that leaves no findings file is run once more; if it leaves none again, file nothing for that draft, in both modes, and say which lens didn't report.
 
 2. **Already done** — when all three files hold a `done` finding, file nothing, and tell the person what already keeps each promise, from the findings' evidence. A `done` finding from fewer than all three is set aside.
 

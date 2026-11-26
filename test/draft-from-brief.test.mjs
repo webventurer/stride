@@ -59,6 +59,15 @@ describe("a card drafted from a brief", () => {
     ok(!plan.includes("Grep/Glob, and read it"));
   });
 
+  it("reads a Vision changed in this checkout, for drafter and reviewers", () => {
+    ok(drafting.includes("and to each reviewer's in step 12"));
+    ok(
+      read(".claude/commands/linear/reference/card-start-review.md").includes(
+        "read `VISION.md` from the working tree instead",
+      ),
+    );
+  });
+
   it("has the drafter read the Vision", () => {
     ok(drafting.includes("Read `VISION.md` first"));
   });
