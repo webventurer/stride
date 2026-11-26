@@ -45,4 +45,5 @@ The run's last message to the user lists, in this order:
 - **Failed:** each card that failed, with the check that failed or the decision it needs.
 - **Waiting:** each card still in Todo that isn't listed as failed, with the reason `start-choice` gave.
 - **Lessons:** for each merged card, the lesson it carried and the cards it reworded, the one-off lessons named and left, or "no lesson for Todo", read from its `/linear:finish` summary.
+- **Decisions:** every line from the `decisions.md` of every batch in the run, with the note on overruling from [a batch's report](../../../skills/parallel-sessions/SKILL.md#6-report). When none was settled, say so.
 - **Questions:** every question held during the run, each in the four labelled parts with its card. This comes last, so the user's answer is the last thing asked for. The user answers on the card, in a comment starting `Answer:`.

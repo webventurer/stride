@@ -423,6 +423,61 @@ describe("an unattended run through a named epic", () => {
   });
 });
 
+describe("the decisions the captain settles", () => {
+  const chain = read(
+    ".claude/skills/parallel-sessions/reference/chain-of-command.md",
+  );
+  const todoRun = read(".claude/commands/linear/reference/todo-run.md");
+  const epicIteration = read(
+    ".claude/commands/linear/reference/epic-iteration.md",
+  );
+  const step5 = skill.slice(
+    skill.indexOf("### 5. Watch and check"),
+    skill.indexOf("### 6. Report"),
+  );
+  const step6 = skill.slice(
+    skill.indexOf("### 6. Report"),
+    skill.indexOf("## While a batch of stride cards runs"),
+  );
+
+  it("are reported by the rule beside the escalation rule", () => {
+    ok(
+      inOrder(chain, [
+        "## The escalation rule",
+        "The captain records the decisions it settles and lists them in the run's final report; it doesn't send them to the user as they happen.",
+        "## The ranks",
+      ]),
+    );
+  });
+
+  it("are written to the batch's folder as they are settled", () => {
+    ok(
+      inOrder(step5, [
+        "work/runs/<batch>/decisions.md",
+        "the card",
+        "the question and the answer",
+      ]),
+    );
+  });
+
+  it("are listed in a batch's report, with how to overrule one", () => {
+    ok(inOrder(step6, ["decisions.md", "overrule"]));
+  });
+
+  it("wait for the final report of a run through Todo, before its questions", () => {
+    ok(step6.includes("lists no decisions"));
+    ok(
+      inOrder(todoRun, [
+        "**Lessons:**",
+        "**Decisions:**",
+        "every batch",
+        "**Questions:**",
+      ]),
+    );
+    ok(epicIteration.includes("lessons, decisions and questions follow"));
+  });
+});
+
 describe("the coordinator of a batch of stride cards while it runs", () => {
   const rule = skill.slice(
     skill.indexOf("## While a batch of stride cards runs"),
