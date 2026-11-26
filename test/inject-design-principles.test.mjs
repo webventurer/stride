@@ -17,12 +17,9 @@ const fixtureRoot = join("/tmp", `stride-design-principles-${process.pid}`);
 const HOOK_PATH = ".claude/hooks/userpromptsubmit/inject_design_principles.sh";
 const hook = join(fixtureRoot, HOOK_PATH);
 const worktreeRoot = `${fixtureRoot}-worktree`;
-const worktreeDoc =
-  "design-decisions text found under the worktree's own root\n";
-const doc = readFileSync(
-  join(strideRoot, ".claude/stride/docs/principles/design-decisions.md"),
-  "utf8",
-);
+const PRINCIPLES_LIST = ".claude/stride/docs/principles/README.md";
+const worktreeDoc = "principles list found under the worktree's own root\n";
+const doc = readFileSync(join(strideRoot, PRINCIPLES_LIST), "utf8");
 
 function injectedFrom(cwd) {
   const output = execFileSync(hook, {
@@ -48,7 +45,7 @@ after(() => {
 });
 
 describe("inject_design_principles hook", () => {
-  it("injects the design-decisions document from the repo root", () => {
+  it("injects the principles list from the repo root", () => {
     strictEqual(injectedFrom(fixtureRoot), doc);
   });
 
@@ -86,10 +83,7 @@ describe("inject_design_principles hook", () => {
       join(fixtureRoot, ".claude/hooks"),
       join(worktreeRoot, ".claude/hooks"),
     );
-    writeFileSync(
-      join(worktreeRoot, ".claude/stride/docs/principles/design-decisions.md"),
-      worktreeDoc,
-    );
+    writeFileSync(join(worktreeRoot, PRINCIPLES_LIST), worktreeDoc);
     const output = execFileSync(join(worktreeRoot, HOOK_PATH), {
       input: JSON.stringify({ cwd: worktreeRoot }),
       encoding: "utf8",
@@ -99,5 +93,15 @@ describe("inject_design_principles hook", () => {
       JSON.parse(output).hookSpecificOutput.additionalContext,
       worktreeDoc,
     );
+  });
+
+  it("injects nothing when the principles list is missing", () => {
+    rmSync(join(worktreeRoot, PRINCIPLES_LIST));
+    const output = execFileSync(join(worktreeRoot, HOOK_PATH), {
+      input: JSON.stringify({ cwd: worktreeRoot }),
+      encoding: "utf8",
+    });
+
+    strictEqual(output, "");
   });
 });

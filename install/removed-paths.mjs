@@ -10,6 +10,7 @@ export const REMOVED_PATHS = [
   ".claude/docs/patterns/git/atomic-git-commits.md",
   ".claude/docs/principles/design-decisions.md",
   ".claude/docs/principles/single-responsibility-principle.md",
+  ".claude/stride/docs/principles/design-decisions.md",
   ".claude/commands/linear/reference/BUG-TEMPLATE.md",
   ".claude/commands/linear/reference/EPIC-TEMPLATE.md",
   ".claude/commands/linear/reference/ISSUE-TEMPLATE.md",

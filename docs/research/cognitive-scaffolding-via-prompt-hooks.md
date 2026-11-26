@@ -14,13 +14,13 @@ Three hooks fire on every `UserPromptSubmit`:
 
 | Hook | Source | What it injects | Role |
 |:-----|:-------|:----------------|:-----|
-| `inject_design_principles.sh` | `settings.json` (committed) | `design-decisions.md` — the 6 principles + "the test" | **What to optimise for** |
+| `inject_design_principles.sh` | `settings.json` (committed) | `.claude/stride/docs/principles/README.md` — the principles list + "the test" | **What to optimise for** |
 | `inject_meta_cognitive.sh` | `settings.local.json` | the meta-cognitive framework — stance, layers, the torch | **How to think** |
 | `faithful_content.sh` | `settings.local.json` | "Execute content exactly as given" | **A fidelity guardrail** |
 
-Each is tiny (the design doc is ~580 words, table-led so it skims fast). The cost is near-free; the effect is not.
+Each is tiny (the principles list stays under 4 KB, one line per principle so it skims fast). The cost is near-free; the effect is not.
 
-**Why every turn, not once?** The hook's own comment says it plainly: *"so they stay active even in long conversations where doc context may get compressed."* The model has no memory across a context compaction — anything not re-stated can silently fall out. These docs are *behaviour-shaping*, so if they evaporate mid-session, behaviour drifts back toward the model's defaults. Re-injection is cheap insurance against that drift. It is **not** a [YAGNI](https://github.com/webventurer/stride/blob/main/.claude/stride/docs/principles/design-decisions.md) violation: it serves a present, recurring need, not a speculative future one.
+**Why every turn, not once?** The hook's own comment says it plainly: *"so they stay active even in long conversations where doc context may get compressed."* The model has no memory across a context compaction — anything not re-stated can silently fall out. These docs are *behaviour-shaping*, so if they evaporate mid-session, behaviour drifts back toward the model's defaults. Re-injection is cheap insurance against that drift. It is **not** a [YAGNI](https://github.com/webventurer/stride/blob/main/.claude/stride/docs/principles/yagni.md) violation: it serves a present, recurring need, not a speculative future one.
 
 ## What it changes
 

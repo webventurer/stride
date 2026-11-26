@@ -74,7 +74,7 @@ Derive `<slug>` from the description, or from the diff in the retrospective path
 
 Make the change iteratively with the user, with the same discipline as `/linear:start` step 8:
 
-- [YAGNI gate](../../stride/docs/principles/design-decisions.md#the-test) — drop anything that closes doors or adds unused complexity
+- [YAGNI gate](../../stride/docs/principles/README.md#the-test) — drop anything that closes doors or adds unused complexity
 - **Footprint audit** — each new helper/test earns its place (used 2+ times, adds semantic value, or encapsulates non-trivial config)
 - Follow the project's coding standards
 

@@ -28,7 +28,7 @@ For software behaviour, we still need precise decisions. **Principles guide the 
 Two useful starting principles are:
 
 - Aim for correct code that expresses its behaviour as clearly and simply as possible to a human reader.
-- When alternatives deliver roughly the same value, prefer the one that makes future change easier. See [design decisions](design-decisions.md#choose-the-path-that-makes-change-easier).
+- When alternatives deliver roughly the same value, prefer the one that makes future change easier. See [be agile](be-agile.md).
 
 When a decision is unclear, return to what you are trying to achieve. Consider the actual readers, dependencies, risks and likely changes. Then explain why a particular choice serves that purpose here. If no established principle fits, describe the concrete requirement or evidence; inventing a grand principle adds nothing.
 
