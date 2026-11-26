@@ -69,6 +69,8 @@ When the orchestrator says to check only what changed since a time, the card as 
 - **Commits that reached `main` since that time:** `.claude/tools/main_changes_since.sh <time>`
 - **Comments posted since that time** on the card itself and on every sibling card: `uv run .claude/tools/linear_cli.py comment list <id>`. The siblings are the other cards under the card's parent, whatever its title: `issue get <card-id>` shows `parent.id`, and `list-by-parent <parent-id>` lists them. A comment that starts `**Card checked**` is a check's own record, not a change
 
+A comment on this card or on any sibling card that overtakes a promise is a `stale` finding, as a commit that overtakes one is.
+
 Then read whatever those changes touch. Raise only a finding one of those changes causes; one that would have held at the earlier check stays unraised. Name the commit or comment in `evidence`.
 
 ## The reader's half

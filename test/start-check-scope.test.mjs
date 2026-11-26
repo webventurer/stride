@@ -66,6 +66,10 @@ describe("the start check after an earlier check", () => {
     );
   });
 
+  it("counts a comment that overtakes a promise as stale", () => {
+    ok(reviewer.includes("overtakes a promise is a `stale` finding"));
+  });
+
   it("reads comments on sibling cards under any parent", () => {
     ok(
       reviewer.includes(
