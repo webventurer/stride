@@ -141,7 +141,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Wheel:
-    """A bicycle wheel."""
+    """A wheel, sized by its rim and tire."""
 
     rim: float
     tire: float
@@ -157,7 +157,7 @@ class Wheel:
 
 @dataclass
 class Gear:
-    """A chainring and cog driving a wheel."""
+    """A bicycle gear: a chainring and cog driving a wheel."""
 
     chainring: int
     cog: int
@@ -216,8 +216,8 @@ Wrap instance variables in properties so the knowledge of what that data means l
 ```python
 @property
 def cog(self) -> int:
-    adjustment = self.fixed_scale if self.is_fixed else self.free_scale
-    return self.base_cog * adjustment
+    adjustment = self.drop_ratio if self.has_drop_bars else self.flat_ratio
+    return self.raw_cog * adjustment
 ```
 
 This transforms `cog` from data (referenced everywhere) to behaviour (defined once). DRY code tolerates change because any change in behaviour can be made in just one place.
@@ -232,17 +232,17 @@ from dataclasses import dataclass
 
 @dataclass
 class WheelData:
-    """A wheel's rim and tire sizes."""
+    """One wheel's rim and tire sizes."""
 
     rim: float
     tire: float
 
 
 class WheelCollection:
-    """Wheels built from raw rows of numbers."""
+    """Wheels built from raw rim and tire rows."""
 
-    def __init__(self, data: list[list[float]]):
-        self.wheels = [WheelData(rim=row[0], tire=row[1]) for row in data]
+    def __init__(self, rows: list[list[float]]):
+        self.wheels = [WheelData(rim=row[0], tire=row[1]) for row in rows]
 
     def diameters(self) -> list[float]:
         return [wheel.rim + (wheel.tire * 2) for wheel in self.wheels]
@@ -252,11 +252,7 @@ The `diameters` method has no knowledge of the incoming array structure — it j
 
 ### Postpone decisions
 
-Your goal is to preserve single responsibility while making the **fewest design commitments possible**. Any decision you make in advance of an explicit requirement is just a guess. Don't decide; **preserve your ability to make a decision later** when you must.
-
-When the future cost of doing nothing equals the current cost, postpone the decision. **Wait for a new requirement** — it supplies the exact information you need to make the next design decision.
-
-If a class has no dependencies and changes to it have no consequences, it doesn't matter if it's imperfect. When it acquires dependencies, those dependencies will supply the information you need to make good design decisions.
+Your goal is to preserve single responsibility while making the **fewest design commitments possible**. [Postpone decisions](postpone-decisions.md) gives the rule, the test and a worked example.
 
 ### It doesn't need to be perfect
 
@@ -300,12 +296,13 @@ bindata/
 The `__init__.py` re-exports what consumers need:
 
 ```python
-from .api import BinanceClient
+# bindata/__init__.py
 from .alerts import PriceAlert
+from .api import BinanceClient
 from .portfolio import Portfolio
 ```
 
-Existing code that did `from bindata import BinanceClient` still works.
+Existing callers that `import bindata` and call `bindata.BinanceClient(...)` still work.
 
 ### Example: React components in a single file
 
