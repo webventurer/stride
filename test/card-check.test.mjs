@@ -188,9 +188,52 @@ describe("card check", () => {
     ok(check.includes("git rev-parse HEAD^{tree}"));
     ok(
       check.includes(
-        "Different tree, different card, no `## Card check` section, or any other verdict",
+        "Different tree or card, every verdict Kept, Fixed or Not acted on",
       ),
     );
+    ok(
+      check.includes("No `## Card check` section, or any other verdict"),
+    );
+  });
+
+  it("merges a behaviour-neutral late change without a fresh check, and records it", () => {
+    const check = read(".claude/commands/linear/reference/card-check.md");
+    const finish = read(".claude/commands/linear/finish.md");
+    const principle =
+      "favour-speed-of-implementation-over-exhaustive-testing.md";
+    const anchor =
+      "reference/card-check.md#a-behaviour-neutral-change-needs-no-fresh-check";
+    const step8 = finish.slice(
+      finish.indexOf("### 8. Check the change against its card"),
+      finish.indexOf("### 9. Merge"),
+    );
+    const rule = finish
+      .split("\n")
+      .find((line) => line.startsWith("- Never merge a branch"));
+
+    ok(rule.includes(anchor));
+    ok(rule.includes(principle));
+    ok(step8.includes(anchor));
+    ok(
+      step8.includes(
+        "When every recorded verdict passes in that way and all that changed since the check is [behaviour-neutral]",
+      ),
+    );
+    ok(
+      inOrder(check, [
+        "linear_cli.py comment save",
+        "git hash-object -w --stdin",
+        "## A behaviour-neutral change needs no fresh check",
+        ".claude/tools/late_change.sh <checked-tree> <promised-path>",
+        "git cat-file -p <checked-card>",
+        "push the late commits",
+        "Not checked again:",
+        "Leave `Checked tree:` and `Checked card:` as they are",
+      ]),
+    );
+    ok(read(`.claude/stride/docs/principles/${principle}`).includes(
+      "`/linear:finish` asks for no new end card check",
+    ));
   });
 
   it("hands the end reviewers the card's comments as proof for a promise that says its proof is posted on the card", () => {
