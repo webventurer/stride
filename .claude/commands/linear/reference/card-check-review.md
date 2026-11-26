@@ -43,16 +43,18 @@ The reader's half (under "Why this matters"), "Assumptions to confirm" and "Live
 
 | Verdict | Use it when | `evidence` must name |
 |:--------|:------------|:---------------------|
-| `kept` | The change does it, and something in the branch, or a read-only check you ran on it, proves it | The test, or the file and line, that proves it — or the command you ran and what it printed |
-| `kept-unproven` | The change appears to do it, but nothing in the branch proves it and no read-only check you could run does | What is missing — the test or check that would prove it |
+| `kept` | The change does it, and either something in the branch, or a read-only check you ran on it, proves it, or nothing does and you can name no failure that would go unseen | The test, or the file and line, that proves it — or the command you ran and what it printed. With no proof, the file and line where the change does it, and that no unseen failure could be named |
+| `kept-unproven` | The change appears to do it, nothing in the branch or any read-only check you could run proves it, and you can name the failure that would go unseen without that proof | What is missing — the test or check that would prove it — and what would go wrong unseen if the change didn't do it |
 | `broken` | The change does not do it | A concrete scenario: the input or situation, and what happens instead |
 | `unclear` | The card's wording cannot be checked, or contradicts itself | Which words, and why they cannot be checked |
 
 <mark>**A `broken` verdict without a concrete scenario is not a finding.**</mark> If you cannot say "when ___, the change does ___ instead of ___", the verdict is `kept-unproven` or `kept`.
 
+<mark>**A `kept-unproven` verdict without a named failure is not a finding.**</mark> Say what would go wrong, with nothing to show it, if the change didn't do the promise, such as "if the cache key changed, the page would show another project's footage with no test failing". If you cannot name such a failure, the verdict is `kept`.
+
 Proof is what the branch itself contains, or what a read-only check run on the branch prints. For code, that is a test that would fail if the promise broke. For instructions and documents, it is the line that states the behaviour where the reader who must follow it will look. A test elsewhere in the repository that already covers the promise counts; name it.
 
-A promise that says its proof is posted on the card, such as "post the list on the card" or a live run's result, is proved by a comment in the comments file you were given. Judge it from the comment: it is `kept` when a comment does what the promise says, with the comment's author and time as the evidence, and `kept-unproven` when no comment does and nothing in the change proves it. A promise that says no such thing is judged only from the change, and no comment proves it, however the comment is worded. A comment the stride flow posted, such as a reworded card or the start check's notes, proves no promise.
+A promise that says its proof is posted on the card, such as "post the list on the card" or a live run's result, is proved by a comment in the comments file you were given. Judge it from the comment: it is `kept` when a comment does what the promise says, with the comment's author and time as the evidence, and `kept-unproven` when no comment does and nothing in the change proves it. This one needs no named failure: the proof the card asks for is still owed. A promise that says no such thing is judged only from the change, and no comment proves it, however the comment is worded. A comment the stride flow posted, such as a reworded card or the start check's notes, proves no promise.
 
 Judge the card as written. A promise the change keeps in spirit but not in letter is `broken` or `unclear`, never `kept` — deciding what the card should have said is the user's call, not yours.
 
@@ -62,7 +64,7 @@ Judge the card as written. A promise the change keeps in spirit but not in lette
 
 Some promises can't be proved by reading the diff, such as "the syntax tree of every changed file is the same before and after". Run a check to prove a promise when the card names that check, or when the promise can only be proved that way.
 
-A check is read-only when it only reads: the branch's files, `git show`, `git diff`, `git log`, or a short command that parses or compares what they print. Don't run a check that writes or changes files, installs packages, or reaches the network. That includes the project's build and tests, and anything run through `uv run --with`, `npx` or a package install. Leave such a promise `kept-unproven`, and name the check as what is missing.
+A check is read-only when it only reads: the branch's files, `git show`, `git diff`, `git log`, or a short command that parses or compares what they print. Don't run a check that writes or changes files, installs packages, or reaches the network. That includes the project's build and tests, and anything run through `uv run --with`, `npx` or a package install. Judge such a promise like any other without proof: `kept-unproven` when you can name the failure that would go unseen, with the check as what is missing, and `kept` when you can't.
 
 Never change the branch to run a check: no `git checkout`, `git switch`, `git stash` or `git reset`. Read the base version of a file with `git show $(git merge-base main HEAD):<file>` instead.
 
@@ -139,4 +141,4 @@ Rules for the file:
 
 ## The governing principle
 
-> A stranger holding only the card, its comments, the diff and the read-only checks you name should reach your verdict. If the only defence of a `kept` is the author's story, the promise is not yet proved kept.
+> A stranger holding only the card, its comments, the diff and the read-only checks you name should reach your verdict. If the only defence of a `kept` is the author's story, it is not `kept`: a stranger needs the proof or, where no failure could go unseen, the line that does it.
