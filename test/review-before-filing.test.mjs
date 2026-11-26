@@ -58,11 +58,7 @@ describe("the review before a card is filed", () => {
 
   it("reviews the draft after the optional second-opinion loop", () => {
     ok(inOrder(plan, ["### 11. Cross-model", "### 12. Check the draft"]));
-    ok(
-      plan.includes(
-        "continue to step 12, so the review reads the draft as saved",
-      ),
-    );
+    ok(plan.includes("then continue to step 12, so the review reads it"));
   });
 
   it("files nothing without all three lenses, or with a stop still unfixed", () => {

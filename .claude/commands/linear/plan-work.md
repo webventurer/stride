@@ -363,7 +363,7 @@ uv run .claude/tools/openrouter_cli.py "<full draft text + Claude assessment>" -
 
 4. **User decides** — ask: **"Send to ChatGPT again or save the issue on Linear?"**
    - If **again** — repeat from step 1 with the revised draft
-   - If **save** — continue to step 12, so the review reads the draft as saved. On the story and bug path the user has seen the draft, so saving counts as the approval; the epic-sized path still asks for its approval at step 13
+   - If **save** — write the draft as saved to `<card-folder>/title.txt` and `<card-folder>/description.md`, then continue to step 12, so the review reads it. On the story and bug path the user has seen the draft, so saving counts as the approval; the epic-sized path still asks for its approval at step 13
 
 Each round has three voices: Claude proposes and synthesises, ChatGPT challenges, the user steers. The loop sharpens the issue through cross-model perspectives — like a design review but for issue planning.
 
@@ -450,7 +450,7 @@ uv run .claude/tools/linear_cli.py issue get <new-id> > <card-folder>/filed.json
 uv run .claude/tools/linear_cli.py issue record-check <new-id> --read-at "$(cat <run-folder>/read-at.txt)" --checked @<card-folder>/filed.json --findings @<card-folder>/findings.md
 ```
 
-Post none for a cross-project card, or for a draft that changed after its review at the person's request. `/linear:start` then checks that card in full.
+Post none for a cross-project card, or for a draft that changed after its review. Step 12's own fixes are part of the review; a change the person asks for, or their answer to a stop the review couldn't fix, comes after it. `/linear:start` then checks that card in full.
 
 ### 15. Confirm creation
 
