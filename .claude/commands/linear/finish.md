@@ -232,7 +232,7 @@ instead of needing a separate PR.
 
 <mark>**This step runs last before the merge**</mark>, after every step that can change the branch, so it judges exactly what merges.
 
-Follow [card check](reference/card-check.md), starting from [Before merge: is the record current?](reference/card-check.md#before-merge-is-the-record-current). When every recorded verdict is Kept, Fixed or Not acted on, and the pull request's recorded check matches the branch's current content and the card's current wording, continue to step 9. When all that changed since that check is [behaviour-neutral](reference/card-check.md#a-behaviour-neutral-change-needs-no-fresh-check), note it in the pull request's record as that section sets out, then continue to step 9. Otherwise run the check once, fix what it finds, re-run validation (step 4) and record the new verdicts in the pull request before merging.
+Follow [card check](reference/card-check.md), starting from [Before merge: is the record current?](reference/card-check.md#before-merge-is-the-record-current). When every recorded verdict is Kept, Fixed or Not acted on, and the pull request's recorded check matches the branch's current content and the card's current wording, continue to step 9. When every recorded verdict passes in that way and all that changed since the check is [behaviour-neutral](reference/card-check.md#a-behaviour-neutral-change-needs-no-fresh-check), note it in the pull request's record as that section sets out, then continue to step 9. Otherwise run the check once, fix what it finds, re-run validation (step 4) and record the new verdicts in the pull request before merging.
 
 ### 9. Merge (preserve commits)
 

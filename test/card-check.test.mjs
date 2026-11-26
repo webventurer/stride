@@ -215,6 +215,11 @@ describe("card check", () => {
     ok(rule.includes(principle));
     ok(step8.includes(anchor));
     ok(
+      step8.includes(
+        "When every recorded verdict passes in that way and all that changed since the check is [behaviour-neutral]",
+      ),
+    );
+    ok(
       inOrder(check, [
         "linear_cli.py comment save",
         "git hash-object -w --stdin",
