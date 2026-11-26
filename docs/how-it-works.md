@@ -149,7 +149,7 @@ That turns review into a loop you drive without leaving the browser:
 
 ## The cross-model feedback loop
 
-`/linear:plan-work` optionally sends issue drafts to ChatGPT via OpenRouter for a second opinion before creating the issue. Three voices — Claude proposes, ChatGPT challenges, you steer — sharpen the issue through cross-model perspectives.
+`/linear:plan-work` checks every draft with three fresh reviewers before filing it. It can also send drafts to ChatGPT via OpenRouter for a second opinion. Three voices — Claude proposes, ChatGPT challenges, you steer — sharpen the issue through cross-model perspectives.
 
 This requires an OpenRouter API key. See the [install guide](/install) for setup.
 

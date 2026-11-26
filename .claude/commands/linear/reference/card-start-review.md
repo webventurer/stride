@@ -1,6 +1,6 @@
 # Card start review
 
-> The brief for an **independent** reviewer of a card, before any work on it starts. A fresh sub-agent reads this file and judges whether the card's promises are clear, consistent and still worth making — from the card, the Vision, the current repository and what earlier cards shipped, never from the conversation that planned it. Called from [`/linear:start`](../start.md) step 3.
+> The brief for an **independent** reviewer of a card, before any work on it starts. A fresh sub-agent reads this file and judges whether the card's promises are clear, consistent and still worth making — from the card, the Vision, the current repository and what earlier cards shipped, never from the conversation that planned it. Called from [`/linear:plan-work`](../plan-work.md) step 12 on a draft before it is filed, and from [`/linear:start`](../start.md) step 3.
 
 ## Why this file is separate
 
@@ -52,6 +52,26 @@ For each promise, look in the current code, commands and skills for the situatio
 ### Prove it
 
 For each promise, work out what would prove it at the end — a test, a line, or the card's live check — and whether anything stops that proof: another line on the card, such as its "What we won't do" or its live check, what finished sibling cards shipped, or what has changed since the card's description last changed.
+
+## A draft not yet filed
+
+When the orchestrator says the card is a draft not yet filed, read it as above, with these differences:
+
+- **It has no card number,** so skip [What changed](#what-you-read) and run no Linear command for the card itself
+- **Read the repository as it is on `main`,** which the orchestrator has just fetched: `git show origin/main:<path>` and `git grep <pattern> origin/main`, `VISION.md` included. When the orchestrator says the Vision has just changed, read `VISION.md` from the working tree instead
+- **Write every `missing` finding's `proposed` as the line that puts the edge case on the card,** because each one is written into the draft, whatever its level
+- **A draft for another project** is judged against that project's `origin/main` when the orchestrator gives its path (`git -C <path>`), with no check of its "Serves:" line or its Vision trace. When its code is not on this machine, judge only the wording: the two tests, and lines that contradict each other
+
+## A check of changes only
+
+When the orchestrator says to check only what changed since a time, the card as it reads now already passed a check then. Read the card, then what changed:
+
+- **Commits that reached `main` since that time:** `.claude/tools/main_changes_since.sh <time>`
+- **Comments posted since that time** on the card itself and on every sibling card: `uv run .claude/tools/linear_cli.py comment list <id>`. The siblings are the other cards under the card's parent, whatever its title: `issue get <card-id>` shows `parent.id`, and `list-by-parent <parent-id>` lists them. A comment that starts `**Card checked**` is a check's own record, not a change
+
+A comment on this card or on any sibling card that overtakes a promise is a `stale` finding, as a commit that overtakes one is.
+
+Then read whatever those changes touch. Raise only a finding one of those changes causes; one that would have held at the earlier check stays unraised. Name the commit or comment in `evidence`.
 
 ## The reader's half
 
