@@ -289,7 +289,7 @@ describe("carrying a merged card's lesson to Todo", () => {
         "A card started by name stops there, before the next card starts",
       ),
     );
-    ok(brief.includes("read it from its record alone"));
+    ok(brief.includes("a card with no check record is read from the pull request alone"));
     ok(brief.includes("whose verdict is Fixed or Not acted on, as one rule"));
     ok(brief.includes('order-todo --project "<project>" --dry-run'));
     ok(

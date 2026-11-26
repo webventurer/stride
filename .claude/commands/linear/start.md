@@ -144,19 +144,33 @@ If already Doing, leave unchanged. Never set any other state in this step.
 
 ### 3. Check the card
 
-The card check in step 11 can only be as good as the promises it checks. Before a branch exists or any code is written, three fresh reviewers read the card the way that check will, each through its own lens, and report any promise that cannot be checked, contradicts something, misses an edge case the code plainly has, or no longer fits what has changed since the card was written: what earlier cards shipped, commits that reached `main` and comments on open sibling cards. [agility](reference/agility.md) says why the check looks at what has changed.
+The card check in step 11 can only be as good as the promises it checks. Before a branch exists or any code is written, three fresh reviewers read the card the way that check will, each through its own lens, and report any promise that cannot be checked, contradicts something, misses an edge case the code plainly has, or no longer fits what has changed: what earlier cards shipped, commits that reached `main` and comments on the card and its sibling cards. [agility](reference/agility.md) says why the check looks at what has changed.
+
+A card an earlier run of this step already checked holds a check record. Only what changed since that record is checked, and when nothing has, no reviewer runs.
 
 Skip this step when the current branch is already the card's branch, as when resuming inside a worktree: the run that created the branch checked the card first. As a `/parallel-sessions` job, run this step anyway: the skill made the worktree and its branch, and nothing has checked the card yet.
 
 1. **Rewrite an old card first,** following [rewrite an old card](reference/rewrite-old-card.md): a story or bug card without the reader's half is rewritten into the new shape, with a comment saying what became of each part, so the three reviewers read the new shape. A card already in the new shape, an epic, and a card in Done or Canceled are left as they are.
 
-2. **Fetch `main` once,** so the three reviewers read it as it is on GitHub without fetching it together and colliding:
+2. **Note the time and the card as it reads, then fetch `main` once,** so the three reviewers read it as it is on GitHub without fetching it together and colliding, and this check's record can say how old that reading is and which wording it covers:
 
    ```bash
+   mkdir -p /tmp/<identifier> && date -u +%Y-%m-%dT%H:%M:%SZ > /tmp/<identifier>/read-at.txt
+   uv run .claude/tools/linear_cli.py issue get <issue-id> > /tmp/<identifier>/checked.json
    git fetch origin main
    ```
 
-3. **Spawn three reviewers at once.** Use the Task tool (`general-purpose`, model `sonnet`, effort `high`), one per lens from the brief's [Read through your lens](reference/card-start-review.md#read-through-your-lens): the first "Promise by promise", the second "Try to break it", the third "Prove it". Give each **only** the card's title and file, its lens, its parent epic when step 1 surfaced one, and its own output path — never the planning conversation.
+3. **Ask stride how much is left to check:**
+
+   ```bash
+   uv run .claude/tools/linear_cli.py issue check-scope <issue-id>
+   ```
+
+   - **`full`** — the card holds no check record, or its title or description differs from the one recorded. Carry on with item 4.
+   - **`changes`** — something changed since the time in `since`: commits on `main`, or comments on the card or a sibling card. Carry on with item 4, and have each reviewer check only what changed.
+   - **`none`** — nothing changed since the time in `since`. Spawn no reviewer, post nothing, report `card start check: nothing changed since <since>, skipped`, and continue to step 4, Load project context. The pull request's check cost line reads `start skipped, nothing changed` in place of the start check's time and counts (step 17).
+
+4. **Spawn three reviewers at once.** Use the Task tool (`general-purpose`, model `sonnet`, effort `high`), one per lens from the brief's [Read through your lens](reference/card-start-review.md#read-through-your-lens): the first "Promise by promise", the second "Try to break it", the third "Prove it". Give each **only** the card's title and file, its lens, its parent epic when step 1 surfaced one, and its own output path — never the planning conversation.
 
    Save the card to the file first. It holds the card's description exactly as the card holds it, so no reviewer reads a copy retyped into a prompt. It sits outside the worktree and its path holds the card's identifier, so cards running side by side never share one:
 
@@ -166,25 +180,31 @@ Skip this step when the current branch is already the card's branch, as when res
 
    Then give each reviewer:
 
-   > Read `.claude/commands/linear/reference/card-start-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. The card is: `<identifier> — <title>`. Read its exact description from `/tmp/<identifier>/card.md`. Its parent epic is `<epic-identifier>`, UUID `<epic-UUID>`. Judge what has changed since `<since-time>`. Write your findings as JSONL to `<output-path>`.
+   > Read `.claude/commands/linear/reference/card-start-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. The card is: `<identifier> — <title>`. Read its exact description from `/tmp/<identifier>/card.md`. Its parent epic is `<epic-identifier>`, UUID `<epic-UUID>`. Judge what has changed since `<since-time>`. Check only what changed since `<record-time>`. Write your findings as JSONL to `<output-path>`.
 
    Sonnet at high effort is the setting [chain-of-command config](../../skills/parallel-sessions/reference/chain-of-command-config.md#sonnet-at-high-effort-is-the-soldiers-sweet-spot) found as good as every higher setting while using fewer tokens than any of them. It was measured on implementation jobs, not on reviews.
 
-   The epic's UUID is the `parent.id` step 1 fetched. Leave out the epic sentence for a card with no parent epic, and the `Judge what has changed since` sentence for a card no run has rewritten. For a rewritten card `<since-time>` is the time saved in `/tmp/<identifier>/since.txt`, or, in a run that finds the card already rewritten, the `Old description last changed:` time in the rewrite's comment. Read the findings from the JSONL files, not the sub-agents' chat replies. A reviewer that leaves no findings file is run once more; if it leaves none again, stop for the user. Only a file that exists and is empty means that lens found nothing.
+   The epic's UUID is the `parent.id` step 1 fetched. Leave out the epic sentence for a card with no parent epic, the `Judge what has changed since` sentence for a card no run has rewritten or when item 3 answers `changes`, and the `Check only what changed since` sentence unless item 3 answered `changes`, where `<record-time>` is its `since`. For a rewritten card `<since-time>` is the time saved in `/tmp/<identifier>/since.txt`, or, in a run that finds the card already rewritten, the `Old description last changed:` time in the rewrite's comment. Read the findings from the JSONL files, not the sub-agents' chat replies. A reviewer that leaves no findings file is run once more; if it leaves none again, stop for the user. Only a file that exists and is empty means that lens found nothing.
 
-4. **Already done** — when all three files hold a `done` finding, the card has nothing left to build: cancel it, in both modes, before any branch exists. Post one comment following [Linear card language](reference/card-language.md) that names, for each promise, the commit, card or file that keeps it, taken from the findings' evidence, then move the card with `uv run .claude/tools/linear_cli.py issue update <issue-id> --state Canceled`. It starts no branch and opens no pull request, and steps 4 to 19 don't run. Report `card start check: already done, card cancelled`. A `done` finding from fewer than all three reviewers cancels nothing: set it aside and read the rest as below. A card that is only partly done is not cancelled: its `stale` findings reword it.
+5. **Already done** — when all three files hold a `done` finding, the card has nothing left to build: cancel it, in both modes, before any branch exists. Post one comment following [Linear card language](reference/card-language.md) that names, for each promise, the commit, card or file that keeps it, taken from the findings' evidence, then move the card with `uv run .claude/tools/linear_cli.py issue update <issue-id> --state Canceled`. It starts no branch and opens no pull request, and steps 4 to 19 don't run. Report `card start check: already done, card cancelled`. A `done` finding from fewer than all three reviewers cancels nothing: set it aside and read the rest as below. A card that is only partly done is not cancelled: its `stale` findings reword it.
 
    As a `/parallel-sessions` job the card's job has no pull request to report: it messages the coordinator that the card ended in Canceled, then releases its slot and ends its turn at once, as its brief sets out. A card run through Todo leaves the batch and the run carries on, as [Todo run](reference/todo-run.md) sets out. A card that was running alone ends there.
 
-5. **Read the levels.** Each finding is a `stop` or a `note`. For a card created in Linear before 2026-10-06 (the `createdAt` step 1 fetched), treat a `mechanism` stop as a note: card language asked for behaviour rather than mechanism only from that date. Then read the three files as one list: findings that quote the same card line, or name the same gap, count as one finding at the stricter level, and are fixed or posted once. Note how long the check took, the slowest of the three reviewers' completion notices, and how many stops and notes the list holds; the pull request's card check record carries them (step 17).
+6. **Read the levels.** Each finding is a `stop` or a `note`. For a card created in Linear before 2026-10-06 (the `createdAt` step 1 fetched), treat a `mechanism` stop as a note: card language asked for behaviour rather than mechanism only from that date. Then read the three files as one list: findings that quote the same card line, or name the same gap, count as one finding at the stricter level, and are fixed or posted once. Note how long the check took, the slowest of the three reviewers' completion notices, and how many stops and notes the list holds; the pull request's card check record carries them (step 17).
 
-6. **No findings** — report `card start check: nothing to raise` and continue to step 4, Load project context, without a prompt.
+7. **No findings** — post the check record (item 10), report `card start check: nothing to raise` and continue to step 4, Load project context, without a prompt.
 
-7. **Notes only** — post them as one comment on the card and continue to step 4, Load project context, without a prompt, in both modes. Write the comment following [Linear card language](reference/card-language.md): each note's card line, what the reviewer found and its proposed wording, with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`.
+8. **Notes only** — post them as one comment on the card and continue to step 4, Load project context, without a prompt, in both modes. That comment is the check record (item 10). Write the notes following [Linear card language](reference/card-language.md): each note's card line, what the reviewer found and its proposed wording.
 
-8. **Stops** — fix them yourself before any branch exists, in both modes. Each stop is a promise the builder would have to guess at, so reword the card until it can be built and judged: use the reviewer's proposed wording, or your own where it fits the card better. Reword both halves in the same edit: a stop on one half that changes what the card promises changes the other half too. Save the card with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`, then post one comment following [Linear card language](reference/card-language.md) that lists each change — the card line, what the reviewer found and the new wording — followed by the notes. Continue to step 4, Load project context.
+9. **Stops** — fix them yourself before any branch exists, in both modes. Each stop is a promise the builder would have to guess at, so reword the card until it can be built and judged: use the reviewer's proposed wording, or your own where it fits the card better. Reword both halves in the same edit: a stop on one half that changes what the card promises changes the other half too. Save the card with `uv run .claude/tools/linear_cli.py issue update <issue-id> --description @<file>`, save it again as item 2 saved it, into `checked.json`, then post one comment, the check record (item 10), written following [Linear card language](reference/card-language.md). It lists each change — the card line, what the reviewer found and the new wording — followed by the notes. Continue to step 4, Load project context.
 
-   Ask the user only when a fix would change what the card is for — its purpose or scope, not its wording. Write the question in the four labelled parts in order, as [asking the user](reference/asking-the-user.md) sets out. In unattended mode, post the comment with that question and end the run.
+   Ask the user only when a fix would change what the card is for — its purpose or scope, not its wording. Write the question in the four labelled parts in order, as [asking the user](reference/asking-the-user.md) sets out. In unattended mode, post the comment with that question, with `uv run .claude/tools/linear_cli.py comment create <issue-id> --body @<file>`, and end the run. A run that stops on a question posts no check record.
+
+10. **Post the check record,** after any rewording is saved. It names the wording in `checked.json`, so a card someone edits while the check runs is checked in full next time. Leave out `--findings` when there were none:
+
+    ```bash
+    uv run .claude/tools/linear_cli.py issue record-check <issue-id> --read-at "$(cat /tmp/<identifier>/read-at.txt)" --checked @/tmp/<identifier>/checked.json --findings @<file>
+    ```
 
 ### 4. Load project context
 
@@ -534,8 +554,9 @@ happens first.
 - Issue ID unresolvable → stop, ask the user
 - Issue not found in Linear → stop
 - `VISION.md` missing → stop, suggest `/vision`
-- Card start check raises only notes → post them as one card comment and continue, in both modes
-- Card start check raises a stop → reword the card, record the changes in one comment and continue, in both modes; ask only when a fix would change the card's purpose or scope
+- Nothing changed since the card's last check record → skip the start check, say so and continue
+- Card start check raises only notes → post them in the check record and continue, in both modes
+- Card start check raises a stop → reword the card, list the changes in the check record and continue, in both modes; ask only when a fix would change the card's purpose or scope
 - Uncommitted changes → stop, suggest `/commit`
 - On `main` with no issue branch → create branch in step 6
 - No commits ahead of `main` → stop

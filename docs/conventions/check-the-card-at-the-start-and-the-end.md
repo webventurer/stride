@@ -44,6 +44,7 @@ The tempting repair is the dangerous one. When code and card disagree, rewriting
 ### At the start
 
 - **When it runs.** `/linear:start` runs it right after the Vision check, before a branch exists or any code is written — for each card as it is started, never for a whole epic at once, so a later card is checked against what the earlier ones actually shipped
+- **How much it checks.** Each completed check leaves a record on the card: when `main` was read and which wording passed. At the start, a card whose record still matches its wording is checked only against what changed since: commits on `main` and comments on the card and its sibling cards. With nothing changed, no reviewer runs. A card with no record, or reworded since, is checked in full
 - **Who checks.** Three fresh reviewers at once, each through its own lens — Promise by promise, Try to break it and Prove it — reading the card, `VISION.md`, the current code and, for a card in an epic, what its finished sibling cards shipped and what changed since the card was written; never the conversation that planned it. Their findings are read as one list
 - **What it reports.** Only problems, each naming the card's line and proposing new wording
 
@@ -58,8 +59,8 @@ The tempting repair is the dangerous one. When code and card disagree, rewriting
 Each finding is a **stop** or a **note**. A stop is a promise the builder would have to guess at, or that the end check couldn't judge; anything else is a note. The check is the agent reviewing its own card, so the agent fixes what it finds and carries on.
 
 - **No findings:** work starts without a prompt
-- **Notes only:** they're posted as one comment on the card and work starts, in both modes
-- **Any stop:** before a branch exists, the agent rewords the card so each promise can be built and judged, posts one comment listing every change and the notes, and work starts, in both modes. It asks the user only when a fix would change what the card is for — its purpose or scope, not its wording
+- **Notes only:** they're posted in the check record on the card and work starts, in both modes
+- **Any stop:** before a branch exists, the agent rewords the card so each promise can be built and judged, lists every change and the notes in the check record, and work starts, in both modes. It asks the user only when a fix would change what the card is for — its purpose or scope, not its wording
 
 The start check feeds the end check. Every promise that survives it can be shown kept or broken, so the verdicts at the end mean something: a kept promise was really tested, and a broken one has a real scenario.
 

@@ -160,9 +160,11 @@ The merge fires *only* on an explicit ship phrase — the agent never decides on
 
 ### /linear:start
 
-**Start work on a Linear issue.** One headless flow: move the issue to Doing, check that the card's promises can be tested, create or switch to the feature branch, inspect the current repository, surface a concrete implementation checklist, work through it visibly, validate (build + tests), **check the change against its card**, **auto-squash similar commits**, push, open a PR with the card check's verdicts, move to In Review, then show the full diff for terminal review.
+**Start work on a Linear issue.** One headless flow: move the issue to Doing, check that the card's promises can be tested and still hold, create or switch to the feature branch, inspect the current repository, surface a concrete implementation checklist, work through it visibly, validate (build + tests), **check the change against its card**, **auto-squash similar commits**, push, open a PR with the card check's verdicts, move to In Review, then show the full diff for terminal review.
 
 Requires `VISION.md` ([see why](#vision-is-a-hard-prerequisite)). The command surfaces the outcome the issue serves (extracted from its "Why this matters" section) and carries it as context throughout implementation.
+
+**The check at the start looks only at what is new.** A card that has passed a check carries a comment saying so. If nothing has reached `main` since, nobody has commented on the card or its siblings, and the card reads the same, the start check is skipped and says why. If something has, the reviewers look only at what changed. A card with no such comment, or reworded since, is checked in full.
 
 <mark>**While iterating, you naturally produce journey-shaped commits — "first attempt", "wait that broke X", "ok now it's fixed", "format pass". Before merge, those should be rewritten to describe where you ended up, not how you got there.**</mark>
 

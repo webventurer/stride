@@ -53,6 +53,15 @@ For each promise, look in the current code, commands and skills for the situatio
 
 For each promise, work out what would prove it at the end — a test, a line, or the card's live check — and whether anything stops that proof: another line on the card, such as its "What we won't do" or its live check, what finished sibling cards shipped, or what has changed since the card's description last changed.
 
+## A check of changes only
+
+When the orchestrator says to check only what changed since a time, the card as it reads now already passed a check then. Read the card, then what changed:
+
+- **Commits that reached `main` since that time:** `.claude/tools/main_changes_since.sh <time>`
+- **Comments posted since that time** on the card itself and on every sibling card: `uv run .claude/tools/linear_cli.py comment list <id>`. The siblings are the other cards under the card's parent, whatever its title: `issue get <card-id>` shows `parent.id`, and `list-by-parent <parent-id>` lists them. A comment that starts `**Card checked**` is a check's own record, not a change
+
+Then read whatever those changes touch. Raise only a finding one of those changes causes; one that would have held at the earlier check stays unraised. Name the commit or comment in `evidence`.
+
 ## The reader's half
 
 Run these three checks only on a card that opens with "For the reader". A card that doesn't, such as a card already on the board, is read as before. [Linear card language](card-language.md#open-every-card-with-a-part-for-the-reader) sets out the halves. Each fault is a `contradictory` stop, because the card breaks its own template's rule, and its `proposed` rewords both halves in the same edit:
