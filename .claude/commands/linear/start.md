@@ -168,7 +168,7 @@ Skip this step when the current branch is already the card's branch, as when res
 
    - **`full`** — the card holds no check record, or its title or description differs from the one recorded. Carry on with item 4.
    - **`changes`** — something changed since the time in `since`: commits on `main`, or comments on the card or a sibling card. Carry on with item 4, and have each reviewer check only what changed.
-   - **`none`** — nothing changed since the time in `since`. Spawn no reviewer, post nothing, report `card start check: nothing changed since <since>, skipped`, and continue to step 4, Load project context. The pull request's check cost line reads `start skipped, nothing changed` in place of the start check's time and counts (step 17).
+   - **`none`** — nothing changed since the time in `since`. Spawn no reviewer, post nothing, report `card start check: nothing changed since <since>, skipped`, and continue to step 4, Load project context. The pull request's check cost line reads `start skipped, nothing changed` in place of the start check's time and counts: save those words to `/tmp/<identifier>/start-cost.txt` for step 17.
 
 4. **Spawn three reviewers at once.** Use the Task tool (`general-purpose`, model `sonnet`, effort `high`), one per lens from the brief's [Read through your lens](reference/card-start-review.md#read-through-your-lens): the first "Promise by promise", the second "Try to break it", the third "Prove it". Give each **only** the card's title and file, its lens, its parent epic when step 1 surfaced one, and its own output path — never the planning conversation.
 
@@ -463,6 +463,7 @@ Run `gh pr create`:
 
 - **Title**: use the Linear issue title (keep under 70 chars)
 - **Base branch**: `main`
+- **Check cost line**: when step 3 skipped the start check, its start part is the words in `/tmp/<identifier>/start-cost.txt`. A session that resumed on the card's branch, and so skipped step 3, reads them there too
 - **Body**: write it to a file with the editor — never an inline heredoc, since bodies carry backticks, `$`, and `<placeholders>` that trip shell quoting ([why](reference/workflow.md#how-skills-talk-to-linear)):
 
 ```markdown

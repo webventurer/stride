@@ -53,6 +53,19 @@ describe("the start check after an earlier check", () => {
     );
   });
 
+  it("carries a skipped check to the pull request's cost line", () => {
+    ok(
+      startCheck.includes(
+        "save those words to `/tmp/<identifier>/start-cost.txt`",
+      ),
+    );
+    ok(
+      start.includes(
+        "**Check cost line**: when step 3 skipped the start check",
+      ),
+    );
+  });
+
   it("reads comments on sibling cards under any parent", () => {
     ok(
       reviewer.includes(
