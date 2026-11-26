@@ -25,8 +25,8 @@ describe("moves the needle", () => {
     const plan = read(".claude/commands/linear/plan-work.md");
     const check = plan.indexOf("Will it move the needle?");
 
-    ok(check > plan.indexOf("### 7. "));
-    ok(check < plan.indexOf("### 9. Draft the issue"));
+    ok(check > plan.indexOf("### 8. Check the code"));
+    ok(check < plan.indexOf("### 10. Draft the issue"));
     ok(plan.includes("reference/moves-the-needle.md"));
     ok(plan.includes("In unattended mode, file nothing and report the reason"));
     ok(plan.includes("recommend not filing"));

@@ -25,6 +25,8 @@ Ranks are roles, not models: the model and effort columns are today's choice, an
 
 A soldier doesn't ring the general, and the general isn't consulted about the coffee. Each decision goes up one rank only when the rank below can't make it, so the user hears from a batch only occasionally; if they're asked often, a rank below is passing up what it could settle. The principle is mission command: give every rank the intent, and decide at the lowest rank that can.
 
+The captain records the decisions it settles and lists them in the run's final report; it doesn't send them to the user as they happen. [Step 5 of the skill](../SKILL.md#5-watch-and-check) says which decisions count and where they are kept.
+
 ## The ranks
 
 **The soldier does focused work where the plan is known.** Sonnet takes the rank because it implements well and costs half as much per token as Opus. Whether a card costs less overall depends on the effort, and high effort gives the best work for the least use; see [the config](chain-of-command-config.md#sonnet-at-high-effort-is-the-soldiers-sweet-spot). It carries the plan across as many files as it takes and makes the calls inside it, such as which errors a narrowed catch should still handle. When the plan is worked out during the work, as in moving code, Opus takes the rank. The soldier's brief sends its questions to the captain rather than the advisor, and a soldier started as a `claude -p` session has the advisor switched off as well. The captain is the right rank to answer them, because it knows what every other soldier is doing.

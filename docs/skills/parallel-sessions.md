@@ -26,7 +26,7 @@ While a batch runs, you can keep making quick changes to your app in your own se
 
 ## Who decides what
 
-The skill runs on a chain of command. Job sessions settle how to do the work, the coordinator settles what they can't, and only questions about what a card is for, or how far it goes, reach you. The skill's `reference/` folder sets out which model and effort each rank runs on, and what it costs.
+The skill runs on a chain of command. Job sessions settle how to do the work, the coordinator settles what they can't, and only questions about what a card is for, or how far it goes, reach you. The decisions the coordinator settles for you aren't sent as they happen: the run's final report lists them, one line each, and you can overrule any of them. The skill's `reference/` folder sets out which model and effort each rank runs on, and what it costs.
 
 ## Needs
 

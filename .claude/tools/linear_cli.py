@@ -21,6 +21,11 @@ import click
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+from card_check_record import (  # noqa: E402
+    check_scope,
+    main_commits_since,
+    record_body,
+)
 from card_comments import comments_text  # noqa: E402
 from hand_work import files_in_hand, main_folder  # noqa: E402
 from legacy import (  # noqa: E402
@@ -390,6 +395,54 @@ def issue_description_changed_at_cmd(identifier: str):
     echo_json(get_description_changed_at(identifier))
 
 
+@issue_group.command("record-check")
+@click.argument("identifier")
+@click.option(
+    "--read-at", required=True, help="When main was read (ISO 8601, UTC)"
+)
+@click.option(
+    "--checked",
+    required=True,
+    help="The card's `issue get` JSON as it was checked: @path, or -",
+)
+@click.option(
+    "--findings",
+    default="",
+    help="Inline text, @path to read a file, or - to read stdin",
+)
+def issue_record_check_cmd(
+    identifier: str, read_at: str, checked: str, findings: str
+):
+    api = bearer_token()
+    issue = get_issue(api, identifier)
+    if not issue:
+        raise click.ClickException(f"Issue not found: {identifier}")
+    try:
+        card = json.loads(read_text_arg(checked))
+        body = record_body(card, read_at, read_text_arg(findings))
+    except ValueError as error:
+        raise click.ClickException(str(error)) from error
+    create_comment(api, issue["id"], body)
+    echo_json({"identifier": identifier, "checked_at": read_at})
+
+
+@issue_group.command("check-scope")
+@click.argument("identifier")
+def issue_check_scope_cmd(identifier: str):
+    api = bearer_token()
+    issue = get_issue(api, identifier)
+    if not issue:
+        raise click.ClickException(f"Issue not found: {identifier}")
+    echo_json(
+        check_scope(
+            issue,
+            list_comments(api, identifier),
+            lambda: sibling_comments(api, issue),
+            main_commits_since,
+        )
+    )
+
+
 @issue_group.command("rewrite-template")
 @click.argument("identifier")
 def issue_rewrite_template_cmd(identifier: str):
@@ -692,6 +745,17 @@ def team_or_fail(api_key: str, team_key: str) -> dict:
     if not team:
         raise click.ClickException(f"Team not found: {team_key!r}")
     return team
+
+
+def sibling_comments(api_key: str, issue: dict) -> list[dict]:
+    if not issue.get("parent"):
+        return []
+    return [
+        comment
+        for card in list_by_parent(issue["parent"]["id"])
+        if card["identifier"] != issue["identifier"]
+        for comment in list_comments(api_key, card["identifier"])
+    ]
 
 
 def parent_id_or_none(
