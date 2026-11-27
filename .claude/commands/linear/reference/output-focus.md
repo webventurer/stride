@@ -138,7 +138,7 @@ PR: <url>
 Build: passed
 [Milestone: <name> — complete / <n> remaining — if applicable]
 [Epic: <name> — Done / <n> sub-issues remaining — if applicable]
-Lessons: <cards reworded, each with its lesson / questions posted / one-off lessons named and left / no lesson for Todo>
+Lessons: <cards commented on, by column, each with its lesson / Todo cards reworded / questions posted / one-off lessons named and left / no lesson for cards to come>
 [Vision sync: applied / declined / already in sync — if VISION.md touched]
 ```
 

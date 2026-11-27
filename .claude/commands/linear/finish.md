@@ -66,6 +66,8 @@ If the list is empty, stop:
 
 Capture the PR `number`, `url`, and `mergeable` for the merge in step 9. This gate is the single PR precondition — later steps assume the PR exists and never re-stop on it.
 
+**Write down late lessons.** A lesson learnt after the pull request opened, such as while merging `main` or fixing review feedback, goes under `## Lessons for later cards` in the pull request body before the merge, as [`/linear:start`](start.md) step 17 sets out: read the body with `gh pr view <number> --json body -q .body`, edit it in a file, and save it with `gh pr edit <number> --body-file <file>`.
+
 ### 3. Check repo state
 
 Run `git status -sb`.
@@ -318,9 +320,9 @@ uv run .claude/tools/linear_cli.py issue update <issue-id> --state Done
 
 Only set Done status. Skip if already Done. Never set any other status.
 
-### 12. Carry the lesson to Todo
+### 12. Carry the lessons to the cards still to come
 
-Before the next card starts, carry what this card's checks found to the cards still in Todo. Follow [carry lessons](reference/carry-lessons.md). Carry the one-line result into the summary in step 17.
+Before the next card starts, carry what this card taught to every card still to come. Follow [carry lessons](reference/carry-lessons.md). Carry the one-line result into the summary in step 17. As a `/parallel-sessions` job, also send that line to the coordinator at once, before step 13, because a card still being built may be about to open its pull request.
 
 ### 13. Check milestone completion
 
@@ -469,7 +471,7 @@ Read the output focus and apply this command's format from [reference/output-foc
 - Fixup commits present + user picks "abort" → exit cleanly, do not merge (autosquash + force-push manually, then re-run)
 - Fixup rebase conflicts → abort rebase, surface conflict, do not merge
 - Vision has no exact fit → tend the Vision with [`/vision-evolve`](../../skills/vision-evolve/SKILL.md), re-check, then continue
-- A lesson would change a Todo card's purpose → post the question on that card; interactive mode asks the user there and then, unattended mode finishes the remaining steps and reports the question; a card started by name stops there before the next card starts, and a run through Todo leaves only that card out of its later batches
+- A lesson would change the purpose of a card still to come → post the question on that card; interactive mode asks the user there and then, unattended mode finishes the remaining steps and reports the question; a card started by name stops there before the next card starts, and a run through Todo leaves only that card out of its later batches
 - Branch not fully merged → stop, warn (never force-delete)
 - Local branch already deleted → skip silently
 - Remote branch already deleted → skip silently

@@ -1,6 +1,6 @@
 # Moves the needle
 
-> **What this is**: the one judgement stride uses to decide whether something learned from the work is worth acting on. [`/linear:plan-work`](../plan-work.md) asks it before filing a card, [carry lessons](carry-lessons.md) asks it before changing the cards still in Todo, and [`/vision-evolve`](../../../skills/vision-evolve/SKILL.md) asks it before adding a line to the Vision.
+> **What this is**: the one judgement stride uses to decide whether something learned from the work is worth acting on. [`/linear:plan-work`](../plan-work.md) asks it before filing a card, [carry lessons](carry-lessons.md) asks it before rewording a card in Todo or asking a card a question, and [`/vision-evolve`](../../../skills/vision-evolve/SKILL.md) asks it before adding a line to the Vision.
 
 Acting on a learning always costs the person running stride some attention: a card to read and judge, a card in Todo that changed under them, a Vision line to keep true. The judgement is whether the learning earns that attention.
 
@@ -12,7 +12,7 @@ This is the idea behind "recurrence reveals reality": each repeat tells you more
 
 ## A one-off is named in one line and left
 
-Something seen once is named in one line, with its reason, and nothing else happens. The line keeps the finding visible, so it can be picked up if it comes back, and it costs the reader a moment instead of a card.
+Something seen once is named in one line, with its reason, and nothing changes because of it. [Carry lessons](carry-lessons.md) still comments a one-off lesson on each card it applies to. The line keeps the finding visible, so it can be picked up if it comes back, and it costs the reader a moment instead of a card.
 
 ## A one-off that cost a lot still earns action
 

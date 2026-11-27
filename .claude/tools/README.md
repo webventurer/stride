@@ -67,6 +67,8 @@ Every command outputs JSON. Slash commands parse JSON; ad-hoc terminal use pipes
 
 **Card checks**: `issue record-check <id> --read-at <time> --checked @<issue-get-json> [--findings <text>]` posts the record a card check leaves on its card, naming the wording in that file · `issue check-scope <id>` says how much the next start check has to look at: `full`, `changes` or `none`. Both live in `card_check_record.py`.
 
+**Lessons**: `cards-to-come <merged-id> --project <name> [--batch <id> ...]` lists the cards that can hear a merged card's lessons: the batch's cards in Doing or In Review, Todo, and the epic's Backlog and Backburner cards. Lives in `cards_to_come.py`.
+
 **Teams**: `team list` · `team state -t <team>`
 
 **Projects**: `project list` · `project create -t <team> --name <name> [--description <subtitle>] [--content <body>]` (board starts on Manual ordering) · `project get <name-or-id>` (accepts either) · `project update <id> --description "..."`
