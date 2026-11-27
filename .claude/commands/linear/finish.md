@@ -19,7 +19,7 @@ the deterministic branches named by this command.
 ## Rules
 
 - Never merge if tests fail
-- Never merge a branch whose current content has no passing card check against the card's current wording, unless all that changed since a passing check is [behaviour-neutral](reference/card-check.md#a-behaviour-neutral-change-needs-no-fresh-check): it touches no promise on the card and changes no behaviour ([favour speed of implementation over exhaustive testing](../../stride/docs/principles/favour-speed-of-implementation-over-exhaustive-testing.md))
+- Never merge a branch whose own change has no passing card check against the card's current wording, unless all that changed since a passing check is [behaviour-neutral](reference/card-check.md#a-behaviour-neutral-change-needs-no-fresh-check): it touches no promise on the card and changes no behaviour ([favour speed of implementation over exhaustive testing](../../stride/docs/principles/favour-speed-of-implementation-over-exhaustive-testing.md))
 - The merge commit message should read as if the work was done right the first time — no mention of rejections, fix cycles, or iterations
 - Use `--merge` (not `--squash`) to preserve atomic commits in the branch
 - Never force-delete branches
@@ -232,9 +232,9 @@ instead of needing a separate PR.
 
 ### 8. Check the change against its card
 
-<mark>**This step runs last before the merge**</mark>, after every step that can change the branch, so it judges exactly what merges.
+<mark>**This step runs last before the merge**</mark>, after every step that can change the branch, so it judges the card's change exactly as it merges.
 
-Follow [card check](reference/card-check.md), starting from [Before merge: is the record current?](reference/card-check.md#before-merge-is-the-record-current). When every recorded verdict is Kept, Fixed or Not acted on, and the pull request's recorded check matches the branch's current content and the card's current wording, continue to step 9. When every recorded verdict passes in that way and all that changed since the check is [behaviour-neutral](reference/card-check.md#a-behaviour-neutral-change-needs-no-fresh-check), note it in the pull request's record as that section sets out, then continue to step 9. Otherwise run the check once, fix what it finds, re-run validation (step 4) and record the new verdicts in the pull request before merging.
+Follow [card check](reference/card-check.md), starting from [Before merge: is the record current?](reference/card-check.md#before-merge-is-the-record-current). When every recorded verdict is Kept, Fixed or Not acted on, and the pull request's recorded check matches the card's own change and the card's current wording, continue to step 9. When every recorded verdict passes in that way and all that changed since the check is [behaviour-neutral](reference/card-check.md#a-behaviour-neutral-change-needs-no-fresh-check), note it in the pull request's record as that section sets out, then continue to step 9. Otherwise run the check once, fix what it finds, re-run validation (step 4) and record the new verdicts in the pull request before merging.
 
 ### 9. Merge (preserve commits)
 
