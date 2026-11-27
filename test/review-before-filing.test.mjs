@@ -43,6 +43,18 @@ describe("the review before a card is filed", () => {
     ok(reviewer.includes("## A draft not yet filed"));
   });
 
+  it("starts the three reviewers as Sonnet at medium effort", () => {
+    const spawn = review
+      .split("\n")
+      .find((line) => line.includes("**Spawn three reviewers at once**"));
+
+    ok(spawn.includes("model `sonnet`"), spawn);
+    ok(spawn.includes("effort `medium`"), spawn);
+    for (const lens of ["Promise by promise", "Try to break it", "Prove it"]) {
+      ok(spawn.includes(lens), lens);
+    }
+  });
+
   it("fixes every stop, writes in edge cases and checks the brief before creating", () => {
     ok(
       inOrder(plan, [

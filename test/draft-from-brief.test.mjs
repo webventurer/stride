@@ -89,3 +89,15 @@ describe("a card drafted from a brief", () => {
     ok(!plan.includes("2–5"));
   });
 });
+
+describe("how fast a card is drafted", () => {
+  it("starts the drafter as Sonnet at medium effort", () => {
+    const spawn = drafting
+      .split("\n")
+      .find((line) => line.includes("**Spawn the drafter**"));
+
+    ok(spawn.includes("model `sonnet`"), spawn);
+    ok(spawn.includes("effort `medium`"), spawn);
+  });
+
+});
