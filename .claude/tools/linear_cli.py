@@ -38,6 +38,7 @@ from legacy import (  # noqa: E402
 from linear import (  # noqa: E402
     LinearError,
     add_blocker,
+    archive_issue,
     bearer_token,
     create_attachment,
     create_comment,
@@ -633,6 +634,27 @@ def issue_attach_cmd(identifier: str, url: str, attach_title: str | None):
         url=url,
     )
     echo_json({"id": attachment_id, "url": url})
+
+
+@issue_group.command("archive")
+@click.argument("identifier")
+def issue_archive_cmd(identifier: str):
+    api = bearer_token()
+    not_found = f"Issue not found: {identifier}"
+    try:
+        issue = get_issue(api, identifier)
+    except LinearError as error:
+        raise click.ClickException(not_found) from error
+    if not issue:
+        raise click.ClickException(not_found)
+    failure = f"Could not archive {identifier}"
+    try:
+        archived = archive_issue(issue["id"])
+    except LinearError as error:
+        raise click.ClickException(f"{failure}: {error}") from error
+    if not archived:
+        raise click.ClickException(f"{failure}: Linear reported no success")
+    echo_json({"identifier": identifier, "archived": True})
 
 
 @cli.group("comment")

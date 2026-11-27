@@ -2311,3 +2311,74 @@ def test_waits_for_answer_reads_the_cards_own_comments():
 
     assert waiting is True
     listing.assert_called_once_with("key", "WB-7")
+
+
+@pytest.mark.parametrize("success", [True, False])
+def test_archive_issue_sends_issue_archive_and_returns_success(success):
+    reply = ok_response({"issueArchive": {"success": success}})
+    with (
+        patch("linear.bearer_token", return_value="lin_test"),
+        patch("linear.requests.post", return_value=reply) as mock,
+    ):
+        archived = linear.archive_issue("issue-uuid")
+
+    assert archived is success
+    assert "issueArchive(id: $id)" in sent_query(mock)
+    assert sent_variables(mock) == {"id": "issue-uuid"}
+
+
+def run_issue_archive(lookup: dict, archive: dict):
+    with (
+        patch("linear_cli.bearer_token", return_value="lin_test"),
+        patch("linear_cli.get_issue", **lookup),
+        patch("linear_cli.archive_issue", **archive) as mock,
+    ):
+        result = CliRunner().invoke(
+            linear_cli.cli, ["issue", "archive", "WB-1"]
+        )
+    return result, mock
+
+
+def test_issue_archive_archives_the_card_by_uuid():
+    result, mock = run_issue_archive(
+        {"return_value": {"id": "issue-uuid"}}, {"return_value": True}
+    )
+
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output) == {
+        "identifier": "WB-1",
+        "archived": True,
+    }
+    mock.assert_called_once_with("issue-uuid")
+
+
+@pytest.mark.parametrize(
+    "lookup",
+    [
+        {"return_value": None},
+        {"side_effect": LinearError("Entity not found: Issue")},
+    ],
+)
+def test_issue_archive_says_not_found_and_archives_nothing(lookup):
+    result, mock = run_issue_archive(lookup, {"return_value": True})
+
+    assert result.exit_code != 0
+    assert "Issue not found: WB-1" in result.output
+    mock.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "archive",
+    [
+        {"return_value": False},
+        {"side_effect": LinearError("Linear said no")},
+    ],
+)
+def test_issue_archive_names_the_card_when_the_archive_fails(archive):
+    result, _ = run_issue_archive(
+        {"return_value": {"id": "issue-uuid"}}, archive
+    )
+
+    assert result.exit_code != 0
+    assert "Could not archive WB-1" in result.output
+    assert '"archived": true' not in result.output

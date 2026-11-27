@@ -47,7 +47,7 @@ Stride's Linear client is split across two files:
 - `list_teams(api_key)`, `get_team(api_key, key)`, `list_team_states(api_key, team_key)`.
 - `list_comments(api_key, issue_id)`.
 
-**Write helpers**: `create_issue` (returns the full issue object, accepts `parent_id`, `priority`, `project_milestone_id`, etc.), `update_issue` (accepts `parent_id`), `create_comment`, `create_attachment`, `create_project`, `update_project`.
+**Write helpers**: `create_issue` (returns the full issue object, accepts `parent_id`, `priority`, `project_milestone_id`, etc.), `update_issue` (accepts `parent_id`), `create_comment`, `create_attachment`, `archive_issue` (returns the success bool), `create_project`, `update_project`.
 
 **Resolvers** (name → UUID lookups used by the CLI):
 
@@ -61,7 +61,7 @@ Stride's Linear client is split across two files:
 
 Every command outputs JSON. Slash commands parse JSON; ad-hoc terminal use pipes through `| jq`.
 
-**Issues**: `issue get <id>` · `issue create -t <team> --title ... [--project <name>] [--state <name>] [--priority N] [--labels a,b] [--parent <id>]` · `issue update <id> [--state <name>] [--parent <id>] [--title] [--description] [--labels] [--priority]` · `issue attach <id> --url <url> [--title <t>]`
+**Issues**: `issue get <id>` · `issue create -t <team> --title ... [--project <name>] [--state <name>] [--priority N] [--labels a,b] [--parent <id>]` · `issue update <id> [--state <name>] [--parent <id>] [--title] [--description] [--labels] [--priority]` · `issue attach <id> --url <url> [--title <t>]` · `issue archive <id>`
 
 **Comments**: `comment list <id>` · `comment create <id> --body <text>`
 
