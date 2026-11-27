@@ -17,6 +17,7 @@ Answer one question: **can every promise on this card be checked, should it stil
 - **The card** you were given: its title and whole description. **Today:** (older cards: "Where things stand") is where it says what it assumes about the code; check that assumption against the repository. Its promises are exactly the ones the end check reads; follow [Find the promises](card-check-review.md#find-the-promises) in the end check's brief, including what it says makes no promise
 - **`VISION.md`:** the criterion the card's "Serves:" line (older cards: "Why this matters") claims to serve
 - **The current repository:** the code, tests and documents the card's promises concern
+- **The card's lesson comments:** every comment on the card headed **Lesson from** another card, whatever its time, in a full check as in a check of changes: `uv run .claude/tools/linear_cli.py comment list <card-id>`. A lesson that overtakes a promise is a `stale` finding, as a commit that overtakes one is
 - **Finished sibling cards**, when you were given a parent epic. List its cards with `uv run .claude/tools/linear_cli.py list-by-parent <epic-UUID>`, using the UUID you were given, read each Done sibling with `uv run .claude/tools/linear_cli.py issue get <id>`, and see what it shipped with `git log main -i --grep=<id>`
 - **What changed since the card's description last changed.** [Agility](agility.md) says why. Use the time you were given when the card was just rewritten into the new shape, because the rewrite reset the description's change time. Otherwise get that time with `uv run .claude/tools/linear_cli.py issue description-changed-at <card-id>`: the last change to the description, or when the card was created if it never changed. A move between columns, a new place in the column or a new link doesn't move it. Then read:
   - **Commits that reached `main` since that time**, whichever card they came from, if any. This lists them by when GitHub received them, not the date each commit carries, so a commit made earlier but pushed or merged later is still read. `/linear:start` has already fetched `main` from GitHub, so you read it as it is there:
@@ -57,7 +58,7 @@ For each promise, work out what would prove it at the end — a test, a line, or
 
 When the orchestrator says the card is a draft not yet filed, read it as above, with these differences:
 
-- **It has no card number,** so skip [What changed](#what-you-read) and run no Linear command for the card itself
+- **It has no card number,** so skip [What changed](#what-you-read) and the lesson comments, and run no Linear command for the card itself
 - **Read the repository as it is on `main`,** which the orchestrator has just fetched: `git show origin/main:<path>` and `git grep <pattern> origin/main`, `VISION.md` included. When the orchestrator says the Vision has just changed, read `VISION.md` from the working tree instead
 - **Write every `missing` finding's `proposed` as the line that puts the edge case on the card,** because each one is written into the draft, whatever its level
 - **A draft for another project** is judged against that project's `origin/main` when the orchestrator gives its path (`git -C <path>`), with no check of its "Serves:" line or its Vision trace. When its code is not on this machine, judge only the wording: the two tests, and lines that contradict each other
