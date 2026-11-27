@@ -85,7 +85,46 @@ ROWS = [
     ('git -C {scratch} commit -m a && echo "git commit', "project", REFUSED),
     ("git -C {lnk}/.. commit -m x", "project", REFUSED),
     ("bash -c 'git commit -m x'", "project", ALLOWED),
+    (
+        "git -C {scratch} add -A; git -C {scratch} commit -qm base | cat",
+        "project",
+        ALLOWED,
+    ),
+    (
+        "git -C {scratch} commit -m a && echo $(git -C {scratch} rev-parse HEAD)",
+        "project",
+        ALLOWED,
+    ),
+    (
+        "cat > {scratch}/exp.sh <<'EOF'\ngit -C {scratch} commit -m a\nEOF\n"
+        "bash {scratch}/exp.sh",
+        "project",
+        ALLOWED,
+    ),
+    ("ls && cd {scratch} && git -C {scratch} commit -m x", "project", REFUSED),
+    (
+        'git -C {scratch} commit -m "git commit test" && echo $(pwd)',
+        "project",
+        REFUSED,
+    ),
+    (
+        'git -C {scratch} commit -qm "base; first" | cat; echo $(pwd)',
+        "project",
+        ALLOWED,
+    ),
+    (
+        'git -C "{scratch}" commit -qm "base; first" | cat; echo $(pwd)',
+        "project",
+        REFUSED,
+    ),
 ]
+
+TRAILER = (
+    "You MUST invoke the /commit skill using the Skill tool before committing.\n"
+    "Do not call do_commit.sh directly — follow the multi-pass workflow first.\n"
+    "A commit is only allowed when git shows it lands in a repository outside this project;\n"
+    "one whose folder cannot be worked out is refused.\n"
+)
 
 
 @pytest.fixture(scope="module")
@@ -126,14 +165,12 @@ def folders(tmp_path_factory):
     }
 
 
-@pytest.mark.parametrize("command, shell_folder, expected", ROWS)
-def test_guard_decision(folders, command, shell_folder, expected):
+def run_guard(folders, command, shell_folder):
     payload = {
         "tool_input": {"command": command.format(**folders)},
         "cwd": str(folders[shell_folder]),
     }
-
-    result = subprocess.run(
+    return subprocess.run(
         [
             "bash",
             folders["project"]
@@ -145,7 +182,47 @@ def test_guard_decision(folders, command, shell_folder, expected):
         cwd=folders["project"],
     )
 
+
+@pytest.mark.parametrize("command, shell_folder, expected", ROWS)
+def test_guard_decision(folders, command, shell_folder, expected):
+    result = run_guard(folders, command, shell_folder)
+
     assert result.returncode == expected, result.stderr
+
+
+def test_unplaced_commit_is_shown_the_two_step_way(folders):
+    command = (
+        "mkdir {missing} && cd {missing} && git init -q && git commit -m x"
+    )
+
+    result = run_guard(folders, command, "scratch")
+
+    assert result.returncode == REFUSED
+    assert "could not work out which repository" in result.stderr
+    assert TRAILER in result.stderr
+    assert "Create the repository in an earlier command" in result.stderr
+    assert "git -C <full path> commit" in result.stderr
+    assert "with no quotes round it" in result.stderr
+
+
+@pytest.mark.parametrize(
+    "command, heading",
+    [
+        (
+            "git commit -m x",
+            'BLOCKED: "git commit" into this project (or one of its worktrees) is not allowed.',
+        ),
+        (
+            "GIT_DIR={project}/.git git commit -m x",
+            'BLOCKED: "git commit" with GIT_DIR or GIT_WORK_TREE set is not allowed.',
+        ),
+    ],
+)
+def test_other_refusals_keep_their_wording(folders, command, heading):
+    result = run_guard(folders, command, "project")
+
+    assert result.returncode == REFUSED
+    assert result.stderr == f"{heading}\n\n{TRAILER}"
 
 
 @pytest.mark.parametrize(
