@@ -459,7 +459,9 @@ If a PR already exists, show the URL and skip to step 18.
 
 ### 17. Create PR
 
-Run `gh pr create`:
+First read the card's comments again with `uv run .claude/tools/linear_cli.py comment list <issue-id>`: a card merged since step 1 may have taught this one something. Act on each new **Lesson from** comment, making the change it calls for within the card's own scope, then re-run step 9, `/commit` and push.
+
+Then run `gh pr create`:
 
 - **Title**: use the Linear issue title (keep under 70 chars)
 - **Base branch**: `main`
@@ -502,7 +504,7 @@ Only after the PR is confirmed created or already exists. Skip if the issue is a
 
 ### 19. Review
 
-When this card runs as a `/parallel-sessions` job, as its brief says, stop here whatever `unattended` says: message the coordinator with the pull request's URL, and run `/linear:finish` only when the coordinator tells you to. The coordinator checks each card combined with `main` before it merges.
+When this card runs as a `/parallel-sessions` job, as its brief says, stop here whatever `unattended` says: message the coordinator with the pull request's URL, and run `/linear:finish` only when the coordinator tells you to. The coordinator checks each card combined with `main` before it merges. While you wait, when the coordinator says your card has a new lesson comment, read the card's comments, act on each new **Lesson from** comment as step 17 sets out, then reply.
 
 If unattended mode is active, do not launch diffity or ask for approval. Show
 the commit list and the plain-English handoff below, then run `/linear:finish`

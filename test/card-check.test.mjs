@@ -326,7 +326,7 @@ describe("carrying a merged card's lesson to Todo", () => {
     ok(
       inOrder(finish, [
         "### 11. Update Linear → done",
-        "### 12. Carry the lesson to Todo",
+        "### 12. Carry the lessons to the cards still to come",
         "reference/carry-lessons.md",
         "### 13. Check milestone completion",
       ]),
@@ -339,7 +339,7 @@ describe("carrying a merged card's lesson to Todo", () => {
 
     ok(brief.includes("Old line:"));
     ok(brief.includes("New line:"));
-    ok(brief.includes("no lesson for Todo"));
+    ok(brief.includes("no lesson for cards to come"));
     ok(
       brief.includes(
         "A run through Todo leaves only that card out of its later batches",
@@ -354,7 +354,7 @@ describe("carrying a merged card's lesson to Todo", () => {
     );
     ok(brief.includes("a card with no check record is read from the pull request alone"));
     ok(brief.includes("whose verdict is Fixed or Not acted on, as one rule"));
-    ok(brief.includes('order-todo --project "<project>" --dry-run'));
+    ok(brief.includes('cards-to-come <issue-id> --project "<project>"'));
     ok(
       brief.includes(
         "never adds or removes a card, or moves one between columns",
@@ -378,7 +378,7 @@ describe("carrying a merged card's lesson to Todo", () => {
         "Other comments posted after the question, including stride's own, don't answer it",
       ),
     );
-    ok(focus.includes("Lessons: <cards reworded"));
+    ok(focus.includes("Lessons: <cards commented on"));
   });
 });
 
