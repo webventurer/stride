@@ -374,7 +374,7 @@ It runs before the commit and PR so accepted deletions reach the final review.
 
 Follow [card check](reference/card-check.md): three fresh reviewers, each through its own lens, compare the change with the card once, promise by promise, before the pull request opens.
 
-Keep the verdicts, the fixes, and the tree once the fixes are committed, for the pull request body in step 17.
+Keep the verdicts, the fixes, and the checked change once the fixes are committed, for the pull request body in step 17.
 
 ### 12. Optional working-tree review
 

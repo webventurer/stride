@@ -38,7 +38,7 @@ describe("card check", () => {
 
     ok(
       finish.includes(
-        "Never merge a branch whose current content has no passing card check against the card's current wording",
+        "Never merge a branch whose own change has no passing card check against the card's current wording",
       ),
     );
     ok(
@@ -145,7 +145,7 @@ describe("card check", () => {
     ok(check.includes("| <the card's words> | Not acted on |"));
     ok(
       check.includes(
-        "Same tree, same card, every verdict Kept, Fixed or Not acted on",
+        "It is current on the same tree as `git rev-parse HEAD^{tree}`, the same card and every verdict Kept, Fixed or Not acted on",
       ),
     );
   });
@@ -178,17 +178,27 @@ describe("card check", () => {
   it("re-checks before merge when the branch content or the card changed", () => {
     const check = read(".claude/commands/linear/reference/card-check.md");
 
-    ok(check.includes("Checked tree:"));
+    ok(check.includes("Checked change: `<base>..<tree>`"));
     ok(check.includes("Checked card:"));
+    ok(check.includes("Note it straight after committing the check's fixes"));
     ok(
       check.includes(
-        "Note the tree straight after committing the check's fixes",
+        "$(git merge-base origin/main HEAD)..$(git rev-parse HEAD^{tree})",
       ),
     );
-    ok(check.includes("git rev-parse HEAD^{tree}"));
     ok(
       check.includes(
-        "Different tree or card, every verdict Kept, Fixed or Not acted on",
+        "`no fresh check: the card's own change is as checked`, same card, every verdict Kept, Fixed or Not acted on",
+      ),
+    );
+    ok(
+      check.includes(
+        "Any other line from the script, or a different card, every verdict Kept, Fixed or Not acted on",
+      ),
+    );
+    ok(
+      check.includes(
+        "A record that holds `Checked tree:` instead of `Checked change:`",
       ),
     );
     ok(
@@ -224,11 +234,11 @@ describe("card check", () => {
         "linear_cli.py comment save",
         "git hash-object -w --stdin",
         "## A behaviour-neutral change needs no fresh check",
-        ".claude/tools/late_change.sh <checked-tree> <promised-path>",
+        ".claude/tools/late_change.sh <checked-change> <promised-path>",
         "git cat-file -p <checked-card>",
         "push the late commits",
         "Not checked again:",
-        "Leave `Checked tree:` and `Checked card:` as they are",
+        "Leave `Checked change:` (or `Checked tree:`) and `Checked card:` as they are",
       ]),
     );
     ok(read(`.claude/stride/docs/principles/${principle}`).includes(

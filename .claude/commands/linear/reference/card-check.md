@@ -88,9 +88,10 @@ The pull request body carries the latest verdicts, one row per promise, so a rea
 ```markdown
 ## Card check
 
-Checked tree: `<the tree once the check's fixes are committed>`
+Checked change: `<base>..<tree>`
 Checked card: `<card fingerprint>`
 Check cost: start <s> s (slowest of three), <n> stops, <n> notes · end <s> s (slowest of three), <n> findings: <n> fixed, <n> not acted on
+Not covered: whether the change builds and passes alongside other cards' changes, which is left to the project's build, tests and CI
 
 | Promise | Verdict | Evidence |
 |:--------|:--------|:---------|
@@ -99,7 +100,12 @@ Check cost: start <s> s (slowest of three), <n> stops, <n> notes · end <s> s (s
 | <the card's words> | Not acted on | <what the reviewer found, and why it does not hold> |
 ```
 
-The tree hash names the exact content that was checked and fixed. Squashing or rewording commits keeps it; any change to the content gives a new one. Note the tree straight after committing the check's fixes, never when the record is written: a change made in between must not inherit a pass it never had.
+The checked change names the card's own change by both its ends: `<base>`, the commit where the branch last left `main`, and `<tree>`, the exact content once the check's fixes are committed. Squashing or rewording commits keeps it. Note it straight after committing the check's fixes, never when the record is written: a change made in between must not inherit a pass it never had.
+
+```bash
+git fetch origin main
+echo "$(git merge-base origin/main HEAD)..$(git rev-parse HEAD^{tree})"
+```
 
 The check cost line records what both checks took and what they found, so after a run of real cards the numbers show whether each check is worth its time. Take each time from the reviewer's completion notice; for the end check, the slowest of the three. A finding is counted once, even when several reviewers raised it. `/linear:finish` replaces the end part when it runs the check again.
 
@@ -116,23 +122,32 @@ Moving the card between board columns keeps it; any change to the title or descr
 
 ## Before merge: is the record current?
 
-`/linear:finish` merges only a branch whose current content has a passing check against the card's current wording, or differs from what was checked only by a [behaviour-neutral change](#a-behaviour-neutral-change-needs-no-fresh-check). Read the pull request body and compare its `Checked tree:` value with `git rev-parse HEAD^{tree}`, and its `Checked card:` value with the card fingerprint computed now:
+`/linear:finish` merges only a branch whose own change has a passing check against the card's current wording, or differs from what was checked only by a [behaviour-neutral change](#a-behaviour-neutral-change-needs-no-fresh-check). The card's own change is what differs between the branch and the point it last left `main`, so work that only `main` brought in calls for no new check.
 
-- **Same tree, same card, every verdict Kept, Fixed or Not acted on** — the check is current. Continue to the merge
-- **Different tree or card, every verdict Kept, Fixed or Not acted on** — judge what changed as the next section sets out
+Read the pull request body. Fetch `main` and give the script the record's `Checked change:` value, then compare the record's `Checked card:` value with the card fingerprint computed now:
+
+```bash
+git fetch origin main
+.claude/tools/late_change.sh <checked-change>
+```
+
+- **`no fresh check: the card's own change is as checked`, same card, every verdict Kept, Fixed or Not acted on** — the check is current. Push any commit GitHub doesn't have yet, so what merges is what step 4 of [`/linear:finish`](../finish.md) validated, and continue to the merge
+- **Any other line from the script, or a different card, every verdict Kept, Fixed or Not acted on** — judge what moved as the next section sets out
 - **No `## Card check` section, or any other verdict** — the change never passed the check. Run the check once from step 1, then record the new result
+
+A record that holds `Checked tree:` instead of `Checked change:` names the whole branch's content. It is current on the same tree as `git rev-parse HEAD^{tree}`, the same card and every verdict Kept, Fixed or Not acted on. With a different tree or card and passing verdicts, judge what changed as the next section sets out, giving the script the checked tree.
 
 ## A behaviour-neutral change needs no fresh check
 
 A change made after a passing check that touches no promise on the card and changes no behaviour gives three reviewers nothing to judge, so it merges without them, as [favour speed of implementation over exhaustive testing](../../../stride/docs/principles/favour-speed-of-implementation-over-exhaustive-testing.md) sets out. Anything else gets a fresh check, and so does any doubt. Both parts must pass:
 
-1. **The files.** List the files and folders the card's promises name or depend on, as paths from the repository root. From the branch, give them to the script after the record's checked tree:
+1. **The files.** List the files and folders the card's promises name or depend on, as paths from the repository root. From the branch, give them to the script after the record's checked change, or its checked tree:
 
    ```bash
-   .claude/tools/late_change.sh <checked-tree> <promised-path> ...
+   .claude/tools/late_change.sh <checked-change> <promised-path> ...
    ```
 
-   `fresh check: <reason>` means run the check. `no fresh check: <files>` passes this part only when you are also sure that no promise depends on what those files now say, and that nothing behaves differently because of them.
+   Given a checked change, the script judges only the files where the card's own change differs from what was checked, never files that only `main` changed. `fresh check: <reason>` means run the check; a merge from `main` that clashed with the checked change, or a record it can't read or replay, prints this. `no fresh check: <files>` passes this part only when you are also sure that no promise depends on what those files now say, and that nothing behaves differently because of them.
 2. **The card.** When the card fingerprint differs, read the checked wording with `git cat-file -p <checked-card>` and compare it with the card now. This part passes only when every line asks what it asked before. A promise added, dropped or changed in meaning, or wording git can't read back, means run the check.
 
 When both pass, push the late commits and run [`/linear:finish`](../finish.md) step 4's validation on them; a failure stops the merge. Then add this line under the record's table, replacing any earlier one:
@@ -141,6 +156,6 @@ When both pass, push the late commits and run [`/linear:finish`](../finish.md) s
 Not checked again: <what changed> in <the files, or the card's wording> — it touches no promise on the card and changes no behaviour
 ```
 
-Leave `Checked tree:` and `Checked card:` as they are, so a later run judges every change since the real check. Then continue to the merge.
+Leave `Checked change:` (or `Checked tree:`) and `Checked card:` as they are, so a later run judges every change since the real check. Then continue to the merge.
 
 When either part fails, run the check once from step 1, then record the new result.

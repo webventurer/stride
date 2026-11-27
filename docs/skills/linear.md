@@ -209,7 +209,7 @@ Reviewer feedback takes priority over the original issue — plans evolve throug
 
 ### /linear:finish
 
-**Finish the issue.** Runs build + tests (stops if they fail), re-checks the change against its card if anything changed since the last passing check, [unless only unpromised docs or card wording changed, and neither a promise nor behaviour did](https://github.com/webventurer/stride/blob/main/docs/conventions/check-the-card-at-the-start-and-the-end.md#at-the-end) (stops if a promise is still broken), merges the PR with `--merge` so each atomic commit lands on `main` intact, switches to main, deletes local and remote branches, and marks the issue Done in Linear.
+**Finish the issue.** Runs build + tests (stops if they fail), re-checks the change against its card if the card's own change or wording moved since the last passing check (work pulled in from `main` without a clash doesn't count), [unless only unpromised docs or card wording changed, and neither a promise nor behaviour did](https://github.com/webventurer/stride/blob/main/docs/conventions/check-the-card-at-the-start-and-the-end.md#at-the-end) (stops if a promise is still broken), merges the PR with `--merge` so each atomic commit lands on `main` intact, switches to main, deletes local and remote branches, and marks the issue Done in Linear.
 
 The merge commit carries only the default subject. The branch's own commits explain what was built and why, each reading as if the work was done right the first time — no mention of rejections, fix cycles, or iterations.
 
