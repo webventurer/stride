@@ -43,6 +43,8 @@ The coordinator may send you back to fix what merging your work with the others 
 
 A `claude -p` session ends when its turn ends, and an ended session can't renew or release its slot, so keep your turn open for every wait on the coordinator: the reply to a question, the go to run `/linear:finish`, and the "work is done" message after you've reported, renewing your slot at each interval while you hold one; once step 4 has released it, keep your turn open without it. Never end your turn with a status report while you wait. A card job that has posted its question on the card ends its turn at once: it waits for nothing. Wait in steps of no more than 60 seconds, a wake-up or a short check, renewing your slot when it is due, and never in one long sleep: a session can't read a message while a command is running, so a long sleep holds up the coordinator's go.
 
+**The coordinator says your card is held:** release your slot and end your turn. Don't claim the slot again, even if a renewal then fails, unless the coordinator resumes you.
+
 If you're told to carry on after your session exited, claim a slot first, as step 1 says, and don't carry on until you hold one.
 
 ## Rules

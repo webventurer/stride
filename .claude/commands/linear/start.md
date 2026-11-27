@@ -6,7 +6,7 @@ description: Implement a Linear issue — branch, code, validate, review, open a
 
 Implement, validate, and open a PR in one headless flow.
 
-Accepts a story ID or an epic ID: `/start PG-205`. An epic argument triggers **[epic iteration](reference/epic-iteration.md)** — on `main` its sub-issues in Todo run as a batch the way `/linear:start` with no card runs Todo, and unattended mode runs on batch after batch until none of its cards can start; on any other branch they are worked one at a time, with interactive mode pausing at each PR.
+Accepts a story ID or an epic ID: `/start PG-205`. An epic argument triggers **[epic iteration](reference/epic-iteration.md)** — on `main` its sub-issues in Todo run as a batch the way `/linear:start` with no card runs Todo, and unattended mode starts a new one each time a slot frees, until none of its cards can start; on any other branch they are worked one at a time, with interactive mode pausing at each PR.
 
 Pass `--worktree` to set up the issue in an isolated git worktree and hand off to a new terminal tab in your current VS Code window, instead of working inline — see **[worktree setup](reference/worktree.md#setup)**.
 
@@ -20,10 +20,10 @@ uv run .claude/tools/linear_cli.py start-choice --project "<project>" --branch "
 
 - **`resume`** — the branch name holds a card ID Linear knows, in either case (`wb-945` or `WB-945`): work that card
 - **`ask`** — any other branch but `main`, or a branch whose card ID Linear doesn't know: ask the user which card
-- **`batch`** — on `main`, two or more cards from the top of Todo can run at once: the batch next-steps named. Run them with `/parallel-sessions`, settling its six settings for it: the mission is the cards' own descriptions, the job is `/linear:start <card>`, the items are the batch, how many at once is `parallel-sessions` from `.stride.json`, the mode is one worktree per job, and the model is the skill's suggestion. Interactive mode shows the batch and waits for the user's "go", then stops after the one batch; unattended mode gives the skill its "go" itself, then runs on through Todo as [Todo run](reference/todo-run.md) sets out
+- **`batch`** — on `main`, two or more cards from the top of Todo can run at once: the batch next-steps named. Run them with `/parallel-sessions`, settling its six settings for it: the mission is the cards' own descriptions, the job is `/linear:start <card>`, the items are the batch, how many at once is `parallel-sessions` from `.stride.json`, the mode is one worktree per job, and the model is the skill's suggestion. Interactive mode shows the batch and waits for the user's "go", then stops after the one batch; unattended mode gives the skill its "go" itself, then fills each slot from Todo as it frees, as [Todo run](reference/todo-run.md) sets out
 - **`single`** — on `main`, one card can run: work it as `/linear:start <card>` does. In unattended mode with no card named it runs as a batch of one, as [Todo run](reference/todo-run.md) sets out
-- **`blocked`** — Todo holds cards but none can start: show each card's reason and stop, starting nothing. Ending a [Todo run](reference/todo-run.md), it is the run's final report
-- **`empty`** — Todo is empty: say so and stop. Ending a [Todo run](reference/todo-run.md), it is the run's final report
+- **`blocked`** — Todo holds cards but none can start: show each card's reason and stop, starting nothing. In a [Todo run](reference/todo-run.md) with cards still running, wait instead; once none is running, it ends the run with the final report
+- **`empty`** — Todo is empty: say so and stop. In a [Todo run](reference/todo-run.md) with cards still running, wait instead; once none is running, it ends the run with the final report
 
 A `parallel-sessions` value the setting refuses makes the command print the setting's message instead: show it and stop.
 
