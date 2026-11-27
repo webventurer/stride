@@ -247,6 +247,17 @@ describe("a card job with a question only the user can answer", () => {
     );
   });
 
+  it("has a held job release its slot and stop without claiming it again", () => {
+    ok(
+      inOrder(brief, [
+        "**The coordinator says your card is held:**",
+        "release your slot and end your turn",
+        "Don't claim the slot again",
+        "unless the coordinator resumes you",
+      ]),
+    );
+  });
+
   it("is the one wait on the coordinator that a card job skips", () => {
     ok(
       brief.includes(
@@ -281,6 +292,63 @@ describe("the coordinator's steps for a batch of stride cards", () => {
         "link_stride_install.sh",
         "share_stride_settings.sh",
         "don't run the check",
+      ]),
+    );
+  });
+
+  it("releases a held card's slot at once in an unattended run and resumes it when the hold clears", () => {
+    ok(
+      inOrder(step5, [
+        "**In an unattended run, a held card gives up its slot at once.**",
+        "release its slot and stop",
+        "before any new card starts",
+      ]),
+    );
+    ok(
+      step5.includes(
+        "In an interactive batch, when only held cards remain",
+      ),
+    );
+    ok(!step5.includes(". When only held cards remain"));
+  });
+
+  it("never counts a held card as running until it is resumed", () => {
+    const todoRun = read(".claude/commands/linear/reference/todo-run.md");
+
+    ok(
+      step5.includes(
+        'as does a held card marked "waiting on the user"',
+      ),
+    );
+    ok(step5.includes("Once resumed it counts as running again"));
+    ok(todoRun.includes("as `/parallel-sessions` step 5 resumes an exited job"));
+    ok(todoRun.includes("A held card is not one of these"));
+  });
+
+  it("covers every card still running in a run, with held cards told their lessons", () => {
+    ok(
+      inOrder(step5, [
+        "every card still running in the run, whichever fill started it",
+        "naming every card of the batch",
+        "any card merged since this one started",
+      ]),
+    );
+    ok(step5.includes("held cards included"));
+  });
+
+  it("lets a run start cards after the go turn, each fill with its own launcher", () => {
+    ok(skill.includes("its own batch folder and its own launcher"));
+  });
+
+  it("keeps each job's holder name unique across a run's launchers", () => {
+    ok(skill.includes("holder name is unique across every fill of the run"));
+  });
+
+  it("marks each batch folder with its run, for a replacement coordinator", () => {
+    ok(
+      inOrder(skill, [
+        "Run: <the run's first batch folder>",
+        "reads every batch folder of that run",
       ]),
     );
   });
@@ -366,6 +434,62 @@ describe("an unattended run through Todo", () => {
     ok(skill.includes("put no question to the user mid-run"));
   });
 
+  it("fills the free slots each time a card leaves its slot", () => {
+    ok(
+      inOrder(todoRun, [
+        "## A card leaving its slot starts a fill",
+        "merges, ends Canceled, fails, stops on a question, or is released while held",
+        "without waiting for the rest",
+        "`parallel-sessions` minus the cards still running",
+      ]),
+    );
+    ok(!todoRun.includes("batch after batch"));
+  });
+
+  it("waits for a merged card's lesson result and starts nothing while a merge is in flight", () => {
+    ok(
+      inOrder(todoRun, [
+        "waits for the one-line lesson result",
+        "`/linear:finish` step 12",
+        "session's exit counts as its card leaving",
+        "going to resume",
+        "**No fill starts a card while a merge is in flight.**",
+        "From the go for a card's `/linear:finish` until its lesson result arrives",
+        "the finish stopped without merging",
+      ]),
+    );
+  });
+
+  it("ends only when no card is running and none can start", () => {
+    ok(
+      inOrder(todoRun, [
+        "`blocked` or `empty` while cards still run",
+        "wait for the next card to leave its slot",
+        "only when no card is running and `start-choice` says `blocked` or `empty`",
+      ]),
+    );
+  });
+
+  it("adds each card to the started list as it starts", () => {
+    ok(todoRun.includes("Add each card when it starts"));
+    ok(!todoRun.includes("After each batch, add every card in it"));
+  });
+
+  it("records a held back card as a blocked by link and a decisions line", () => {
+    ok(
+      inOrder(todoRun, [
+        "## Holding a card back",
+        "issue block <card> --by <blocker>",
+        "decisions.md",
+        "`progress.md` that opens with its `Run:` line",
+        "the first fill uses that folder",
+        "ask `start-choice` again",
+        "ends Canceled",
+        "**Waiting**",
+      ]),
+    );
+  });
+
   it("names the failed cards and each lesson in the final report", () => {
     ok(
       inOrder(todoRun, [
@@ -389,7 +513,9 @@ describe("an unattended run through a named epic", () => {
     epicIteration.indexOf("## E1."),
   );
 
-  it("asks stride again after each batch with the epic and every card run", () => {
+  it("asks stride again as each card leaves its slot, with the epic and every card run", () => {
+    ok(!batchOnMain.includes("After each batch's report, the run asks again"));
+    ok(batchOnMain.includes("Each time a card leaves its slot"));
     ok(batchOnMain.includes('--epic "<epic-identifier>"'));
     ok(batchOnMain.includes("--started <card>"));
     ok(batchOnMain.includes("[Todo run](todo-run.md)"));
@@ -491,12 +617,12 @@ describe("the coordinator of a batch of stride cards while it runs", () => {
     ok(rule.includes("the user's request word for word"));
   });
 
-  it("holds from the batch's go to the batch's report, and in a Todo run to the final report", () => {
+  it("holds from the batch's go to the batch's report, and in a run to the final report", () => {
     ok(
       inOrder(rule, [
         'the batch\'s "go" until the batch\'s report',
         "until the run's final report",
-        "between one batch's report and the next batch's \"go\"",
+        "between one fill and the next",
       ]),
     );
   });

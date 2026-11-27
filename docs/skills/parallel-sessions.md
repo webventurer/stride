@@ -11,7 +11,7 @@ Give it several jobs that don't depend on each other, such as three Linear cards
 
 ## Runs through Todo
 
-In unattended mode, `/linear:start` with no card named carries on through Todo, batch after batch, with no "go" between batches. It stops when no card in Todo can start.
+In unattended mode, `/linear:start` with no card named carries on through Todo with no further "go" from you. Each time a card finishes, whether it merged, was cancelled, failed or stopped on a question, the next card that can start takes its place, never more at once than your limit. After a merge, that waits until the card's lessons have reached Todo. A card the coordinator keeps back is marked on the board as blocked by the card it waits for. The run stops when no card is running and none in Todo can start.
 
 Cards that change the same files still run together. Each card is tested combined with `main` as it stands, one card at a time, before it merges, so a clash with another card, or with a commit you pushed meanwhile, is fixed before the merge.
 
