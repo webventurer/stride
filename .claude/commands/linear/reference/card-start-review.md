@@ -36,6 +36,21 @@ Answer one question: **can every promise on this card be checked, should it stil
 
 A line that fails test 2 is a `mechanism` finding when it describes something the change does, such as an edit. It is `uncheckable` when it is true or false whatever the change does, such as a fact about today, an opinion or a guess. [Linear card language](card-language.md#every-promise-can-be-marked-right-or-wrong) gives card writers the same two tests.
 
+## Inside the repo
+
+A card's job, its sub-agents included, works inside the repo it is built in, and is refused when it reaches outside.
+
+**Inside the repo** means what a fresh worktree of the card's branch holds. That is the narrowest place a card can be built, so every card is judged against it, whether or not it is later started with `--worktree`. It holds:
+
+- **What the card's branch tracks,** and files the repo's own tests make when they run, in the system's temporary folder too
+- **What stride links in from the main checkout:** stride's install, `.stride.json`, `.claude/settings.local.json`, the project's `.venv` or `venv` and the `worktree-links` paths, as `.claude/commands/linear/reference/worktree.md` sets out. A Python environment kept outside the worktree, such as Poetry's, Pipenv's or Conda's, is not linked in, and is outside
+
+**Allowed outside the repo,** because it is stride's plumbing rather than the card's work: the shared slot store; stride's scratch files, under `/tmp/<identifier>` for a card and `/tmp/plan-work.XXXXXX/` for a draft; the files an orchestrator hands a reviewer, and the reviewer's own output path; Linear; GitHub; and the tools the repo's own commands run, such as `uv`, `node` and `pnpm`, with the packages they install, such as `uv run --with`.
+
+**Outside the repo and not allowed:** the person's other projects, the files and environments of installed programs, such as anything under `~/.local`, and the person's own files. A file in the main checkout that a fresh worktree doesn't have is outside too: one git ignores and stride doesn't link into the worktree, and one that is untracked or not yet committed.
+
+Judge each check against what that worktree will hold, wherever you run from.
+
 ## Read through your lens
 
 Three reviewers check every card before work starts, and the orchestrator tells each one which lens is theirs. They carry the same names as the end check's lenses in [card check review](card-check-review.md#read-through-your-lens), turned to face a card that isn't built yet. Each lens looks a different way, so together they cover the card three ways rather than one way three times.
@@ -54,6 +69,13 @@ For each promise, look in the current code, commands and skills for the situatio
 
 For each promise, work out what would prove it at the end — a test, a line, or the card's live check — and whether anything stops that proof: another line on the card, such as its "What we won't do" or its live check, what finished sibling cards shipped, or what has changed since the card's description last changed.
 
+Raise an `uncheckable` stop for each of these, judged against what is [inside the repo](#inside-the-repo):
+
+- **A promise whose only proof needs a file from outside the repo.** `proposed` proves it with test files in the repo and moves the run on real files under "Live check" as the person's to run after the merge
+- **A live check the job would run, or any other run the card asks of the job, that needs outside files,** though it makes no promise. `proposed` marks it as the person's to run after the merge
+
+A "Live check" line already marked as the person's to run after the merge is what the rule asks for, so it is no finding.
+
 ## A draft not yet filed
 
 When the orchestrator says the card is a draft not yet filed, read it as above, with these differences:
@@ -61,7 +83,7 @@ When the orchestrator says the card is a draft not yet filed, read it as above, 
 - **It has no card number,** so skip [What changed](#what-you-read) and the lesson comments, and run no Linear command for the card itself
 - **Read the repository as it is on `main`,** which the orchestrator has just fetched: `git show origin/main:<path>` and `git grep <pattern> origin/main`, `VISION.md` included. When the orchestrator says the Vision has just changed, read `VISION.md` from the working tree instead
 - **Write every `missing` finding's `proposed` as the line that puts the edge case on the card,** because each one is written into the draft, whatever its level
-- **A draft for another project** is judged against that project's `origin/main` when the orchestrator gives its path (`git -C <path>`), with no check of its "Serves:" line or its Vision trace. When its code is not on this machine, judge only the wording: the two tests, and lines that contradict each other
+- **A draft for another project** is judged against that project's `origin/main` when the orchestrator gives its path (`git -C <path>`), with no check of its "Serves:" line or its Vision trace. What is [inside the repo](#inside-the-repo) then means inside that project's repo. When its code is not on this machine, judge only the wording: the two tests, and lines that contradict each other
 
 ## A check of changes only
 
@@ -87,7 +109,7 @@ Run these three checks only on a card that opens with "For the reader". A card t
 | Finding | Use it when | `evidence` must name |
 |:--------|:------------|:---------------------|
 | `done` | Every promise that describes a result on `main` is already kept by what is on `main`, through another card or a direct commit | For each promise, the commit, card or file that keeps it. Write at most one `done` line, and none when any such promise is still to do |
-| `uncheckable` | A promise fails test 1 — a vague quality such as "works well" or "is robust", a process line, a risk rating — or fails test 2 while being true or false whatever the change does — an opinion, a guess, a fact about today. Also a claim only a run against a real service could show, such as "the API accepts this filter", that sits outside "Live check" | Which test the line fails, and why. For a claim only a real run can prove, `proposed` moves it under "Live check" |
+| `uncheckable` | A promise fails test 1 — a vague quality such as "works well" or "is robust", a process line, a risk rating — or fails test 2 while being true or false whatever the change does — an opinion, a guess, a fact about today. Also a claim only a run against a real service could show, such as "the API accepts this filter", that sits outside "Live check". Also the two outside-the-repo cases under [Prove it](#prove-it) | Which test the line fails, and why. For a claim only a real run can prove, `proposed` moves it under "Live check". For a file from outside the repo, the file and the line that needs it |
 | `contradictory` | Two promises cannot both hold, or the current repository already makes a promise impossible | Both lines, or the promise and the file and line that rules it out |
 | `missing` | The current repository plainly has an edge case on the card's path that the card does not mention | The file and line where the edge case lives, and the situation that triggers it |
 | `stale` | A promise or the Vision trace no longer fits, given what a finished sibling card shipped, a commit that reached `main` since the card's description last changed, or a comment on an open sibling card since then | The sibling, commit or comment, what it changed, and why the promise no longer fits |
@@ -134,16 +156,18 @@ The level says what `/linear:start` does with the finding:
 
 Ask one question: **if work started on the card as written, would the builder have to guess what done means, or would the end check be unable to give a promise a verdict that means anything?** Yes is `stop`. No is `note`.
 
+Two cases are `stop` whatever the answer, because the job would be refused when it reached [outside the repo](#inside-the-repo): a promise whose only proof needs a file from outside it, and a run the card asks of the job that needs one, such as a live check, even though it makes no promise.
+
 | Finding | Level |
 |:--------|:------|
-| `uncheckable` | Always `stop`: the end check would return `unclear` on it, after the code is written |
+| `uncheckable` | Always `stop`: the end check would return `unclear` on it, after the code is written, or the job would be refused the outside file |
 | `contradictory` | Always `stop`: the builder would have to choose which promise to break |
 | `done` | Always `stop`: the card is cancelled when all three reviewers report it, and is reworded or built as it stands when they don't, so write it only when you are sure |
 | `stale` | `stop` when a promise no longer fits. `note` when only the Vision trace no longer fits, because `/linear:finish` judges the trace again before merge |
 | `missing` | `note`, unless how the edge case is handled decides whether a stated promise is kept; then `stop`, and name that promise in `evidence` |
 | `mechanism` | `note` when the card states elsewhere the result the edit serves, naming that line in `evidence`. `stop` when the edit is the only statement of that result |
 
-<mark>**A note never stops the run.** When you cannot name the promise a finding puts at risk, it is a note.</mark>
+<mark>**A note never stops the run.** When you cannot name the promise a finding puts at risk, it is a note, apart from those two cases.</mark>
 
 ## Output contract
 
@@ -169,7 +193,7 @@ Rules for the file:
 - Do not change the branch, the working tree, the index or the stash list: no `git checkout`, `git switch`, `git stash` or `git reset`, and no other command that changes them, such as `git restore`, `git clean`, `git merge`, `git rebase`, `git cherry-pick`, `git apply` or `git pull`. Read the base version of a file with `git show $(git merge-base main HEAD):<file>` instead
 - Do not propose new scope; a `missing` finding names an edge case on the card's own path, never a feature
 - Do not raise a finding you cannot pin to evidence
-- Do not raise a `stop` you cannot tie to a promise the builder would have to guess at or the end check could not judge
+- Do not raise a `stop` you cannot tie to a promise the builder would have to guess at or the end check could not judge, apart from a run the card asks of the job that needs a file from outside the repo
 
 ## The governing principle
 

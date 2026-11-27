@@ -26,6 +26,7 @@
 | 10 | What we won't do | Where's the boundary? |
 | 11 | Acceptance | How do we know it's fixed? |
 | 12 | Regression test | What would have caught this? |
+| 13 | Live check | What is run by hand, and by whom? |
 
 The reader's half holds the five labelled lines in order. "Today:", "The problem:", "The change:" and "Example:" are one or two sentences each; "Serves:" is whatever length the Vision line is. Outside the "Serves:" quote it names no file and shows no command in backticks, and a stride term it has to use is explained in the same sentence. It promises nothing the builder's half doesn't also promise: "The change:" and "Example:" are the lines that promise, and the start check stops a card whose promise has nothing behind it in the builder's half. Whoever rewords one half rewords the other in the same edit.
 
@@ -161,7 +162,12 @@ bullets — what they see, not what's happening underneath.
 ### Repro
 Numbered steps. Exact commands where applicable. Minimal setup
 — a developer with a clean checkout should be able to follow
-these end-to-end.
+these end-to-end. Reproduce a bug first seen on another project's
+files on made-up files in the repo that show the same fault.
+Where a proof needs files, use test files the repo holds or its
+tests make, never a file from outside the repo. A check that needs
+real files from outside goes under "Live check", marked as the
+person's to run after the merge: name the files and the command.
 
 ```
 1. ...
@@ -191,6 +197,11 @@ Scope exclusions — e.g. "not refactoring the surrounding
 module while we're in there".
 
 ### Acceptance
+Where a proof needs files, use test files the repo holds or its
+tests make, never a file from outside the repo. A check that needs
+real files from outside goes under "Live check", marked as the
+person's to run after the merge: name the files and the command.
+
 - [ ] Failure mode disappears under the repro steps above
 - [ ] Regression test (below) passes
 
@@ -199,6 +210,18 @@ Write the test first — the test that would have caught this
 bug if it had existed. Name the file, describe what it asserts,
 and confirm it fails on the current code and passes after the
 fix.
+Where a proof needs files, use test files the repo holds or its
+tests make, never a file from outside the repo. A check that needs
+real files from outside goes under "Live check", marked as the
+person's to run after the merge: name the files and the command.
+
+### Live check
+(Optional — omit when no run is done by hand)
+Runs done by hand, each with its result posted on the card as a
+comment. A check on real files from outside the repo is marked as
+the person's to run after the merge: name the files and the
+command, and say the person posts the result on the card. The job
+doesn't run it.
 
 TARGET AUDIENCE:
 A developer who will diagnose and fix this bug. They need the

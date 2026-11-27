@@ -54,15 +54,16 @@ If even the system behaviour is invisible (a pure rename, for instance), say wha
 | 7 | What we won't do | Where's the boundary? |
 | 8 | Expected outcome | How do we know it's done? |
 | 9 | How to test it | How do we verify? |
-| 10 | Assumptions to confirm | What's still uncertain? |
+| 10 | Live check | What is run by hand, and by whom? |
+| 11 | Assumptions to confirm | What's still uncertain? |
 
-Sections 7, 9, and 10 are optional — omit them when they don't add value.
+Sections 7, 9, 10 and 11 are optional — omit them when they don't add value. Every check the builder must prove can be proved with what is inside the repo; a check on real files from elsewhere goes under **Live check**, for you to run after the merge.
 
 ### The reader's half
 
 The five lines are one or two sentences each (**Serves:** is as long as the Vision line is), written in plain words for a reader of about 16: no file names and no commands in backticks outside the **Serves:** quote, and any stride term explained in the same sentence. The reader's half promises nothing the builder's half doesn't also promise, and whoever rewords one half rewords the other in the same edit. There is no "Where things stand" section: what happens now goes in **Today:**. A story or bug card already on the board without the reader's half is rewritten into this shape when `/linear:start` starts it, and left as it is until then.
 
-A bug card keeps the same reader's half, and its builder's half holds its symptoms, repro, expected vs actual, suspected causes, what we won't do, acceptance and regression test instead of the four story sections.
+A bug card keeps the same reader's half, and its builder's half holds its symptoms, repro, expected vs actual, suspected causes, what we won't do, acceptance, regression test and live check instead of the story sections.
 
 ### Serves: trace back to Vision
 

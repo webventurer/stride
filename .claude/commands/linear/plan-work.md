@@ -309,6 +309,28 @@ behaviour, edge cases, error conditions.]
 
 Omit the section entirely when tests don't apply.
 
+#### Prove each check inside the repo
+
+A card's job, its sub-agents included, works inside the repo it is built in, so every promise and check the job must prove is one it can prove there:
+
+- **No expected outcome, acceptance line or test scenario needs a file from outside the repo for its proof.** Where a proof needs files, it uses test files the repo holds or its tests make. A proof that needs no files, such as a stated line or a read-only check, stays allowed, and a card that needs no tests still needs none
+- **A bug first seen on real files from another project** is reproduced on made-up files in the repo that show the same fault
+- **A check only real files from outside can show** goes under `### Live check`, marked as the person's to run after the merge: name the files and the command, and say the person posts the result on the card. The job doesn't run it. It goes there because the [end check](reference/card-check-review.md#find-the-promises) reads "Live check" as context, not a promise; written as an expected outcome, its proof would be owed on the card by a job that can't run it
+- **Any other run the card asks of the job** stays inside the repo too
+
+Example: "the export finds 40 slides in the keynote video" is not written as an expected outcome. The card writes "on made-up frames saved in the repo's test folder, the export finds one slide per change of slide", and adds under "Live check": "after the merge, the person runs the export command on the keynote video and posts the slide count on the card".
+
+**Inside the repo** means what a fresh worktree of the card's branch holds. That is the narrowest place a card can be built, so every card is judged against it, whether or not it is later started with `--worktree`. It holds:
+
+- **What the card's branch tracks,** and files the repo's own tests make when they run, in the system's temporary folder too
+- **What stride links in from the main checkout:** stride's install, `.stride.json`, `.claude/settings.local.json`, the project's `.venv` or `venv` and the `worktree-links` paths, as `.claude/commands/linear/reference/worktree.md` sets out. A Python environment kept outside the worktree, such as Poetry's, Pipenv's or Conda's, is not linked in, and is outside
+
+**Allowed outside the repo,** because it is stride's plumbing rather than the card's work: the shared slot store; stride's scratch files, under `/tmp/<identifier>` for a card and `/tmp/plan-work.XXXXXX/` for a draft; the files an orchestrator hands a reviewer, and the reviewer's own output path; Linear; GitHub; and the tools the repo's own commands run, such as `uv`, `node` and `pnpm`, with the packages they install, such as `uv run --with`.
+
+**Outside the repo and not allowed:** the person's other projects, the files and environments of installed programs, such as anything under `~/.local`, and the person's own files. A file in the main checkout that a fresh worktree doesn't have is outside too: one git ignores and stride doesn't link into the worktree, and one that is untracked or not yet committed.
+
+Judge each check against what that worktree will hold, wherever you run from.
+
 ### 10. Draft the issue
 
 Before drafting a card title or description in this step, read [Linear card
