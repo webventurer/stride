@@ -1,23 +1,25 @@
 # Carry lessons
 
-> **What this is**: how [`/linear:finish`](../finish.md) step 12 carries what a merged card's checks found to the cards still in Todo, before the next card starts. It is the "learn, apply, then take the next step" part of the agile loop that [agility](agility.md) describes.
+> **What this is**: how [`/linear:finish`](../finish.md) step 12 carries what a merged card taught to the cards still in Todo, before the next card starts. It is the "learn, apply, then take the next step" part of the agile loop that [agility](agility.md) describes.
 
-<mark>**Every finished card teaches the cards still to come.**</mark> A card's checks find things the next cards need to know: a promise shape that keeps coming back unproven, a rule that clashed with the card, a test only a run can show. Once stride runs Todo by itself, nothing carries that lesson unless this step does.
+<mark>**Every finished card teaches the cards still to come.**</mark> A card learns things the next cards need to know: a promise shape that keeps coming back unproven, a rule that clashed with the card, a library default that behaved differently, a shared piece one card owns, an order two cards must merge in. Once stride runs Todo by itself, nothing carries that lesson unless this step does.
 
-## 1. Read what the merged card's checks found
+## 1. Read what the merged card taught
 
-Read the merged pull request's `## Card check` record, and the card's check records:
+Read the merged pull request's `## Card check` and `## Lessons for later cards` sections, and the card's check records:
 
 ```bash
 gh pr view <number> --json body -q .body
 uv run .claude/tools/linear_cli.py comment list <issue-id>
 ```
 
-A check record is a comment starting `**Card checked**`, posted when the card was filed and when its start check completed, listing that check's stops and notes. A record with nothing below its first line found nothing, and a card with no check record is read from the pull request alone. A pull request with no `## Card check` record, such as one merged through `/linear:quick`, has nothing to read: report "no lesson for Todo" and stop here.
+A check record is a comment starting `**Card checked**`, posted when the card was filed and when its start check completed, listing that check's stops and notes. A record with nothing below its first line found nothing, and a card with no check record is read from the pull request alone. A pull request with neither section, such as one merged through `/linear:quick`, has nothing to read: report "no lesson for Todo" and stop here.
+
+Take the lessons from these records, never from memory of the build.
 
 ## 2. Name each lesson
 
-State each start-check stop or note, and each row of the record whose verdict is Fixed or Not acted on, as one rule about how a promise is worded or tested. For example, a finding that a promise naming two worktree locations was tested for one becomes "a promise naming two situations needs a test for each".
+State each start-check stop or note, and each row of the `## Card check` record whose verdict is Fixed or Not acted on, as one rule about how a promise is worded or tested. For example, a finding that a promise naming two worktree locations was tested for one becomes "a promise naming two situations needs a test for each". Each line of `## Lessons for later cards` is a lesson as it stands.
 
 Then judge each lesson with [moves the needle](moves-the-needle.md). A lesson that has come back, which a comment on a card in Todo or the `## Card check` record of another recently merged pull request shows (read them when a lesson looks familiar), or that would cost a lot even once, goes on to step 3. A one-off that cost little is named in one line in step 4's report, and no card in Todo is reworded for it.
 
@@ -47,4 +49,4 @@ This step only rewords card descriptions and posts comments. It never adds or re
 
 ## 4. Report what happened
 
-End with one line for the summary: the cards reworded and the lesson each carried, the questions posted, the one-off lessons named and left, or "no lesson for Todo" when the merged card's checks changed no Todo card and raised no question.
+End with one line for the summary: the cards reworded and the lesson each carried, the questions posted, the one-off lessons named and left, or "no lesson for Todo" when the merged card's lessons changed no Todo card and raised no question.

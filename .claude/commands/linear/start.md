@@ -479,7 +479,12 @@ Run `gh pr create`:
 
 ## Card check
 <the verdicts from step 11, in the format from reference/card-check.md>
+
+## Lessons for later cards
+<what building this card taught that a later card would otherwise find out for itself, one line each; leave the section out when there is none>
 ```
+
+A lesson for later cards is something such as a library default that behaved differently, a shared piece one card owns, or an order two cards must merge in. [`/linear:finish`](finish.md) step 12 reads this section, not your memory of the build.
 
 Then create the PR with `--body-file`:
 
