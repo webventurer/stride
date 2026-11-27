@@ -475,6 +475,21 @@ describe("an unattended run through Todo", () => {
     ok(!todoRun.includes("After each batch, add every card in it"));
   });
 
+  it("records a held back card as a blocked by link and a decisions line", () => {
+    ok(
+      inOrder(todoRun, [
+        "## Holding a card back",
+        "issue block <card> --by <blocker>",
+        "decisions.md",
+        "`progress.md` that opens with its `Run:` line",
+        "the first fill uses that folder",
+        "ask `start-choice` again",
+        "ends Canceled",
+        "**Waiting**",
+      ]),
+    );
+  });
+
   it("names the failed cards and each lesson in the final report", () => {
     ok(
       inOrder(todoRun, [

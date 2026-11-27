@@ -34,6 +34,16 @@ As each card merges, report one line for it: its lesson result from its `/linear
 
 The reasons the run reports are the ones `start-choice` prints for a card that is out: a blocker that isn't Done, a lesson question with no answer, a card the run already started, or a card that names a file you have changed by hand in the main folder and not yet pushed (`waits for your work on <files> to be pushed`). The last one clears by itself: once none of the card's files has uncommitted or unpushed changes, the next `start-choice` offers the card again. A run with no card running and nothing else to start ends, and the final report lists the card under Waiting with its files named.
 
+## Holding a card back
+
+When the coordinator judges that a card `start-choice` offers should not start yet, such as one that edits files a running card is moving, it records the hold on the board before anything else:
+
+```bash
+uv run .claude/tools/linear_cli.py issue block <card> --by <blocker>
+```
+
+Add one line naming the card, the blocker and why to the `decisions.md` of the run's most recent batch folder. A hold made before the run has a folder makes the first fill's folder then, with a `progress.md` that opens with its `Run:` line, and the first fill uses that folder. Then ask `start-choice` again, so the slot goes to the next card that can start. The link keeps the card out as any other blocker does, so nothing about the hold lives only in the coordinator's memory. Once the blocker is Done, the next fill offers the held card. A blocker that fails or ends Canceled is never Done, so the link stays, the held card stays in Todo and the final report lists it under **Waiting** with `blocked by <blocker>`.
+
 ## A card that is already done
 
 A card that ended in Canceled at its start check had nothing left to build. A card that ended in Canceled leaves the batch, merges nothing and is not a failure, and the other cards carry on. Its job reports that the card is Canceled in place of a pull request's URL.
