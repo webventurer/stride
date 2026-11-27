@@ -309,6 +309,11 @@ def create_attachment(
     return data["data"]["attachmentCreate"]["attachment"]["id"]
 
 
+def archive_issue(issue_uuid: str) -> bool:
+    query = "mutation($id: String!) { issueArchive(id: $id) { success } }"
+    return graphql_data(query, {"id": issue_uuid})["issueArchive"]["success"]
+
+
 # ---- Mutations: projects ----
 
 CREATE_PROJECT_QUERY = """mutation($input: ProjectCreateInput!) {
