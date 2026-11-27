@@ -27,6 +27,7 @@ from card_check_record import (  # noqa: E402
     record_body,
 )
 from card_comments import comments_text  # noqa: E402
+from cards_to_come import cards_to_come, epic_id  # noqa: E402
 from hand_work import files_in_hand, main_folder  # noqa: E402
 from legacy import (  # noqa: E402
     backfill_focus,
@@ -301,6 +302,28 @@ def list_considered_todo_cards(
 
 def waits_for_answer(card: dict) -> bool:
     return waits_on_answer(list_comments(bearer_token(), card["identifier"]))
+
+
+@cli.command("cards-to-come")
+@click.argument("merged")
+@click.option("--project", required=True)
+@click.option(
+    "--batch", multiple=True, help="A card in the merged card's batch"
+)
+def cards_to_come_cmd(merged: str, project: str, batch: tuple[str, ...]):
+    api_key = bearer_token()
+    card = get_issue(api_key, merged)
+    epic = epic_id(card)
+    epic_cards = list_by_parent(epic) if epic else []
+    batch_cards = [get_issue(api_key, name) for name in batch]
+    todo = list_by_project_state(project, "Todo")
+    echo_json(
+        cards_to_come(
+            todo + epic_cards + batch_cards,
+            {c["identifier"] for c in epic_cards},
+            {c["identifier"] for c in batch_cards},
+        )
+    )
 
 
 @cli.command("set-project-view-manual")
