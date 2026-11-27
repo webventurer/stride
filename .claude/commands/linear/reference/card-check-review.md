@@ -129,7 +129,8 @@ Rules for the file:
 ## What you must not do
 
 - Do not read or ask for the author's rationale — judge the card, its comments, the diff and your read-only checks alone
-- Do not search outside the repository: open a path the card or the orchestrator names directly, find any other file with `git ls-files --cached --others --exclude-standard` or `git grep --untracked`, which both include files the change added but hasn't committed, and never start a search from `/` or the home folder. A search of the whole disk runs until the command time limit stops it
+- Do not open a path outside the repository, even when the card names it. You may open: a path inside the repository, including what stride links into the worktree and every uncommitted and untracked file in the checkout you are told to review; the files the orchestrator hands you, such as the card and its comments under `/tmp/<identifier>`, or a draft under `/tmp/plan-work.XXXXXX/`; and your own output path. Don't open, copy or run anything else outside; judge an outside path from the card's own words
+- Do not search outside the repository: find a file you weren't given with `git ls-files --cached --others --exclude-standard` or `git grep --untracked`, which both include files the change added but hasn't committed, and never start a search from `/` or the home folder. A search of the whole disk runs until the command time limit stops it
 - Do not edit, stage or commit anything — you report, the author acts
 - Do not run the project's build or tests
 - Do not run a check that writes or changes files, installs packages, or reaches the network

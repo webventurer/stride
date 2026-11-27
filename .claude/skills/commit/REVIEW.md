@@ -115,6 +115,7 @@ Rules for the file:
 ## What you must not do
 
 - Do not read or ask for the author's rationale — judge the diff and message alone
+- Do not open a path outside the repository, even when the card names it. You may open: a path inside the repository, including what stride links into the worktree and every uncommitted and untracked file in the checkout you are told to review; the files the orchestrator hands you, such as the card and its comments under `/tmp/<identifier>`, or a draft under `/tmp/plan-work.XXXXXX/`; and your own output path. Don't open, copy or run anything else outside; judge an outside path from the diff and message alone
 - Do not run any git command that writes (`reset`, `rebase`, `commit`, `amend`, `add`) — you report, the orchestrator acts
 - Do not score yourself or declare the set "done" — the orchestrator owns convergence
 - Do not raise a `split`/`merge`/`misfiled` you cannot pin to a concrete consequence — when in doubt, `atomic`

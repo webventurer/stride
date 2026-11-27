@@ -23,7 +23,8 @@
 | 7 | What we won't do | Where's the boundary? |
 | 8 | Expected outcome | How do we know it's done? |
 | 9 | How to test it | How do we verify? |
-| 10 | Assumptions to confirm | What's still uncertain? |
+| 10 | Live check | What is run by hand, and by whom? |
+| 11 | Assumptions to confirm | What's still uncertain? |
 
 The reader's half holds the five labelled lines in order. "Today:", "The problem:", "The change:" and "Example:" are one or two sentences each; "Serves:" is whatever length the Vision line is. Outside the "Serves:" quote it names no file and shows no command in backticks, and a stride term it has to use is explained in the same sentence. It promises nothing the builder's half doesn't also promise: "The change:" and "Example:" are the lines that promise, and the start check stops a card whose promise has nothing behind it in the builder's half. Whoever rewords one half rewords the other in the same edit.
 
@@ -178,11 +179,24 @@ when applicable.
 ### How to test it
 (Optional — omit for docs, config, or exploratory work)
 What the finished change must show: the tests that prove the
-expected behaviour, edge cases and error conditions. A run done by
-hand, such as a live test on a throwaway card, goes under "Live
-check" instead; its result is posted on the card as a comment. A
-claim only that run can prove, such as matching the real board,
-belongs under "Live check" too, not in What we'll do.
+expected behaviour, edge cases and error conditions. Prove each
+expected outcome and scenario from inside the repo: where a proof
+needs files, use test files the repo holds or its tests make. A
+check that needs real files from outside goes under "Live check",
+marked as the person's to run after the merge: name the files and
+the command. Any other run done by hand, such as a live test on a
+throwaway card, goes under "Live
+check" instead. A claim only that run can prove, such as matching
+the real board, belongs under "Live check" too, not in What we'll
+do.
+
+### Live check
+(Optional — omit when no run is done by hand)
+Runs done by hand, each with its result posted on the card as a
+comment. A check on real files from outside the repo is marked as
+the person's to run after the merge: name the files and the
+command, and say the person posts the result on the card. The job
+doesn't run it.
 
 ### Assumptions to confirm
 - Bullet list of ambiguities that need resolving
