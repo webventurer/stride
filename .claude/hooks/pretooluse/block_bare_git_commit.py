@@ -58,6 +58,14 @@ OPTIONS_WITH_VALUE = {
 REDIRECTING_OPTIONS = ("--git-dir", "--work-tree")
 SCOPE_MARKERS = re.compile(r"[(){}`|]|(?<!&)&(?!&)")
 SUBSTITUTION = re.compile(r"\$\(|`")
+TWO_STEP_ADVICE = (
+    "\n"
+    "To commit in a throwaway test repository, use two commands:\n"
+    "1. Create the repository in an earlier command.\n"
+    "2. In a later command, commit with git -C <full path> commit. Write the path\n"
+    "   out in full, with no quotes round it and not held in a variable, and use\n"
+    "   no cd in that command.\n"
+)
 
 
 def main():
@@ -309,12 +317,14 @@ def refusal_message(reason):
         "unknown": 'BLOCKED: could not work out which repository this "git commit" lands in.',
         "redirected": 'BLOCKED: "git commit" with GIT_DIR or GIT_WORK_TREE set is not allowed.',
     }[reason]
+    advice = TWO_STEP_ADVICE if reason == "unknown" else ""
     return (
         f"{detail}\n\n"
         "You MUST invoke the /commit skill using the Skill tool before committing.\n"
         "Do not call do_commit.sh directly — follow the multi-pass workflow first.\n"
         "A commit is only allowed when git shows it lands in a repository outside this project;\n"
         "one whose folder cannot be worked out is refused.\n"
+        f"{advice}"
     )
 
 

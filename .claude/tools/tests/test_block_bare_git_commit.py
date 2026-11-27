@@ -190,6 +190,21 @@ def test_guard_decision(folders, command, shell_folder, expected):
     assert result.returncode == expected, result.stderr
 
 
+def test_unplaced_commit_is_shown_the_two_step_way(folders):
+    command = (
+        "mkdir {missing} && cd {missing} && git init -q && git commit -m x"
+    )
+
+    result = run_guard(folders, command, "scratch")
+
+    assert result.returncode == REFUSED
+    assert "could not work out which repository" in result.stderr
+    assert TRAILER in result.stderr
+    assert "Create the repository in an earlier command" in result.stderr
+    assert "git -C <full path> commit" in result.stderr
+    assert "with no quotes round it" in result.stderr
+
+
 @pytest.mark.parametrize(
     "command, heading",
     [
