@@ -32,6 +32,8 @@ The reader's half holds the five labelled lines in order. "Today:", "The problem
 
 <mark>**The bug template drops "What we'll do" and "Assumptions to confirm".**</mark> The deliverable is implicit — *fix the bug* — and committing to a specific fix before diagnosis is done is premature. Each suspected cause is itself an assumption to test, so a separate Assumptions section duplicates the work.
 
+**Aim to keep the description under 6,000 characters.** It is an aim, not a limit: every decision and exclusion in the drafter's brief comes first when the two pull against each other.
+
 ---
 
 Replace `[user's description]` with what the user provided, and

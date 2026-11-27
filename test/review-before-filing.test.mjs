@@ -55,6 +55,11 @@ describe("the review before a card is filed", () => {
     }
   });
 
+  it("lets a reviewer report a long card as a note, never a stop", () => {
+    ok(reviewer.includes("| `long` | Always `note`"));
+    ok(reviewer.includes('| stale | mechanism | long"'));
+  });
+
   it("fixes every stop, writes in edge cases and checks the brief before creating", () => {
     ok(
       inOrder(plan, [

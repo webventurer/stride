@@ -27,7 +27,7 @@ const step3 = start.slice(
 
 describe("a card whose work is already done", () => {
   it("is reported by a reviewer as a `done` finding that names what keeps each promise", () => {
-    ok(brief.includes("## The six kinds of finding"));
+    ok(brief.includes("## The seven kinds of finding"));
     ok(brief.includes("| `done` |"));
     ok(
       brief.includes(
