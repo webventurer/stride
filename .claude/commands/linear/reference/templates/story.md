@@ -28,6 +28,8 @@
 
 The reader's half holds the five labelled lines in order. "Today:", "The problem:", "The change:" and "Example:" are one or two sentences each; "Serves:" is whatever length the Vision line is. Outside the "Serves:" quote it names no file and shows no command in backticks, and a stride term it has to use is explained in the same sentence. It promises nothing the builder's half doesn't also promise: "The change:" and "Example:" are the lines that promise, and the start check stops a card whose promise has nothing behind it in the builder's half. Whoever rewords one half rewords the other in the same edit.
 
+**Aim to keep the description under 6,000 characters.** It is an aim, not a limit: every decision and exclusion in the drafter's brief comes first when the two pull against each other.
+
 ---
 
 Replace `[user's description]` with what the user provided, and

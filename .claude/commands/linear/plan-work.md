@@ -255,7 +255,7 @@ If no signals fire, skip silently and continue to step 7 — feature-shaped is t
 
    In cross-project mode, when the target project's repo is on this machine, fetch there with `git -C <target-repo> fetch origin main`.
 
-4. **Spawn the drafter** with the Task tool (`general-purpose`), one per card:
+4. **Spawn the drafter** with the Task tool (`general-purpose`, model `sonnet`, effort `medium`), one per card:
 
    > Draft one Linear card: <which card the brief asks for>. Your brief is `<run-folder>/brief.md`; it is all you have from the conversation. Read `VISION.md` first, with `git show origin/main:VISION.md`. Then follow steps 8 to 10 of `.claude/commands/linear/plan-work.md`, after the CRAFT run in its step 4 when the brief says CRAFT was chosen. Read the code, tests and documents as they are on `origin/main`, with `git show origin/main:<path>` and `git grep <pattern> origin/main`. Write the title to `<card-folder>/title.txt` and the description to `<card-folder>/description.md`. Write to `<card-folder>/notes.md` what the check of the code corrected, and anything those steps would put to the person: don't ask, and don't create anything in Linear.
 
@@ -397,7 +397,7 @@ Each round has three voices: Claude proposes and synthesises, ChatGPT challenges
 
 Every draft, a story, a bug or an epic's parent, gets the [card start check](reference/card-start-review.md) before it is created, so the card the person first reads holds no unfixed stop.
 
-1. **Spawn three reviewers at once** with the Task tool (`general-purpose`, model `sonnet`, effort `high`), one per lens from the brief's [Read through your lens](reference/card-start-review.md#read-through-your-lens): "Promise by promise", "Try to break it" and "Prove it". Give each only this, with its own output path, and never the brief or the conversation:
+1. **Spawn three reviewers at once** with the Task tool (`general-purpose`, model `sonnet`, effort `medium`), one per lens from the brief's [Read through your lens](reference/card-start-review.md#read-through-your-lens): "Promise by promise", "Try to break it" and "Prove it". Give each only this, with its own output path, and never the brief or the conversation:
 
    > Read `.claude/commands/linear/reference/card-start-review.md` and follow it. Your lens is <Promise by promise | Try to break it | Prove it>. The card is a draft not yet filed: `<title>`. Read its exact description from `<card-folder>/description.md`. Its parent epic is `<epic-identifier>`, UUID `<epic-UUID>`. Write your findings as JSONL to `<output-path>`.
 

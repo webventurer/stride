@@ -141,7 +141,7 @@ describe("card halves", () => {
     );
     const section = brief.slice(
       brief.indexOf("## The reader's half"),
-      brief.indexOf("## The six kinds of finding"),
+      brief.indexOf("## The seven kinds of finding"),
     );
 
     ok(section.includes("A promise the builder's half doesn't make"));

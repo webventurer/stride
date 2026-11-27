@@ -104,7 +104,7 @@ Run these three checks only on a card that opens with "For the reader". A card t
 2. **A "Serves:" line that doesn't match the Vision.** Compare the quote with `VISION.md` character for character. A cross-project card's "Vision anchoring deferred" line is exempt. When the quote matches an earlier wording of the same criterion, `proposed` is the current line.
 3. **A line over two sentences.** A **Today:**, **The problem:**, **The change:** or **Example:** line longer than two sentences. **Serves:** has no limit.
 
-## The six kinds of finding
+## The seven kinds of finding
 
 | Finding | Use it when | `evidence` must name |
 |:--------|:------------|:---------------------|
@@ -114,6 +114,7 @@ Run these three checks only on a card that opens with "For the reader". A card t
 | `missing` | The current repository plainly has an edge case on the card's path that the card does not mention | The file and line where the edge case lives, and the situation that triggers it |
 | `stale` | A promise or the Vision trace no longer fits, given what a finished sibling card shipped, a commit that reached `main` since the card's description last changed, or a comment on an open sibling card since then | The sibling, commit or comment, what it changed, and why the promise no longer fits |
 | `mechanism` | A promise fails test 2 by describing something the change does: it is met by making a particular edit or using a particular mechanism, whether or not the result it serves holds — "move the retry logic into its own file", "add a page from the template", "use a lock" | The promise, and why the edit landing would read as kept even if the result failed |
+| `long` | A story or bug description plainly runs past the 6,000-character aim its [story](templates/story.md) or [bug](templates/bug.md) template sets. Write at most one `long` line | What makes the card long, such as the lines that repeat each other |
 
 Only promises about a result on `main` count towards `done`: a "What we won't do" line, a "How to test it" line and the "Live check" neither count nor stop a `done` finding, because each is true or untestable on `main` before any work. A card with no promise about a result on `main` gets no `done` finding. A card that is only partly done gets no `done` finding either: report each promise that no longer fits as `stale`.
 
@@ -166,6 +167,7 @@ Two cases are `stop` whatever the answer, because the job would be refused when 
 | `stale` | `stop` when a promise no longer fits. `note` when only the Vision trace no longer fits, because `/linear:finish` judges the trace again before merge |
 | `missing` | `note`, unless how the edge case is handled decides whether a stated promise is kept; then `stop`, and name that promise in `evidence` |
 | `mechanism` | `note` when the card states elsewhere the result the edit serves, naming that line in `evidence`. `stop` when the edit is the only statement of that result |
+| `long` | Always `note`: length is an aim, and every decision and exclusion on the card comes before it |
 
 <mark>**A note never stops the run.** When you cannot name the promise a finding puts at risk, it is a note, apart from those two cases.</mark>
 
@@ -174,7 +176,7 @@ Two cases are `stop` whatever the answer, because the job would be refused when 
 Write one JSON object per line (JSONL) to the output path the orchestrator gives you, one line per finding, in the order the card makes the promises:
 
 ```jsonl
-{"finding": "done | uncheckable | contradictory | missing | stale | mechanism", "level": "stop | note", "line": "<the card's words, or the gap>", "evidence": "<what the table above requires>", "proposed": "<new wording, or the line to add or remove>"}
+{"finding": "done | uncheckable | contradictory | missing | stale | mechanism | long", "level": "stop | note", "line": "<the card's words, or the gap>", "evidence": "<what the table above requires>", "proposed": "<new wording, or the line to add or remove>"}
 ```
 
 Rules for the file:

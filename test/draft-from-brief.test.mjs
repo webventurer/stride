@@ -89,3 +89,27 @@ describe("a card drafted from a brief", () => {
     ok(!plan.includes("2–5"));
   });
 });
+
+describe("how fast a card is drafted", () => {
+  it("starts the drafter as Sonnet at medium effort", () => {
+    const spawn = drafting
+      .split("\n")
+      .find((line) => line.includes("**Spawn the drafter**"));
+
+    ok(spawn.includes("model `sonnet`"), spawn);
+    ok(spawn.includes("effort `medium`"), spawn);
+  });
+
+  for (const template of ["story.md", "bug.md"]) {
+    it(`has ${template} aim a description under 6,000 characters`, () => {
+      const text = read(`.claude/commands/linear/reference/templates/${template}`);
+
+      ok(text.includes("Aim to keep the description under 6,000 characters"));
+      ok(
+        text.includes(
+          "every decision and exclusion in the drafter's brief comes first",
+        ),
+      );
+    });
+  }
+});
